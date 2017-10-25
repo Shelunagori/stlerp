@@ -144,9 +144,21 @@ class PurchaseReturnsController extends AppController
         $purchaseReturn = $this->PurchaseReturns->newEntity();
 		$invoice_booking_id=@(int)$this->request->query('invoiceBooking');
 		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
-            'contain' => ['InvoiceBookingRows' => ['Items'],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+            'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
+				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
+										->group(['PurchaseReturnRows.invoice_booking_row_id']);
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
-
+        /* foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
+		{ echo $invoice_booking_row->id;
+		    $PurchaseReturnQuantity = $this->PurchaseReturns->PurchaseReturnRows->find();
+										$PurchaseReturnQuantity->select(['total'=>$PurchaseReturnQuantity->func()->SUM('PurchaseReturnRows.quantity')])
+										->group(['PurchaseReturnRows.invoice_booking_row_id'])
+										->where(['PurchaseReturnRows.invoice_booking_row_id' => $invoice_booking_row->id])
+										->autoFields(true);
+								
+		} */
+		pr($invoiceBooking);exit;
 			   $st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
@@ -234,7 +246,8 @@ class PurchaseReturnsController extends AppController
 				}
 				$total_vat_item=0;
 				$total_amounts_item=0;
-				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
+				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row)
+				{
 					$total_vat=$vat_amounts[$purchase_return_row->item_id]*$purchase_return_row->quantity;
 					$total_vat_item=$total_vat_item+$total_vat;
 					$total_amt=$total_amounts[$purchase_return_row->item_id]*$purchase_return_row->quantity;
@@ -242,19 +255,19 @@ class PurchaseReturnsController extends AppController
 					
 					$query = $this->PurchaseReturns->PurchaseReturnRows->query();
 						$query->update()
-							->set(['vat_per_item'=>$vat_amounts[$purchase_return_row->item_id],])
-							->where(['purchase_return_id' => $purchaseReturn->id,'item_id'=>$purchase_return_row->item_id])
-							->execute();
+							  ->set(['vat_per_item'=>$vat_amounts[$purchase_return_row->item_id],])
+							  ->where(['purchase_return_id' => $purchaseReturn->id,'item_id'=>$purchase_return_row->item_id])
+							  ->execute();
 
 				}
 
-				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
+				/* foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
 						$query = $this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->query();
 						$query->update()
 							->set(['purchase_return_quantity'=>$purchase_return_row->quantity])
 							->where(['invoice_booking_id' => $invoiceBooking->id,'item_id'=>$purchase_return_row->item_id])
 							->execute();
-					}
+					} */
 						
 						$query = $this->PurchaseReturns->InvoiceBookings->query();
 						$query->update()

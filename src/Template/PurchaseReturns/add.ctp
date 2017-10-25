@@ -131,7 +131,8 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
 							<td ><?php echo ++$q; ?></td>
 							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
 							</td>
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_quantity',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->quantity]); ?>
@@ -336,7 +337,8 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(6) input[type="checkbox"]:checked').val();
 			if(val){
 				i++;
-				$(this).find('td:nth-child(2) input').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(2) input.item').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(2) input.hidden').attr("name","purchase_return_rows["+row_no+"][invoice_booking_row_id]").attr("id","purchase_return_rows-"+row_no+"-invoice_booking_row_id");
 				$(this).find('td:nth-child(3) input:eq(0)').attr("name","purchase_return_rows["+row_no+"][ib_ammount]").attr("id","purchase_return_rows-"+row_no+"-ib_ammount").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(3) input:eq(1)').attr("name","purchase_return_rows["+row_no+"][ib_quantity]").attr("id","purchase_return_rows-"+row_no+"-ib_quantity").removeAttr("readonly").rules("add", "required");
 				

@@ -46,6 +46,10 @@ class InvoiceBookingRowsTable extends Table
         ]);
 		$this->belongsTo('InvoiceBookings');
 		
+		$this->hasMany('PurchaseReturnRows', [
+            'foreignKey' => 'invoice_booking_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

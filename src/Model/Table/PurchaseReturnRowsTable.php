@@ -45,6 +45,10 @@ class PurchaseReturnRowsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('InvoiceBookingRows', [
+            'foreignKey' => 'invoice_booking_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
