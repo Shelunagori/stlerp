@@ -958,20 +958,42 @@ class PurchaseReturnsController extends AppController
      */
     public function edit($id = null)
     {
-
+      
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
         $purchaseReturn = $this->PurchaseReturns->newEntity();
-		$invoice_booking_id=@(int)$this->request->query('invoice-booking');
-		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
-            'contain' => ['InvoiceBookingRows' => ['Items'],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+		$purchase_return_id=@(int)$this->request->query('purchase-return');
+		
+		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id);
+		
+		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
+            'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
+				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
+										->group(['PurchaseReturnRows.invoice_booking_row_id'])
+										->autoFields(true);
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
-		//pr($invoiceBooking); exit;
+		/* pr($invoiceBooking); exit; 
+		$maxQty=[];
+		if(!empty($invoiceBooking->invoice_booking_rows))
+		{
+			foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
+			{
+				if(!empty($invoice_booking_row->purchase_return_rows))
+				{
+					foreach($invoice_booking_row->purchase_return_rows as $purchase_return_row)
+					{
+						$maxQty[$purchase_return_row->invoice_booking_row_id]=($invoice_booking_row->quantity-$purchase_return_row->totalQty+$purchase_return_row->quantity);
+					}
+				}
+			}
+		} */
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();
 		
 		$purchase_return_id=$invoiceBooking->purchase_return_id;
+		//echo $purchase_return_id;exit;
 		$ReferenceDetails=$this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id]);
 //pr($purchase_return_id); exit;
 		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, [
