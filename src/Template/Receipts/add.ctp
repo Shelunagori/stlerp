@@ -239,11 +239,8 @@ $(document).ready(function() {
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
-				//$(this).find("td:nth-child(2) input").rules("remove", "required");
 				$(this).find("td:nth-child(2) select").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/'+row_id+'/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+row_id}).rules("add", "required");
 			}
 			
