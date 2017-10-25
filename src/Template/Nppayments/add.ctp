@@ -319,9 +319,9 @@ $(document).ready(function() {
     });
     
     $('.cr_dr').live("change",function() {
-        var sel=$(this);
-        load_ref_section(sel);
-        do_mian_amount_total();
+       // var sel=$(this);
+       // load_ref_section(sel);
+      //  do_mian_amount_total();
     });
     
     function load_ref_section(sel){ 
@@ -418,6 +418,21 @@ $(document).ready(function() {
     $('.ref_amount_textbox').live("keyup",function() {
         do_ref_total();
     });
+	
+		$('.ref_list').live("change",function() {
+		do_ref_total();
+	});
+	$('.ref_amount_textbox').live("keyup",function() {
+		do_ref_total();
+	});
+	
+	$('.cr_dr').live("change",function() { 
+		do_ref_total();
+	});
+	
+	$('.drcrChange').live("change",function() { 
+		do_ref_total();
+	});
     
 function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){

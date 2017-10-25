@@ -336,8 +336,8 @@ class NppaymentsController extends AppController
 							$ReferenceDetail->credit = $ref_rows['ref_amount'];
 							$ReferenceDetail->debit = 0;
 						}
-						$ReferenceDetail->receipt_id = $nppayment->id;
-						$ReferenceDetail->receipt_row_id = $nppayment_row->id;
+						$ReferenceDetail->nppayment_id = $nppayment->id;
+						$ReferenceDetail->nppayment_row_id = $nppayment_row->id;
 						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
 						$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
 					} 
@@ -353,8 +353,8 @@ class NppaymentsController extends AppController
 							$ReferenceDetail->credit = $nppayment_row->on_acc;
 							$ReferenceDetail->debit = 0;
 						}
-						$ReferenceDetail->receipt_id = $nppayment->id;
-						$ReferenceDetail->receipt_row_id = $nppayment_row->id;
+						$ReferenceDetail->nppayment_id = $nppayment->id;
+						$ReferenceDetail->nppayment_row_id = $nppayment_row->id;
 						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
 						if($nppayment_row->on_acc > 0){ 
 							$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
