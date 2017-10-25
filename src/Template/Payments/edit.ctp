@@ -100,7 +100,7 @@ if($transaction_date <  $start_date ) {
 				<tr class="main_tr" old_received_from_id="<?php echo $payment_row->received_from_id; ?>">
 					<td>
 					<?php echo $this->Form->input('payment_row_id', ['class' => 'hidden','value'=>$payment_row->id,'type'=>'hidden']); ?>
-					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$payment_row->received_from_id]); ?>
+					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$payment_row->received_from_id,'style'=>'width:266px;']); ?>
 					<div class="show_grns">
 					<?php if($payment_row->received_from_id=='101' || $payment_row->received_from_id=="165" || $payment_row->received_from_id=='313'){
 							 $option=[];
@@ -173,38 +173,38 @@ if($transaction_date <  $start_date ) {
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($old_ref_rows[$payment_row->received_from_id] as $old_ref_row){ ?>
+							<?php foreach($payment_row->reference_details as $reference_detail){
+								if($reference_detail->reference_type!='On_account'){
+								?>
 								<tr>
-									<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
+									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
 									<td class="ref_no">
-									<?php if($old_ref_row->reference_type=="Against Reference"){
-										//pr($old_ref_row->reference_no);
-										/* echo $this->requestAction('Payments/fetchRefNumbersEdit/?ref_no'.$payment_row->received_from_id.'/'.$payment_row->cr_dr.'/'.$old_ref_row->reference_no.'/'.$old_ref_row->debit.'/'.$old_ref_row->credit); */
-										
-										echo $this->requestAction('/Payments/fetchRefNumbersEdit?received_from_id='.$payment_row->received_from_id.'&cr_dr='.$payment_row->cr_dr.'&reference_no='.$old_ref_row->reference_no.'&debit='.$old_ref_row->debit.'&credit='.$old_ref_row->credit); 
-										
-									}else{ 
-										echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$old_ref_row->reference_no.'" readonly="readonly" is_old="yes">';
-									}?>
+										<?php 
+										if($reference_detail->reference_type=='Against Reference')
+										{
+											echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$payment_row->received_from_id.'&ref_name='.$reference_detail->reference_no);
+										}
+										else
+										{
+											echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$reference_detail->reference_no.'"  is_old="yes">';
+										}
+										?> 
 									</td>
-									<td width="25%">
-									<?php 
-									if($payment_row->cr_dr=="Dr"){
-										echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->debit]);
-										echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->debit]);
+									<td><?php 
+									if(!empty($reference_detail->credit)){
+										$amount=$reference_detail->credit;
+										$dr_cr="Cr";
 									}else{
-										echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->credit]);
-										echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->credit]);
+										$amount=$reference_detail->debit;
+										$dr_cr="Dr";
 									}
-									 ?>
-									</td>
-									<td width="23%">
-									<?php 
-										echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  ref_total','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
-									</td>
-									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button" old_ref="<?php echo $old_ref_row->reference_no; ?>" old_ref_type="<?php echo $old_ref_row->reference_type; ?>"><i class="fa fa-times"></i></a></td>
+									echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$amount]); ?></td>
+									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>$dr_cr]); ?></td>
+									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 								</tr>
-							<?php } ?>
+								<?php }
+							} ?>
+							
 							</tbody>
 							<tfoot>
 								<tr>
@@ -392,6 +392,7 @@ $(document).ready(function() {
 						required: true,
 						
 					});
+			$(this).find("td:eq(0) .row_id").val(i);
 			/*var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length; 
 			if(serial_l > 1)
 			{*/
@@ -426,7 +427,11 @@ $(document).ready(function() {
 			i++;
 		});
 	}
-	
+	var i=0;
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			var sel=$(this);
+			rename_ref_rows(sel,1);
+		});
 	$('.addrow').live("click",function() {
 		add_row();
 	});
@@ -452,49 +457,38 @@ $(document).ready(function() {
 	function rename_ref_rows(sel,received_from_id){
 		var i=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
-			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
+			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
+			$(this).find("td:nth-child(1) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
-				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
+				$(this).find("td:nth-child(2) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Payments','action'=>'checkRefNumberUniqueEdit']); ?>';
-				var is_old=$(this).find("td:nth-child(2) input").attr('is_old');
-				if(!is_old){
-					is_old='no';
-				}
-				url=url+'/'+received_from_id+'/'+i+'/'+is_old;
-				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id}).rules('add', {
-														required: true,
-														noSpace: true,
-														notEqualToGroup: ['.ref_number-'+received_from_id],
-														remote: {
-															url: url,
-														},
-														messages: {
-															remote: "Not an unique."
-														}
-													});
+				var url='<?php echo $this->Url->build(['controller'=>'Payments','action'=>'checkRefNumberUnique']); ?>';
+				url=url+'/'+received_from_id+'/'+i;
+				$(this).find("td:nth-child(2) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
 			}
 			
-			var is_ref_old_amount=$(this).find("td:nth-child(3) input:eq(0)").length;
-			if(is_ref_old_amount){
-				$(this).find("td:nth-child(3) input:eq(0)").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_old_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_old_amount"});
-			}
-			$(this).find("td:nth-child(3) input:eq(1)").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(3) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(4) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
-		var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
-		var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length;
-		if(is_tot_input){
+		
+		/* $(sel).find("table.ref_table tfoot tr:eq(1) td:eq(2) input.on_account").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"});  */
+		
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"payment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		
+		//var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
+		//var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length; 
+		/* if(is_tot_input){
 			$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total["+received_from_id+"]", id:"ref_rows_total-"+received_from_id}).rules('add', {
 														equalTo: "#"+amount_id
 													});
-		}
-		
+		} */
 	}
-	
 	/* $('.deleterefrow').live("click",function() {
 		var sel=$(this);
 		delete_one_ref_no(sel);
@@ -514,6 +508,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
+		$(this).closest('div.select').css("width","266px");
 		load_ref_section(sel);
 	});
 	

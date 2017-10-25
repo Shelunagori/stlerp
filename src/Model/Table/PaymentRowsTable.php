@@ -46,6 +46,9 @@ class PaymentRowsTable extends Table
             'foreignKey' => 'received_from_id',
             'propertyName' => 'ReceivedFrom',
         ]);
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'payment_row_id'
+        ]);
     }
 
     /**

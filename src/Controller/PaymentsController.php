@@ -478,6 +478,10 @@ class PaymentsController extends AppController
 		$financial_month_first = $this->Payments->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Payments->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		
+		 $receipt = $this->Payments->get($id, [
+            'contain' => ['PaymentRows'=>['ReferenceDetails']]
+        ]);
+		
 		   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
 		   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
@@ -502,7 +506,7 @@ class PaymentsController extends AppController
 
 		
         $payment = $this->Payments->get($id, [
-            'contain' => ['PaymentRows']
+            'contain' => ['PaymentRows'=>['ReferenceDetails']]
         ]);
 		$old_ref_rows=[];
 		$old_received_from_ids=[];
