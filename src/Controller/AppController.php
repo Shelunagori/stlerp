@@ -144,6 +144,32 @@ class AppController extends Controller
 			$this->coreVariable = $coreVariable;
 			$this->set(compact('coreVariable'));
 	  }
+	  
+	  public function listRefArray($ledger_id=null)
+		{
+			$this->loadModel('ReferenceDetails');
+			$query = $this->ReferenceDetails->find();
+			$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
+			->where(['ReferenceDetails.ledger_account_id'=>$ledger_id,'ReferenceDetails.reference_type !='=>'On_account'])
+			->group(['ReferenceDetails.reference_no'])
+			->autoFields(true);
+			$referenceDetails=$query;
+			$option=[];
+			foreach($referenceDetails as $referenceDetail){
+				$remider=$referenceDetail->total_debit-$referenceDetail->total_credit;
+				if($remider>0){
+					$bal=abs($remider).' Dr';
+				}else if($remider<0){
+					$bal=abs($remider).' Cr';
+				}
+				if($referenceDetail->total_debit!=$referenceDetail->total_credit){
+					$option[]=['text' =>$referenceDetail->reference_no.' ('.$bal.')', 'value' => $referenceDetail->reference_no, 'amt' => abs($remider)];
+				}
+			}
+			return $option;
+			
+		  
+		}
 
     /**
      * Before render callback.

@@ -150,4 +150,35 @@ class ReferenceDetailsController extends AppController
         $this->set(compact('option'));
         $this->set('_serialize', ['referenceDetails']);
     }
+	
+	public function listRefEdit()
+    {
+		$ledger_id=$this->request->query('ledger_account_id');
+		$ref_name=$this->request->query('ref_name');
+		$this->viewBuilder()->layout('');
+        $query = $this->ReferenceDetails->find();
+		$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
+		->where(['ReferenceDetails.ledger_account_id'=>$ledger_id,'ReferenceDetails.reference_type !='=>'On_account'])
+		->group(['ReferenceDetails.reference_no'])
+		->autoFields(true);
+		$referenceDetails=$query;
+		$option=[];
+		foreach($referenceDetails as $referenceDetail){
+			$remider=$referenceDetail->total_debit-$referenceDetail->total_credit;
+			if($remider>0){
+				$bal=abs($remider).' Dr';
+			}else if($remider<0){
+				$bal=abs($remider).' Cr';
+			}
+			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
+				$option[]=['text' =>$referenceDetail->reference_no.' ('.$bal.')', 'value' => $referenceDetail->reference_no, 'amt' => abs($remider)];
+			}
+		}
+		//pr($option); exit;
+		
+        $this->set(compact('option', 'ref_name'));
+        $this->set('_serialize', ['referenceDetails']);
+    }
+	
+	
 }
