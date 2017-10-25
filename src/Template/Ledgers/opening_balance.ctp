@@ -30,25 +30,51 @@
 							<label class="control-label">Date</label>
 							<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm ','data-date-format' => 'dd-mm-yyyy','value' =>date("d-m-Y",strtotime($financial_year->date_from)),'readonly']); ?>
 						</div>
-					</div>
+				</div>
+				<div class="col-md-1">
+						<div class="form-group">
+							<label class="control-label">Dr/Cr</label>
+							<?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm   refDrCr','value'=>'Dr']); ?>
+						</div>
+				</div>
+				
+				<div class="col-md-3">
+					<div class="form-group">
+						<label class="col-md-6 control-label">Amount</label>
+						<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm amount','placeholder'=>'Amount']); ?>
+						</div>
+				</div>
 				
 				
 			<?= $this->Form->hidden('voucher_source',['value'=>'Opening Balance']) ?>
 			</div>
-	<table class="table table-bordered" id="main_table">
+	<table class="table table-bordered" id="main_table" style="width:83%">
+	<thead>
 	<tr>
-	<td>Ref. No.</td>
-	<td>Credit</td>
-	<td>Debit</td>
-	<td></td>
+	<th>Ref. No.</th>
+	<th>Amount</th>
+	<th>Dr/Cr</th>
+	<th></th>
 	</tr>
-	<tr>
-	<td><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'distinctreference','label'=>false,'id'=>'reference_no_1']) ?></td>
-	<td><?= $this->Form->input('credit[]',['type'=>'text','class'=>'','label'=>false, 'value'=>0]) ?></td>
-	<td><?= $this->Form->input('debit[]',['type'=>'text','class'=>'','label'=>false, 'value'=>0]) ?></td>
-	<td><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row','label'=>false]) ?></td>
-	</tr>
+	</thead>
+	<tbody id="main_tbody">
+		<tr id="main_tr">
+			<td width="28%"><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'distinctreference','label'=>false,'id'=>'reference_no_1']) ?></td>
+			<td width="35%"><?= $this->Form->input('amount[]',['type'=>'text','class'=>'credit','label'=>false, 'value'=>0]) ?></td>
+			<td width="15%"><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+			<td width="15%"><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row','label'=>false]) ?></td>
+		</tr>
+	</tbody>
 	</table>
+	
+	<div class="row">
+			<div class="col-md-3">
+			</div>
+			<div class="col-md-2">
+			<input type="text" class="form-control input-sm rightAligntextClass noBorder " name="totalMainDr" id="totalMainDr" readonly>
+			</div>
+	</div>
+	
 	<button class="btn btn-sm btn-primary" name="submit" value="save" type="submit">Submit</button>
 	</div>
     
@@ -58,80 +84,20 @@
 </div>
 </div>
 <table class="table table-bordered" id="temp_table" style="display:none;">
-	<tr>
+<tbody id="temp_tbody">
+	<tr id="main_tr">
 	<td><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'distinctreference','label'=>false,'id'=>'reference_no_2']) ?></td>
-	<td><?= $this->Form->input('credit[]',['type'=>'text','class'=>'credit','label'=>false, 'value'=>0]) ?></td>
-	<td><?= $this->Form->input('debit[]',['type'=>'text','class'=>'debit','label'=>false, 'value'=>0]) ?></td>
-	<td><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row','label'=>false]) ?><?= $this->Form->button(__('<i class="fa fa-minus"></i>'),['type'=>'button','class'=>'remove_row','label'=>false]) ?></td>
+	<td><?= $this->Form->input('amount[]',['type'=>'text','class'=>'credit','label'=>false, 'value'=>0]) ?></td>
+	<td><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+	<td><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row add_row1','label'=>false]) ?><?= $this->Form->button(__('<i class="fa fa-minus"></i>'),['type'=>'button','class'=>'remove_row','label'=>false]) ?></td>
 	</tr>
+</tbody>
 	</table>
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
-	
-	$( document ).on( 'click', '.add_row', function() {
-		var new_line=$('#temp_table').html();
-		$("#main_table").append(new_line);
-		var i=1;
-		var len=$("[name^=reference_no]").length;
-		
-		$("[name^=reference_no]").each(function () {
-			
-			$(this).attr('id','reference_no_'+i);
-			
-			$(this).rules("add", {
-				required: true,
-				noSpace: true,
-				notEqualToGroup: ['.distinctreference']
-			});
-			i++;
-		});
-	});
-	$( document ).on( 'click', '.remove_row', function() {
-		$(this).closest("#main_table tr").remove();
-		var i=1;
-		
-		$("[name^=reference_no]").each(function () {
-			
-			$(this).attr('id','reference_no_'+i);
-			i++;
-			$(this).rules("add", {
-				required: true,
-			});
-		});
-	});
 
-	
-	////////////////  Validation  ////////////////////////
-	
-	jQuery.validator.addMethod("noSpace", function(value, element) { 
-	  return value.indexOf(" ") < 0 && value != ""; 
-	}, "No space please and don't leave it empty");
-	
-	jQuery.validator.addMethod("notEqualToGroup", function (value, element, options) {
-    // get all the elements passed here with the same class
-    var elems = $(element).parents('form').find(options[0]);
-    // the value of the current element
-    var valueToCompare = value;
-    // count
-    var matchesFound = 0;
-    // loop each element and compare its value with the current value
-    // and increase the count every time we find one
-    jQuery.each(elems, function () {
-        thisVal = $(this).val();
-        if (thisVal == valueToCompare) {
-            matchesFound++;
-        }
-    });
-    // count should be either 0 or 1 max
-    if (this.optional(element) || matchesFound <= 1) {
-        //elems.removeClass('error');
-        return true;
-    } else {
-        //elems.addClass('error');
-    }
-}, jQuery.format("Please enter a Unique Value."));
 
 	//--------- FORM VALIDATION
 	var form3 = $('#opening_balance');
@@ -148,20 +114,9 @@ $(document).ready(function() {
 				transaction_date:{
 					required: true,
 				},
-				'reference_no[]':{
+				amount:{
 					required: true,
-					noSpace: true,
-					notEqualToGroup: ['.distinctreference'],
-					remote : {
-                    url: '<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'check_reference_no']); ?>',
-                    type: "get",
-                    data:
-                        {
-                            ledger_account_id: function(){return $('select[name=ledger_account_id] option:selected').val();}
-                        },
-					},
-
-				}
+				},
 			},
 
 		messages: { // custom messages for radio buttons and checkboxes
@@ -212,6 +167,12 @@ $(document).ready(function() {
 		},
 
 		submitHandler: function (form) {
+			
+			var total_amt=$('.amount').val();
+			var totalMainDr=$('#totalMainDr').val();
+			alert(totalMainDr)
+			alert(total_amt)
+			
 			success3.show();
 			error3.hide();
 			form[0].submit(); // submit the form
@@ -220,6 +181,65 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
+		
+	
+	$('.add_row').live("click",function() { 
+		var new_line=$('#temp_table tbody#temp_tbody').html(); 
+		$("#main_table tbody#main_tbody").append(new_line);
+		var i=1;
+		rename_rows();
+	});
+	
+	$('.credit').live("keyup",function() {
+		rename_rows();
+	});
+	
+	$('.drcrChange').live("change",function() { 
+		rename_rows();
+	});
+	
+	
+	function rename_rows(){
+		var total_dr=0;
+		var total_cr=0;
+		var type=$('.refDrCr').val();
+		
+		
+		$("#main_table tbody#main_tbody tr").each(function(){
+			var dr_cr=$(this).find("td:nth-child(3) select").val();
+			if(dr_cr=="Cr"){
+				var amt=parseFloat($(this).find("td:nth-child(2) input").val());
+				total_cr=total_cr+amt;
+			}else{
+				var amt=parseFloat($(this).find("td:nth-child(2) input").val());
+				total_dr=total_dr+amt;
+			}
+		});
+		
+		if(total_dr > total_cr){
+			var total_amt=$('.amount').val();
+			var refamt=total_dr-total_cr;
+			$('#totalMainDr').val(refamt.toFixed(2));
+		}else if(total_dr < total_cr){
+			var total_amt=$('.amount').val();
+			var refamt=total_cr-total_dr;
+			$('#totalMainDr').val(refamt.toFixed(2));
+		}
+		else{
+			$('#totalMainDr').val(0);
+		}
+		
+		
+	}
+	
+	$('.remove_row').live("click",function() {
+		$(this).closest("#main_table tr").remove();
+		var i=1;
+		
+	});
+
+	
+
 	
 	
 });	
