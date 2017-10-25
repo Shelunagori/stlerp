@@ -127,7 +127,9 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 				</thead>
 				<tbody>
 					<?php
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
+					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
+						if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+					?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
 							<td ><?php echo ++$q; ?></td>
 							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
@@ -144,7 +146,7 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 								<label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->item->id]); ?></label>
 							</td>
 						</tr>
-					<?php   endforeach; ?>
+						<?php  } endforeach; ?>
 				</tbody>
 			</table>
 			</div>

@@ -143,22 +143,26 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
         $purchaseReturn = $this->PurchaseReturns->newEntity();
 		$invoice_booking_id=@(int)$this->request->query('invoiceBooking');
+		
 		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
             'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
-										->group(['PurchaseReturnRows.invoice_booking_row_id']);
+										->group(['PurchaseReturnRows.invoice_booking_row_id'])
+										->autoFields(true);
 			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
-        /* foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
-		{ echo $invoice_booking_row->id;
-		    $PurchaseReturnQuantity = $this->PurchaseReturns->PurchaseReturnRows->find();
-										$PurchaseReturnQuantity->select(['total'=>$PurchaseReturnQuantity->func()->SUM('PurchaseReturnRows.quantity')])
-										->group(['PurchaseReturnRows.invoice_booking_row_id'])
-										->where(['PurchaseReturnRows.invoice_booking_row_id' => $invoice_booking_row->id])
-										->autoFields(true);
-								
-		} */
-		pr($invoiceBooking);exit;
+		$PurchaseReturnQty=[];
+        foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
+		{ 
+			if(!empty($invoice_booking_row->purchase_return_rows))
+			{
+				foreach($invoice_booking_row->purchase_return_rows as $purchase_return_row)
+				{
+					$PurchaseReturnQty[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->totalQty;
+				}
+			}				
+		}
+		//pr($PurchaseReturnQty);exit;
 			   $st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
@@ -388,7 +392,7 @@ class PurchaseReturnsController extends AppController
 		$Em = new FinancialYearsController;
 	    $financial_year_data = $Em->checkFinancialYear($invoiceBooking->created_on);
         $companies = $this->PurchaseReturns->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last'));
+        $this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','PurchaseReturnQty'));
         $this->set('_serialize', ['purchaseReturn']);
     }
 
