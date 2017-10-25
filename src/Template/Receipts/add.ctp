@@ -440,7 +440,7 @@ $(document).ready(function() {
 					
 				}
 				
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 			}
 		});
 	}
@@ -535,7 +535,7 @@ $(document).ready(function() {
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td colspan="2"><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+				<td colspan="2"></td>
 				
 			</tr>
 		</tfoot>
