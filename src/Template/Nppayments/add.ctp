@@ -295,8 +295,6 @@ $(document).ready(function() {
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").attr({name:"nppayment_rows["+row_id+"][on_acc_dr_cr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		///var a=$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val();
-		
-		
 	}
     
     /* $('.deleterefrow').live("click",function() {
