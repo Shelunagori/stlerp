@@ -250,6 +250,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(3) input").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+row_id+"-"+i+"-ref_amount"}).rules("add", "required");
 			
 			$(this).find("td:nth-child(4) select").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+			
 			i++;
 		});
 		
