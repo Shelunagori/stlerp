@@ -330,7 +330,8 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
-		load_ref_section(sel);
+		$(this).closest('div.select').css("width","260px");
+		load_ref_section(sel);1
 	});
 	
 	$('.cr_dr').live("change",function() {
@@ -460,7 +461,7 @@ $(document).ready(function() {
 			});
 			var on_acc=0;
 			var total_ref=0;
-			
+			var on_acc_cr_dr='';
 			if(main_cr_dr=='Dr')
 			{
 				
@@ -468,15 +469,18 @@ $(document).ready(function() {
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Dr';
 				}
 				else if(total_ref_dr < total_ref_cr)
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Cr';
 				}
 				else
 				{
 					on_acc=main_amount;
+					on_acc_cr_dr='Dr';
 				}
 			}
 			else
@@ -485,16 +489,19 @@ $(document).ready(function() {
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Cr';
 					
 				}
 				else if(total_ref_dr > total_ref_cr)
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Dr';
 				}
 				else
 				{
 					on_acc=main_amount;
+					on_acc_cr_dr='Cr';
 				}
 			}
 			on_acc=Math.abs(on_acc);
@@ -504,7 +511,8 @@ $(document).ready(function() {
 			}else{
 				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
 			}
-			$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+			$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
 		});
 	}
 	
@@ -580,9 +588,9 @@ $(document).ready(function() {
 		<thead>
 			<tr>
 				<th width="25%">Ref Type</th>
-				<th width="40%">Ref No.</th>
+				<th width="25%">Ref No.</th>
 				<th width="30%">Amount</th>
-				<th width="5%"></th>
+				<th width="20%"></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -599,11 +607,11 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td></td>
+				<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+				<td></td>
 				<td></td>
 			</tr>
 		</tfoot>
