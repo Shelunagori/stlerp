@@ -98,7 +98,9 @@ if($transaction_date <  $start_date ) {
 			<tbody id="main_tbody">
 			<?php  foreach($payment->payment_rows as $payment_row){ ?> 
 				<tr class="main_tr" old_received_from_id="<?php echo $payment_row->received_from_id; ?>">
-					<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$payment_row->received_from_id]); ?>
+					<td>
+					<?php echo $this->Form->input('payment_row_id', ['class' => 'hidden','value'=>$payment_row->id,'type'=>'hidden']); ?>
+					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$payment_row->received_from_id]); ?>
 					<div class="show_grns">
 					<?php if($payment_row->received_from_id=='101' || $payment_row->received_from_id=="165" || $payment_row->received_from_id=='313'){
 							 $option=[];
@@ -164,16 +166,16 @@ if($transaction_date <  $start_date ) {
 						<table width="100%" class="ref_table">
 							<thead>
 								<tr>
-									<th width="25%">Ref Type</th>
-									<th width="40%">Ref No.</th>
-									<th width="30%">Amount</th>
-									<th width="5%"></th>
+									<th>Ref Type</th>
+									<th>Ref No.</th>
+									<th>Amount</th>
+									<th></th>
 								</tr>
 							</thead>
 							<tbody>
 							<?php foreach($old_ref_rows[$payment_row->received_from_id] as $old_ref_row){ ?>
 								<tr>
-									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
+									<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
 									<td class="ref_no">
 									<?php if($old_ref_row->reference_type=="Against Reference"){
 										//pr($old_ref_row->reference_no);
@@ -185,7 +187,7 @@ if($transaction_date <  $start_date ) {
 										echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$old_ref_row->reference_no.'" readonly="readonly" is_old="yes">';
 									}?>
 									</td>
-									<td>
+									<td width="25%">
 									<?php 
 									if($payment_row->cr_dr=="Dr"){
 										echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->debit]);
@@ -196,6 +198,10 @@ if($transaction_date <  $start_date ) {
 									}
 									 ?>
 									</td>
+									<td width="23%">
+									<?php 
+										echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  ref_total','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+									</td>
 									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button" old_ref="<?php echo $old_ref_row->reference_no; ?>" old_ref_type="<?php echo $old_ref_row->reference_type; ?>"><i class="fa fa-times"></i></a></td>
 								</tr>
 							<?php } ?>
@@ -205,11 +211,13 @@ if($transaction_date <  $start_date ) {
 									<td align="center" style="vertical-align: middle !important;">On Account</td>
 									<td></td>
 									<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-									<td></td>
+									<td>
+									<?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?>
+									</td>
 								</tr>
 								<tr>
 									<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-									<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+									<td></td>
 									<td></td>
 								</tr>
 							</tfoot>
@@ -378,6 +386,8 @@ $(document).ready(function() {
 	function rename_rows(){ 
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			
+			$(this).find("td:eq(0) input.hidden").attr({name:"payment_rows["+i+"][id]", id:"quotation_rows-"+i+"-id"});
 			$(this).find("td:eq(0) select.received_from").select2().attr({name:"payment_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true,
 						
@@ -610,7 +620,9 @@ $(document).ready(function() {
 		do_ref_total();
 		delete_one_ref_no(sel);
 	});
-	
+	$('.ref_total').live("change",function() {
+		do_ref_total();
+	});
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
@@ -618,7 +630,7 @@ $(document).ready(function() {
 	do_ref_total();
 	function do_ref_total(){
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			var main_amount=$(this).find('td:nth-child(2) input').val();
+			/* var main_amount=$(this).find('td:nth-child(2) input').val();
 			
 			var total_ref=0;
 			$(this).find("table.ref_table tbody tr").each(function(){
@@ -634,7 +646,106 @@ $(document).ready(function() {
 			}else{
 				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
 			}
-			$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+			$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2)); */
+			var main_amount=$(this).find('td:nth-child(2) input').val();
+			var main_cr_dr=$(this).find('td:nth-child(2) select.cr_dr option:selected').val(); 
+			var total_ref=0;
+			var ref_cr_amt=0;
+			var ref_dr_amt=0;
+			
+			$(this).find("table.ref_table tbody tr").each(function(){
+			    var cr_dr=$(this).find('td:nth-child(4) select option:selected').val();
+				var am=parseFloat($(this).find('td:nth-child(3) input').val());
+				 if(!am){ am=0; }
+				if(cr_dr=='Cr')
+				{
+					ref_cr_amt = ref_cr_amt+am;
+				}
+				else{
+					ref_dr_amt = ref_dr_amt+am;
+				}
+				
+			   
+				//total_ref=total_ref+am;
+			});
+			
+			if(ref_cr_amt>ref_dr_amt)
+			{
+				var reference_cr_amount=ref_cr_amt-ref_dr_amt;
+			}
+			else if(ref_cr_amt<ref_dr_amt)
+			{
+				var reference_dr_amount=ref_dr_amt-ref_cr_amt;
+			}
+			if(main_cr_dr=="Cr")
+			{
+				var main_cr_amt = main_amount;
+				if(reference_cr_amount)
+				{
+					if(main_cr_amt>reference_cr_amount)
+					{
+						var on_acc = main_cr_amt-reference_cr_amount;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+					}
+					else if(main_cr_amt<reference_cr_amount)
+					{
+						var on_acc = reference_cr_amount-main_cr_amt;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+					}
+				}
+				else
+				{
+					if(main_cr_amt>reference_dr_amount)
+					{
+						var on_acc = main_cr_amt-reference_dr_amount;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+					}
+					else if(main_cr_amt<reference_dr_amount)
+					{
+						var on_acc = reference_dr_amount-main_cr_amt;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
+					}
+					
+				}
+			}
+			else
+			{
+				var main_dr_amt = main_amount; 
+				if(reference_cr_amount)
+				{
+					if(main_dr_amt>reference_cr_amount)
+					{
+						var on_acc = main_dr_amt-reference_cr_amount;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
+					}
+					else if(main_dr_amt<reference_cr_amount)
+					{
+						var on_acc = reference_cr_amount-main_dr_amt;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+					}
+				}
+				else
+				{
+					if(main_dr_amt>reference_dr_amount)
+					{
+						var on_acc = main_dr_amt-reference_dr_amount;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
+					}
+					else if(main_dr_amt<reference_dr_amount)
+					{
+						var on_acc = reference_dr_amount-main_dr_amt;
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
+					}
+				}
+			}
 		});
 	}
 	
@@ -756,20 +867,21 @@ $(document).ready(function() {
 	<table width="100%" class="ref_table">
 		<thead>
 			<tr>
-				<th width="25%">Ref Type</th>
-				<th width="40%">Ref No.</th>
-				<th width="30%">Amount</th>
-				<th width="5%"></th>
+				<th>Ref Type</th>
+				<th>Ref No.</th>
+				<th>Amount</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+				<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
-				<td>
-				<?php echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden']); ?>
-				<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?>
-				</td>
+				<td width="25%"><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php 
+				echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  ref_total','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+			    </td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>
@@ -778,11 +890,11 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td></td>
+				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+				<td></td>
 				<td></td>
 			</tr>
 		</tfoot>
