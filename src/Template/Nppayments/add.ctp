@@ -83,10 +83,10 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
         <div style="overflow: auto;">
         <table width="100%" id="main_table">
             <thead>
-                <th width="25%"><label class="control-label">Received From</label></th>
+                <th width="20%"><label class="control-label">Received From</label></th>
 				<th width="20%"><label class="control-label">Amount</label></th>
-				<th></th>
-                <th width="10%"><label class="control-label">Narration</label></th>
+				<th width="50%"></th>
+                <th width="7%"><label class="control-label">Narration</label></th>
                 <th width="3%"></th>
             </thead>
             <tbody id="main_tbody">
@@ -314,13 +314,14 @@ $(document).ready(function() {
     
     $('.received_from').live("change",function() {
         var sel=$(this); 
+		$(this).closest('div.select').css("width","235px");
         load_ref_section(sel);
     });
     
     $('.cr_dr').live("change",function() {
-        var sel=$(this);
-        load_ref_section(sel);
-        do_mian_amount_total();
+       // var sel=$(this);
+       // load_ref_section(sel);
+      //  do_mian_amount_total();
     });
     
     function load_ref_section(sel){ 
@@ -390,8 +391,8 @@ $(document).ready(function() {
         var ref_type=$(this).find('option:selected').val();
         var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
         if(ref_type=="Against Reference"){
-            var url="<?php echo $this->Url->build(['controller'=>'nppayments','action'=>'fetchRefNumbers']); ?>";
-            url=url+'/'+received_from_id+'/'+cr_dr,
+            var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
+			url=url+'/'+received_from_id,
             $.ajax({
                 url: url,
                 type: 'GET',
@@ -409,14 +410,29 @@ $(document).ready(function() {
     
     $('.ref_list').live("change",function() {
         var current_obj=$(this);
-        var due_amount=$(this).find('option:selected').attr('due_amount');
-        $(this).closest('tr').find('td:eq(2) input').val(due_amount);
+        var due_amount=$(this).find('option:selected').attr('amt');
+		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
         do_ref_total();
     });
     
     $('.ref_amount_textbox').live("keyup",function() {
         do_ref_total();
     });
+	
+		$('.ref_list').live("change",function() {
+		do_ref_total();
+	});
+	$('.ref_amount_textbox').live("keyup",function() {
+		do_ref_total();
+	});
+	
+	$('.cr_dr').live("change",function() { 
+		do_ref_total();
+	});
+	
+	$('.drcrChange').live("change",function() { 
+		do_ref_total();
+	});
     
 function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -606,7 +622,7 @@ function do_ref_total(){
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td colspan="2"><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+				<td colspan="2"></td>
 				
 			</tr>
 		</tfoot>

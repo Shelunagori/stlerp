@@ -129,7 +129,11 @@ if($transaction_date <  $start_date ) {
 								<tr>
 									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
 									<td class="ref_no">
-										<?php echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$receipt_row->received_from_id.'&ref_name='.$reference_detail->reference_no); ?> 
+									<?php if($reference_detail->reference_type=="Against Reference"){
+									echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$receipt_row->received_from_id.'&ref_name='.$reference_detail->reference_no);
+									}else{
+										echo $this->Form->input('ref_cr_dr', ['label' => false,'class' => 'form-control input-sm ','value'=>$reference_detail->reference_no]);
+									} ?> 
 									</td>
 									<td><?php 
 									if(!empty($reference_detail->credit)){
@@ -271,22 +275,24 @@ $(document).ready(function() {
 		rename_rows();
 	}
 	
+	rename_rows();
 	function rename_rows(){
 		var i=0;
-		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+			$(this).find("td:eq(0) .receipt_row_id").attr({name:"receipt_rows["+i+"][id]", id:"receipt_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"receipt_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true
 					});
 			$(this).find("td:eq(0) .row_id").val(i);
-			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"receipt_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01
 					});
-			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"receipt_rows-"+i+"-cr_dr"});
 			i++;
 		});
 	}
-	
+	var i=0;
 	$('.addrow').live("click",function() {
 		add_row();
 	});
@@ -297,18 +303,25 @@ $(document).ready(function() {
 	$('.addrefrow').live("click",function() {
 		var sel=$(this).closest('tr.main_tr');
 		var received_from_id=$(this).closest('tr.main_tr').find('td:nth-child(1) select').val();
-		add_ref_row(sel,received_from_id);
+		add_ref_row(sel);
 	});
 	
-	function add_ref_row(sel,received_from_id){
+	function add_ref_row(sel){
 		var tr=$("#sample_ref table.ref_table tbody tr").clone();
 		sel.find("table.ref_table tbody").append(tr);
-		
-		rename_ref_rows(sel,received_from_id);
-		
+		rename_ref_rows(sel);
 	}
 	
-	function rename_ref_rows(sel,received_from_id){
+	
+	$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var sel=$(this);
+		rename_ref_rows(sel);
+	});
+
+	
+	
+	
+	function rename_ref_rows(sel){
 		var i=0;
 		var row_id=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
@@ -615,7 +628,7 @@ $(document).ready(function() {
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td colspan="2"><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+				<td colspan="2"></td>
 				
 			</tr>
 		</tfoot>
