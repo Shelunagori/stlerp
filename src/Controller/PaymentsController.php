@@ -240,7 +240,7 @@ class PaymentsController extends AppController
         if ($this->request->is('post')) {  
 		$grnIds=[];$invoiceIds=[];
 		
-		pr($this->request->data)	; exit;
+		
 		foreach( $this->request->data['payment_rows'] as $key =>  $pr)
 		{
 			$grnstring="";$invoiceString="";
@@ -314,7 +314,7 @@ class PaymentsController extends AppController
 				$total_cr=0; $total_dr=0;
 				foreach($payment->payment_rows as $payment_row){ 
 					$ledger = $this->Payments->Ledgers->newEntity();
-					//$ledger->company_id=$st_company_id;
+					$ledger->company_id=$st_company_id;
 					$ledger->ledger_account_id = $payment_row->received_from_id;
 					if($payment_row->cr_dr=="Cr"){
 					$ledger->credit = $payment_row->amount;
@@ -325,14 +325,14 @@ class PaymentsController extends AppController
 					$ledger->debit = $payment_row->amount;
 					$total_dr=$total_dr+$payment_row->amount;
 					}
-					//$ledger->voucher_id = $receipt->id;
-					//$ledger->voucher_source = 'Receipt Voucher';
-					//$ledger->transaction_date = $receipt->transaction_date;
+					$ledger->voucher_id = $payment->id;
+					$ledger->voucher_source = 'Payment Voucher';
+					$ledger->transaction_date = $payment->transaction_date;
 					$this->Payments->Ledgers->save($ledger);
 					
 					foreach($payment_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
-						//$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
 						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
 						$ReferenceDetail->ledger_account_id = $payment_row->received_from_id;
@@ -343,9 +343,9 @@ class PaymentsController extends AppController
 							$ReferenceDetail->credit = $ref_rows['ref_amount'];
 							$ReferenceDetail->debit = 0;
 						}
-						//$ReferenceDetail->receipt_id = $receipt->id;
-						$ReferenceDetail->receipt_row_id = $payment_row->id;
-						//$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						$ReferenceDetail->payment_id = $payment->id;
+						$ReferenceDetail->payment_row_id = $payment_row->id;
+						$ReferenceDetail->transaction_date = $payment->transaction_date;
 						$this->Payments->ReferenceDetails->save($ReferenceDetail);
 					} 
 					
@@ -360,9 +360,9 @@ class PaymentsController extends AppController
 							$ReferenceDetail->credit = $payment_row->on_acc;
 							$ReferenceDetail->debit = 0;
 						}
-						$ReferenceDetail->receipt_id = $receipt->id;
-						$ReferenceDetail->receipt_row_id = $payment_row->id;
-						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						$ReferenceDetail->payment_id = $payment->id;
+						$ReferenceDetail->payment_row_id = $payment_row->id;
+						$ReferenceDetail->transaction_date = $payment->transaction_date;
 						if($payment_row->on_acc > 0){ 
 							$this->Payments->ReferenceDetails->save($ReferenceDetail);
 						}
@@ -374,9 +374,9 @@ class PaymentsController extends AppController
 				//pr($bankAmt); exit;
 
 				//Ledger posting for bankcash
-				$ledger = $this->Receipts->Ledgers->newEntity();
+				$ledger = $this->Payments->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
-				$ledger->ledger_account_id = $receipt->bank_cash_id;
+				$ledger->ledger_account_id = $payment->bank_cash_id;
 				if($bankAmt > 0){
 					$ledger->credit = $bankAmt;
 					$ledger->debit = 0;
@@ -385,11 +385,11 @@ class PaymentsController extends AppController
 					$ledger->credit = 0;
 				}
 				
-				$ledger->voucher_id = $receipt->id;
-				$ledger->voucher_source = 'Receipt Voucher';
-				$ledger->transaction_date = $receipt->transaction_date;
+				$ledger->voucher_id = $payment->id;
+				$ledger->voucher_source = 'Payment Voucher';
+				$ledger->transaction_date = $payment->transaction_date;
 				if($bankAmt != 0){
-					$this->Receipts->Ledgers->save($ledger);
+					$this->Payments->Ledgers->save($ledger);
 				}
 				
                 $this->Flash->success(__('The payment has been saved.'));
