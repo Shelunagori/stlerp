@@ -340,11 +340,11 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	$('.cr_dr').live("change",function() {
-		var sel=$(this);
-		load_ref_section(sel);
+	/* $('.cr_dr').live("change",function() {
+		//var sel=$(this);
+		//load_ref_section(sel);
 		do_mian_amount_total();
-	});
+	}); */
 	
 	function load_ref_section(sel){ 
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
@@ -433,15 +433,15 @@ $(document).ready(function() {
 		}
 	});
 	
-	$('.ref_list').live("change",function() {
+	/* $('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-	});
-	$('.ref_total').live("change",function() {
+	}); */
+	/* $('.ref_total').live("change",function() {
 		do_ref_total();
-	});
+	}); */
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
@@ -449,107 +449,85 @@ $(document).ready(function() {
 	function do_ref_total(){
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
-			var main_cr_dr=$(this).find('td:nth-child(2) select.cr_dr option:selected').val(); 
 			var total_ref=0;
-			var ref_cr_amt=0;
-			var ref_dr_amt=0;
-			
+			var main_cr_dr=$(this).find('td:nth-child(2) select').val();
+			var total_ref_cr=0;
+			var total_ref_dr=0;
 			$(this).find("table.ref_table tbody tr").each(function(){
-			    var cr_dr=$(this).find('td:nth-child(4) select option:selected').val();
-				var am=parseFloat($(this).find('td:nth-child(3) input').val());
-				 if(!am){ am=0; }
-				if(cr_dr=='Cr')
-				{
-					ref_cr_amt = ref_cr_amt+am;
-				}
-				else{
-					ref_dr_amt = ref_dr_amt+am;
-				}
-				
-			   
-				//total_ref=total_ref+am;
-			});
 			
-			if(ref_cr_amt>ref_dr_amt)
-			{
-				var reference_cr_amount=ref_cr_amt-ref_dr_amt;
-			}
-			else if(ref_cr_amt<ref_dr_amt)
-			{
-				var reference_dr_amount=ref_dr_amt-ref_cr_amt;
-			}
-			if(main_cr_dr=="Cr")
-			{
-				var main_cr_amt = main_amount;
-				if(reference_cr_amount)
+				var am=parseFloat($(this).find('td:nth-child(3) input').val());
+				var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
+				if(!am){ am=0; }
+				
+				if(ref_cr_dr=='Dr')
 				{
-					if(main_cr_amt>reference_cr_amount)
-					{
-						var on_acc = main_cr_amt-reference_cr_amount;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
-					}
-					else if(main_cr_amt<reference_cr_amount)
-					{
-						var on_acc = reference_cr_amount-main_cr_amt;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
-					}
+					total_ref_dr=total_ref_dr+am;
 				}
 				else
 				{
-					if(main_cr_amt>reference_dr_amount)
-					{
-						var on_acc = main_cr_amt-reference_dr_amount;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
-					}
-					else if(main_cr_amt<reference_dr_amount)
-					{
-						var on_acc = reference_dr_amount-main_cr_amt;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
-					}
-					
+					total_ref_cr=total_ref_cr+am;
+				}
+				
+			});
+			
+			var on_acc=0;
+			var total_ref=0;
+			var on_acc_cr_dr='';
+			if(main_cr_dr=='Dr')
+			{
+				
+				if(total_ref_dr > total_ref_cr)
+				{
+					total_ref=total_ref_dr-total_ref_cr;
+					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Dr';
+				}
+				else if(total_ref_dr < total_ref_cr)
+				{
+					total_ref=total_ref_dr-total_ref_cr;
+					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Cr';
+				}
+				else
+				{
+					on_acc=main_amount;
+					on_acc_cr_dr='Dr';
 				}
 			}
 			else
 			{
-				var main_dr_amt = main_amount; 
-				if(reference_cr_amount)
+				if(total_ref_dr < total_ref_cr)
 				{
-					if(main_dr_amt>reference_cr_amount)
-					{
-						var on_acc = main_dr_amt-reference_cr_amount;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
-					}
-					else if(main_dr_amt<reference_cr_amount)
-					{
-						var on_acc = reference_cr_amount-main_dr_amt;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
-					}
+					total_ref=total_ref_cr-total_ref_dr;
+					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Cr';
+					
+				}
+				else if(total_ref_dr > total_ref_cr)
+				{
+					total_ref=total_ref_cr-total_ref_dr;
+					on_acc=main_amount-total_ref;
+					on_acc_cr_dr='Dr';
 				}
 				else
 				{
-					if(main_dr_amt>reference_dr_amount)
-					{
-						var on_acc = main_dr_amt-reference_dr_amount;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
-					}
-					else if(main_dr_amt<reference_dr_amount)
-					{
-						var on_acc = reference_dr_amount-main_dr_amt;
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-						$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
-					}
+					on_acc=main_amount;
+					on_acc_cr_dr='Cr';
 				}
 			}
-			
+			on_acc=Math.abs(on_acc);
+			if(on_acc>=0){
+				//$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+				total_ref=total_ref+on_acc;
+			}else{
+				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
+			}
+			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+			$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
 		});
-	}
+		}
 	
 	$('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
@@ -580,7 +558,10 @@ $(document).ready(function() {
 			$('#receipt_amount').text(mian_amount_total.toFixed(2));
 		});
 	}
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_mian_amount_total();
+		do_ref_total();
+	});
 	
 	
 });
@@ -599,7 +580,7 @@ $(document).ready(function() {
 					<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
 				</div>
 				<div class="col-md-5"style="padding-left: 0;">
-					<select name="cr_dr" class="form-control input-sm cr_dr" >
+					<select name="cr_dr" class="form-control input-sm cr_dr_amount" >
 						<option value="Dr">Dr</option>
 						<option value="Cr">Cr</option>
 					</select>
@@ -633,7 +614,7 @@ $(document).ready(function() {
 				<td width="25%"><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
 				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
 				<?php 
-				echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  ref_total','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
 			    </td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
