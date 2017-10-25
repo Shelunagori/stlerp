@@ -328,13 +328,9 @@ class ReceiptsController extends AppController
 						if($receipt_row->on_acc > 0){ 
 							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
 						}
-						
-					
-					
 				}
 				$bankAmt=$total_dr-$total_cr;
 				//pr($bankAmt); exit;
-
 				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
