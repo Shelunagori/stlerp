@@ -336,6 +336,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
+		$(this).closest('div.select').css("width","235px");
 		load_ref_section(sel);
 	});
 	
