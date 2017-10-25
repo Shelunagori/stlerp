@@ -482,45 +482,91 @@ class ReceiptsController extends AppController
 			$receipt->transaction_date=date("Y-m-d",strtotime($receipt->transaction_date));
 				
 			//Save receipt
-			//pr($receipt); exit;
+		//	pr($receipt->receipt_rows); exit;
             if ($this->Receipts->save($receipt)) {
 				$this->Receipts->Ledgers->deleteAll(['voucher_id' => $receipt->id, 'voucher_source' => 'Receipt Voucher']);
+				$this->Receipts->ReferenceDetails->deleteAll(['receipt_id' => $receipt->id]);
 				$total_cr=0; $total_dr=0;
 				foreach($receipt->receipt_rows as $receipt_row){
-					
-					//Ledger posting for Received From Entity
 					$ledger = $this->Receipts->Ledgers->newEntity();
 					$ledger->company_id=$st_company_id;
 					$ledger->ledger_account_id = $receipt_row->received_from_id;
 					if($receipt_row->cr_dr=="Cr"){
-						$ledger->credit = $receipt_row->amount;
-						$ledger->debit = 0;
-						$total_cr=$total_cr+$receipt_row->amount;
+					$ledger->credit = $receipt_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$receipt_row->amount;
 					}else{
-						$ledger->credit = 0;
-						$ledger->debit = $receipt_row->amount;
-						$total_dr=$total_dr+$receipt_row->amount;
+					$ledger->credit = 0;
+					$ledger->debit = $receipt_row->amount;
+					$total_dr=$total_dr+$receipt_row->amount;
 					}
-					
 					$ledger->voucher_id = $receipt->id;
 					$ledger->voucher_source = 'Receipt Voucher';
 					$ledger->transaction_date = $receipt->transaction_date;
 					$this->Receipts->Ledgers->save($ledger);
 					
-					$total_amount=$total_cr-$total_dr;
+					foreach($receipt_row->ref_rows as $ref_rows){
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
+						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($ref_rows['ref_cr_dr']=="Dr"){
+							$ReferenceDetail->debit = $ref_rows['ref_amount'];
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $ref_rows['ref_amount'];
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+					} 
+					
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($receipt_row->on_acc_dr_cr=="Dr"){
+							$ReferenceDetail->debit = $receipt_row->on_acc;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $receipt_row->on_acc;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						if($receipt_row->on_acc > 0){ 
+							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+						}
+						
 					
 					
 				}
+				$bankAmt=$total_dr-$total_cr;
+				//pr($bankAmt); exit;
+
 				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $receipt->bank_cash_id;
-				$ledger->debit = $total_amount;
-				$ledger->credit = 0;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
 				$ledger->voucher_id = $receipt->id;
 				$ledger->voucher_source = 'Receipt Voucher';
 				$ledger->transaction_date = $receipt->transaction_date;
-				$this->Receipts->Ledgers->save($ledger);
+				if($bankAmt != 0){
+					$this->Receipts->Ledgers->save($ledger);
+				}
+	
 				
                 $this->Flash->success(__('The receipt has been saved.'));
 
