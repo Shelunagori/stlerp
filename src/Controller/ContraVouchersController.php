@@ -395,8 +395,9 @@ class ContraVouchersController extends AppController
 		
         
         $contravoucher = $this->ContraVouchers->get($id, [
-            'contain' => ['ContraVoucherRows']
+            'contain' => ['ContraVoucherRows'=>['ReferenceDetails']]
         ]);
+		//pr($contravoucher); exit;
         $old_ref_rows=[];
         $old_received_from_ids=[];
         $old_reference_numbers=[];
@@ -423,27 +424,14 @@ class ContraVouchersController extends AppController
 					$chkdate = 'Not Found';	
 				}
 
-        
-        foreach($contravoucher->contra_voucher_rows as $contra_voucher_row){
-            $ReferenceDetails=$this->ContraVouchers->ReferenceDetails->find()->where(['ledger_account_id'=>$contra_voucher_row->received_from_id,'contra_voucher_id'=>$contravoucher->id]);
-            foreach($ReferenceDetails as $ReferenceDetail){
-                $old_reference_numbers[$contra_voucher_row->received_from_id][]=$ReferenceDetail->reference_no;
-            }
-            $old_ref_rows[$contra_voucher_row->received_from_id]=$ReferenceDetails->toArray();
-            $old_received_from_ids[]=$contra_voucher_row->received_from_id;
-        }
-        
         if ($this->request->is(['patch', 'post', 'put'])) {
             $contravoucher = $this->ContraVouchers->patchEntity($contravoucher, $this->request->data);
             $contravoucher->company_id=$st_company_id;
-            
-            
             $contravoucher->edited_on=date("Y-m-d");
             $contravoucher->edited_by=$s_employee_id;
             $contravoucher->transaction_date=date("Y-m-d",strtotime($contravoucher->transaction_date));
-                
-            //Save receipt
-            //pr($payment); exit;
+            
+			//Save receipt
             if ($this->ContraVouchers->save($contravoucher)) {
                 $this->ContraVouchers->Ledgers->deleteAll(['voucher_id' => $contravoucher->id, 'voucher_source' => 'Contra Voucher']);
                 $total_cr=0; $total_dr=0;

@@ -49,7 +49,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
                         <?php } ?>
                     </span>
 
-                </div>
+             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label">Bank/Cash Account<span class="required" aria-required="true">*</span></label>
@@ -345,41 +345,7 @@ $(document).ready(function() {
             rename_ref_rows(sel2,received_from_id);
         });
         
-        var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
-        url=url+'/'+received_from_id;
-        if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
-        { 
-           $.ajax({
-                url: url,
-                type: 'GET',
-                dataType: 'text'
-            }).done(function(response) {
-                $(sel).closest('tr.main_tr').find('.show_result').html(response);
-                rename_rows();
-            });
-        }
-        else
-        {
-            $(sel).closest('tr.main_tr').find('.show_result').html('');
-        }
-        
-        var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadInvoices']); ?>";
-        url=url+'/'+received_from_id;
-        if(received_from_id=='105' || received_from_id=='168' || received_from_id=='316')
-        {
-           $.ajax({
-                url: url,
-                type: 'GET',
-                dataType: 'text'
-            }).done(function(response) {  
-                $(sel).closest('tr.main_tr').find('.show_result').html(response);
-                rename_rows(); 
-            });
-        }
-        else
-        {
-            $(sel).closest('tr.main_tr').find('.show_result').html('');
-        }
+
     }
     
     
@@ -392,8 +358,8 @@ $(document).ready(function() {
         var ref_type=$(this).find('option:selected').val();
         var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
         if(ref_type=="Against Reference"){
-            var url="<?php echo $this->Url->build(['controller'=>'ContraVouchers','action'=>'fetchRefNumbers']); ?>";
-            url=url+'/'+received_from_id+'/'+cr_dr,
+           var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
+			url=url+'/'+received_from_id,
             $.ajax({
                 url: url,
                 type: 'GET',
