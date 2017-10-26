@@ -176,27 +176,26 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				</thead>
 				<tbody>
 					<?php 
-					$existing_rows=[];
 					$current_rows=[];
 					$current_row_items=[];
 					
-					foreach($invoice->sales_order->invoices as $all_invoice){
-						foreach($all_invoice->invoice_rows as $all_invoice_row){
-							$existing_rows[$all_invoice_row->item_id]=@$existing_rows[$all_invoice_row->item_id]+$all_invoice_row->quantity;
-						}
-					}
 					foreach($invoice->invoice_rows as $current_invoice_row){
-						@$existing_rows[$current_invoice_row->item_id]=$existing_rows[$current_invoice_row->item_id]-$current_invoice_row->quantity;
 						$current_rows[]=$current_invoice_row->item_id;
 						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
 						$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
-						
 					}
 					$q=0; 
-					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){  ?>
-						<?php if(@$existing_rows[$sales_order_row->item_id]!=$sales_order_row->quantity) { ?> 
+						
+			
+					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
+					
+						?>
+						<?php if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?> 
 						<tr class="tr1" row_no="<?= h($q) ?>">
-							<td rowspan="2"><?php echo ++$q; $q--; ?></td>
+							<td rowspan="2">
+								<?php echo ++$q; $q--; ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_row->id,'readonly']); ?>
+							</td>
 							<td>
 								<?php 
 								echo $this->Form->input('q', ['type'=>'hidden','value'=>$sales_order_row->item_id]);
@@ -205,9 +204,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => @$current_row_items[$sales_order_row->item_id],'max'=>$sales_order_row->quantity-@$existing_rows[$sales_order_row->item_id]]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => @$current_invoice_rows[$sales_order_row->id],'max'=>@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id]]); 
 								?>
-								<span>Max: <?= h($sales_order_row->quantity-@$existing_rows[$sales_order_row->item_id]) ?></span>
+								<span>Max: <?= h(@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id]) ?></span>
 							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Rate','step'=>0.01,'value'=>$sales_order_row->rate]); ?>
@@ -708,7 +707,8 @@ $(document).ready(function() {
 			
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
-				$(this).find("td:nth-child(1)").html(++i); i--;
+				i++;
+				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
 				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
@@ -770,7 +770,7 @@ $(document).ready(function() {
 
 			$("#checked_row_length").val(unique.length);
 			calculate_total();
-			i++;
+			
 		});
 		
 	}

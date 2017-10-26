@@ -143,18 +143,25 @@
 					}
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
 					
-					if(@$item_ar[$sales_order_rows->item_id]==$sales_order_rows->quantity){
+					if(@$sales_orders_qty[$sales_order_rows->id] > 0){
 						
-						$disable_class="disabledbutton";
-					}else{ $disable_class=""; } 
+						$disable_class=" disabled='true'";
+						$disable_class_item="disabledbutton";
+					}else{
+						$disable_class=""; 
+						$disable_class_item=""; 
+						} 
 					
 					?>
-					<tr class="tr1 <?php echo $disable_class; ?> main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
-						<td rowspan="2"><?= h($q) ?></td>
+					<tr class="tr1 main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
+						<td rowspan="2">
+							<?= h($q) ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id]); ?>	
+						</td>
 						<td>						
 							<div class="row">
 								<div class="col-md-10 padding-right-decrease">
-									<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
+									<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q ,$disable_class]); ?>
 								</div>
 								<div class="col-md-1 padding-left-decrease">
 									<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -173,7 +180,6 @@
 								</div>
 							</div>
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.height', ['type' => 'hidden','value' => @$sales_order_rows->height]); ?>
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.processed_quantity', ['type' => 'hidden','value'=>$sales_order_rows->processed_quantity]); ?>
 							
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.source_type', ['type' => 'hidden','value'=>$sales_order_rows->source_type]); ?>
 							
@@ -189,21 +195,15 @@
 							<?php //pr($job_card_row_ids); ?>
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.job_card_row_ids', ['type' => 'hidden','value'=>$job_card_row_ids]); ?>
 							
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id]); ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id,'class'=>'SalesOrderRowId']); ?>
 							
 							
 							
 						</td>
 						
 						<td>
-						<?php if($salesOrder->quotation_id > 0){
-							
-							$max_val=@$qt_data[$sales_order_rows->item_id]-@$qt_data1[$sales_order_rows->item_id]+@$sales_order_rows->quantity;
-						}else{
-							$max_val='';
-						}?>
 						
-						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>$sales_order_rows->processed_quantity,'max'=>$max_val]); ?>
+						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
 						<?php 
 						 echo $this->Form->input('sales_order_rows.'.$q.'.old_quantity', ['type' => 'hidden','value'=>$sales_order_rows->quantity]);
 						?>
@@ -222,14 +222,14 @@
 						echo $this->Form->input('sales_order_rows.'.$q.'.sale_tax_id', ['options'=>$options,'label' => false,'class' => 'form-control input-sm change_des','value'=>$sales_order_rows->sale_tax_id]);?>
 						</td>
 						<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-						<?php if($sales_order_rows->processed_quantity > 0){ ?>
-						
-						<?php }else{ ?>
+						<?php if(@$sales_orders_qty[$sales_order_rows->id] > 0){ ?>
+							
+						<?php }else{ ?> 
 						<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
 						<?php } ?>
 						</td>
 					</tr>
-					<tr class="tr2 <?php echo $disable_class; ?> main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
+					<tr class="tr2 <?php echo $disable_class_item; ?> main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
 						<td colspan="6" class="main">
 							<div class="note-editable"><?php echo $sales_order_rows->description; ?></div>
 						</td>
@@ -723,11 +723,8 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1)").html(++i); i--;
 			//$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules("add", "required");
 			$(this).find("td:nth-child(2) select").select2().attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
+						
 					});
 			
 			//var hl=$(this).find("td:nth-child(2) input[type=hidden]:eq(0)").length();
@@ -735,11 +732,11 @@ $(document).ready(function() {
 			//var serial_l=$('td:nth-child(2) input[type=hidden] :eq(3)').length;
 			//alert(serial_l);
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(0)").attr({name:"sales_order_rows["+i+"][height]", id:"sales_order_rows-"+i+"-height"});
-			$(this).find("td:nth-child(2) input[type=hidden]:eq(1)").attr({name:"sales_order_rows["+i+"][processed_quantity]", id:"sales_order_rows-"+i+"-processed_quantity"});
+			
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(2)").attr({name:"sales_order_rows["+i+"][source_type]", id:"sales_order_rows-"+i+"-source_type"});
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(3)").attr({name:"sales_order_rows["+i+"][job_card_row_ids]", id:"sales_order_rows-"+i+"-job_card_row_ids"});
 			
-			$(this).find("td:nth-child(2) input[type=hidden]:eq(4)").attr({name:"sales_order_rows["+i+"][id]", id:"sales_order_rows-"+i+"-id"});
+			$(this).find("td:nth-child(2) .SalesOrderRowId").attr({name:"sales_order_rows["+i+"][id]", id:"sales_order_rows-"+i+"-id"});
 			
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
@@ -753,6 +750,7 @@ $(document).ready(function() {
 						required: true,
 						number: true
 					});
+			
 			$(this).find("td:nth-child(5) input").attr({name:"sales_order_rows["+i+"][amount]", id:"sales_order_rows-"+i+"-amount"}).rules("add", "required");
 			$(this).find("td:nth-child(6) select").attr("name","sales_order_rows["+i+"][excise_duty]");
 			$(this).find("td:nth-child(7) select").select2().attr("name","sales_order_rows["+i+"][sale_tax_id]");

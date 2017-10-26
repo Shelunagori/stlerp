@@ -207,14 +207,18 @@ $('.closetin').on("click",function() {
 					if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
 						$ed_des[]=$sales_order_rows->excise_duty;
+					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){	
 					?>
 						<tr class="tr1  firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
 						
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+							<td rowspan="2">
+								<?php echo ++$q; --$q; ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->id,'readonly']); ?>
+							</td>
 							<td>
 							<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item->id,'readonly']); ?>
 							<?php echo $sales_order_rows->item->name; ?></td>
-							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-$sales_order_rows->processed_quantity,'readonly','min'=>'1','max'=>@$sales_order_rows->quantity-$sales_order_rows->processed_quantity]); ?></td>
+							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','min'=>'1','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount,'readonly','step'=>0.01]); ?></td>
 							<td><?php echo @$sales_order_rows->sale_tax->tax_figure.'('.@$sales_order_rows->sale_tax->invoice_description.')'; ?></td>
@@ -247,7 +251,7 @@ $('.closetin').on("click",function() {
 							<td colspan="5">
 							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']);  ?></td>
 							</tr><?php } ?>
-					<?php $q++; endforeach; }?>
+					<?php $q++; } endforeach; }?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
@@ -788,7 +792,7 @@ $(document).ready(function() {
 			
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
-				
+				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
 				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
