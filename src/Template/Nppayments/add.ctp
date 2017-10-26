@@ -280,8 +280,7 @@ $(document).ready(function() {
 				//$(this).find("td:nth-child(2) input").rules("remove", "required");
 				$(this).find("td:nth-child(2) select").attr({name:"nppayment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/'+row_id+'/'+i;
+				
 				$(this).find("td:nth-child(2) input").attr({name:"nppayment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+row_id}).rules("add", "required");
 			}
 			
@@ -344,13 +343,14 @@ $(document).ready(function() {
 		
 		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
+		
 		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
-		{ 
+		{  
 	       $.ajax({
 				url: url,
 				type: 'GET',
 				dataType: 'text'
-			}).done(function(response) {
+			}).done(function(response) { alert(response);
 				$(sel).closest('tr.main_tr').find('.show_result').html(response);
 				rename_rows();
 			});
@@ -567,6 +567,7 @@ function do_ref_total(){
 		<tr class="main_tr">
 			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
 			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			<div class="show_result"></div>
 			</td>
 			<td>
 				<div class="row">
