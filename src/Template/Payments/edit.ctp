@@ -213,7 +213,7 @@ if($transaction_date <  $start_date ) {
 									<td></td>
 									<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
 									<td>
-									<?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?>
+									<?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?>
 									</td>
 								</tr>
 								<tr>
@@ -476,7 +476,7 @@ $(document).ready(function() {
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"payment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		//var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
 		//var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length; 
@@ -754,31 +754,7 @@ $(document).ready(function() {
 		do_mian_amount_total();
 		do_ref_total();
 	});
-	function delete_all_ref_no(sel){
-		var old_received_from_id=sel.closest('tr').attr('old_received_from_id');
-		var url="<?php echo $this->Url->build(['controller'=>'Payments','action'=>'deleteAllRefNumbers']); ?>";
-		url=url+'/'+old_received_from_id+'/'+<?php echo $payment->id; ?>,
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-			//alert(response);
-		});
-	}
 	
-	function delete_one_ref_no(sel){
-		var old_received_from_id=sel.closest('tr.main_tr').attr('old_received_from_id');
-		var old_ref=sel.closest('tr').find('a.deleterefrow').attr('old_ref');
-		var old_ref_type=sel.closest('tr').find('a.deleterefrow').attr('old_ref_type');
-		var url="<?php echo $this->Url->build(['controller'=>'Payments','action'=>'deleteOneRefNumbers']); ?>";
-		url=url+'?old_received_from_id='+old_received_from_id+'&payment_id=<?php echo $payment->id; ?>&old_ref='+old_ref+'&old_ref_type='+old_ref_type,
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-			//alert(response);
-		});
-	}
 	
 	$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 		var sel2=$(this);
@@ -857,7 +833,7 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
+				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>

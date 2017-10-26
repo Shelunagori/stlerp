@@ -311,19 +311,11 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		/* $(sel).find("table.ref_table tfoot tr:eq(1) td:eq(2) input.on_account").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"});  */
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"payment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		//var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
-		//var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length; 
-		/* if(is_tot_input){
-			$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total["+received_from_id+"]", id:"ref_rows_total-"+received_from_id}).rules('add', {
-														equalTo: "#"+amount_id
-													});
-		} */
 	}
 	
 	$('.deleterefrow').live("click",function() {
@@ -627,7 +619,7 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
+				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>

@@ -329,7 +329,8 @@ class PaymentsController extends AppController
 					$ledger->voucher_source = 'Payment Voucher';
 					$ledger->transaction_date = $payment->transaction_date;
 					$this->Payments->Ledgers->save($ledger);
-					
+					if(!empty($payment_row->ref_rows))
+					{
 					foreach($payment_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -353,7 +354,7 @@ class PaymentsController extends AppController
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $payment_row->received_from_id;
-						if($payment_row->on_acc_dr_cr=="Dr"){
+						if($payment_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $payment_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
@@ -366,6 +367,7 @@ class PaymentsController extends AppController
 						if($payment_row->on_acc > 0){ 
 							$this->Payments->ReferenceDetails->save($ReferenceDetail);
 						}
+					}
 						
 					
 				}
@@ -623,8 +625,9 @@ class PaymentsController extends AppController
 					$ledger->voucher_source = 'Payment Voucher';
 					$ledger->transaction_date = $payment->transaction_date;
 					$this->Payments->Ledgers->save($ledger);
-					
-					foreach($payment_row->ref_rows as $ref_rows){
+					if(!empty($payment_row->ref_rows))
+					{
+					foreach($payment_row->ref_rows as $ref_rows){ 
 						$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
@@ -646,8 +649,8 @@ class PaymentsController extends AppController
 						$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
-						$ReferenceDetail->ledger_account_id = $payment_row->received_from_id;
-						if($payment_row->on_acc_dr_cr=="Dr"){
+						$ReferenceDetail->ledger_account_id = $payment_row->received_from_id; 
+						if($payment_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $payment_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
@@ -660,10 +663,10 @@ class PaymentsController extends AppController
 						if($payment_row->on_acc > 0){ 
 							$this->Payments->ReferenceDetails->save($ReferenceDetail);
 						}
+					}
 						
 					
 				}
-				
 				$bankAmt=$total_dr-$total_cr;
 				//pr($bankAmt); exit;
 
