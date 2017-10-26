@@ -546,7 +546,7 @@ $(document).ready(function() {
 		var ref_type=$(this).find('option:selected').val();
 		var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
 		if(ref_type=="Against Reference"){
-			var url="<?php echo $this->Url->build(['controller'=>'Payments','action'=>'fetchRefNumbers']); ?>";
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url+'/'+received_from_id+'/'+cr_dr,
 			$.ajax({
 				url: url,
@@ -571,7 +571,7 @@ $(document).ready(function() {
 	
 	$('.ref_list').live("change",function() {
 		var sel=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 		delete_one_ref_no(sel);
@@ -703,7 +703,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 	});
 	
 	
