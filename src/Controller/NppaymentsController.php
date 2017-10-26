@@ -273,7 +273,7 @@ class NppaymentsController extends AppController
 			}
 			
 			
-			//pr($nppayment); exit;
+			pr($nppayment); exit;
 			
 			
             if ($this->Nppayments->save($nppayment)) {
@@ -322,7 +322,8 @@ class NppaymentsController extends AppController
 					$ledger->voucher_source = 'Non Print Payment Voucher';
 					$ledger->transaction_date = $nppayment->transaction_date;
 					$this->Nppayments->Ledgers->save($ledger);
-					
+					if(!empty($nppayment_row->ref_rows))
+					{
 					foreach($nppayment_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Nppayments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -358,7 +359,8 @@ class NppaymentsController extends AppController
 						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
 						if($nppayment_row->on_acc > 0){ 
 							$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
-						}                   
+						}
+					}		
                     
                 }
 					$bankAmt=$total_dr-$total_cr;
