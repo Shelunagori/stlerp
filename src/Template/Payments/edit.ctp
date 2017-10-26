@@ -485,7 +485,13 @@ $(document).ready(function() {
 	});
 	
 	
-	
+	$('.deleterefrow').live("click",function() {
+		var l=$(this).closest("table.ref_table tbody").find("tr").length;
+			if(l>1){
+				$(this).closest("tr").remove();
+			}
+		do_ref_total();
+	});
 	function load_ref_section(sel){
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
 		var sel2=$(sel).closest('tr.main_tr');
@@ -573,7 +579,7 @@ $(document).ready(function() {
 	
 	$('.ref_type').live("change",function() {
 		var sel=$(this);
-		delete_one_ref_no(sel);
+		//delete_one_ref_no(sel);
 	});
 	
 	$('.ref_list').live("change",function() {
@@ -581,7 +587,7 @@ $(document).ready(function() {
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-		delete_one_ref_no(sel);
+		//delete_one_ref_no(sel);
 	}); 
 	
 	$('.ref_amount_textbox').live("keyup",function() {

@@ -466,16 +466,18 @@ $(document).ready(function() {
 	}
 	
 	/* $('.deleterefrow').live("click",function() {
+		
 		var sel=$(this);
-		delete_one_ref_no(sel);
+		//delete_one_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_ref_total();
-	});
-	 */
+	}); */
+	 
 	
 	$('.deleterefrow').live("click",function() {
 		var sel=$(this);
-		delete_one_ref_no(sel);
+		//alert();
+		//delete_one_ref_no(sel);
 		var l=$(this).closest("table.ref_table tbody").find("tr").length;
 			if(l>1){
 				$(this).closest("tr").remove();
@@ -580,7 +582,7 @@ $(document).ready(function() {
 	
 	$('.ref_type').live("change",function() {
 		var sel=$(this);
-		delete_one_ref_no(sel);
+		//delete_one_ref_no(sel);
 	});
 	
 	$('.ref_list').live("change",function() {
@@ -588,7 +590,7 @@ $(document).ready(function() {
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-		delete_one_ref_no(sel);
+		//delete_one_ref_no(sel);
 	});
 	
 	$('.ref_amount_textbox').live("keyup",function() {

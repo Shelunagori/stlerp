@@ -321,7 +321,13 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	
+	$('.deleterefrow').live("click",function() {
+		var l=$(this).closest("table.ref_table tbody").find("tr").length;
+			if(l>1){
+				$(this).closest("tr").remove();
+			}
+		do_ref_total();
+	});
 	
 	function load_ref_section(sel){ 
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
