@@ -68,10 +68,10 @@ class PurchaseOrdersController extends AppController
 		
 		if($status==null or $status=='Pending'){
 			$having=['total_rows >' => 0];
-			$where1=['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity'];
+			//$where1=['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity'];
 		}elseif($status=='Converted-Into-GRN'){
 			$having=['total_rows =' => 0];
-			$where1=['PurchaseOrderRows.processed_quantity = PurchaseOrderRows.quantity'];
+			//$where1=['PurchaseOrderRows.processed_quantity = PurchaseOrderRows.quantity'];
 		}
 		
 		
@@ -96,7 +96,7 @@ class PurchaseOrdersController extends AppController
 			$this->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['Items']])->select(['total_rows' => 
 				$this->PurchaseOrders->find()->func()->count('PurchaseOrderRows.id')])
 				->leftJoinWith('PurchaseOrderRows', function ($q) {
-					return $q->where(['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity']);
+					return $q;
 				})
 				->group(['PurchaseOrders.id'])
 				->autoFields(true)

@@ -41,6 +41,11 @@ class PurchaseOrderRowsTable extends Table
             'foreignKey' => 'purchase_order_id',
             'joinType' => 'INNER'
         ]);
+		
+		 $this->hasMany('GrnRows', [
+            'foreignKey' => 'purchase_order_row_id'
+			]);
+		
         $this->belongsTo('Items', [
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
