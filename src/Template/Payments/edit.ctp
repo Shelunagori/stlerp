@@ -698,6 +698,10 @@ $(document).ready(function() {
 	
 	do_mian_amount_total();
 	function do_mian_amount_total(){
+		if($("#main_table tbody#main_tbody tr.main_tr").length<1)
+		{
+			 $('#receipt_amount').text('');
+		}
 		var mian_amount_total_cr=0; var mian_amount_total_dr=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var v=parseFloat($(this).find("td:nth-child(2) input").val());

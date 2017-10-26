@@ -153,7 +153,7 @@ if($transaction_date <  $start_date ) {
                             <?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount','value'=>$petty_cash_voucher_row->amount]); ?>
                         </div>
                         <div class="col-md-5"style="padding-left: 0;">
-                            <?php echo $this->Form->input('cr_dr', ['label' => false,'options'=>$cr_dr_options,'class' => 'form-control input-sm cr_dr','value'=>$petty_cash_voucher_row->cr_dr]); ?>
+                            <?php echo $this->Form->input('cr_dr', ['label' => false,'options'=>$cr_dr_options,'class' => 'form-control input-sm cr_dr_amount','value'=>$petty_cash_voucher_row->cr_dr]); ?>
                         </div>
                     </div>
                     </td>
@@ -422,7 +422,7 @@ $(document).ready(function() {
 
 	$('.deleterow').live("click",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_mian_amount_total();
 	});
@@ -706,8 +706,12 @@ $(document).ready(function() {
 	});
 	
 	do_mian_amount_total();
-	function do_mian_amount_total(){
+	function do_mian_amount_total(){ 
 		var mian_amount_total_cr=0; var mian_amount_total_dr=0;
+		if($("#main_table tbody#main_tbody tr.main_tr").length<1)
+		{
+			 $('#receipt_amount').text('');
+		}
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var v=parseFloat($(this).find("td:nth-child(2) input").val());
 			var cr_dr=($(this).find("td:nth-child(2) select").val());
@@ -717,7 +721,8 @@ $(document).ready(function() {
 			}else{
 				mian_amount_total_dr=mian_amount_total_dr+v;
 			}
-			
+			mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
+			$('#receipt_amount').text(mian_amount_total.toFixed(2));
 		});
 	}
 	

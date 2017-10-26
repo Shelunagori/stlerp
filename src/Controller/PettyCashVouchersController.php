@@ -538,7 +538,8 @@ class PettyCashVouchersController extends AppController
 					$ledger->voucher_source = 'Petty Cash Payment Voucher';
 					$ledger->transaction_date = $pettycashvoucher->transaction_date;
 					$this->PettyCashVouchers->Ledgers->save($ledger);
-					
+					if(!empty($petty_cash_voucher_row->ref_rows))
+					{
 					foreach($petty_cash_voucher_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -557,6 +558,7 @@ class PettyCashVouchersController extends AppController
 						$ReferenceDetail->transaction_date = $pettycashvoucher->transaction_date;
 						$this->PettyCashVouchers->ReferenceDetails->save($ReferenceDetail);
 					} 
+					}
 					
 						$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;

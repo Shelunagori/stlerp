@@ -428,6 +428,10 @@ $(document).ready(function() {
 	});
 	
 	function do_ref_total(){
+		if($("#main_table tbody#main_tbody tr.main_tr").length<1)
+		{
+			 $('#receipt_amount').text('');
+		}
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
 			var total_ref=0;
