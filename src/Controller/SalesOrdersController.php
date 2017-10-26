@@ -80,116 +80,60 @@ class SalesOrdersController extends AppController
 		$where1=[];
 		if($status==null or $status=='Pending'){ 
 			$having=['total_rows >' => 0];
-			$where1=['SalesOrderRows.processed_quantity < SalesOrderRows.quantity'];
+			//$where1=['SalesOrderRows.processed_quantity < SalesOrderRows.quantity'];
 		}elseif($status=='Converted Into Invoice'){ 
 			$having=['total_rows =' => 0];
-			$where1=['SalesOrderRows.processed_quantity = SalesOrderRows.quantity'];
+			//$where1=['SalesOrderRows.processed_quantity = SalesOrderRows.quantity'];
 		}
 		
+		
+		
+		
+		/* $salesOrders = $this->SalesOrders->find();
+		$this->paginate(
+			$salesOrders->innerJoinWith('SalesOrderRows', function ($q) {
+				return $q->select(['total_salesorder_qty' => $q->func()->sum('SalesOrderRows.quantity'),'SalesOrderRows.id'])
+				->group(['SalesOrderRows.sales_order_id'])
+				->innerJoinWith('InvoiceRows', function ($q) {
+					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
+				});
+			})
+		->group(['SalesOrders.id'])
+		->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.id'=>405])); */
+		
+		$salesOrders = $this->SalesOrders->find();
+		$this->paginate(
+			$salesOrders->contain(['SalesOrderRows'=>['InvoiceRows']])
+			 ->select(['totalWickets' => $salesOrders->func()->count('salesOrders.SalesOrderRows.quantity')])
+			->group(['SalesOrders.id'])
+			->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.id'=>405])
+		);
 	
 		
-		if(!empty($items)){
-			
-			$salesOrders=	$this->paginate($this->SalesOrders->find()
-									->contain(['Quotations','SalesOrderRows'=>['Items']])
-									->leftJoinWith('SalesOrderRows', function ($q) use($where1){
-											return $q->where($where1);})
-									->matching(
-										'SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
-											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
-										})
-									->where(['SalesOrders.company_id'=>$st_company_id]));
-				
-		}else{ //exit;
-		$salesOrders=$this->paginate(
-			$this->SalesOrders->find()->contain(['Quotations','SalesOrderRows'=>['Items']])->select(['total_rows' => 
-				$this->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-					->leftJoinWith('SalesOrderRows', function ($q) {
-						return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-					})
-					->group(['SalesOrders.id'])
-					->autoFields(true)
-					->having($having)
-					->where($where)
-					->where(['SalesOrders.company_id'=>$st_company_id])
-					->order(['SalesOrders.so2' => 'DESC'])
-			);
-			
-		}	
-		if(!empty($gst)){ //pr($salesOrders->toArray());exit;
-			if(!empty($items)){
-				$salesOrders=	$this->paginate($this->SalesOrders->find()
-									->contain(['Quotations','SalesOrderRows'=>['Items']])
-									->leftJoinWith('SalesOrderRows', function ($q) use($where1){
-											return $q->where($where1);})
-									->matching(
-										'SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
-											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
-										})
-									->where(['SalesOrders.company_id'=>$st_company_id]));
-			}else{
-				$salesOrders=	$this->paginate(
-								$this->SalesOrders->find()
-								->contain(['Quotations','SalesOrderRows'=>['Items']])
-								->select(['total_rows' => 
-								  $this->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-								->leftJoinWith('SalesOrderRows', function ($q) {
-									return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-									})
-								->group(['SalesOrders.id'])
-								->autoFields(true)
-								->having($having)
-								->where($where)
-								->where(['SalesOrders.company_id'=>$st_company_id])
-								->order(['SalesOrders.so2' => 'DESC']));
-				}
-		}
-		if(!empty($pull_request)){
-			if(!empty($items)){
-				$salesOrders=	$this->paginate($this->SalesOrders->find()
-									 ->contain(['Quotations','SalesOrderRows'=>['Items']])
-									->leftJoinWith('SalesOrderRows', function ($q) {
-										return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-											})
-									->matching(
-										'SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
-										return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
-										})
-									->where(['SalesOrders.company_id'=>$st_company_id,'gst'=>'no']));
-			}else{
-				$salesOrders=$this->paginate(
-				$this->SalesOrders->find()->contain(['Quotations','SalesOrderRows'=>['Items']])->select(['total_rows' => 
-					$this->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-						->leftJoinWith('SalesOrderRows', function ($q) {
-							return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-						})
-						->group(['SalesOrders.id'])
-						->autoFields(true)
-						->having($having)
-						->where($where)
-						->where(['SalesOrders.company_id'=>$st_company_id,'gst'=>'no'])
-						->order(['SalesOrders.so2' => 'DESC'])
-				);
-			}
-		}
+		pr($salesOrders->toArray());exit;
+		
+		/////for Pull Request
+		
+		////for Job Cards
 		if(!empty($job_card)){
 			$salesOrders=$this->paginate(
 				$this->SalesOrders->find()->contain(['SalesOrderRows'])
 				->where(['job_card'=>'Pending'])->order(['SalesOrders.id' => 'DESC'])
 				->where(['SalesOrders.company_id'=>$st_company_id])
 			);
-		}
+		}	
+		
 		$Items = $this->SalesOrders->SalesOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
         $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
 					'Departments', function ($q) use($items,$st_company_id) {
 						return $q->where(['Departments.id' =>1]);
 					}
 				);
-				//pr($SalesMans->toArray()); exit;
-		$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-        $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name'));
+		
+		 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name'));
 		 $this->set('_serialize', ['salesOrders']);
 		$this->set(compact('url'));
+		
     }
 	
 	
@@ -1009,7 +953,7 @@ class SalesOrdersController extends AppController
 		$financial_year = $this->SalesOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 			foreach($salesOrder->quotation->quotation_rows as $quotation_row){
 				$qt_data[$quotation_row->item_id]=$quotation_row->quantity;
-				$qt_data1[$quotation_row->item_id]=$quotation_row->proceed_qty;
+				//$qt_data1[$quotation_row->item_id]=$quotation_row->proceed_qty;
 			}
 		}
 //pr($qt_data1); exit;
@@ -1062,59 +1006,7 @@ class SalesOrdersController extends AppController
 				$salesOrder->edited_on=date("Y-m-d");
 				$salesOrder->edited_on_time= date("Y-m-d h:i:sA");
 				
-				//pr($salesOrder); exit;
-
-
 				if ($this->SalesOrders->save($salesOrder)) {
-					
-					foreach($salesOrder->sales_order_rows as $sales_order_row){
-						$job_card_row_ids=explode(',',$sales_order_row->job_card_row_ids);
-						foreach($job_card_row_ids as $job_card_row_id){
-							//pr($job_card_row_id); exit;
-							$query = $this->SalesOrders->SalesOrderRows->JobCardRows->query();
-							$query->update()
-							->set(['sales_order_row_id' => $sales_order_row->id])
-							->where(['id' => $job_card_row_id])
-							->execute();
-						}
-					}
-					foreach($salesOrder->sales_order_rows as $sales_order_row){
-					$quotation_rows = $this->SalesOrders->Quotations->QuotationRows->find()->where(['QuotationRows.item_id'=>$sales_order_row->item_id,'quotation_id'=>$salesOrder->quotation_id])->first();
-				
-						if($quotation_rows){ 
-							$query1 = $this->SalesOrders->Quotations->QuotationRows->query();
-							$query1->update()
-							->set(['proceed_qty' =>$quotation_rows->proceed_qty-$sales_order_row->old_quantity+$sales_order_row->quantity])
-							->where(['id' => $quotation_rows->id])
-							->execute();
-						}
-					}
-						
-					$falg=0;
-					if($salesOrder->quotation_id > 0){
-					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
-						foreach($quotation_rows_datas as $quotation_rows_data){
-							if($quotation_rows_data->quantity != $quotation_rows_data->proceed_qty){ 
-							$falg=1;	
-							}
-						} 
-					} 
-					
-					
-					if($falg==1){
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['status' => 'Pending'])
-						->where(['id' => $salesOrder->quotation_id])
-						->execute();
-					}
-					else{
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['status' => 'Converted Into Sales Order'])
-						->where(['id' => $salesOrder->quotation_id])
-						->execute();
-					}
 					
 					$salesOrder->job_card_status='Pending';
 					$query2 = $this->SalesOrders->query();
@@ -1159,7 +1051,24 @@ class SalesOrdersController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes'));
+				
+			////
+			$SalesOrders = $this->SalesOrders->get($id, [
+            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}],'SalesOrderRows'=>['Items']])
+        ]);
+			
+		$sales_orders_qty=[];
+			foreach($SalesOrders->invoices as $invoices){ 
+				foreach($invoices->invoice_rows as $invoice_row){ 
+					$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+					
+				}
+			}	
+
+		
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else

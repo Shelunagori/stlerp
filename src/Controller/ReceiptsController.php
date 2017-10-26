@@ -275,105 +275,81 @@ class ReceiptsController extends AppController
             if ($this->Receipts->save($receipt)) {
 				$total_cr=0; $total_dr=0;
 				foreach($receipt->receipt_rows as $receipt_row){
-					
-					//Ledger posting for Received From Entity
 					$ledger = $this->Receipts->Ledgers->newEntity();
 					$ledger->company_id=$st_company_id;
 					$ledger->ledger_account_id = $receipt_row->received_from_id;
 					if($receipt_row->cr_dr=="Cr"){
-						$ledger->credit = $receipt_row->amount;
-						$ledger->debit = 0;
-						$total_cr=$total_cr+$receipt_row->amount;
+					$ledger->credit = $receipt_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$receipt_row->amount;
 					}else{
-						$ledger->credit = 0;
-						$ledger->debit = $receipt_row->amount;
-						$total_dr=$total_dr+$receipt_row->amount;
+					$ledger->credit = 0;
+					$ledger->debit = $receipt_row->amount;
+					$total_dr=$total_dr+$receipt_row->amount;
 					}
-					
 					$ledger->voucher_id = $receipt->id;
 					$ledger->voucher_source = 'Receipt Voucher';
 					$ledger->transaction_date = $receipt->transaction_date;
 					$this->Receipts->Ledgers->save($ledger);
 					
-					$total_amount=$total_cr-$total_dr;
-					
-					//Reference Number coding
-					if(sizeof(@$receipt->ref_rows[$receipt_row->received_from_id])>0){
-						
-						foreach($receipt->ref_rows[$receipt_row->received_from_id] as $ref_row){ 
-							$ref_row=(object)$ref_row;
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-								$query = $this->Receipts->ReferenceBalances->query();
-								if($receipt_row->cr_dr=="Cr"){
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $receipt_row->received_from_id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => $ref_row->ref_amount,
-										'debit' => 0
-									]);
-								}else{
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $receipt_row->received_from_id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => 0,
-										'debit' => $ref_row->ref_amount
-									]);
-								}
-								$query->execute();
-							}else{
-								$ReferenceBalance=$this->Receipts->ReferenceBalances->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->Receipts->ReferenceBalances->get($ReferenceBalance->id);
-								if($receipt_row->cr_dr=="Cr"){
-									$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-								}else{
-									$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-								}
-								
-								$this->Receipts->ReferenceBalances->save($ReferenceBalance);
-							}
-							
-							$query = $this->Receipts->ReferenceDetails->query();
-							if($receipt_row->cr_dr=="Cr"){
-								$query->insert(['ledger_account_id', 'receipt_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $receipt_row->received_from_id,
-									'receipt_id' => $receipt->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => $ref_row->ref_amount,
-									'debit' => 0,
-									'reference_type' => $ref_row->ref_type
-								]);
-							}else{
-								$query->insert(['ledger_account_id', 'receipt_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $receipt_row->received_from_id,
-									'receipt_id' => $receipt->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount,
-									'reference_type' => $ref_row->ref_type
-								]);
-							}
-							
-							$query->execute();
+					foreach($receipt_row->ref_rows as $ref_rows){
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
+						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($ref_rows['ref_cr_dr']=="Dr"){
+							$ReferenceDetail->debit = $ref_rows['ref_amount'];
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $ref_rows['ref_amount'];
+							$ReferenceDetail->debit = 0;
 						}
-					}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+					} 
+					
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($receipt_row->on_acc_dr_cr=="Dr"){
+							$ReferenceDetail->debit = $receipt_row->on_acc;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $receipt_row->on_acc;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						if($receipt_row->on_acc > 0){ 
+							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+						}
 				}
-				
+				$bankAmt=$total_dr-$total_cr;
+				//pr($bankAmt); exit;
 				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $receipt->bank_cash_id;
-				$ledger->debit = $total_amount;
-				$ledger->credit = 0;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
 				$ledger->voucher_id = $receipt->id;
 				$ledger->voucher_source = 'Receipt Voucher';
 				$ledger->transaction_date = $receipt->transaction_date;
-				$this->Receipts->Ledgers->save($ledger);
-				
-                $this->Flash->success(__('The receipt has been saved.'));
+				if($bankAmt != 0){
+					$this->Receipts->Ledgers->save($ledger);
+				}
+				$this->Flash->success(__('The receipt has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             } else {
@@ -453,16 +429,15 @@ class ReceiptsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
-		 
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Receipts->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->Receipts->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Receipts->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		
         $receipt = $this->Receipts->get($id, [
-            'contain' => ['ReceiptRows']
+            'contain' => ['ReceiptRows'=>['ReferenceDetails']]
         ]);
+		
 
 			   $session = $this->request->session();
 			   $st_year_id = $session->read('st_year_id');
@@ -491,16 +466,7 @@ class ReceiptsController extends AppController
 		
 
 		$old_ref_rows=[];
-		$old_received_from_ids=[];
-		$old_reference_numbers=[];
-		foreach($receipt->receipt_rows as $receipt_row){
-			$ReferenceDetails=$this->Receipts->ReferenceDetails->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'receipt_id'=>$receipt->id]);
-			foreach($ReferenceDetails as $ReferenceDetail){
-				$old_reference_numbers[$receipt_row->received_from_id][]=$ReferenceDetail->reference_no;
-			}
-			$old_ref_rows[$receipt_row->received_from_id]=$ReferenceDetails->toArray();
-			$old_received_from_ids[]=$receipt_row->received_from_id;
-		}
+		
 		
         if ($this->request->is(['patch', 'post', 'put'])) {
             $receipt = $this->Receipts->patchEntity($receipt, $this->request->data);
@@ -512,131 +478,91 @@ class ReceiptsController extends AppController
 			$receipt->transaction_date=date("Y-m-d",strtotime($receipt->transaction_date));
 				
 			//Save receipt
-			//pr($receipt); exit;
+		//	pr($receipt->receipt_rows); exit;
             if ($this->Receipts->save($receipt)) {
 				$this->Receipts->Ledgers->deleteAll(['voucher_id' => $receipt->id, 'voucher_source' => 'Receipt Voucher']);
+				$this->Receipts->ReferenceDetails->deleteAll(['receipt_id' => $receipt->id]);
 				$total_cr=0; $total_dr=0;
 				foreach($receipt->receipt_rows as $receipt_row){
-					
-					//Ledger posting for Received From Entity
 					$ledger = $this->Receipts->Ledgers->newEntity();
 					$ledger->company_id=$st_company_id;
 					$ledger->ledger_account_id = $receipt_row->received_from_id;
 					if($receipt_row->cr_dr=="Cr"){
-						$ledger->credit = $receipt_row->amount;
-						$ledger->debit = 0;
-						$total_cr=$total_cr+$receipt_row->amount;
+					$ledger->credit = $receipt_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$receipt_row->amount;
 					}else{
-						$ledger->credit = 0;
-						$ledger->debit = $receipt_row->amount;
-						$total_dr=$total_dr+$receipt_row->amount;
+					$ledger->credit = 0;
+					$ledger->debit = $receipt_row->amount;
+					$total_dr=$total_dr+$receipt_row->amount;
 					}
-					
 					$ledger->voucher_id = $receipt->id;
 					$ledger->voucher_source = 'Receipt Voucher';
 					$ledger->transaction_date = $receipt->transaction_date;
 					$this->Receipts->Ledgers->save($ledger);
 					
-					$total_amount=$total_cr-$total_dr;
-					
-					//Reference Number coding
-					if(sizeof(@$receipt->ref_rows[$receipt_row->received_from_id])>0){
-						
-						foreach($receipt->ref_rows[$receipt_row->received_from_id] as $ref_row){
-							$ref_row=(object)$ref_row;
-							$ReferenceDetail=$this->Receipts->ReferenceDetails->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'reference_no'=>$ref_row->ref_no,'receipt_id'=>$receipt->id])->first();
-							
-							if($ReferenceDetail){
-								$ReferenceBalance=$this->Receipts->ReferenceBalances->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->Receipts->ReferenceBalances->get($ReferenceBalance->id);
-								if($receipt_row->cr_dr=="Cr"){
-									$ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								}else{
-									$ReferenceBalance->debit=$ReferenceBalance->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								}
-								
-								$this->Receipts->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->Receipts->ReferenceDetails->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'reference_no'=>$ref_row->ref_no,'receipt_id'=>$receipt->id])->first();
-								$ReferenceDetail=$this->Receipts->ReferenceDetails->get($ReferenceDetail->id);
-								if($receipt_row->cr_dr=="Cr"){
-									$ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								}else{
-									$ReferenceDetail->debit=$ReferenceDetail->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								}
-								$this->Receipts->ReferenceDetails->save($ReferenceDetail);
-							}else{
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									$query = $this->Receipts->ReferenceBalances->query();
-									if($receipt_row->cr_dr=="Cr"){
-										$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-										->values([
-											'ledger_account_id' => $receipt_row->received_from_id,
-											'reference_no' => $ref_row->ref_no,
-											'credit' => $ref_row->ref_amount,
-											'debit' => 0
-										])
-										->execute();
-									}else{
-										$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-										->values([
-											'ledger_account_id' => $receipt_row->received_from_id,
-											'reference_no' => $ref_row->ref_no,
-											'credit' => 0,
-											'debit' => $ref_row->ref_amount
-										])
-										->execute();
-									}
-									
-								}else{
-									$ReferenceBalance=$this->Receipts->ReferenceBalances->find()->where(['ledger_account_id'=>$receipt_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->Receipts->ReferenceBalances->get($ReferenceBalance->id);
-									if($receipt_row->cr_dr=="Cr"){
-										$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-									}else{
-										$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-									}
-									$this->Receipts->ReferenceBalances->save($ReferenceBalance);
-								}
-								
-								$query = $this->Receipts->ReferenceDetails->query();
-								if($receipt_row->cr_dr=="Cr"){
-									$query->insert(['ledger_account_id', 'receipt_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-									->values([
-										'ledger_account_id' => $receipt_row->received_from_id,
-										'receipt_id' => $receipt->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => $ref_row->ref_amount,
-										'debit' => 0,
-										'reference_type' => $ref_row->ref_type
-									])
-									->execute();
-								}else{
-									$query->insert(['ledger_account_id', 'receipt_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-									->values([
-										'ledger_account_id' => $receipt_row->received_from_id,
-										'receipt_id' => $receipt->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => $ref_row->ref_amount,
-										'debit' => $ref_row->ref_type,
-										'reference_type' => 0
-									])
-									->execute();
-								}
-							}
+					foreach($receipt_row->ref_rows as $ref_rows){
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
+						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($ref_rows['ref_cr_dr']=="Dr"){
+							$ReferenceDetail->debit = $ref_rows['ref_amount'];
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $ref_rows['ref_amount'];
+							$ReferenceDetail->debit = 0;
 						}
-					}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+					} 
+					
+						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $receipt_row->received_from_id;
+						if($receipt_row->on_acc_dr_cr=="Dr"){
+							$ReferenceDetail->debit = $receipt_row->on_acc;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $receipt_row->on_acc;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->receipt_id = $receipt->id;
+						$ReferenceDetail->receipt_row_id = $receipt_row->id;
+						$ReferenceDetail->transaction_date = $receipt->transaction_date;
+						if($receipt_row->on_acc > 0){ 
+							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+						}
+						
+					
+					
 				}
+				$bankAmt=$total_dr-$total_cr;
+				//pr($bankAmt); exit;
+
 				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $receipt->bank_cash_id;
-				$ledger->debit = $total_amount;
-				$ledger->credit = 0;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
 				$ledger->voucher_id = $receipt->id;
 				$ledger->voucher_source = 'Receipt Voucher';
 				$ledger->transaction_date = $receipt->transaction_date;
-				$this->Receipts->Ledgers->save($ledger);
+				if($bankAmt != 0){
+					$this->Receipts->Ledgers->save($ledger);
+				}
+	
 				
                 $this->Flash->success(__('The receipt has been saved.'));
 
@@ -701,7 +627,7 @@ class ReceiptsController extends AppController
 			$ReceivedFroms_selected='no';
 		}
 		
-        $this->set(compact('receipt', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected', 'old_ref_rows','chkdate','financial_month_first','financial_month_last'));
+        $this->set(compact('receipt', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['receipt']);
     }
 
@@ -725,9 +651,11 @@ class ReceiptsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 	
+	
+	
 	public function fetchRefNumbers($received_from_id=null,$cr_dr=null){
 		$this->viewBuilder()->layout('');
-		$ReferenceBalances=$this->Receipts->ReferenceBalances->find()->where(['ledger_account_id'=>$received_from_id]);
+		$ReferenceBalances=$this->Receipts->ReferenceDetails->find()->where(['ledger_account_id'=>$received_from_id]);
 		$this->set(compact('ReferenceBalances','cr_dr'));
 	}
 	

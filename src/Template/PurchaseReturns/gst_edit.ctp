@@ -194,9 +194,9 @@
 							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 							
 							<td style="white-space: nowrap;">
-							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal','type'=>'hidden','value' => @$invoice_booking_row->item->id]);
+							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal item','type'=>'hidden','value' => @$invoice_booking_row->item->id]);
 							 echo @$invoice_booking_row->item->name; ?>
-							
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
 							</td>
 							
 							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.unit_rate_from_po',['value'=>$invoice_booking_row->unit_rate_from_po,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
@@ -754,8 +754,8 @@ $(document).ready(function() {
 			
 			if(val){ 
 				i++; 
-				$(this).find('td:nth-child(2) input').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");  
-				
+				$(this).find('td:nth-child(2) input.item').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");  
+				$(this).find('td:nth-child(2) input.hidden').attr("name","purchase_return_rows["+row_no+"][invoice_booking_row_id]").attr("id","purchase_return_rows-"+row_no+"-invoice_booking_row_id");
 				$(this).find('td:nth-child(3) input').attr("name","purchase_return_rows["+row_no+"][unit_rate_from_po]").attr("id","purchase_return_rows-"+row_no+"-unit_rate_from_po").removeAttr("readonly").rules("add", "required"); 
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required"); 
 				

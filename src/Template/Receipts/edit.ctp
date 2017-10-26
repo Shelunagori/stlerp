@@ -95,7 +95,10 @@ if($transaction_date <  $start_date ) {
 			<tbody id="main_tbody">
 			<?php foreach($receipt->receipt_rows as $receipt_row){ ?> 
 				<tr class="main_tr" old_received_from_id="<?php echo $receipt_row->received_from_id; ?>">
-					<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$receipt_row->received_from_id]); ?></td>
+					<td>
+					<?php echo $this->Form->input('id', ['type' => 'hidden','class' => 'form-control input-sm receipt_row_id','value'=>$receipt_row->id]); ?>
+					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$receipt_row->received_from_id]); ?></td>
 					<td>
 					<div class="row">
 						<div class="col-md-7" style="padding-right: 0;">
@@ -108,53 +111,57 @@ if($transaction_date <  $start_date ) {
 					</td>
 					<td>
 					
-						<div class="ref" style="padding:4px;">
+					<div class="ref" style="padding:4px;">
 						<table width="100%" class="ref_table">
 							<thead>
 								<tr>
-									<th width="25%">Ref Type</th>
-									<th width="40%">Ref No.</th>
-									<th width="30%">Amount</th>
+									<th width="20%">Ref Type</th>
+									<th width="35%">Ref No.</th>
+									<th width="28%">Amount</th>
+									<th width="30%">Cr/Dr</th>
 									<th width="5%"></th>
 								</tr>
 							</thead>
 							<tbody>
-							<?php foreach($old_ref_rows[$receipt_row->received_from_id] as $old_ref_row){ ?>
+							<?php foreach($receipt_row->reference_details as $reference_detail){
+								if($reference_detail->reference_type!='On_account'){
+								?>
 								<tr>
-									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
+									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
 									<td class="ref_no">
-									<?php if($old_ref_row->reference_type=="Against Reference"){
-										
-										
-										echo $this->requestAction('/Receipts/fetchRefNumbersEdit?received_from_id='.$receipt_row->received_from_id.'&cr_dr='.$receipt_row->cr_dr.'&reference_no='.$old_ref_row->reference_no.'&debit='.$old_ref_row->debit.'&credit='.$old_ref_row->credit); 
+									<?php if($reference_detail->reference_type=="Against Reference"){
+									echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$receipt_row->received_from_id.'&ref_name='.$reference_detail->reference_no);
 									}else{
-										echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$old_ref_row->reference_no.'" readonly="readonly" is_old="yes">';
-									}?>
+										echo $this->Form->input('ref_cr_dr', ['label' => false,'class' => 'form-control input-sm ','value'=>$reference_detail->reference_no]);
+									} ?> 
 									</td>
-									<td>
-									<?php if($receipt_row->cr_dr=="Cr"){
-											echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->credit]);
-											echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->credit]);
-										}else{
-											echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->debit]);
-											echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->debit]);
-										}							
-									?>
-									</td>
-									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button" old_ref="<?php echo $old_ref_row->reference_no; ?>" old_ref_type="<?php echo $old_ref_row->reference_type; ?>"><i class="fa fa-times"></i></a></td>
+									<td><?php 
+									if(!empty($reference_detail->credit)){
+										$amount=$reference_detail->credit;
+										$dr_cr="Cr";
+									}else{
+										$amount=$reference_detail->debit;
+										$dr_cr="Dr";
+									}
+									echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$amount]); ?></td>
+									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>$dr_cr]); ?></td>
+									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 								</tr>
-							<?php } ?>
+								<?php }
+							} ?>
 							</tbody>
 							<tfoot>
 								<tr>
 									<td align="center" style="vertical-align: middle !important;">On Account</td>
 									<td></td>
 									<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-									<td></td>
+									
+									<td><?php echo $this->Form->input('on_account_dr_cr', ['label' => false,'class' => 'form-control input-sm on_account_dr_cr','readonly']); ?></td>
+										
 								</tr>
 								<tr>
 									<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-									<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+									<td></td>
 									<td></td>
 								</tr>
 							</tfoot>
@@ -186,39 +193,9 @@ if($transaction_date <  $start_date ) {
 </div>
 <?php }  ?>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
-
 <script>
 $(document).ready(function() {
 	//--------- FORM VALIDATION
-	jQuery.validator.addMethod("noSpace", function(value, element) { 
-	  return value.indexOf(" ") < 0 && value != ""; 
-	}, "No space allowed");
-	
-	jQuery.validator.addMethod("notEqualToGroup", function (value, element, options) {
-		// get all the elements passed here with the same class
-		var elems = $(element).parents('form').find(options[0]);
-		// the value of the current element
-		var valueToCompare = value;
-		// count
-		var matchesFound = 0;
-		// loop each element and compare its value with the current value
-		// and increase the count every time we find one
-		jQuery.each(elems, function () {
-			thisVal = $(this).val();
-			if (thisVal == valueToCompare) {
-				matchesFound++;
-			}
-		});
-		// count should be either 0 or 1 max
-		if (this.optional(element) || matchesFound <= 1) {
-			//elems.removeClass('error');
-			return true;
-		} else {
-			//elems.addClass('error');
-		}
-	}, jQuery.format("Reference number should unique for one party."))
-
-
 	var form3 = $('#form_sample_3');
 	var error3 = $('.alert-danger', form3);
 	var success3 = $('.alert-success', form3);
@@ -271,8 +248,9 @@ $(document).ready(function() {
 		},
 
 		submitHandler: function (form) {
-			//$('#submitbtn').prop('disabled', true);
-			//$('#submitbtn').text('Submitting.....');
+			
+			$('#submitbtn').prop('disabled', true);
+			$('#submitbtn').text('Submitting.....');
 			success3.show();
 			error3.hide();
 			form[0].submit(); // submit the form
@@ -281,11 +259,9 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
-	
-		
 	$('input[name="payment_mode"]').die().live("click",function() {
 		var payment_mode=$(this).val();
-		alert(payment_mode);
+		
 		if(payment_mode=="Cheque"){
 			$("#chq_no").show();
 		}else{
@@ -293,124 +269,90 @@ $(document).ready(function() {
 		}
 	});
 	
-	var payment_mode=$('input[name="payment_mode"]:checked').val();
-	if(payment_mode=="Cheque"){
-		$("#chq_no").show();
-	}else{
-		$("#chq_no").hide();
-	}
-	//rename_rows();
-	
-	
-	function function2(){
-		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			var sel=$(this);
-			var received_from_id=$(this).find('td:nth-child(1) select').val();
-			rename_ref_rows(sel,received_from_id);
-		});
-	}
-	$.when(rename_rows()).then(function2());
 	function add_row(){
 		var tr=$("#sample_table tbody tr").clone();
 		$("#main_table tbody#main_tbody").append(tr);
 		rename_rows();
 	}
 	
+	rename_rows();
 	function rename_rows(){
 		var i=0;
-		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.received_from'],
-						messages: {
-							notEqualToGroup: "Do not select same party again."
-						}
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+			$(this).find("td:eq(0) .receipt_row_id").attr({name:"receipt_rows["+i+"][id]", id:"receipt_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"receipt_rows-"+i+"-received_from_id"}).rules('add', {
+						required: true
 					});
-			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(0) .row_id").val(i);
+			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"receipt_rows-"+i+"-amount"}).rules('add', {
 						required: true,
-						min: 0.01,
+						min: 0.01
 					});
-			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"receipt_rows-"+i+"-cr_dr"});
 			i++;
 		});
 	}
-	
+	var i=0;
 	$('.addrow').live("click",function() {
 		add_row();
 	});
 	$('.deleterow').live("click",function() {
-		var sel=$(this);
-		delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
-		do_mian_amount_total();
 	});
 	
 	$('.addrefrow').live("click",function() {
 		var sel=$(this).closest('tr.main_tr');
 		var received_from_id=$(this).closest('tr.main_tr').find('td:nth-child(1) select').val();
-		add_ref_row(sel,received_from_id);
+		add_ref_row(sel);
 	});
 	
-	function add_ref_row(sel,received_from_id){
+	function add_ref_row(sel){
 		var tr=$("#sample_ref table.ref_table tbody tr").clone();
 		sel.find("table.ref_table tbody").append(tr);
-		rename_ref_rows(sel,received_from_id);
+		rename_ref_rows(sel);
 	}
 	
-	function rename_ref_rows(sel,received_from_id){
+	
+	$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var sel=$(this);
+		rename_ref_rows(sel);
+	});
+
+	
+	
+	
+	function rename_ref_rows(sel){
 		var i=0;
+		var row_id=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
-			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
+			
+			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
+			
+			$(this).find("td:nth-child(1) select").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+row_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
-				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
+				$(this).find("td:nth-child(2) select").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'checkRefNumberUniqueEdit']); ?>';
-				var is_old=$(this).find("td:nth-child(2) input").attr('is_old');
-				url=url+'/'+received_from_id+'/'+i+'/'+is_old;
-				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id}).rules('add', {
-														required: true,
-														noSpace: true,
-														notEqualToGroup: ['.ref_number-'+received_from_id],
-														remote: {
-															url: url,
-														},
-														messages: {
-															remote: "Not an unique."
-														}
-													});
+				$(this).find("td:nth-child(2) input").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+row_id}).rules("add", "required");
 			}
 			
-			var is_ref_old_amount=$(this).find("td:nth-child(3) input:eq(0)").length;
-			if(is_ref_old_amount){
-				$(this).find("td:nth-child(3) input:eq(0)").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_old_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_old_amount"});
-			}
-			$(this).find("td:nth-child(3) input:eq(1)").attr({name:"ref_rows["+received_from_id+"]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(3) input").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+row_id+"-"+i+"-ref_amount"}).rules("add", "required");
+			
+			$(this).find("td:nth-child(4) select").attr({name:"receipt_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
-		var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
-		var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length;
-		if(is_tot_input){
-			$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total["+received_from_id+"]", id:"ref_rows_total-"+received_from_id}).rules('add', {
-														equalTo: "#"+amount_id
-													});
-		}
+		
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").attr({name:"receipt_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").attr({name:"receipt_rows["+row_id+"][on_acc_dr_cr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		///var a=$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val();
+		
 		
 	}
 	
-/* 	$('.deleterefrow').live("click",function() {
-		var sel=$(this);
-		delete_one_ref_no(sel);
-		$(this).closest("tr").remove();
-		do_ref_total();
-	}); */
-	
-	
 	$('.deleterefrow').live("click",function() {
-		var sel=$(this);
-		delete_one_ref_no(sel);
 		var l=$(this).closest("table.ref_table tbody").find("tr").length;
 			if(l>1){
 				$(this).closest("tr").remove();
@@ -423,12 +365,12 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	$('.cr_dr').live("change",function() {
+	/* $('.cr_dr').live("change",function() {
 		var sel=$(this);
 		load_ref_section(sel);
 		do_mian_amount_total();
 	});
-	
+	 */
 	function load_ref_section(sel){
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
 		var sel2=$(sel).closest('tr.main_tr');
@@ -450,20 +392,21 @@ $(document).ready(function() {
 		});
 	}
 	
-	
 	$('.ref_type').live("change",function() {
 		var current_obj=$(this);
+		
 		var sel3=$(this).closest('tr.main_tr');
 		var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
 		var ref_type=$(this).find('option:selected').val();
 		var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
 		if(ref_type=="Against Reference"){
-			var url="<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'fetchRefNumbers']); ?>";
-			url=url+'/'+received_from_id+'/'+cr_dr,
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
+			url=url+'/'+received_from_id,
+			
 			$.ajax({
 				url: url,
 				type: 'GET',
-			}).done(function(response) {
+			}).done(function(response) { 
 				current_obj.closest('tr').find('td:eq(1)').html(response);
 				rename_ref_rows(sel3,received_from_id);
 			});
@@ -473,47 +416,120 @@ $(document).ready(function() {
 		}else{
 			current_obj.closest('tr').find('td:eq(1)').html('');
 		}
-		
 	});
-	
-	
-	$('.ref_type').live("change",function() {
-		var sel=$(this);
-		delete_one_ref_no(sel);
-	});
-	
 	
 	$('.ref_list').live("change",function() {
-		var sel=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var current_obj=$(this);
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-		delete_one_ref_no(sel);
 	});
 	
+	$('.ref_list').live("change",function() {
+		do_ref_total();
+	});
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
 	
+	$('.cr_dr').live("change",function() { 
+		do_ref_total();
+	});
+	
+	$('.drcrChange').live("change",function() { 
+		do_ref_total();
+	});
+	
 	do_ref_total();
-	function do_ref_total(){
+	function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
-			var total_ref=0;
-			$(this).find("table.ref_table tbody tr").each(function(){
+			var total_ref_cr=0;
+			var total_ref_dr=0;
 			
-				var am=parseFloat($(this).find('td:nth-child(3) input:eq(1)').val());
+			$(this).find("table.ref_table tbody tr").each(function(){
+				var am=parseFloat($(this).find('td:nth-child(3) input').val());
+				var cr_dr=$(this).find('td:nth-child(4) select').val();
+				//alert(cr_dr);
 				if(!am){ am=0; }
-				total_ref=total_ref+am;
+				if(cr_dr=="Dr"){
+					total_ref_dr=total_ref_dr+am;
+				}else{
+					total_ref_cr=total_ref_cr+am;
+				}
 			});
-			var on_acc=main_amount-total_ref;
-			if(on_acc>=0){
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-				total_ref=total_ref+on_acc;
+			
+			
+			var main_dr_cr=$(this).closest("#main_table tbody#main_tbody tr.main_tr").find('.cr_dr').val();
+			var onAcc_dr_cr="";
+			var onAcc=0;
+			var afterCal=0;
+			if(main_dr_cr=="Dr"){
+				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
+				if(total_ref_dr > total_ref_cr){
+					afterCal=total_ref_dr-total_ref_cr;
+					onAcc=main_amt-afterCal;
+					onAcc_dr_cr="Dr";
+				}else if(total_ref_dr < total_ref_cr){
+					afterCal=total_ref_dr-total_ref_cr;
+					 onAcc=main_amt-afterCal;
+					onAcc_dr_cr="Dr";
+				}else{
+					onAcc=main_amt;
+					onAcc_dr_cr="Dr";
+				}
+				if(onAcc>=0){
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
+				}else{
+					onAcc=Math.abs(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Cr");
+				}
+				
+				var total_amt_ref=0;
+				if(onAcc_dr_cr=="Dr"){
+					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
+				}else{
+					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
+				}
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				
 			}else{
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
+				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
+				if(total_ref_dr < total_ref_cr){
+					afterCal=total_ref_cr-total_ref_dr;
+					onAcc=main_amt-afterCal;
+					onAcc_dr_cr="Cr";
+				}else if(total_ref_dr > total_ref_cr){
+					afterCal=total_ref_cr-total_ref_dr;
+					onAcc=main_amt-afterCal;
+					onAcc_dr_cr="Cr";
+				}else{
+					onAcc=main_amt;
+					onAcc_dr_cr="Cr";
+				}
+				
+				//alert(onAcc);
+				if(onAcc>=0){
+				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
+				//total_ref_cr=total_ref_cr+on_acc;
+				}else{
+					//onAcc=Math.abs(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
+				}
+				var total_amt_ref=0;
+				if(onAcc_dr_cr=="Dr"){
+					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
+				}else{ 
+					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
+					
+				}
+				
+				//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 			}
-			$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
 		});
 	}
 	
@@ -528,7 +544,6 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
-	do_mian_amount_total();
 	function do_mian_amount_total(){
 		var mian_amount_total_cr=0; var mian_amount_total_dr=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -547,60 +562,6 @@ $(document).ready(function() {
 	}
 	
 	
-	$('.received_from').live("change",function() {
-		var sel=$(this);
-		delete_all_ref_no(sel);
-	});
-	
-	$('.cr_dr').live("change",function() {
-		var sel=$(this);
-		delete_all_ref_no(sel);
-	});
-	
-	function delete_all_ref_no(sel){
-		var old_received_from_id=sel.closest('tr').attr('old_received_from_id');
-		var url="<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'deleteAllRefNumbers']); ?>";
-		url=url+'/'+old_received_from_id+'/'+<?php echo $receipt->id; ?>,
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-			//alert(response);
-		});
-	}
-	
-	function delete_one_ref_no(sel){
-		var old_received_from_id=sel.closest('tr.main_tr').attr('old_received_from_id');
-		var old_ref=sel.closest('tr').find('a.deleterefrow').attr('old_ref');
-		var old_ref_type=sel.closest('tr').find('a.deleterefrow').attr('old_ref_type');
-		var url="<?php echo $this->Url->build(['controller'=>'Receipts','action'=>'deleteOneRefNumbers']); ?>";
-		url=url+'?old_received_from_id='+old_received_from_id+'&receipt_id=<?php echo $receipt->id; ?>&old_ref='+old_ref+'&old_ref_type='+old_ref_type,
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-			//alert(response);
-		});
-	}
-	
-	$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-		var sel2=$(this);
-		var received_from_id=$(this).find("td:nth-child(1) select").find('option:selected').val();
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
-		url=url+'/'+received_from_id,
-		$.ajax({
-			url: url,
-			type: 'GET',
-			dataType: 'text'
-		}).done(function(response) {
-			if(response.trim()=="Yes"){
-				
-			}else{
-				$(sel2).find("td:nth-child(3)").html("");
-			}
-			rename_ref_rows(sel2,received_from_id);
-		});
-	});
 	
 });
 </script>
@@ -609,19 +570,21 @@ $(document).ready(function() {
 <table id="sample_table" style="display:none;">
 	<tbody>
 		<tr class="main_tr">
-			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?></td>
+			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
+			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			</td>
 			<td>
-			<div class="row">
-				<div class="col-md-7" style="padding-right: 0;">
-					<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
+				<div class="row">
+					<div class="col-md-7" style="padding-right: 0;">
+						<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
+					</div>
+					<div class="col-md-5  " style="padding-left: 0;">
+						<select name="cr_dr" class="form-control input-sm cr_dr" >
+							<option value="Cr">Cr</option>
+							<option value="Dr">Dr</option>
+						</select>
+					</div>
 				</div>
-				<div class="col-md-5"style="padding-left: 0;">
-					<select name="cr_dr" class="form-control input-sm cr_dr" >
-						<option value="Cr">Cr</option>
-						<option value="Dr">Dr</option>
-					</select>
-				</div>
-			</div>
 			</td>
 			<td></td>
 			<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
@@ -629,15 +592,16 @@ $(document).ready(function() {
 	</tbody>
 </table>
 
-
+<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
 <div id="sample_ref" style="display:none;">
 	<div class="ref" style="padding:4px;">
 	<table width="100%" class="ref_table">
 		<thead>
 			<tr>
-				<th width="25%">Ref Type</th>
-				<th width="40%">Ref No.</th>
-				<th width="30%">Amount</th>
+				<th width="20%">Ref Type</th>
+				<th width="35%">Ref No.</th>
+				<th width="28%">Amount</th>
+				<th width="30%">Cr/Dr</th>
 				<th width="5%"></th>
 			</tr>
 		</thead>
@@ -645,10 +609,8 @@ $(document).ready(function() {
 			<tr>
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
-				<td>
-				<?php echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden']); ?>
-				<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?>
-				</td>
+				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>
@@ -657,12 +619,13 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td></td>
+				<td><?php echo $this->Form->input('on_account_dr_cr', ['label' => false,'class' => 'form-control input-sm on_account_dr_cr','readonly']); ?></td>
+				
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
-				<td></td>
+				<td colspan="2"></td>
+				
 			</tr>
 		</tfoot>
 	</table>

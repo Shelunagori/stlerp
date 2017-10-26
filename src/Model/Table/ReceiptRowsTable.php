@@ -47,6 +47,9 @@ class ReceiptRowsTable extends Table
             'foreignKey' => 'received_from_id',
             'propertyName' => 'ReceivedFrom',
         ]);
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'receipt_row_id'
+        ]);
 		
     }
 
