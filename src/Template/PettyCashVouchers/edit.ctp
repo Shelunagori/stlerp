@@ -599,6 +599,7 @@ $(document).ready(function() {
 	function do_ref_total(){
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
+			
 			var total_ref=0;
 			var main_cr_dr=$(this).find('td:nth-child(2) select').val();
 			var total_ref_cr=0;
@@ -606,6 +607,7 @@ $(document).ready(function() {
 			$(this).find("table.ref_table tbody tr").each(function(){
 			
 				var am=parseFloat($(this).find('td:nth-child(3) input').val());
+				
 				var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
 				if(!am){ am=0; }
 				
@@ -791,7 +793,7 @@ $(document).ready(function() {
 <table id="sample_table" style="display:none;">
 	<tbody>
 		<tr class="main_tr">
-			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','auto_inc'=>0]); ?><div class="show_result"></div></td>
+			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','auto_inc'=>0]); ?><?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?><div class="show_result"></div></td>
 			<td>
 			<div class="row">
 				<div class="col-md-7" style="padding-right: 0;">
@@ -829,7 +831,7 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td>
-				<?php echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden']); ?>
+				<?php //echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden']); ?>
 				<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?>
 				</td>
 				<td width="15%" style="padding-left:0px; vertical-align: top !important;">

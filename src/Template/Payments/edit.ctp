@@ -370,7 +370,14 @@ $(document).ready(function() {
 	}
 	rename_rows();
 	
-	
+/* 	function function2(){
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			var sel=$(this);
+			var received_from_id=$(this).find('td:nth-child(1) select').val();
+			rename_ref_rows(sel,received_from_id);
+		});
+	} */
+	//$.when(rename_rows()).then(function2());
 	function add_row(){
 		var tr=$("#sample_table tbody tr").clone();
 		$("#main_table tbody#main_tbody").append(tr);
@@ -703,7 +710,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
-		//delete_all_ref_no(sel);
+		delete_all_ref_no(sel);
 	});
 	
 	
