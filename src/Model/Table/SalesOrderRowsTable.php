@@ -59,6 +59,11 @@ class SalesOrderRowsTable extends Table
 			'saveStrategy' => 'replace'
         ]);
 		
+		$this->hasMany('InvoiceRows', [
+            'foreignKey' => 'sales_order_row_id',
+            'joinType' => 'INNER'
+        ]);
+		
 		
     }
 

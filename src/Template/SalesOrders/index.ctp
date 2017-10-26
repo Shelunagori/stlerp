@@ -106,7 +106,16 @@
 					<tbody>
 						<?php 
 						//pr($salesOrders);exit;
-						foreach ($salesOrders as $salesOrder): ?>
+						foreach ($salesOrders as $salesOrder):
+							$TotalSalesOrderQuantity=0;
+							$item_ids=[];
+							foreach($salesOrder->sales_order_rows as $sales_order_row){ 
+								$TotalSalesOrderQuantity+=$sales_order_row->quantity;
+								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
+							}
+							
+						?>
+						
 						<tr <?php if($status=='Converted Into Invoice'){ echo 'style="background-color:#f4f4f4"'; } ?> >
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
@@ -121,10 +130,12 @@
 								<div class="btn-group">
 									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
 										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
-										<?php  foreach($salesOrder->sales_order_rows as $sales_order_rows){ 
-											if($sales_order_rows->sales_order_id == $salesOrder->id){?>
-											<li><p><?= h($sales_order_rows->item->name) ?></p></li>
-											<?php }}?>
+										<?php   
+												foreach($Items_sales as $item){ 
+												if($item_ids[$item->id] == $item->id){
+											 ?>
+											<li><p><?php echo $item->name; ?></p></li>
+												<?php }} ?>
 										</ul>
 								</div>
 							</td>
