@@ -21,6 +21,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 #main_tb thead th {
 	font-size:10px;
 }
+.disabledbutton {
+   display:none;
+}
 </style>
 <div class="portlet light bordered">
 	<div class="portlet-title">
@@ -249,15 +252,27 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					}
 				if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
+					/* if(@$sales_orders_qty[@$sales_order_rows->id] == @$sales_order_rows->quantity){
+						$disable_class="disabledbutton";
+					}else{
+						$disable_class="";
+					} */
+					
+					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){
 					?>
-						<tr class="tr1  firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+					
+						<tr class="tr1 firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
+							<td rowspan="2">
+								<?php echo ++$q; --$q; ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->id,'readonly']); ?>
+							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item_id,'readonly']); ?>
 								<?php echo $sales_order_rows->item->name; ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-$sales_order_rows->processed_quantity,'readonly','min'=>'1','max'=>@$sales_order_rows->quantity-$sales_order_rows->processed_quantity]); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','min'=>'1','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?>
+							
 							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'readonly','step'=>0.01]); ?>
@@ -298,8 +313,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
 							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%']);  ?></td>
 							<td></td>
-							</tr><?php } ?>
-						<?php $q++; endforeach; }?>
+					</tr><?php }  ?>
+					<?php $q++; } endforeach; }?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -669,6 +684,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(18) input[type="checkbox"]:checked').val();
 			if(val){ 
 				i++;
+				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
 				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");

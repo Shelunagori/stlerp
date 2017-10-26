@@ -46,6 +46,10 @@ class InvoiceRowsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('SalesOrderRows', [
+            'foreignKey' => 'sales_order_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

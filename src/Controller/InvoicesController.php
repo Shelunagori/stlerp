@@ -411,7 +411,7 @@ class InvoicesController extends AppController
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) {
 						   return $q
-								->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity'])
+								
 								->contain(['ItemSerialNumbers'=>function($q) use($st_company_id){
 									return $q->where(['ItemSerialNumbers.status' => 'In','ItemSerialNumbers.company_id' => $st_company_id]); 
 								},
@@ -1672,7 +1672,7 @@ class InvoicesController extends AppController
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) {
 						   return $q
-								->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity'])
+								
 								->contain(['ItemSerialNumbers'=>function($q) use($st_company_id){
 									return $q->where(['ItemSerialNumbers.status' => 'In','ItemSerialNumbers.company_id' => $st_company_id]); 
 								},
@@ -1749,7 +1749,7 @@ class InvoicesController extends AppController
 			} */
 
 			$ref_rows=@$invoice->ref_rows;
-			
+			//pr($invoice);exit;
             if ($this->Invoices->save($invoice)) {
 				foreach($invoice->invoice_rows as $invoice_row){
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
@@ -1893,8 +1893,8 @@ class InvoicesController extends AppController
 						$item_saletax=$saletax/$qty;
 						$fr_amount=$fright*$amount/$total_amt;
 						$item_fright=$fr_amount/$qty;
-						$SalesOrderRow = $this->Invoices->SalesOrderRows->get($sales_order_row_id);
-						$SalesOrderRow->processed_quantity=$SalesOrderRow->processed_quantity+$qty;
+						//$SalesOrderRow = $this->Invoices->SalesOrderRows->get($sales_order_row_id);
+						//$SalesOrderRow->processed_quantity=$SalesOrderRow->processed_quantity+$qty;
 						$this->Invoices->SalesOrderRows->save($SalesOrderRow);
 						$i++;
 						//Insert in Item Ledger//
@@ -2024,14 +2024,14 @@ class InvoicesController extends AppController
 				
 				
 
-		$salesOrders = $this->Invoices->SalesOrders->find()->select(['total_rows' => 
+		/* $salesOrders = $this->Invoices->SalesOrders->find()->select(['total_rows' => 
 		$this->Invoices->SalesOrders->find()->func()->count('SalesOrderRows.id')])
 		->leftJoinWith('SalesOrderRows', function ($q) {
 		return $q->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity']);
 		})
 		->group(['SalesOrders.id'])
 		->autoFields(true)
-		->having(['total_rows >' => 0]);
+		->having(['total_rows >' => 0]); */
 		
 		$items = $this->Invoices->Items->find('list');
 		$transporters = $this->Invoices->Transporters->find('list', ['limit' => 200])->order(['Transporters.transporter_name' => 'ASC']);
@@ -2078,10 +2078,26 @@ class InvoicesController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
+				
+		/////
+			$SalesOrders = $this->Invoices->SalesOrders->get($sales_order_id, [
+            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}],'SalesOrderRows'=>['Items']])
+        ]);
+			
+		$sales_orders_qty=[];
+			foreach($SalesOrders->invoices as $invoices){ 
+				foreach($invoices->invoice_rows as $invoice_row){ 
+					$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+					
+				}
+			}	
+	//	pr($sales_orders_qty);exit;
 		//pr($SaleTaxes->toArray());exit;
 		$item_serial_no=$this->Invoices->ItemSerialNumbers->find('list');
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','GstTaxes'));
+        $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','GstTaxes','sales_orders_qty'));
         $this->set('_serialize', ['invoice']);
 
 		$this->set(compact('sales_order','process_status','sales_order_id','chkdate'));
@@ -2185,15 +2201,6 @@ class InvoicesController extends AppController
 				}
 			}
 			
-			
-			foreach($invoice_old_data->invoice_rows as $invoice_row){
-				//pr($invoice_row->quantity);
-				$salesorderrowupdate=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
-				$salesorderrowupdate->processed_quantity=$salesorderrowupdate->processed_quantity-$invoice_row->quantity;
-				$this->Invoices->SalesOrderRows->save($salesorderrowupdate);
-				//pr($salesorderrowupdate->processed_quantity); exit;
-			} 
-			//exit;
 			
 			if ($this->Invoices->save($invoice)) {
 				
@@ -2499,16 +2506,28 @@ class InvoicesController extends AppController
 		$customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
 	   
+	   $invoicesMaxQty = $this->Invoices->get($id, [
+            'contain' => (['InvoiceRows'=>function ($q) {
+					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
+				}])
+        ]);
 		
-		$salesOrders = $this->Invoices->SalesOrders->find()->select(['total_rows' => 
-				$this->Invoices->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-				->leftJoinWith('SalesOrderRows', function ($q) {
-					return $q->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity']);
-				})
-				->group(['SalesOrders.id'])
-				->autoFields(true)
-				->having(['total_rows >' => 0]);
-				
+		$invoicesMaxQty = $this->Invoices->get($id, [
+            'contain' => (['InvoiceRows' => function($q) {
+				return $q->select(['total_qty' => $q->func()->sum('InvoiceRows.quantity')])
+				group(['InvoiceRows.id'])->contain(['SalesOrderRows']);
+			}])
+        ]);
+		
+		
+		
+			pr($invoicesMaxQty);exit;
+		$invoice_sales_orders_qty=[];
+			foreach($invoicesMaxQty->invoice_rows as $invoice_row){ 
+					$invoice_sales_orders_qty[@$invoice_row->sales_order_row_id]+=$invoice_row->total_qty;
+					
+				}
+				pr($invoice_sales_orders_qty);exit;
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
