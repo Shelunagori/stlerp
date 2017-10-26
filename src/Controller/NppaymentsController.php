@@ -273,7 +273,7 @@ class NppaymentsController extends AppController
 			}
 			
 			
-			pr($nppayment); exit;
+			//pr($nppayment); exit;
 			
 			
             if ($this->Nppayments->save($nppayment)) {
