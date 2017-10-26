@@ -433,12 +433,12 @@ $(document).ready(function() {
 		}
 	});
 	
-	/* $('.ref_list').live("change",function() {
+	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-	}); */
+	});
 	/* $('.ref_total').live("change",function() {
 		do_ref_total();
 	}); */
@@ -475,57 +475,60 @@ $(document).ready(function() {
 			var on_acc_cr_dr='';
 			if(main_cr_dr=='Dr')
 			{
-				
+				on_acc_cr_dr='Dr';
 				if(total_ref_dr > total_ref_cr)
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Dr';
 				}
 				else if(total_ref_dr < total_ref_cr)
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Cr';
 				}
 				else
 				{
 					on_acc=main_amount;
-					on_acc_cr_dr='Dr';
+				}
+				
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+				}else{
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 				}
 			}
 			else
 			{
+				on_acc_cr_dr='Cr';
 				if(total_ref_dr < total_ref_cr)
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Cr';
-					
 				}
 				else if(total_ref_dr > total_ref_cr)
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Dr';
 				}
 				else
 				{
 					on_acc=main_amount;
-					on_acc_cr_dr='Cr';
+				}
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+					
+				}else{
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 				}
 			}
-			on_acc=Math.abs(on_acc);
-			if(on_acc>=0){
-				//$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
-				total_ref=total_ref+on_acc;
-			}else{
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
-			}
-			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
-			$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
-			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
 		});
 		}
 	
