@@ -479,10 +479,8 @@ $(document).ready(function() {
 					onAcc_dr_cr="Dr";
 				}
 				if(onAcc>=0){
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
-				
-				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
-				//total_ref_cr=total_ref_cr+on_acc;
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
 				}else{
 					onAcc=Math.abs(onAcc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
@@ -522,9 +520,7 @@ $(document).ready(function() {
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
 					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
 				}
-				
 				var total_amt_ref=0;
-				
 				if(onAcc_dr_cr=="Dr"){
 					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
 				}else{ 

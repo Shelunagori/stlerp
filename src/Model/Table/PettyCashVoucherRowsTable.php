@@ -46,6 +46,9 @@ class PettyCashVoucherRowsTable extends Table
             'foreignKey' => 'received_from_id',
             'propertyName' => 'ReceivedFrom',
         ]);
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'petty_cash_voucher_row_id'
+        ]);
     }
 
     /**

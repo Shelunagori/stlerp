@@ -46,6 +46,10 @@ class ContraVoucherRowsTable extends Table
             'foreignKey' => 'received_from_id',
             'propertyName' => 'ReceivedFrom',
         ]);
+		
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'contra_voucher_row_id'
+        ]);
     }
 
     /**

@@ -235,9 +235,7 @@ $(document).ready(function() {
 						required: true
 					});
 					$(this).find("td:eq(0) .row_id").val(i);
-			/*var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length;
-			if(serial_l > 1)
-			{*/
+			
 				var thela_type = $(this).find("td:eq(0) select.received_from").val();
                 if(thela_type=='101' || thela_type=='165' || thela_type=='313')
 		        {				
@@ -259,8 +257,7 @@ $(document).ready(function() {
 						}
 					});
 				}
-			//}
-			
+		
 			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,
@@ -301,8 +298,6 @@ $(document).ready(function() {
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Payments','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/'+received_from_id+'/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
 			}
 			
@@ -311,28 +306,14 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		/* $(sel).find("table.ref_table tfoot tr:eq(1) td:eq(2) input.on_account").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"});  */
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"payment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		//var amount_id=$(sel).find("td:nth-child(2) input").attr('id');
-		//var is_tot_input=$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").length; 
-		/* if(is_tot_input){
-			$(sel).find("table.ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total["+received_from_id+"]", id:"ref_rows_total-"+received_from_id}).rules('add', {
-														equalTo: "#"+amount_id
-													});
-		} */
 	}
 	
-	$('.deleterefrow').live("click",function() {
-		var l=$(this).closest("table.ref_table tbody").find("tr").length;
-			if(l>1){
-				$(this).closest("tr").remove();
-			}
-		do_ref_total();
-	});
+	
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
@@ -340,11 +321,7 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	/* $('.cr_dr').live("change",function() {
-		//var sel=$(this);
-		//load_ref_section(sel);
-		do_mian_amount_total();
-	}); */
+	
 	
 	function load_ref_section(sel){ 
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
@@ -433,15 +410,13 @@ $(document).ready(function() {
 		}
 	});
 	
-	/* $('.ref_list').live("change",function() {
+	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-	}); */
-	/* $('.ref_total').live("change",function() {
-		do_ref_total();
-	}); */
+	});
+	
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
@@ -475,57 +450,60 @@ $(document).ready(function() {
 			var on_acc_cr_dr='';
 			if(main_cr_dr=='Dr')
 			{
-				
+				on_acc_cr_dr='Dr';
 				if(total_ref_dr > total_ref_cr)
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Dr';
 				}
 				else if(total_ref_dr < total_ref_cr)
 				{
 					total_ref=total_ref_dr-total_ref_cr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Cr';
 				}
 				else
 				{
 					on_acc=main_amount;
-					on_acc_cr_dr='Dr';
+				}
+				
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+				}else{
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 				}
 			}
 			else
 			{
+				on_acc_cr_dr='Cr';
 				if(total_ref_dr < total_ref_cr)
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Cr';
-					
 				}
 				else if(total_ref_dr > total_ref_cr)
 				{
 					total_ref=total_ref_cr-total_ref_dr;
 					on_acc=main_amount-total_ref;
-					on_acc_cr_dr='Dr';
 				}
 				else
 				{
 					on_acc=main_amount;
-					on_acc_cr_dr='Cr';
+				}
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+					
+				}else{
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 				}
 			}
-			on_acc=Math.abs(on_acc);
-			if(on_acc>=0){
-				//$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
-				total_ref=total_ref+on_acc;
-			}else{
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
-			}
-			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
-			$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
-			//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
 		});
 		}
 	
@@ -624,7 +602,7 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
+				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>

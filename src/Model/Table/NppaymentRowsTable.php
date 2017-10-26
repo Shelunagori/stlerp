@@ -46,6 +46,9 @@ class NppaymentRowsTable extends Table
             'foreignKey' => 'received_from_id',
             'propertyName' => 'ReceivedFrom',
         ]);
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'nppayment_row_id'
+        ]);
 
        
 

@@ -296,14 +296,36 @@ class GrnsController extends AppController
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) use($st_company_id){
 						   return $q
-								->where(['PurchaseOrderRows.quantity > PurchaseOrderRows.processed_quantity'])
 								->contain(['ItemCompanies'=>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]);
 						},'Companies','Vendors'
 					]
 			]);
-			//pr($purchase_order); exit;
+/* 
+			 foreach($purchase_order->purchase_order_rows as $data)
+			{
+			 $purchase_order_row_ids=$data->id;
+			 $purchaseOrders = $this->Grns->GrnRows->find()
+			 ->where(['GrnRows.purchase_order_row_id'=>$purchase_order_row_ids])
+			 
+			 function($query){
+				return $query->select([
+			 ->select(['total' => $query->func()->sum('quantity')])
+				->group('GrnRows.purchase_order_row_id')
+				->autoFields(true);
+             
+			 pr($purchaseOrders->toArray());
+			 
+				  if($purchaseOrders)
+				 {
+					$grn_quantity=$purchaseOrders->quantity;
+				 }
+				 else{
+					$grn_quantity=0;
+				 } */ 
+			} 
+			exit;
 		}
 		
 		$this->set(compact('purchase_order'));
@@ -359,6 +381,11 @@ class GrnsController extends AppController
 			$grn->company_id=$st_company_id ;
 			$grn->created_by=$this->viewVars['s_employee_id'];
 			//
+			
+			//pr($grn);
+			//exit;
+			
+			
 			 if ($this->Grns->save($grn)) {
 				
 					if(!empty($purchase_order_id)){
@@ -397,7 +424,9 @@ class GrnsController extends AppController
 		$companies = $this->Grns->Companies->find('all');
         $purchaseOrders = $this->Grns->PurchaseOrders->find('all');
 		
-        
+		//pr($purchase_order->toArray());
+		//exit;
+		
         $this->set(compact('grn', 'purchaseOrders', 'companies','customers','chkdate','financial_year','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['grn']);
     }
