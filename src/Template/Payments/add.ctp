@@ -235,9 +235,7 @@ $(document).ready(function() {
 						required: true
 					});
 					$(this).find("td:eq(0) .row_id").val(i);
-			/*var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length;
-			if(serial_l > 1)
-			{*/
+			
 				var thela_type = $(this).find("td:eq(0) select.received_from").val();
                 if(thela_type=='101' || thela_type=='165' || thela_type=='313')
 		        {				
@@ -259,8 +257,7 @@ $(document).ready(function() {
 						}
 					});
 				}
-			//}
-			
+		
 			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,
@@ -301,8 +298,6 @@ $(document).ready(function() {
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Payments','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/'+received_from_id+'/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
 			}
 			
@@ -318,13 +313,7 @@ $(document).ready(function() {
 		
 	}
 	
-	$('.deleterefrow').live("click",function() {
-		var l=$(this).closest("table.ref_table tbody").find("tr").length;
-			if(l>1){
-				$(this).closest("tr").remove();
-			}
-		do_ref_total();
-	});
+	
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
@@ -332,11 +321,7 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	/* $('.cr_dr').live("change",function() {
-		//var sel=$(this);
-		//load_ref_section(sel);
-		do_mian_amount_total();
-	}); */
+	
 	
 	function load_ref_section(sel){ 
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
@@ -431,9 +416,7 @@ $(document).ready(function() {
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 	});
-	/* $('.ref_total').live("change",function() {
-		do_ref_total();
-	}); */
+	
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
