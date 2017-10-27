@@ -191,17 +191,26 @@
 							
 					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+							<td rowspan="2"><?php echo ++$q; --$q; ?>
+							<?php echo $this->Form->input('purchase_return_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$purchaseReturnRowId[@$invoice_booking_row->id]]); ?>
+							</td>
 							
 							<td style="white-space: nowrap;">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal item','type'=>'hidden','value' => @$invoice_booking_row->item->id]);
 							 echo @$invoice_booking_row->item->name; ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
+							
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'invoice','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
+
 							</td>
 							
 							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.unit_rate_from_po',['value'=>$invoice_booking_row->unit_rate_from_po,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
 							
-							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>@$invoice_booking_row->quantity,'readonly','max'=>@$invoice_booking_row->quantity,'type'=>'text','style'=>'width:50px;']); ?></td>
+							<td><?php 
+							if(!empty(@$purchaseReturnRowItemDetail[@$invoice_booking_row->id]))
+							{ 
+								$data = explode(',',$purchaseReturnRowItemDetail[@$invoice_booking_row->id]);
+							}
+							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>@$data[0],'readonly','max'=>@$maxQty[@$invoice_booking_row->id],'type'=>'text','style'=>'width:50px;']); ?></td>
 							
 							<td align="center">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.misc',['type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly','value'=>0,'value'=>$invoice_booking_row->misc]); ?>
@@ -260,10 +269,11 @@
 							</td>
 							
 							<?php $checked2="";
-									if($invoice_booking_row->purchase_return_quantity == 0){ 
-											$check='';
+									if(@$data[0] > 0){ 
+											$check='checked';
 									} 
-									else{	$check='checked';
+									else{	
+									$check='';
 									} 
 								?>
 							<td><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check',$check,'value' => @$invoice_booking_row->id]); ?>
@@ -754,8 +764,9 @@ $(document).ready(function() {
 			
 			if(val){ 
 				i++; 
+				$(this).find('td:nth-child(1) input.hidden').attr("name","purchase_return_rows["+row_no+"][id]").attr("id","purchase_return_rows-"+row_no+"-id");
 				$(this).find('td:nth-child(2) input.item').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");  
-				$(this).find('td:nth-child(2) input.hidden').attr("name","purchase_return_rows["+row_no+"][invoice_booking_row_id]").attr("id","purchase_return_rows-"+row_no+"-invoice_booking_row_id");
+				$(this).find('td:nth-child(2) input.invoice').attr("name","purchase_return_rows["+row_no+"][invoice_booking_row_id]").attr("id","purchase_return_rows-"+row_no+"-invoice_booking_row_id");
 				$(this).find('td:nth-child(3) input').attr("name","purchase_return_rows["+row_no+"][unit_rate_from_po]").attr("id","purchase_return_rows-"+row_no+"-unit_rate_from_po").removeAttr("readonly").rules("add", "required"); 
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required"); 
 				
