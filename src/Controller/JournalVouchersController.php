@@ -253,7 +253,8 @@ class JournalVouchersController extends AppController
 					$ledger->voucher_source = 'Journal Voucher';
 					$ledger->transaction_date = $journalVoucher->transaction_date;
 					$this->JournalVouchers->Ledgers->save($ledger);
-					
+				if(!empty($journal_voucher_row->ref_rows))
+				{
 					foreach($journal_voucher_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->JournalVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -272,6 +273,7 @@ class JournalVouchersController extends AppController
 						$ReferenceDetail->transaction_date = $journalVoucher->transaction_date;
 						$this->JournalVouchers->ReferenceDetails->save($ReferenceDetail);
 					} 
+				}
 					
 						$ReferenceDetail = $this->JournalVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
