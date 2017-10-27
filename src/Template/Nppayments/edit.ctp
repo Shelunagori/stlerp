@@ -513,7 +513,6 @@ $(document).ready(function() {
     
     $('.ref_type').live("change",function() {
         var current_obj=$(this);
-        
         var sel3=$(this).closest('tr.main_tr');
         var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
         var ref_type=$(this).find('option:selected').val();
