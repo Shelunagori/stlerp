@@ -68,7 +68,8 @@ if($transaction_date <  $start_date ) {
 			<tbody id="main_tbody">
 			<?php foreach($journalVoucher->journal_voucher_rows as $journal_voucher_rows){ ?> 
 				<tr class="main_tr" old_received_from_id="<?php echo $journal_voucher_rows->received_from_id; ?>">
-					<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$journal_voucher_rows->received_from_id]); ?>
+					<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$journal_voucher_rows->received_from_id,'style'=>'width:266px;']); ?>
+					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					
 					<div class="show_grns">
 										<?php if($journal_voucher_rows->received_from_id=='101' || $journal_voucher_rows->received_from_id=="165" || $journal_voucher_rows->received_from_id=='313'){
@@ -91,7 +92,7 @@ if($transaction_date <  $start_date ) {
 												} 
 
 											}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns','style'=>'width:100%']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns','style'=>'width:266px']);
 											}
 											elseif($journal_voucher_rows->received_from_id=='105' || $journal_voucher_rows->received_from_id=="168" || $journal_voucher_rows->received_from_id=='316')
 											{
@@ -114,7 +115,7 @@ if($transaction_date <  $start_date ) {
 												    } 
 
 												}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices','style'=>'width:100%']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices','style'=>'width:266px']);
 											}
 
 										?>
@@ -130,16 +131,16 @@ if($transaction_date <  $start_date ) {
 						</div>
 					</div>
 					</td>
-					<td>
+					<td style="width:40%">
 					
 						<div class="ref" style="padding:4px;">
 						<table width="100%" class="ref_table">
 							<thead>
 								<tr>
 									<th width="25%">Ref Type</th>
-									<th width="40%">Ref No.</th>
+									<th width="25%">Ref No.</th>
 									<th width="30%">Amount</th>
-									<th width="5%"></th>
+									<th width="15%"></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -185,7 +186,7 @@ if($transaction_date <  $start_date ) {
 								</tr>
 								<tr>
 									<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-									<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+									<td></td>
 									<td></td>
 								</tr>
 							</tfoot>
@@ -361,8 +362,8 @@ $(document).ready(function() {
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			
-			$(this).find("td:eq(0) input.hidden").attr({name:"payment_rows["+i+"][id]", id:"payment_rows-"+i+"-id"});
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"payment_rows["+i+"][received_from_id]", id:"payment_rows-"+i+"-received_from_id"}).rules('add', {
+			$(this).find("td:eq(0) input.hidden").attr({name:"journal_voucher_rows["+i+"][id]", id:"journal_voucher_rows-"+i+"-id"});
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"journal_voucher_rows["+i+"][received_from_id]", id:"journal_voucher_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true,
 						
 					});
@@ -371,7 +372,7 @@ $(document).ready(function() {
 				var thela_type = $(this).find("td:eq(0) select.received_from").val();
                 if(thela_type=='101' || thela_type=='165' || thela_type=='313')
 		        {				
-					$(this).find("td:eq(0) select.grns").select2().attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
+					$(this).find("td:eq(0) select.grns").select2().attr({name:"journal_voucher_rows["+i+"][grn_ids][]", id:"journal_voucher_rows-"+i+"-grn_ids"}).rules('add', {
 						required: true,
 						notEqualToGroup: ['.grns'],
 						messages: {
@@ -381,7 +382,7 @@ $(document).ready(function() {
 				}
 				else if(thela_type=='105' || thela_type=='168' || thela_type=='316')
 		        {		 		
-					$(this).find("td:eq(0) select.invoices").select2().attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
+					$(this).find("td:eq(0) select.invoices").select2().attr({name:"journal_voucher_rows["+i+"][invoice_ids][]", id:"journal_voucher_rows-"+i+"-invoice_ids"}).rules('add', {
 						required: true,
 						notEqualToGroup: ['.invoices'],
 						messages: {
@@ -390,12 +391,12 @@ $(document).ready(function() {
 					});
 				}
 			
-			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"payment_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"journal_voucher_rows["+i+"][amount]", id:"journal_voucher_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,
 					});
-			$(this).find("td:eq(1) select").attr({name:"payment_rows["+i+"][cr_dr]", id:"payment_rows-"+i+"-cr_dr"});
-			$(this).find("td:nth-child(4) textarea").attr({name:"payment_rows["+i+"][narration]", id:"payment_rows-"+i+"-narration"}).rules("add", "required");
+			$(this).find("td:eq(1) select").attr({name:"journal_voucher_rows["+i+"][cr_dr]", id:"journal_voucher_rows-"+i+"-cr_dr"});
+			$(this).find("td:nth-child(4) textarea").attr({name:"journal_voucher_rows["+i+"][narration]", id:"journal_voucher_rows-"+i+"-narration"}).rules("add", "required");
 			i++;
 		});
 	}
@@ -405,7 +406,7 @@ $(document).ready(function() {
 	});
 	$('.deleterow').live("click",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_mian_amount_total();
 	});
@@ -426,24 +427,24 @@ $(document).ready(function() {
 		var i=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
 			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
-			$(this).find("td:nth-child(1) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
+			$(this).find("td:nth-child(1) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
-				$(this).find("td:nth-child(2) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
+				$(this).find("td:nth-child(2) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				$(this).find("td:nth-child(2) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
+				$(this).find("td:nth-child(2) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
 			}
 			
-			$(this).find("td:nth-child(3) input").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
-			$(this).find("td:nth-child(4) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+			$(this).find("td:nth-child(3) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(4) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"payment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"journal_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"payment_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"journal_voucher_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		
 	}
@@ -695,7 +696,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 	});
 	
 	

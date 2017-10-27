@@ -432,7 +432,7 @@ $(document).ready(function() {
 	});
 	$('.deleterow').live("click",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_mian_amount_total();
 	});
@@ -720,7 +720,7 @@ $(document).ready(function() {
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
-		delete_all_ref_no(sel);
+		//delete_all_ref_no(sel);
 	});
 	
 	
