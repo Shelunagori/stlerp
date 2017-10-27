@@ -268,13 +268,14 @@
 							
 							</td>
 							
-							<?php $checked2="";
-									if(@$data[0] > 0){ 
-											$check='checked';
-									} 
-									else{	
-									$check='';
-									} 
+							<?php 
+								$checked2="";
+								if(@$data[0] > 0){ 
+									$check='checked';
+								} 
+								else{	
+								$check='';
+								} 
 								?>
 							<td><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check',$check,'value' => @$invoice_booking_row->id]); ?>
 							</td>

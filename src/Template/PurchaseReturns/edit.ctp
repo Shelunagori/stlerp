@@ -147,7 +147,9 @@ if($transaction_date <  $start_date ) {
 					
 					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td ><?php echo ++$q; ?></td>
+							<td ><?php echo ++$q; ?>
+							<?php echo $this->Form->input('purchase_return_rows.'.$q.'id', ['class' => 'invoice','type'=>'hidden','value' => @$purchaseReturnRowId[@$invoice_booking_row->id]]); ?>
+							</td>
 							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
@@ -389,6 +391,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(6) input[type="checkbox"]:checked').val();
 			if(val){
 				i++;
+				$(this).find('td:nth-child(1) input.invoice').attr("name","purchase_return_rows["+row_no+"][id]").attr("id","purchase_return_rows-"+row_no+"-id");
 				$(this).find('td:nth-child(2) input.item').attr("name","purchase_return_rows["+row_no+"][item_id]").attr("id","purchase_return_rows-"+row_no+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(2) input.hidden').attr("name","purchase_return_rows["+row_no+"][invoice_booking_row_id]").attr("id","purchase_return_rows-"+row_no+"-invoice_booking_row_id");
 				$(this).find('td:nth-child(3) input:eq(0)').attr("name","purchase_return_rows["+row_no+"][ib_ammount]").attr("id","purchase_return_rows-"+row_no+"-ib_ammount").removeAttr("readonly").rules("add", "required");

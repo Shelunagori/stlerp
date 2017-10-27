@@ -1054,8 +1054,10 @@ class PurchaseReturnsController extends AppController
 		}
 		
 		$purchaseReturnRowItemQty=[];
+		$purchaseReturnRowId = [];
 		foreach($PurchaseReturn->purchase_return_rows as $purchase_return_row)
 		{
+			$purchaseReturnRowId[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->id;
 			$maxQty[$purchase_return_row->invoice_booking_row_id] =$invoiceBookingItemQty[@$purchase_return_row->invoice_booking_row_id]-$Qty[@$purchase_return_row->invoice_booking_row_id]+$purchase_return_row->quantity;
 			$purchaseReturnRowItemDetail[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->quantity.','.$purchase_return_row->total;
 		}
@@ -1314,7 +1316,7 @@ class PurchaseReturnsController extends AppController
 	    $financial_year_data = $Em->checkFinancialYear($invoiceBooking->created_on);			
         $invoiceBookings = $this->PurchaseReturns->InvoiceBookings->find('list', ['limit' => 200]);
         $companies = $this->PurchaseReturns->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('purchaseReturn', 'invoiceBookings', 'companies','invoiceBooking','v_LedgerAccount','financial_year_data','ReferenceDetails','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','maxQty','purchaseReturnRowItemDetail'));
+        $this->set(compact('purchaseReturn', 'invoiceBookings', 'companies','invoiceBooking','v_LedgerAccount','financial_year_data','ReferenceDetails','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
         $this->set('_serialize', ['purchaseReturn']);
     }
 
