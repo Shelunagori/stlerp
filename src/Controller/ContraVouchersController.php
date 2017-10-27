@@ -430,134 +430,89 @@ class ContraVouchersController extends AppController
             $contravoucher->edited_on=date("Y-m-d");
             $contravoucher->edited_by=$s_employee_id;
             $contravoucher->transaction_date=date("Y-m-d",strtotime($contravoucher->transaction_date));
-            
+          
 			//Save receipt
             if ($this->ContraVouchers->save($contravoucher)) {
                 $this->ContraVouchers->Ledgers->deleteAll(['voucher_id' => $contravoucher->id, 'voucher_source' => 'Contra Voucher']);
+                $this->ContraVouchers->ReferenceDetails->deleteAll(['contra_voucher_id' => $contravoucher->id]);
                 $total_cr=0; $total_dr=0;
                 foreach($contravoucher->contra_voucher_rows as $contra_voucher_row){
-                    
-                    //Ledger posting for Received From Entity
-                    $ledger = $this->ContraVouchers->Ledgers->newEntity();
-                    $ledger->company_id=$st_company_id;
-                    $ledger->ledger_account_id = $contra_voucher_row->received_from_id;
-                    if($contra_voucher_row->cr_dr=="Dr"){
-                        $ledger->debit = $contra_voucher_row->amount;
-                        $ledger->credit = 0;
-                        $total_dr=$total_dr+$contra_voucher_row->amount;
-                    }else{
-                        $ledger->debit = 0;
-                        $ledger->credit = $contra_voucher_row->amount;
-                        $total_cr=$total_cr+$contra_voucher_row->amount;
-                    }
-                    $ledger->voucher_id = $contravoucher->id;
-                    $ledger->voucher_source = 'Contra Voucher';
-                    $ledger->transaction_date = $contravoucher->transaction_date;
-                    $this->ContraVouchers->Ledgers->save($ledger);
-                    
-                    $total_amount=$total_dr-$total_cr;
-                    
-                    //Reference Number coding
-                    if(sizeof(@$contravoucher->ref_rows[$contra_voucher_row->received_from_id])>0){
-                     foreach($contravoucher->ref_rows[$contra_voucher_row->received_from_id] as $ref_row){
-                            $ref_row=(object)$ref_row;
-                            $ReferenceDetail=$this->ContraVouchers->ReferenceDetails->find()->where(['ledger_account_id'=>$contra_voucher_row->received_from_id,'reference_no'=>$ref_row->ref_no,'payment_id'=>$contravoucher->id])->first();
-                            
-                            if($ReferenceDetail){
-                                $ReferenceBalance=$this->ContraVouchers->ReferenceBalances->find()->where(['ledger_account_id'=>$contra_voucher_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-                                $ReferenceBalance=$this->ContraVouchers->ReferenceBalances->get($ReferenceBalance->id);
-                                if($contra_voucher_row->cr_dr=="Dr"){
-                                    $ReferenceBalance->debit=$ReferenceBalance->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }else{
-                                    $ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }
-                                
-                                $this->ContraVouchers->ReferenceBalances->save($ReferenceBalance);
-                                
-                                $ReferenceDetail=$this->ContraVouchers->ReferenceDetails->find()->where(['ledger_account_id'=>$contra_voucher_row->received_from_id,'reference_no'=>$ref_row->ref_no,'contra_voucher_id'=>$contravoucher->id])->first();
-                                $ReferenceDetail=$this->ContraVouchers->ReferenceDetails->get($ReferenceDetail->id);
-                                if($contra_voucher_row->cr_dr=="Dr"){
-                                    $ReferenceDetail->debit=$ReferenceDetail->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }else{
-                                    $ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }
-                                
-                                $this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
-                            }else{
-                                if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-                                    $query = $this->ContraVouchers->ReferenceBalances->query();
-                                    if($contra_voucher_row->cr_dr=="Dr"){
-                                        $query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-                                        ->values([
-                                            'ledger_account_id' => $contra_voucher_row->received_from_id,
-                                            'reference_no' => $ref_row->ref_no,
-                                            'credit' => 0,
-                                            'debit' => $ref_row->ref_amount
-                                        ])
-                                        ->execute();
-                                    }else{
-                                        $query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-                                        ->values([
-                                            'ledger_account_id' => $contra_voucher_row->received_from_id,
-                                            'reference_no' => $ref_row->ref_no,
-                                            'credit' => $ref_row->ref_amount,
-                                            'debit' => 0
-                                        ])
-                                        ->execute();
-                                    }
-                                    
-                                }else{
-                                    $ReferenceBalance=$this->ContraVouchers->ReferenceBalances->find()->where(['ledger_account_id'=>$contra_voucher_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-                                    $ReferenceBalance=$this->ContraVouchers->ReferenceBalances->get($ReferenceBalance->id);
-                                    if($contra_voucher_row->cr_dr=="Dr"){
-                                        $ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-                                    }else{
-                                        $ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-                                    }
-                                    
-                                    $this->ContraVouchers->ReferenceBalances->save($ReferenceBalance);
-                                }
-                                
-                                $query = $this->ContraVouchers->ReferenceDetails->query();
-                                if($contra_voucher_row->cr_dr=="Dr"){
-                                    $query->insert(['ledger_account_id', 'contra_voucher_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-                                    ->values([
-                                        'ledger_account_id' => $contra_voucher_row->received_from_id,
-                                        'contra_voucher_id' => $contravoucher->id,
-                                        'reference_no' => $ref_row->ref_no,
-                                        'credit' => 0,
-                                        'debit' => $ref_row->ref_amount,
-                                        'reference_type' => $ref_row->ref_type
-                                    ])
-                                    ->execute();
-                                }else{
-                                    $query->insert(['ledger_account_id', 'contra_voucher_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-                                    ->values([
-                                        'ledger_account_id' => $contra_voucher_row->received_from_id,
-                                        'contra_voucher_id' => $contravoucher->id,
-                                        'reference_no' => $ref_row->ref_no,
-                                        'credit' => $ref_row->ref_amount,
-                                        'debit' => 0,
-                                        'reference_type' => $ref_row->ref_type
-                                    ])
-                                    ->execute();
-                                }
-                                
-                            }
-                        }
-                    }
+ 					$ledger = $this->ContraVouchers->Ledgers->newEntity();
+					$ledger->company_id=$st_company_id;
+					$ledger->ledger_account_id = $contra_voucher_row->received_from_id;
+					if($contra_voucher_row->cr_dr=="Cr"){
+					$ledger->credit = $contra_voucher_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$contra_voucher_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $contra_voucher_row->amount;
+					$total_dr=$total_dr+$contra_voucher_row->amount;
+					}
+					$ledger->voucher_id = $contravoucher->id;
+					$ledger->voucher_source = 'Contra Voucher';
+					$ledger->transaction_date = $contravoucher->transaction_date;
+					$this->ContraVouchers->Ledgers->save($ledger);
+					
+					foreach($contra_voucher_row->ref_rows as $ref_rows){  // pr($ref_rows); 
+						$ReferenceDetail = $this->ContraVouchers->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
+						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
+						$ReferenceDetail->ledger_account_id = $contra_voucher_row->received_from_id;
+						if($ref_rows['ref_cr_dr']=="Dr"){
+							$ReferenceDetail->debit = $ref_rows['ref_amount'];
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $ref_rows['ref_amount'];
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->contra_voucher_id = $contravoucher->id;
+						$ReferenceDetail->contra_voucher_row_id = $contra_voucher_row->id;
+						$ReferenceDetail->transaction_date = $contravoucher->transaction_date;
+						$this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
+					} 
+					
+						$ReferenceDetail = $this->ContraVouchers->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $contra_voucher_row->received_from_id;
+						if($contra_voucher_row->on_acc_dr_cr=="Dr"){
+							$ReferenceDetail->debit = $contra_voucher_row->on_acc;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $contra_voucher_row->on_acc;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->contra_voucher_id = $contravoucher->id;
+						$ReferenceDetail->contra_voucher_row_id = $contra_voucher_row->id;
+						$ReferenceDetail->transaction_date = $contravoucher->transaction_date;
+						if($contra_voucher_row->on_acc > 0){ 
+							$this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
+						} 
                 }
-             //Ledger posting for bankcash
-                $ledger = $this->ContraVouchers->Ledgers->newEntity();
-                $ledger->company_id=$st_company_id;
-                $ledger->ledger_account_id = $contravoucher->bank_cash_id;
-                $ledger->debit = 0;
-                $ledger->credit = $total_amount;
-                $ledger->voucher_id = $contravoucher->id;
-                $ledger->voucher_source = 'Contra Voucher';
-                $ledger->transaction_date = $contravoucher->transaction_date;
-                $this->ContraVouchers->Ledgers->save($ledger);
                 
+                //Ledger posting for bankcash
+					$bankAmt=$total_dr-$total_cr;
+					//pr($bankAmt); exit;
+					//Ledger posting for bankcash
+					$ledger = $this->ContraVouchers->Ledgers->newEntity();
+					$ledger->company_id=$st_company_id;
+					$ledger->ledger_account_id = $contravoucher->bank_cash_id;
+					if($bankAmt > 0){
+						$ledger->credit = $bankAmt;
+						$ledger->debit = 0;
+					}else{
+						$ledger->debit = abs($bankAmt);
+						$ledger->credit = 0;
+					}
+					$ledger->voucher_id = $contravoucher->id;
+					$ledger->voucher_source = 'Contra Voucher';
+					$ledger->transaction_date = $contravoucher->transaction_date;
+					if($bankAmt != 0){
+						$this->ContraVouchers->Ledgers->save($ledger);
+					} 
+					
                 $this->Flash->success(__('The receipt has been saved.'));
 
                 return $this->redirect(['action' => 'index']);

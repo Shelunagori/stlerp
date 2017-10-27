@@ -162,7 +162,7 @@ if($transaction_date <  $start_date ) {
                                 </tr>
                                 <tr>
                                     <td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-                                    <td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+                                    <td></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -330,7 +330,10 @@ $(document).ready(function() {
         rename_ref_rows(sel);
     }
 	
-   
+    $("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var sel=$(this);
+		rename_ref_rows(sel);
+	});
 	
 	function rename_ref_rows(sel){
 		var i=0;
@@ -526,7 +529,7 @@ $(document).ready(function() {
 				}else{ 
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+			//	$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 			}
 		});
 	}
@@ -538,11 +541,11 @@ $(document).ready(function() {
     });
     
     $('.mian_amount').live("keyup",function() {
-        do_mian_amount_total();
+     //   do_mian_amount_total();
         do_ref_total();
     });
     
-    function do_mian_amount_total(){
+/*     function do_mian_amount_total(){
         var mian_amount_total_cr=0; var mian_amount_total_dr=0;
         $("#main_table tbody#main_tbody tr.main_tr").each(function(){
             var v=parseFloat($(this).find("td:nth-child(2) input").val());
@@ -557,7 +560,7 @@ $(document).ready(function() {
             mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
             $('#receipt_amount').text(mian_amount_total.toFixed(2));
         });
-    }   
+    } */   
   
 });
 </script>
@@ -566,7 +569,9 @@ $(document).ready(function() {
 <table id="sample_table" style="display:none;">
     <tbody>
         <tr class="main_tr">
-            <td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?></td>
+            <td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
+			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			</td>
             <td>
             <div class="row">
                 <div class="col-md-7" style="padding-right: 0;">
@@ -618,7 +623,7 @@ $(document).ready(function() {
             </tr>
             <tr>
                 <td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-                <td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+                <td></td>
                 <td></td>
             </tr>
         </tfoot>
