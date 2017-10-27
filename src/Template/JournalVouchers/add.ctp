@@ -210,25 +210,44 @@ $(document).ready(function() {
 	}
 	
 	function rename_rows(){
-		var i=0;
+		var i=0; 
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"journal_voucher_rows["+i+"][received_from_id]", id:"journal_voucher_rows-"+i+"-received_from_id"}).rules('add', {
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"journal_voucher_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true
 					});
-			$(this).find("td:eq(0) .row_id").val(i);
-			$(this).find("td:eq(1) input").attr({name:"journal_voucher_rows["+i+"][amount]", id:"journal_voucher_rows-"+i+"-amount"}).rules('add', {
+					$(this).find("td:eq(0) .row_id").val(i);
+			
+				var thela_type = $(this).find("td:eq(0) select.received_from").val();
+                if(thela_type=='101' || thela_type=='165' || thela_type=='313')
+		        {				
+					$(this).find("td:eq(0) select.grns").select2().attr({name:"journal_voucher_rows["+i+"][grn_ids][]", id:"quotation_rows-"+i+"-grn_ids"}).rules('add', {
 						required: true,
-						min: 0.01
+						notEqualToGroup: ['.grns'],
+						messages: {
+							notEqualToGroup: "Do not select same grn again."
+						}
 					});
-			
-			$(this).find("td:eq(1) select").attr({name:"journal_voucher_rows["+i+"][cr_dr]", id:"journal_voucher_rows-"+i+"-cr_dr"});
-			
-			$(this).find("td:eq(3) textarea").attr({name:"journal_voucher_rows["+i+"][narration]", id:"journal_voucher_rows-"+i+"-narration"});
-			
+				}
+				if(thela_type=='105' || thela_type=='168' || thela_type=='316')
+		        {				
+					$(this).find("td:eq(0) select.invoices").select2().attr({name:"journal_voucher_rows["+i+"][invoice_ids][]", id:"quotation_rows-"+i+"-invoice_ids"}).rules('add', {
+						required: true,
+						notEqualToGroup: ['.invoices'],
+						messages: {
+							notEqualToGroup: "Do not select same invoice again."
+						}
+					});
+				}
+		
+			$(this).find("td:eq(1) input").attr({name:"journal_voucher_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+						required: true,
+						min: 0.01,
+					});
+			$(this).find("td:eq(1) select").attr({name:"journal_voucher_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:nth-child(4) textarea").attr({name:"journal_voucher_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
 			i++;
 		});
-	}	
-	
+	}
 	
 	$('.addrow').live("click",function() {
 		add_row();
@@ -251,39 +270,37 @@ $(document).ready(function() {
 	
 	function rename_ref_rows(sel,received_from_id){
 		var i=0;
-		var row_id=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
-			
 			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
-			
-			$(this).find("td:nth-child(1) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+row_id+"-"+i+"-ref_type"}).rules("add", "required");
+			$(this).find("td:nth-child(1) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
-				//$(this).find("td:nth-child(2) input").rules("remove", "required");
-				$(this).find("td:nth-child(2) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no"}).rules("add", "required");
+				$(this).find("td:nth-child(2) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				$(this).find("td:nth-child(2) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+row_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+row_id}).rules("add", "required");
+				$(this).find("td:nth-child(2) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_no]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_no", class:"form-control input-sm ref_number-"+received_from_id});
 			}
 			
-			$(this).find("td:nth-child(3) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+row_id+"-"+i+"-ref_amount"}).rules("add", "required");
-			
+			$(this).find("td:nth-child(3) input").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_amount]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_amount"}).rules("add", "required");
 			$(this).find("td:nth-child(4) select").attr({name:"journal_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").attr({name:"journal_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").attr({name:"journal_voucher_rows["+row_id+"][on_acc_dr_cr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
-		///var a=$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val();
-	}	
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"journal_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"journal_voucher_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		
+	}
 	
 	
-	/* $('.deleterefrow').live("click",function() {
-		$(this).closest("tr").remove();
-		do_ref_total();
-	}); */
+	
+	$('.received_from').live("change",function() {
+		var sel=$(this);
+		$(this).closest('div.select').css("width","266px");
+		load_ref_section(sel);
+	});
 	
 	$('.deleterefrow').live("click",function() {
 		var l=$(this).closest("table.ref_table tbody").find("tr").length;
@@ -293,37 +310,25 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
-	$('.received_from').live("change",function() {
-		var sel=$(this);
-		$(this).closest('div.select').css("width","235px");
-		load_ref_section(sel);
-	});
-	
-    $('.cr_dr').live("change",function() {
-       // var sel=$(this);
-       // load_ref_section(sel);
-      //  do_mian_amount_total();
-    });
-	
 	function load_ref_section(sel){ 
-        $(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
-        var sel2=$(sel).closest('tr.main_tr');
-        var received_from_id=$(sel).closest("tr.main_tr").find("td:nth-child(1) select").find('option:selected').val();
-        var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
-        url=url+'/'+received_from_id,
-        $.ajax({
-            url: url,
-            type: 'GET',
-            dataType: 'text'
-        }).done(function(response) {
-            if(response.trim()=="Yes"){
-                var ref_table=$("#sample_ref div.ref").clone();
-                $(sel).closest("tr").find("td:nth-child(3)").html(ref_table);
-            }else{
-                $(sel).closest("tr").find("td:nth-child(3)").html("");
-            }
-            rename_ref_rows(sel2,received_from_id);
-        });
+		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
+		var sel2=$(sel).closest('tr.main_tr');
+		var received_from_id=$(sel).closest("tr.main_tr").find("td:nth-child(1) select").find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) {
+			if(response.trim()=="Yes"){
+				var ref_table=$("#sample_ref div.ref").clone();
+				$(sel).closest("tr").find("td:nth-child(3)").html(ref_table);
+			}else{
+				$(sel).closest("tr").find("td:nth-child(3)").html("");
+			}
+			rename_ref_rows(sel2,received_from_id);
+		});
 		
 		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
@@ -334,13 +339,16 @@ $(document).ready(function() {
 				type: 'GET',
 				dataType: 'text'
 			}).done(function(response) {
-				$(sel).closest('tr.main_tr').find('.show_result').html(response);
+				//$(this).closest("tr").remove();
+				//$(".show_grns").html(response);
+		    	
+				$(sel).closest('tr.main_tr').find('.show_grns').html(response);
 				rename_rows();
 			});
 		}
 		else
 		{
-			$(sel).closest('tr.main_tr').find('.show_result').html('');
+			$(sel).closest('tr.main_tr').find('.show_grns').html('');
 		}
 		
 		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadInvoices']); ?>";
@@ -352,165 +360,143 @@ $(document).ready(function() {
 				type: 'GET',
 				dataType: 'text'
 			}).done(function(response) {  
-				$(sel).closest('tr.main_tr').find('.show_result').html(response);
-				rename_rows(); 
+				$(sel).closest('tr.main_tr').find('.show_grns').html(response);
+				rename_rows();
 			});
 		}
 		else
 		{
-			$(sel).closest('tr.main_tr').find('.show_result').html('');
+			$(sel).closest('tr.main_tr').find('.show_grns').html('');
 		}
 	}
 	
 	
 	
 	$('.ref_type').live("change",function() {
-        var current_obj=$(this);
-        
-        var sel3=$(this).closest('tr.main_tr');
-        var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
-        var ref_type=$(this).find('option:selected').val();
-        var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
-        if(ref_type=="Against Reference"){
-            var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
+		var current_obj=$(this);
+		
+		var sel3=$(this).closest('tr.main_tr');
+		var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
+		var ref_type=$(this).find('option:selected').val();
+		var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
+		if(ref_type=="Against Reference"){
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url+'/'+received_from_id,
-            $.ajax({
-                url: url,
-                type: 'GET',
-            }).done(function(response) {
-                current_obj.closest('tr').find('td:eq(1)').html(response);
-                rename_ref_rows(sel3,received_from_id);
-            });
-        }else if(ref_type=="New Reference" || ref_type=="Advance Reference"){
-            current_obj.closest('tr').find('td:eq(1)').html('<input type="text" class="form-control input-sm" placeholder="Ref No." >');
-            rename_ref_rows(sel3,received_from_id);
-        }else{
-            current_obj.closest('tr').find('td:eq(1)').html('');
-        }
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {
+				current_obj.closest('tr').find('td:eq(1)').html(response);
+				rename_ref_rows(sel3,received_from_id);
+			});
+		}else if(ref_type=="New Reference" || ref_type=="Advance Reference"){
+			current_obj.closest('tr').find('td:eq(1)').html('<input type="text" class="form-control input-sm" placeholder="Ref No." >');
+			rename_ref_rows(sel3,received_from_id);
+		}else{
+			current_obj.closest('tr').find('td:eq(1)').html('');
+		}
 	});
 	
-    $('.ref_list').live("change",function() {
-        var current_obj=$(this);
-        var due_amount=$(this).find('option:selected').attr('amt');
+	$('.ref_list').live("change",function() {
+		var current_obj=$(this);
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
-        do_ref_total();
-    });
-    
-    $('.ref_amount_textbox').live("keyup",function() {
-        do_ref_total();
-    });
-	
-		$('.ref_list').live("change",function() {
 		do_ref_total();
 	});
+	
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
 	
-	$('.cr_dr').live("change",function() { 
-		do_ref_total();
-	});
-	
-	$('.drcrChange').live("change",function() { 
-		do_ref_total();
-	});	
-	
-	
 	function do_ref_total(){
+		if($("#main_table tbody#main_tbody tr.main_tr").length<1)
+		{
+			 $('#receipt_amount').text('');
+		}
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
+			var total_ref=0;
+			var main_cr_dr=$(this).find('td:nth-child(2) select').val();
 			var total_ref_cr=0;
 			var total_ref_dr=0;
-			
 			$(this).find("table.ref_table tbody tr").each(function(){
+			
 				var am=parseFloat($(this).find('td:nth-child(3) input').val());
-				var cr_dr=$(this).find('td:nth-child(4) select').val();
-				//alert(cr_dr);
+				var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
 				if(!am){ am=0; }
-				if(cr_dr=="Dr"){
+				
+				if(ref_cr_dr=='Dr')
+				{
 					total_ref_dr=total_ref_dr+am;
-				}else{
+				}
+				else
+				{
 					total_ref_cr=total_ref_cr+am;
 				}
+				
 			});
 			
-			
-			var main_dr_cr=$(this).closest("#main_table tbody#main_tbody tr.main_tr").find('.cr_dr').val();
-			var onAcc_dr_cr="";
-			var onAcc=0;
-			var afterCal=0;
-			if(main_dr_cr=="Dr"){
-				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
-				if(total_ref_dr > total_ref_cr){
-					afterCal=total_ref_dr-total_ref_cr;
-					onAcc=main_amt-afterCal;
-					onAcc_dr_cr="Dr";
-				}else if(total_ref_dr < total_ref_cr){
-					afterCal=total_ref_dr-total_ref_cr;
-					 onAcc=main_amt-afterCal;
-					onAcc_dr_cr="Dr";
-				}else{
-					onAcc=main_amt;
-					onAcc_dr_cr="Dr";
+			var on_acc=0;
+			var total_ref=0;
+			var on_acc_cr_dr='';
+			if(main_cr_dr=='Dr')
+			{
+				on_acc_cr_dr='Dr';
+				if(total_ref_dr > total_ref_cr)
+				{
+					total_ref=total_ref_dr-total_ref_cr;
+					on_acc=main_amount-total_ref;
 				}
-				if(onAcc>=0){
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
-				
-				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
-				//total_ref_cr=total_ref_cr+on_acc;
-				}else{
-					onAcc=Math.abs(onAcc);
-					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
-					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Cr");
+				else if(total_ref_dr < total_ref_cr)
+				{
+					total_ref=total_ref_dr-total_ref_cr;
+					on_acc=main_amount-total_ref;
+				}
+				else
+				{
+					on_acc=main_amount;
 				}
 				
-				var total_amt_ref=0;
-				if(onAcc_dr_cr=="Dr"){
-					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 				}else{
-					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
-				
-			}else{
-				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
-				if(total_ref_dr < total_ref_cr){
-					afterCal=total_ref_cr-total_ref_dr;
-					onAcc=main_amt-afterCal;
-					onAcc_dr_cr="Cr";
-				}else if(total_ref_dr > total_ref_cr){
-					afterCal=total_ref_cr-total_ref_dr;
-					onAcc=main_amt-afterCal;
-					onAcc_dr_cr="Cr";
-				}else{
-					onAcc=main_amt;
-					onAcc_dr_cr="Cr";
+			}
+			else
+			{
+				on_acc_cr_dr='Cr';
+				if(total_ref_dr < total_ref_cr)
+				{
+					total_ref=total_ref_cr-total_ref_dr;
+					on_acc=main_amount-total_ref;
 				}
-				
-				//alert(onAcc);
-				if(onAcc>=0){
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
-				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
-				//total_ref_cr=total_ref_cr+on_acc;
-				}else{
-					//onAcc=Math.abs(onAcc);
-					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
-					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
+				else if(total_ref_dr > total_ref_cr)
+				{
+					total_ref=total_ref_cr-total_ref_dr;
+					on_acc=main_amount-total_ref;
 				}
-				
-				var total_amt_ref=0;
-				
-				if(onAcc_dr_cr=="Dr"){
-					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
-				}else{ 
-					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
+				else
+				{
+					on_acc=main_amount;
+				}
+				if(on_acc>=0){
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 					
+				}else{
+					on_acc=Math.abs(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 				}
-				
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 			}
 		});
-	}
+		}
 	
 	$('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
@@ -523,29 +509,30 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
-	function do_mian_amount_total(){
-        var mian_amount_total_cr=0; var mian_amount_total_dr=0;
-        $("#main_table tbody#main_tbody tr.main_tr").each(function(){
-            var v=parseFloat($(this).find("td:nth-child(2) input").val());
-            var cr_dr=($(this).find("td:nth-child(2) select").val());
-            if(!v){ v=0; }
-            if(cr_dr=="Cr"){
-                mian_amount_total_cr=mian_amount_total_cr+v;
-            }else{
-                mian_amount_total_dr=mian_amount_total_dr+v;
-            }
-            
-            mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-            $('#receipt_amount').text(mian_amount_total.toFixed(2));
+	function do_mian_amount_total()
+	{
+		
+		var mian_amount_total_cr=0; var mian_amount_total_dr=0;
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			var v=parseFloat($(this).find("td:nth-child(2) input").val());
+			var cr_dr=($(this).find("td:nth-child(2) select").val());
+			if(!v){ v=0; }
+			if(cr_dr=="Cr"){
+				mian_amount_total_cr=mian_amount_total_cr+v;
+			}else{
+				mian_amount_total_dr=mian_amount_total_dr+v;
+			}
+			
+			mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
+			$('#receipt_amount').text(mian_amount_total.toFixed(2));
 			$('#debitamount').val(mian_amount_total_dr.toFixed(2));
-			$('#creditamount').val(mian_amount_total_cr.toFixed(2));			
-        });
+			$('#creditamount').val(mian_amount_total_cr.toFixed(2));
+		});
 	}
-	
-
-	
-	
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_mian_amount_total();
+		do_ref_total();
+	});
 	
 	
 });
@@ -554,26 +541,28 @@ $(document).ready(function() {
 <table id="sample_table" style="display:none;">
 	<tbody>
 		<tr class="main_tr">
-			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
+			<td width="25%"><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
 			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			<div class="show_grns"></div>
 			</td>
-			<td>
-				<div class="row">
-					<div class="col-md-7" style="padding-right: 0;">
-						<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
-					</div>
-					<div class="col-md-5  " style="padding-left: 0;">
-						<select name="cr_dr" class="form-control input-sm cr_dr" >
-							<option value="Cr">Cr</option>
-							<option value="Dr">Dr</option>
-						</select>
-					</div>
+			<td width="20%">
+			<div class="row">
+				<div class="col-md-7" style="padding-right: 0;">
+					<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
 				</div>
+				<div class="col-md-5"style="padding-left: 0;">
+					<select name="cr_dr" class="form-control input-sm cr_dr_amount" >
+						<option value="Dr">Dr</option>
+						<option value="Cr">Cr</option>
+					</select>
+				</div>
+			</div>
 			</td>
-			<td></td>
-			<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration  ','placeholder'=>'Narration']); ?></td>
+			<td width="35%"></td>
+			<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration']); ?></td>
 			<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 		</tr>
+		
 	</tbody>
 </table>
 
@@ -583,19 +572,21 @@ $(document).ready(function() {
 	<table width="100%" class="ref_table">
 		<thead>
 			<tr>
-				<th width="20%">Ref Type</th>
-				<th width="35%">Ref No.</th>
-				<th width="28%">Amount</th>
-				<th width="30%">Cr/Dr</th>
-				<th width="5%"></th>
+				<th>Ref Type</th>
+				<th>Ref No.</th>
+				<th>Amount</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			<tr>
-				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+				<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
-				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
-				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+				<td width="25%"><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php 
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+			    </td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>
@@ -604,16 +595,16 @@ $(document).ready(function() {
 				<td align="center" style="vertical-align: middle !important;">On Account</td>
 				<td></td>
 				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-				<td><?php echo $this->Form->input('on_account_dr_cr', ['label' => false,'class' => 'form-control input-sm on_account_dr_cr','readonly']); ?></td>
-				
+				<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td colspan="2"></td>
-				
+				<td></td>
+				<td></td>
 			</tr>
 		</tfoot>
 	</table>
 	</div>
 </div>
+
 <?php last: ?>
