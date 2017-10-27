@@ -77,6 +77,10 @@ class ReferenceDetailsTable extends Table
             'foreignKey' => 'petty_cash_voucher_row_id',
             'joinType' => 'LEFT'
         ]);
+		$this->belongsTo('JournalVoucherRows', [
+            'foreignKey' => 'journal_voucher_row_id',
+            'joinType' => 'LEFT'
+        ]);
     }
 
     /**

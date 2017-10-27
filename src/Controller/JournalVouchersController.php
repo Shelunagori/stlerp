@@ -357,7 +357,7 @@ class JournalVouchersController extends AppController
 		$financial_month_last = $this->JournalVouchers->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
     
         $journalVoucher = $this->JournalVouchers->get($id, [
-            'contain' => ['Companies','JournalVoucherRows'=>['ReceivedFroms'],'Companies','Creator']
+            'contain' => ['Companies','JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator']
         ]);
 		
 		   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
