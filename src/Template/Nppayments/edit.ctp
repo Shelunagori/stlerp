@@ -462,7 +462,7 @@ $(document).ready(function() {
             url: url,
             type: 'GET',
             dataType: 'text'
-        }).done(function(response) {
+        }).done(function(response) { alert(response);
             if(response.trim()=="Yes"){
                 var ref_table=$("#sample_ref div.ref").clone();
                 $(sel).closest("tr").find("td:nth-child(3)").html(ref_table);
