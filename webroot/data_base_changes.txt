@@ -1,2 +1,7 @@
+<--------------Manoj------------>
+Purchase_return_quantity remove in invoice booking.
+
 <--------------Gopal------------>
 Add New Field in Refrence_details opening_balance varchar(255).
+
+

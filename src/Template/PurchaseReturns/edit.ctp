@@ -155,12 +155,18 @@ if($transaction_date <  $start_date ) {
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_quantity',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->quantity]); ?>
 							</td>
-							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>$invoice_booking_row->purchase_return_quantity,'max'=>$invoice_booking_row->quantity]); ?></td>
+							<td><?php 
+							if(!empty(@$purchaseReturnRowItemDetail[@$invoice_booking_row->id]))
+							{
+								$data = explode(',',$purchaseReturnRowItemDetail[@$invoice_booking_row->id]);
+							}
+							
+							echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>@$data[0],'max'=>@$maxQty[@$invoice_booking_row->id]]); ?></td>
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.total',['label' => false,'class' => 'form-control input-sm','type'=>'text','value'=>$invoice_booking_row->total]); ?></td>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.total',['label' => false,'class' => 'form-control input-sm','type'=>'text','value'=>@$data[1]]); ?></td>
 							<td>
 								<?php $checked2="";
-									if($invoice_booking_row->purchase_return_quantity > 0)
+									if(@$data[0] > 0)
 									{
 										$checked2='Checked';
 									}else{	
