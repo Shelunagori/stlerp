@@ -68,7 +68,9 @@ class SaleReturnsTable extends Table
         ]);
         $this->belongsTo('FinancialYears');
         $this->belongsTo('FinancialMonths');
-        $this->belongsTo('Invoices');
+        $this->belongsTo('Invoices', [
+            'foreignKey' => 'invoice_id'
+        ]);
 		$this->belongsTo('LedgerAccounts');
 		$this->belongsTo('AccountReferences');
 		$this->belongsTo('AccountFirstSubgroups');

@@ -259,14 +259,19 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$q=0; foreach ($invoice->invoice_rows as $invoice_row): 
 					?>
 						<tr class="tr1  firsttr " row_no='<?php echo @$invoice_row->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+							<td rowspan="2">
+								<?php echo ++$q; --$q; ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sale_return_row_id[@$invoice_row->id],'readonly','class'=>'hiddenid']); ?>
+								
+								<?php echo $this->Form->input('q',['label' => false,'type' => 'hidden','value' => @$invoice_row->id,'readonly','class'=>'Invoicerowid']); ?>
+							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row->item_id,'readonly']); ?>
 								<?php echo $invoice_row->item->name; ?>
 								<?php echo $invoice_row->item->name; ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','value' => @$invoice_row->sale_return_quantity,'max'=>@$invoice_row->quantity]); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','value'=>@$current_salesreturn_rows[@$invoice_row->id],'max'=>@$sales_return_qty[$invoice_row->id]-@$existing_salesreturn_rows[$invoice_row->id]+@$current_salesreturn_rows[$invoice_row->id]]); ?>
 							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Rate','value' => @$invoice_row->rate,'readonly','step'=>0.01]); ?>
@@ -285,7 +290,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01,'value' => @$invoice_row->igst_amount]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01,'value' => @$invoice_row->total]); ?></td>
 							<?php $checked2="";
-									if($invoice_row->sale_return_quantity == 0){ 
+									if(@$current_salesreturn_rows[@$invoice_row->id] == 0){
 											$check='';
 									} 
 									else{	$check='checked';
@@ -719,6 +724,8 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(18) input[type="checkbox"]:checked').val();
 			if(val){ 
 				i++;
+				$(this).find('td:nth-child(1) input.Invoicerowid').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
+				$(this).find('td:nth-child(1) input.hiddenid').attr("name","sale_return_rows["+row_no+"][id]").attr("id","sale_return_rows-"+row_no+"-id");
 				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+val+"][item_id]").attr("id","sale_return_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+val+"][quantity]").attr("id","q"+val).removeAttr("readonly").attr("id","sale_return_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+val+"][rate]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-rate").rules("add", "required");
@@ -766,6 +773,8 @@ $(document).ready(function() {
 				p++;
 			}			
 			else{ 
+				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q", readonly:"readonly"});
+				$(this).find('td:nth-child(1) input.Invoicerowid').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"});

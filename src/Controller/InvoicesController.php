@@ -744,7 +744,7 @@ class InvoicesController extends AppController
 			$SalesOrders = $this->Invoices->SalesOrders->get($sales_order_id, [
             'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
-			}],'SalesOrderRows'=>['Items']])
+			}],'SalesOrderRows'])
         ]);
 			
 		$sales_orders_qty=[];
@@ -789,6 +789,15 @@ class InvoicesController extends AppController
 						return $q
 						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
         ]);
+		
+		$invoice = $this->Invoices->get($id, [
+            'contain' => ['ItemSerialNumbers','InvoiceRows','SalesOrders' => ['SalesOrderRows' => ['Items'=>['ItemSerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}],'SaleTaxes']],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
+						return $q
+						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
+        ]);
+		
 		
 		$edited_by=$invoice->edited_by;
 		$edited_on=$invoice->edited_on;
@@ -877,6 +886,7 @@ class InvoicesController extends AppController
 					$invoice_row->item_serial_number=$item_serial_no;
 				}
 			}
+			//pr($invoice);exit;
 			if ($this->Invoices->save($invoice)) {
 				
 				$flag=0;
@@ -1147,7 +1157,7 @@ class InvoicesController extends AppController
 				}])
         ]);
 		
-		$sales_order_qty=[];$existing_invoice_rows=[]; $current_invoice_rows=[];
+		$sales_order_qty=[];$existing_invoice_rows=[]; $current_invoice_rows=[];$invoice_row_id=[];
 		
 		foreach($invoice->sales_order->invoices as $all_invoice){
 			foreach($all_invoice->invoice_rows as $all_invoice_row){
@@ -1159,6 +1169,7 @@ class InvoicesController extends AppController
 		
 		foreach($invoice->invoice_rows as $current_invoice_row){
 			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
+			@$invoice_row_id[$current_invoice_row->sales_order_row_id]=@$current_invoice_row->id;
 		}
 		
 		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
@@ -1232,7 +1243,7 @@ class InvoicesController extends AppController
 		$termsConditions = $this->Invoices->TermsConditions->find('all');
 		$SaleTaxes = $this->Invoices->SaleTaxes->find('all')->where(['freeze'=>0]);
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','existing_invoice_rows','sales_order_qty','current_invoice_rows'));
+        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','existing_invoice_rows','sales_order_qty','current_invoice_rows','invoice_row_id'));
         $this->set('_serialize', ['invoice']);
 		}
 		else

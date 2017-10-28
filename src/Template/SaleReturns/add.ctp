@@ -169,19 +169,22 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					<?php 
 					$q=0; 
 					foreach (@$invoice->invoice_rows as $invoice_row){ 
-					if($invoice_row->quantity > $invoice_row->sale_return_quantity ){
+					if($invoice_row->quantity > @$sales_return_qty[@$invoice_row->id] ){
 					?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
-							<td ><?php echo ++$q; $q--; ?></td>
+							<td >
+								<?php echo ++$q; $q--; ?>
+								<?php echo $this->Form->input('invoice_row_id', ['label' => false,'type' => 'hidden','value' => @$invoice_row->id,'readonly']); ?>
+							</td>
 							<td>
 								<?php 
-								echo $this->Form->input('sale_return_rows.'.$q.'.item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
 								echo @$invoice_row->item->name;
 								?>
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('sale_return_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','max'=>$invoice_row->quantity-$invoice_row->sale_return_quantity,'value'=>0,'required']); 
+								echo $this->Form->input('sale_return_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','max'=>$invoice_row->quantity-@$sales_orders_qty[$invoice_row->id],'value'=>0,'required']); 
 								?>
 							</td>
 							<td>
@@ -209,7 +212,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							?>
 							<td></td>
 							<td colspan="6">
-							<?php echo $this->Form->input('itm_serial_number', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%','readonly']);  ?></td>
+							<?php echo $this->Form->input('itm_serial_number', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me itm_serial_number','style'=>'width:100%','readonly']);  ?></td>
 						</tr>
 					<?php }  ?>
 					<?php $q++; } }  ?>
@@ -521,19 +524,25 @@ $(document).ready(function() {
 
 	rename_rows();
 	function rename_rows(){
+var list = new Array();
+		var p=0;
+		var i=0;
 		$("#main_tb tbody tr.tr1").each(function(){  //alert();
 			var row_no=$(this).attr('row_no');
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
-			if(val){
+
+			if(val){i++;
+				$(this).find('td:nth-child(1) input').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
+				
 				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+row_no+"][quantity]").attr("id","sale_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+row_no+"][rate]").attr("id","sale_return_rows-"+row_no+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
 				$(this).css('background-color','#fffcda');
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').length;
 				if(serial_l>0){ 	
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][item_serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][itm_serial_number][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -558,7 +567,7 @@ $(document).ready(function() {
 				}
 			}
 			
-				
+				$('input[name="checked_row_length"]').val(i);
 				
 		});
 	}

@@ -104,33 +104,40 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 				<tbody id='main_tbody'>
 					<?php 
 					$q=0; $p=1; 
-					foreach ($invoice->invoice_rows as $invoice_row){ ?>
+					foreach ($invoice->invoice_rows as $invoice_row){  ?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
-							<td ><?php echo $p++; ?></td>
+							<td >
+								<?php echo $p++; ?>
+								
+								<?php echo $this->Form->input('id', ['label' => false,'type' => 'hidden','value' => @$sale_return_row_id[@$invoice_row->id],'readonly','class'=>'hiddenid']); ?>
+								
+								<?php echo $this->Form->input('invoice_row_id',['label' => false,'type' => 'hidden','value' => @$invoice_row->id,'readonly','class'=>'Invoicerowid']); ?>
+							</td>
 							<td>
+								
 								<?php 
-								echo $this->Form->input('sale_return_rows.'.$q.'.item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
 								echo $invoice_row->item->name;
 								?>
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('sale_return_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity'
-								,'max'=>$invoice_row->quantity ,'value'=>$invoice_row->sale_return_quantity]); 
+								echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity'
+								,'value'=>@$current_salesreturn_rows[@$invoice_row->id],'max'=>@$sales_return_qty[$invoice_row->id]-@$existing_salesreturn_rows[$invoice_row->id]+@$current_salesreturn_rows[$invoice_row->id]]); 
 								?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('sale_return_rows.'.$q.'.rate', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Rate','step'=>0.01,'value'=>$invoice_row->rate]); ?>
+								<?php echo $this->Form->input('rate', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Rate','step'=>0.01,'value'=>$invoice_row->rate]); ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('sale_return_rows.'.$q.'.amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Amount','step'=>0.01,'value'=>$invoice_row->amount]); ?>
+								<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Amount','step'=>0.01,'value'=>$invoice_row->amount]); ?>
 							</td>
 							<td>
 								<?php echo @$invoice->sale_tax->tax_figure.'('.@$invoice->sale_tax->invoice_description.')'; ?>
 							</td>
 							<td>
 								<?php $checked2="";
-									if($invoice_row->sale_return_quantity == 0){ 
+									if(@$current_salesreturn_rows[@$invoice_row->id] == 0){ 
 											$check='';
 									} 
 									else{	$check='checked';
@@ -142,13 +149,14 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 							</td>
 						</tr>
 						
-						<?php if($invoice_row->item->item_companies[0]->serial_number_enable==1){
+						<?php if(@$invoice_row->item->item_companies[0]->serial_number_enable==1){
 						?>
 						
 						<tr class="tr2" row_no="<?= h($q) ?>">
 						<?php $options1=[]; $choosen=[];
 							 
-								foreach($invoice_row->item->item_serial_numbers as $item_serial_numbers){
+								foreach(@$invoice_row->item->item_serial_numbers as $item_serial_numbers){
+
 									$options1[]=['text' =>$item_serial_numbers->serial_no, 'value' => $item_serial_numbers->id];
 									
 									if($item_serial_numbers->sale_return_id==$saleReturn->id){
@@ -157,10 +165,11 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 									}
 										//pr()
 								}
+
 						?>
 							<td></td>
 							<td colspan="6">
-							<?php echo $this->Form->input('sale_return_rows.'.$q.'.itm_serial_number', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
+							<?php echo $this->Form->input('itm_serial_number', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me itm_serial_number','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
 						</tr>
 					<?php  } 
 					$q++; 
@@ -419,9 +428,7 @@ $(document).ready(function() {
 	
 	//--	 END OF VALIDATION
  
-$('.quantity').die().live("keyup",function() {
-			calculate_total();  
-    });	
+
 
 	function calculate_total(){  
 		var total=0; var grand_total=0;
@@ -483,7 +490,7 @@ $('.quantity').die().live("keyup",function() {
 	
 	
 	$('.rename_check').die().live("click",function() {
-		rename_rows(); calculate_total();
+		rename_rows(); 
     });
 	
 	$('.quantity').die().live("keyup",function() {
@@ -494,19 +501,24 @@ $('.quantity').die().live("keyup",function() {
 
 	rename_rows();
 	function rename_rows(){
+		var list = new Array();
+		var i=0; 
 		$("#main_tb tbody tr.tr1").each(function(){  //alert();
 			var row_no=$(this).attr('row_no');
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
+			//alert(val);
 			if(val){
+				$(this).find('td:nth-child(1) input.Invoicerowid').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
+				$(this).find('td:nth-child(1) input.hiddenid').attr("name","sale_return_rows["+row_no+"][id]").attr("id","sale_return_rows-"+row_no+"-id");
 				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+row_no+"][quantity]").attr("id","sale_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+row_no+"][rate]").attr("id","sale_return_rows-"+row_no+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
 				$(this).css('background-color','#fffcda');
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').length;
 				if(serial_l>0){ 	
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][itm_serial_number][]").attr("id","sale_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][itm_serial_number][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -519,6 +531,8 @@ $('.quantity').die().live("keyup",function() {
 				}
 			}else{
 
+				$(this).find('td:nth-child(1) input.Invoicerowid').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(2) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
