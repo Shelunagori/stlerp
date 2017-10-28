@@ -2,7 +2,6 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
 /**
  * SalesOrders Controller
  *
@@ -18,122 +17,48 @@ class SalesOrdersController extends AppController
      */
     public function index($status=null)
     {
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
-		$copy_request=$this->request->query('copy-request');
-		$gst_copy_request=$this->request->query('gst-copy-request');
-		$job_card=$this->request->query('job-card');
-		
-		
-		$where=[];
-		//$company_alise=$this->request->query('company_alise');
-		$gst=$this->request->query('gst');
-		$sales_order_no=$this->request->query('sales_order_no');
-		$file=$this->request->query('file');
-		$customer=$this->request->query('customer');
-		$po_no=$this->request->query('po_no');
-		$From=$this->request->query('From');
-		$To=$this->request->query('To');
-		$items=$this->request->query('items');
-		$salesman_name=$this->request->query('salesman_name');
-		$pull_request=$this->request->query('pull-request');
-		$this->set(compact('sales_order_no','customer','po_no','product','From','To','file','pull_request','items','gst'));
-		/* if(!empty($company_alise)){
-			$where['SalesOrders.so1 LIKE']='%'.$company_alise.'%';
-		} */
-		if(!empty($salesman_name)){
-			$where['SalesOrders.employee_id']=$salesman_name;
-		}
-		if(!empty($sales_order_no)){
-			$where['SalesOrders.so2 LIKE']=$sales_order_no;
-		}
-		if(!empty($file)){
-			$where['SalesOrders.so3 LIKE']='%'.$file.'%';
-		}
-		if(!empty($customer)){
-			$where['Customers.customer_name LIKE']='%'.$customer.'%';
-		}
-		if(!empty($po_no)){
-			$where['SalesOrders.customer_po_no LIKE']='%'.$po_no.'%';
-		}
-		if(!empty($From)){
-			$From=date("Y-m-d",strtotime($this->request->query('From')));
-			$where['SalesOrders.created_on >=']=$From;
-		}
-		if(!empty($To)){
-			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['SalesOrders.created_on <=']=$To;
-		}
-        $this->paginate = [
-            'contain' => ['Customers','Employees','Categories', 'Companies']
-        ];
-		
-        $this->paginate = [
-            'contain' => ['Customers']
-        ];
-		
-		$where1=[];
-		if($status==null or $status=='Pending'){ 
-			$having=['total_rows >' => 0];
-			//$where1=['SalesOrderRows.processed_quantity < SalesOrderRows.quantity'];
-		}elseif($status=='Converted Into Invoice'){ 
-			$having=['total_rows =' => 0];
-			//$where1=['SalesOrderRows.processed_quantity = SalesOrderRows.quantity'];
-		}
-		
-		
-		
-		
 		/* $salesOrders = $this->SalesOrders->find();
 		$this->paginate(
-			$salesOrders->innerJoinWith('SalesOrderRows', function ($q) {
-				return $q->select(['total_salesorder_qty' => $q->func()->sum('SalesOrderRows.quantity'),'SalesOrderRows.id'])
-				->group(['SalesOrderRows.sales_order_id'])
-				->innerJoinWith('InvoiceRows', function ($q) {
-					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
-				});
+			$salesOrders
+			->select(['id'])
+			->innerJoinWith('SalesOrderRows', function ($q) {
+				return $q->group(['SalesOrderRows.sales_order_id'])->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity')]);
 			})
-		->group(['SalesOrders.id'])
-		->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.id'=>405])); */
+			->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
+				return $q->group(['InvoiceRows.sales_order_row_id'])->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
+			})
+			->where(['SalesOrders.company_id'=>$st_company_id])
+			->group(['SalesOrderRows.sales_order_id'])
+			->group(['SalesOrders.id'])
+		); */
+		
+		/* $salesOrders = $this->SalesOrders->find();
+		$salesOrders
+		->contain(['SalesOrderRows'=>function($q){
+			return $q->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity'),'SalesOrderRows.quantity','SalesOrderRows.id'])->group(['SalesOrderRows.sales_order_id'])->autoFields(true)
+			->contain(['InvoiceRows'=>function($w){
+				return $w->select(['invoiceQty' => $w->func()->sum('InvoiceRows.quantity'),'InvoiceRows.quantity','InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id'])->autoFields(true);
+			}]);
+		}])
+		->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
+			return $q->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
+		}); */
 		
 		$salesOrders = $this->SalesOrders->find();
-		$this->paginate(
-			$salesOrders->contain(['SalesOrderRows'=>['InvoiceRows']])
-			 ->select(['totalWickets' => $salesOrders->func()->count('salesOrders.SalesOrderRows.quantity')])
-			->group(['SalesOrders.id'])
-			->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.id'=>405])
-		);
-	
 		
-		pr($salesOrders->toArray());exit;
-		
-		/////for Pull Request
-		
-		////for Job Cards
-		if(!empty($job_card)){
-			$salesOrders=$this->paginate(
-				$this->SalesOrders->find()->contain(['SalesOrderRows'])
-				->where(['job_card'=>'Pending'])->order(['SalesOrders.id' => 'DESC'])
-				->where(['SalesOrders.company_id'=>$st_company_id])
-			);
-		}	
-		
-		$Items = $this->SalesOrders->SalesOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
-        $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
-					'Departments', function ($q) use($items,$st_company_id) {
-						return $q->where(['Departments.id' =>1]);
-					}
-				);
-		
-		 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name'));
-		 $this->set('_serialize', ['salesOrders']);
-		$this->set(compact('url'));
-		
+		$matchingComment = $salesOrders->association('SalesOrderRows')->find()
+			->select(['sales_order_id','salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
+			->group(['SalesOrderRows.sales_order_id']);
+
+		$query = $salesOrders->find()
+			->select(['sqty' => $matchingComment]);
+		pr($query->toArray());
+		exit;
     }
 	
 	

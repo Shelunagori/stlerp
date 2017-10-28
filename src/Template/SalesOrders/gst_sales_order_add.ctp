@@ -864,11 +864,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1)").html(++i); --i;
 			//$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules("add", "required");
 			$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
 					});
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
@@ -878,7 +874,6 @@ $(document).ready(function() {
 							min: "Quantity can't be zero."
 						}
 					});
-				//$(this).find("td:nth-child(3)").append('<span for="sales_order_rows-'+i+'-quantity" class="help-block help-block-error" style="display:none;"></span>');
 					
 			$(this).find("td:nth-child(4) input").attr({name:"sales_order_rows["+i+"][rate]", id:"sales_order_rows-"+i+"-rate",r_popup_id:i}).rules('add', {
 						required: true,
@@ -1019,36 +1014,6 @@ $(document).ready(function() {
 		$('input[name="total"]').val(total.toFixed(2));
 		
 		
-		/*if($("#discount_per").is(':checked')){
-			var discount_per=parseFloat($('input[name="discount_per"]').val());
-			var discount_amount=(total*discount_per)/100;
-			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
-		}else{
-			var discount_amount=parseFloat($('input[name="discount"]').val());
-			if(isNaN(discount_amount)) { var discount_amount = 0; }
-		}
-		total=total-discount_amount*/
-		
-		//$('input[name="total"]').val(total.toFixed(2));
-		
-		/*if($("#pnfper").is(':checked')){
-			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
-			var pnf_amount=(total*pnf_per)/100;
-			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
-		}else{
-			var pnf_amount=parseFloat($('input[name="pnf"]').val());
-			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-		}*/
-		//var total_after_pnf=total+pnf_amount;
-		//if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		//$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
-		
-		//var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
-		/*var sale_tax=(total_after_pnf*sale_tax_per)/100;
-		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));*/
 		
 
 		

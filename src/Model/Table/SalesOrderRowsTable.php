@@ -61,7 +61,7 @@ class SalesOrderRowsTable extends Table
 		
 		$this->hasMany('InvoiceRows', [
             'foreignKey' => 'sales_order_row_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
 		
 		

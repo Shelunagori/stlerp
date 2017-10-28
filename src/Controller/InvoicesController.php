@@ -2506,7 +2506,7 @@ class InvoicesController extends AppController
 		$customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
 	   
-	   $invoicesMaxQty = $this->Invoices->get($id, [
+	 /*   $invoicesMaxQty = $this->Invoices->get($id, [
             'contain' => (['InvoiceRows'=>function ($q) {
 					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
 				}])
@@ -2527,7 +2527,7 @@ class InvoicesController extends AppController
 					$invoice_sales_orders_qty[@$invoice_row->sales_order_row_id]+=$invoice_row->total_qty;
 					
 				}
-				pr($invoice_sales_orders_qty);exit;
+				pr($invoice_sales_orders_qty);exit; */
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
