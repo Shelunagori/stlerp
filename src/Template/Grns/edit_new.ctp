@@ -114,10 +114,12 @@ if($transaction_date <  $start_date ) {
 								}
 							}
 							
-							foreach($grn->grn_rows as $current_invoice_row){ //pr($current_invoice_row); 
+							foreach($grn->grn_rows as $current_invoice_row){ 
+							
+							//pr($current_invoice_row); 
 								@$existing_rows[$current_invoice_row->item_id]=$existing_rows[$current_invoice_row->item_id]-$current_invoice_row->quantity;
-								$current_rows[]=$current_invoice_row->item_id;
-								$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
+								$current_rows[]=$current_invoice_row->purchase_order_row_id;
+								$current_row_items[$current_invoice_row->purchase_order_row_id]=$current_invoice_row->quantity;
 								$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
 								
 							}
@@ -157,16 +159,14 @@ if($transaction_date <  $start_date ) {
 								<td>
 								
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->item_id]]); 
-								
-								
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id]]); 
 								?>
 								<span>Max: <?= h($grn_rows->quantity-@$existing_rows[$grn_rows->item_id]) ?></span>
 								
 								</td>
 								<td>
 									<label class="hide_lebel"><?php 
-									if(in_array($grn_rows->item_id,$current_rows)){
+									if(in_array($grn_rows->id,$current_rows)){
 									$check='checked';
 										}else{
 											$check=' ';

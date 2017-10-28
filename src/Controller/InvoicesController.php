@@ -398,7 +398,7 @@ class InvoicesController extends AppController
      * @return \Cake\Network\Response|void Redirects on successful add, renders view otherwise.
      */
     public function add()
-    {
+    { 
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		
@@ -631,9 +631,7 @@ class InvoicesController extends AppController
 						$item_saletax=$saletax/$qty;
 						$fr_amount=$fright*$amount/$total_amt;
 						$item_fright=$fr_amount/$qty;
-						$SalesOrderRow = $this->Invoices->SalesOrderRows->get($sales_order_row_id);
-						$SalesOrderRow->processed_quantity=$SalesOrderRow->processed_quantity+$qty;
-						$this->Invoices->SalesOrderRows->save($SalesOrderRow);
+						
 						$i++;
 						//Insert in Item Ledger//
 						$itemLedger = $this->Invoices->ItemLedgers->newEntity();
@@ -700,14 +698,7 @@ class InvoicesController extends AppController
         }
 		
 		
-		$salesOrders = $this->Invoices->SalesOrders->find()->select(['total_rows' => 
-		$this->Invoices->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-		->leftJoinWith('SalesOrderRows', function ($q) {
-		return $q->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity']);
-		})
-		->group(['SalesOrders.id'])
-		->autoFields(true)
-		->having(['total_rows >' => 0]);
+		
 		
 		$items = $this->Invoices->Items->find('list');
 		$transporters = $this->Invoices->Transporters->find('list', ['limit' => 200])->order(['Transporters.transporter_name' => 'ASC']);
@@ -749,9 +740,25 @@ class InvoicesController extends AppController
 			return $q->where(['AccountFirstSubgroups.id'=>$account_first_subgroup_id_for_fright]);
 		}]])->where(['LedgerAccounts.company_id'=>$st_company_id])->order(['LedgerAccounts.name' => 'ASC']);
 		
+		////
+			$SalesOrders = $this->Invoices->SalesOrders->get($sales_order_id, [
+            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}],'SalesOrderRows'=>['Items']])
+        ]);
+			
+		$sales_orders_qty=[];
+			foreach($SalesOrders->invoices as $invoices){ 
+				foreach($invoices->invoice_rows as $invoice_row){ 
+					$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+					
+				}
+			}	
+		
+		
 		$item_serial_no=$this->Invoices->ItemSerialNumbers->find('list');
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount'));
+        $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','sales_orders_qty'));
         $this->set('_serialize', ['invoice']);
     }
 	
@@ -1005,16 +1012,7 @@ class InvoicesController extends AppController
 				}
 				$this->Invoices->ItemLedgers->deleteAll(['source_id' => $invoice->id, 'source_model'=> 'Invoices']);
 				
-				$qq=0; foreach($invoice->invoice_rows as $invoice_rows){
-					$salesorderrow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_rows->item_id])->first();
-					
-					
-					$salesorderrow->processed_quantity=$salesorderrow->processed_quantity-@$invoice->getOriginal('invoice_rows')[$qq]->quantity+$invoice_rows->quantity;
-					
-					//pr($salesorderrow->processed_quantity); exit;
-					$this->Invoices->SalesOrderRows->save($salesorderrow);
-					$qq++; 
-				}
+				
 				
 				$this->Invoices->ItemLedgers->deleteAll(['source_id' => $invoice->id, 'source_model'=> 'Invoices']);
 				
@@ -1136,16 +1134,39 @@ class InvoicesController extends AppController
        $customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
 	   
+		$invoice_old_data = $this->Invoices->get($id,['contain' =>(['InvoiceRows'])]);
 		
-		$salesOrders = $this->Invoices->SalesOrders->find()->select(['total_rows' => 
-				$this->Invoices->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-				->leftJoinWith('SalesOrderRows', function ($q) {
-					return $q->where(['SalesOrderRows.quantity > SalesOrderRows.processed_quantity']);
-				})
-				->group(['SalesOrders.id'])
-				->autoFields(true)
-				->having(['total_rows >' => 0]);
+		 
+		//start array declaration for unique validation and proceed quantity
+		$sales_order_id = $invoice_old_data->sales_order_id;
+		 
+		$sales_qty = $this->Invoices->SalesOrders->get($sales_order_id, [
+            'contain' => (['SalesOrderRows' => function ($q) {
+					$q->select(['SalesOrderRows.sales_order_id','SalesOrderRows.id','total_sales_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group(['SalesOrderRows.id']);
+					return $q;
+				}])
+        ]);
+		
+		$sales_order_qty=[];$existing_invoice_rows=[]; $current_invoice_rows=[];
+		
+		foreach($invoice->sales_order->invoices as $all_invoice){
+			foreach($all_invoice->invoice_rows as $all_invoice_row){
+				if($all_invoice_row->sales_order_row_id != 0){
+					@$existing_invoice_rows[$all_invoice_row->sales_order_row_id]+=@$all_invoice_row->quantity;
+				}
+			}
+		}
+		
+		foreach($invoice->invoice_rows as $current_invoice_row){
+			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
+		}
+		
+		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
+			@$sales_order_qty[@$sales_order_row->id]+=@$sales_order_row->total_sales_qty;
+		}
 				
+		
+		//end array declaration for unique validation and proceed quantity		
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
@@ -1211,7 +1232,7 @@ class InvoicesController extends AppController
 		$termsConditions = $this->Invoices->TermsConditions->find('all');
 		$SaleTaxes = $this->Invoices->SaleTaxes->find('all')->where(['freeze'=>0]);
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate'));
+        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','existing_invoice_rows','sales_order_qty','current_invoice_rows'));
         $this->set('_serialize', ['invoice']);
 		}
 		else
@@ -2122,7 +2143,7 @@ class InvoicesController extends AppController
         ]);
 		
 		$invoice_old_data = $this->Invoices->get($id, ['contain' => ['InvoiceRows']]);
-		// pr($invoice_old_data); exit;
+		
 		 $edited_by=$invoice->edited_by;
 		 $edited_on=$invoice->edited_on;
 		$closed_month=$this->viewVars['closed_month'];
@@ -2503,24 +2524,43 @@ class InvoicesController extends AppController
        
 		
 		
+<<<<<<< HEAD
 		$customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
 	   
 	 /*   $invoicesMaxQty = $this->Invoices->get($id, [
             'contain' => (['InvoiceRows'=>function ($q) {
 					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
+=======
+			$customers = $this->Invoices->Customers->find('all');
+			$companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
+
+			//start array declaration for unique validation and proceed quantity
+		$sales_order_id = $invoice_old_data->sales_order_id;
+		 
+		$sales_qty = $this->Invoices->SalesOrders->get($sales_order_id, [
+            'contain' => (['SalesOrderRows' => function ($q) {
+					$q->select(['SalesOrderRows.sales_order_id','SalesOrderRows.id','total_sales_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group(['SalesOrderRows.id']);
+					return $q;
+>>>>>>> origin/master
 				}])
         ]);
 		
-		$invoicesMaxQty = $this->Invoices->get($id, [
-            'contain' => (['InvoiceRows' => function($q) {
-				return $q->select(['total_qty' => $q->func()->sum('InvoiceRows.quantity')])
-				group(['InvoiceRows.id'])->contain(['SalesOrderRows']);
-			}])
-        ]);
+		$sales_order_qty=[];$existing_invoice_rows=[]; $current_invoice_rows=[];
 		
+		foreach($invoice->sales_order->invoices as $all_invoice){
+			foreach($all_invoice->invoice_rows as $all_invoice_row){
+				if($all_invoice_row->sales_order_row_id != 0){
+					@$existing_invoice_rows[$all_invoice_row->sales_order_row_id]+=@$all_invoice_row->quantity;
+				}
+			}
+		}
 		
+		foreach($invoice->invoice_rows as $current_invoice_row){
+			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
+		}
 		
+<<<<<<< HEAD
 			pr($invoicesMaxQty);exit;
 		$invoice_sales_orders_qty=[];
 			foreach($invoicesMaxQty->invoice_rows as $invoice_row){ 
@@ -2528,6 +2568,15 @@ class InvoicesController extends AppController
 					
 				}
 				pr($invoice_sales_orders_qty);exit; */
+=======
+		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
+			@$sales_order_qty[@$sales_order_row->id]+=@$sales_order_row->total_sales_qty;
+		}
+				
+		
+		//end array declaration for unique validation and proceed quantity			
+	   
+>>>>>>> origin/master
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
@@ -2598,7 +2647,7 @@ class InvoicesController extends AppController
 				);
 				
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','GstTaxes'));
+        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','GstTaxes','current_invoice_rows','sales_order_qty','existing_invoice_rows'));
         $this->set('_serialize', ['invoice']);
 		
 		

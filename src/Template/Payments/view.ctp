@@ -122,7 +122,7 @@ margin-bottom: 0;
 		<td colspan="3" style="border-top:none !important;">
 			<table width="100%">
 			
-			<?php $dr_amt=0; $cr_amt=0; foreach($ref_details[$paymentRows->received_from_id] as $refdetail):
+			<?php $dr_amt=0; $cr_amt=0; foreach($paymentRows->reference_details as $refdetail):
 			
 			?>
 			<tr>

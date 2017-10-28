@@ -281,7 +281,6 @@ class GrnsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
 		$purchase_order_id=@(int)$this->request->query('purchase-order');
-		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
@@ -291,20 +290,22 @@ class GrnsController extends AppController
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$purchase_order=array();
 		
-		if(!empty($purchase_order_id)){
+		if(!empty($purchase_order_id))
+		{
 			$purchase_order = $this->Grns->PurchaseOrders->get($purchase_order_id, [
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) use($st_company_id){
 						   return $q
-								->where(['PurchaseOrderRows.quantity > PurchaseOrderRows.processed_quantity'])
 								->contain(['ItemCompanies'=>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]);
 						},'Companies','Vendors'
 					]
 			]);
-			//pr($purchase_order); exit;
-		}
+ 
+		} 
+			
+	
 		
 		$this->set(compact('purchase_order'));
 		
@@ -359,6 +360,11 @@ class GrnsController extends AppController
 			$grn->company_id=$st_company_id ;
 			$grn->created_by=$this->viewVars['s_employee_id'];
 			//
+			
+			//pr($grn);
+			//exit;
+			
+			
 			 if ($this->Grns->save($grn)) {
 				
 					if(!empty($purchase_order_id)){
@@ -368,9 +374,9 @@ class GrnsController extends AppController
 						foreach($grn->check as $purchase_order_row_id){
 							$qty=$grn->grn_rows[$i]['quantity'];
 							$item_id=$grn->grn_rows[$i]['item_id'];
-							$PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
+							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
 							$PurchaseOrderRows->processed_quantity=$PurchaseOrderRows->processed_quantity+$qty;
-							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows);
+							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows); */
 							$i++;
 							
 							//Insert in Item Ledger//
@@ -397,7 +403,9 @@ class GrnsController extends AppController
 		$companies = $this->Grns->Companies->find('all');
         $purchaseOrders = $this->Grns->PurchaseOrders->find('all');
 		
-        
+		//pr($purchase_order->toArray());
+		//exit;
+		
         $this->set(compact('grn', 'purchaseOrders', 'companies','customers','chkdate','financial_year','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['grn']);
     }

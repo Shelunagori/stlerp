@@ -322,7 +322,8 @@ class NppaymentsController extends AppController
 					$ledger->voucher_source = 'Non Print Payment Voucher';
 					$ledger->transaction_date = $nppayment->transaction_date;
 					$this->Nppayments->Ledgers->save($ledger);
-					
+					if(!empty($nppayment_row->ref_rows))
+					{
 					foreach($nppayment_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Nppayments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -358,7 +359,8 @@ class NppaymentsController extends AppController
 						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
 						if($nppayment_row->on_acc > 0){ 
 							$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
-						}                   
+						}
+					}		
                     
                 }
 					$bankAmt=$total_dr-$total_cr;
@@ -493,21 +495,9 @@ class NppaymentsController extends AppController
 
         
         $nppayment = $this->Nppayments->get($id, [
-            'contain' => ['NppaymentRows']
+            'contain' => ['NppaymentRows'=>['ReferenceDetails']]
         ]);
-        $old_ref_rows=[];
-        $old_received_from_ids=[];
-        $old_reference_numbers=[];
-        
-        foreach($nppayment->nppayment_rows as $nppayment_row){
-            $ReferenceDetails=$this->Nppayments->ReferenceDetails->find()->where(['ledger_account_id'=>$nppayment_row->received_from_id,'nppayment_id'=>$nppayment->id]);
-            foreach($ReferenceDetails as $ReferenceDetail){
-                $old_reference_numbers[$nppayment_row->received_from_id][]=$ReferenceDetail->reference_no;
-            }
-            $old_ref_rows[$nppayment_row->received_from_id]=$ReferenceDetails->toArray();
-            $old_received_from_ids[]=$nppayment_row->received_from_id;
-        }
-        
+   // pr( $nppayment); exit;
         if ($this->request->is(['patch', 'post', 'put'])) {
 			$grnIds=[];$invoiceIds=[];
 			foreach( $this->request->data['nppayment_rows'] as $key =>  $pr)
@@ -540,20 +530,24 @@ class NppaymentsController extends AppController
             //Save receipt
 			$grn    = $this->Nppayments->Grns->query();
 				    $grn->update()
-				    ->set(['purchase_thela_bhada_status' => 'no','payment_id' => ''])
-				    ->where(['payment_id' => $nppayment->id])
+				    ->set(['purchase_thela_bhada_status' => 'no','nppayment_id' => ''])
+				    ->where(['nppayment_id' => $nppayment->id])
 				    ->execute();
 		   $invoice = $this->Nppayments->Invoices->query();
 					  $invoice->update()
-					  ->set(['sales_thela_bhada_status' => 'no','payment_id' => ''])
-					  ->where(['payment_id' => $nppayment->id])
+					  ->set(['sales_thela_bhada_status' => 'no','nppayment_id' => ''])
+					  ->where(['nppayment_id' => $nppayment->id])
 					  ->execute();
 			foreach($nppayment->nppayment_rows as $key => $nppayment_row)
 			{
 				$nppayment_row->grn_ids = @$grnIds[$key];
 				$nppayment_row->invoice_ids =@$invoiceIds[$key];
 			}
-            if ($this->Nppayments->save($nppayment)) {
+            if($this->Nppayments->save($nppayment)) {
+				$this->Nppayments->Ledgers->deleteAll(['voucher_id' => $nppayment->id, 'voucher_source' => 'Non Print Payment Voucher']);
+				$this->Nppayments->ReferenceDetails->deleteAll(['nppayment_id' => $nppayment->id]);
+
+				
 				foreach($nppayment->nppayment_rows as $key => $nppayment_row)
 				{
 					if(count($grnIds)>0)
@@ -563,7 +557,7 @@ class NppaymentsController extends AppController
 						{ 
 							$grn = $this->Nppayments->Grns->query();
 							$grn->update()
-							->set(['purchase_thela_bhada_status' => 'yes','payment_id' => $nppayment->id])
+							->set(['purchase_thela_bhada_status' => 'yes','nppayment_id' => $nppayment->id])
 							->where(['id' => $grnArray])
 							->execute();
 					   }
@@ -575,139 +569,91 @@ class NppaymentsController extends AppController
 						{ 
 							$invoice = $this->Nppayments->Invoices->query();
 							$invoice->update()
-							->set(['sales_thela_bhada_status' => 'yes','payment_id' => $nppayment->id])
+							->set(['sales_thela_bhada_status' => 'yes','nppayment_id' => $nppayment->id])
 							->where(['id' => $invoiceArray])
 							->execute();
 					   }
 					}
 				}
-                $this->Nppayments->Ledgers->deleteAll(['voucher_id' => $nppayment->id, 'voucher_source' => 'Non Print Payment Voucher']);
                 $total_cr=0; $total_dr=0;
-				
-                foreach($nppayment->nppayment_rows as $nppayment_row){
-                   
-                    //Ledger posting for Received From Entity
-                    $ledger = $this->Nppayments->Ledgers->newEntity();
-                    $ledger->company_id=$st_company_id;
-                    $ledger->ledger_account_id = $nppayment_row->received_from_id;
-                    if($nppayment_row->cr_dr=="Dr"){
-                        $ledger->debit = $nppayment_row->amount;
-                        $ledger->credit = 0;
-                        $total_dr=$total_dr+$nppayment_row->amount;
-                    }else{
-                        $ledger->debit = 0;
-                        $ledger->credit = $nppayment_row->amount;
-                        $total_cr=$total_cr+$nppayment_row->amount;
+                foreach($nppayment->nppayment_rows as $nppayment_row){  
+ 					$ledger = $this->Nppayments->Ledgers->newEntity();
+					$ledger->company_id=$st_company_id;
+					$ledger->ledger_account_id = $nppayment_row->received_from_id;
+					if($nppayment_row->cr_dr=="Cr"){
+					$ledger->credit = $nppayment_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$nppayment_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $nppayment_row->amount;
+					$total_dr=$total_dr+$nppayment_row->amount;
+					}
+					$ledger->voucher_id = $nppayment->id;
+					$ledger->voucher_source = 'Non Print Payment Voucher';
+					$ledger->transaction_date = $nppayment->transaction_date;
+					$this->Nppayments->Ledgers->save($ledger);
+					if(!empty($nppayment_row->ref_rows))
+					{
+					foreach($nppayment_row->ref_rows as $ref_rows){   
+						$ReferenceDetail = $this->Nppayments->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
+						$ReferenceDetail->reference_no=$ref_rows['ref_no'];
+						$ReferenceDetail->ledger_account_id = $nppayment_row->received_from_id;
+						if($ref_rows['ref_cr_dr']=="Dr"){
+							$ReferenceDetail->debit = $ref_rows['ref_amount'];
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $ref_rows['ref_amount'];
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->nppayment_id = $nppayment->id;
+						$ReferenceDetail->nppayment_row_id = $nppayment_row->id;
+						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
+						$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
+					} 
+					
+						$ReferenceDetail = $this->Nppayments->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $nppayment_row->received_from_id;
+						if($nppayment_row->on_acc_dr_cr=="Dr"){
+							$ReferenceDetail->debit = $nppayment_row->on_acc;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $nppayment_row->on_acc;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->nppayment_id = $nppayment->id;
+						$ReferenceDetail->nppayment_row_id = $nppayment_row->id;
+						$ReferenceDetail->transaction_date = $nppayment->transaction_date;
+						if($nppayment_row->on_acc > 0){ 
+							$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
+						}                   
                     }
-                    $ledger->voucher_id = $nppayment->id;
-                    $ledger->voucher_source = 'Non Print Payment Voucher';
-                    $ledger->transaction_date = $nppayment->transaction_date;
-                    $this->Nppayments->Ledgers->save($ledger);
-                    
-                    $total_amount=$total_dr-$total_cr;
-                    
-                    //Reference Number coding
-                    if(sizeof(@$nppayment->ref_rows[$nppayment_row->received_from_id])>0){
-                        
-                        foreach($nppayment->ref_rows[$nppayment_row->received_from_id] as $ref_row){
-                            $ref_row=(object)$ref_row;
-                            $ReferenceDetail=$this->Nppayments->ReferenceDetails->find()->where(['ledger_account_id'=>$nppayment_row->received_from_id,'reference_no'=>$ref_row->ref_no,'nppayment_id'=>$nppayment->id])->first();
-                            
-                            if($ReferenceDetail){
-                                $ReferenceBalance=$this->Nppayments->ReferenceBalances->find()->where(['ledger_account_id'=>$nppayment_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-                                $ReferenceBalance=$this->Nppayments->ReferenceBalances->get($ReferenceBalance->id);
-                                if($nppayment_row->cr_dr=="Dr"){
-                                    $ReferenceBalance->debit=$ReferenceBalance->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }else{
-                                    $ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }
-                                
-                                $this->Nppayments->ReferenceBalances->save($ReferenceBalance);
-                                
-                                $ReferenceDetail=$this->Nppayments->ReferenceDetails->find()->where(['ledger_account_id'=>$nppayment_row->received_from_id,'reference_no'=>$ref_row->ref_no,'nppayment_id'=>$nppayment->id])->first();
-								
-                                $ReferenceDetail=$this->Nppayments->ReferenceDetails->get($ReferenceDetail->id);
-                                if($nppayment_row->cr_dr=="Dr"){
-                                    $ReferenceDetail->debit=$ReferenceDetail->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }else{
-                                    $ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-                                }
-								
-                                $this->Nppayments->ReferenceDetails->save($ReferenceDetail);
-                            }else{
-                                if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-                                    $query = $this->Nppayments->ReferenceBalances->query();
-                                    if($nppayment_row->cr_dr=="Dr"){
-                                        $query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-                                        ->values([
-                                            'ledger_account_id' => $nppayment_row->received_from_id,
-                                            'reference_no' => $ref_row->ref_no,
-                                            'credit' => 0,
-                                            'debit' => $ref_row->ref_amount
-                                        ])
-                                        ->execute();
-                                    }else{
-                                        $query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-                                        ->values([
-                                            'ledger_account_id' => $nppayment_row->received_from_id,
-                                            'reference_no' => $ref_row->ref_no,
-                                            'credit' => $ref_row->ref_amount,
-                                            'debit' => 0
-                                        ])
-                                        ->execute();
-                                    }
-                                    
-                                }else{
-                                    $ReferenceBalance=$this->Nppayments->ReferenceBalances->find()->where(['ledger_account_id'=>$nppayment_row->received_from_id,'reference_no'=>$ref_row->ref_no])->first();
-                                    $ReferenceBalance=$this->Nppayments->ReferenceBalances->get($ReferenceBalance->id);
-                                    if($nppayment_row->cr_dr=="Dr"){
-                                        $ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-                                    }else{
-                                        $ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-                                    }
-                                    
-                                    $this->Nppayments->ReferenceBalances->save($ReferenceBalance);
-                                }
-                                
-                                $query = $this->Nppayments->ReferenceDetails->query();
-                                if($nppayment_row->cr_dr=="Dr"){
-                                    $query->insert(['ledger_account_id', 'nppayment_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-                                    ->values([
-                                        'ledger_account_id' => $nppayment_row->received_from_id,
-                                        'nppayment_id' => $nppayment->id,
-                                        'reference_no' => $ref_row->ref_no,
-                                        'credit' => 0,
-                                        'debit' => $ref_row->ref_amount,
-                                        'reference_type' => $ref_row->ref_type
-                                    ])
-                                    ->execute();
-                                }else{
-                                    $query->insert(['ledger_account_id', 'nppayment_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-                                    ->values([
-                                        'ledger_account_id' => $nppayment_row->received_from_id,
-                                        'nppayment_id' => $nppayment->id,
-                                        'reference_no' => $ref_row->ref_no,
-                                        'credit' => $ref_row->ref_amount,
-                                        'debit' => 0,
-                                        'reference_type' => $ref_row->ref_type
-                                    ])
-                                    ->execute();
-                                }
-                                
-                            }
-                        }
-                    }
-                } 
-                //Ledger posting for bankcash
-                $ledger = $this->Nppayments->Ledgers->newEntity();
-                $ledger->company_id=$st_company_id;
-                $ledger->ledger_account_id = $nppayment->bank_cash_id;
-                $ledger->debit = 0;
-                $ledger->credit = $total_amount;
-                $ledger->voucher_id = $nppayment->id;
-                $ledger->voucher_source = 'Non Print Payment Voucher';
-                $ledger->transaction_date = $nppayment->transaction_date;
-                $this->Nppayments->Ledgers->save($ledger);
+                }
+					$bankAmt=$total_dr-$total_cr;
+					//pr($bankAmt); exit;
+					//Ledger posting for bankcash
+					$ledger = $this->Nppayments->Ledgers->newEntity();
+					$ledger->company_id=$st_company_id;
+					$ledger->ledger_account_id = $nppayment->bank_cash_id;
+					if($bankAmt > 0){
+						$ledger->credit = $bankAmt;
+						$ledger->debit = 0;
+					}else{
+						$ledger->debit = abs($bankAmt);
+						$ledger->credit = 0;
+					}
+					
+					$ledger->voucher_id = $nppayment->id;
+					$ledger->voucher_source = 'Non Print Payment Voucher';
+					$ledger->transaction_date = $nppayment->transaction_date;
+					if($bankAmt != 0){
+						$this->Nppayments->Ledgers->save($ledger);
+					} 
+                 
                 
                 $this->Flash->success(__('The receipt has been saved.'));
 

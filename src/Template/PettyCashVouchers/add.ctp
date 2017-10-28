@@ -240,7 +240,7 @@ $(document).ready(function() {
 	}
 	
 
-	function rename_rows(){
+	/* function rename_rows(){
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			$(this).find("td:eq(0) select.received_from").select2().attr({name:"petty_cash_voucher_rows["+i+"][received_from_id]", id:"petty_cash_voucher_rows-"+i+"-received_from_id"}).rules('add', {
@@ -259,13 +259,57 @@ $(document).ready(function() {
 			
 			i++;
 		});
-	}
-
+	} */
+	function rename_rows(){ 
+        var i=0;
+        $("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			$(this).find("td:eq(0) input.hidden").attr({name:"petty_cash_voucher_rows["+i+"][id]", id:"petty_cash_voucher_rows-"+i+"-id"});
+            $(this).find("td:eq(0) select.received_from").select2().attr({name:"petty_cash_voucher_rows["+i+"][received_from_id]", id:"petty_cash_voucher_rows-"+i+"-received_from_id"}).rules('add', {
+						required: true,
+						
+					});
+					$(this).find("td:eq(0) .row_id").val(i);
+			//var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length; 
+			
+				var thela_type = $(this).find("td:eq(0) select.received_from").val();
+				
+                if(thela_type=='101' || thela_type=='165' || thela_type=='313')
+		        {				
+					$(this).find("td:eq(0) select.grns").select2().attr({name:"petty_cash_voucher_rows["+i+"][grn_ids][]", id:"petty_cash_voucher_rows-"+i+"-grn_ids"}).rules('add', {
+						required: true,
+						notEqualToGroup: ['.grns'],
+						messages: {
+							notEqualToGroup: "Do not select same grn again."
+						}
+					});
+				}
+				if(thela_type=='105' || thela_type=='168' || thela_type=='316')
+		        {				
+					$(this).find("td:eq(0) select.invoices").select2().attr({name:"petty_cash_voucher_rows["+i+"][invoice_ids][]", id:"petty_cash_voucher_rows-"+i+"-invoice_ids"}).rules('add', {
+						required: true,
+						notEqualToGroup: ['.invoices'],
+						messages: {
+							notEqualToGroup: "Do not select same invoice again."
+						}
+					});
+				}
+			
+            $(this).find("td:eq(1) input").attr({name:"petty_cash_voucher_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+                        required: true,
+                        min: 0.01,
+                    });
+            $(this).find("td:eq(1) select").attr({name:"petty_cash_voucher_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+            $(this).find("td:nth-child(4) textarea").attr({name:"petty_cash_voucher_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
+			$(this).find("td:eq(0) select.received_from").attr('auto_inc',i)
+            i++;
+        });
+    }
     $('.addrow').live("click",function() {
         add_row();
     });
     $('.deleterow').live("click",function() {
         $(this).closest("tr").remove();
+		do_mian_amount_total();
     });
 	
     $('.addrefrow').live("click",function() {
@@ -332,12 +376,12 @@ $(document).ready(function() {
 		load_ref_section(sel);
 	});
 	
-	$('.cr_dr').live("change",function() {
+	/* $('.cr_dr').live("change",function() {
 		//var sel=$(this);
 		//load_ref_section(sel);
 		//do_mian_amount_total();
 	});
-	
+	 */
 	function load_ref_section(sel){
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading..."); 
 		var sel2=$(sel).closest('tr.main_tr');
@@ -405,7 +449,7 @@ $(document).ready(function() {
 		var ref_type=$(this).find('option:selected').val();
 		var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
 		if(ref_type=="Against Reference"){
-			var url="<?php echo $this->Url->build(['controller'=>'PettyCashVouchers','action'=>'fetchRefNumbers']); ?>";
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url+'/'+received_from_id+'/'+cr_dr,
 			$.ajax({
 				url: url,
@@ -424,7 +468,7 @@ $(document).ready(function() {
 	
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 	});
@@ -441,13 +485,13 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
-	$('.cr_dr').live("change",function() { 
+	/* $('.cr_dr').live("change",function() { 
 		do_ref_total();
 	});
 	
 	$('.drcrChange').live("change",function() { 
 		do_ref_total();
-	});	
+	});	 */
 	
 	function do_ref_total(){
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -555,9 +599,17 @@ $(document).ready(function() {
 		do_mian_amount_total();
 		do_ref_total();
 	});
-	
+	$('.cr_dr_amount').live("change",function() {
+		
+		do_mian_amount_total();
+		do_ref_total();
+	});
 	function do_mian_amount_total(){
         var mian_amount_total_cr=0; var mian_amount_total_dr=0;
+		if($("#main_table tbody#main_tbody tr.main_tr").length<1)
+		{
+			 $('#receipt_amount').text('');
+		}
         $("#main_table tbody#main_tbody tr.main_tr").each(function(){
             var v=parseFloat($(this).find("td:nth-child(2) input").val());
             var cr_dr=($(this).find("td:nth-child(2) select").val());
@@ -579,7 +631,7 @@ $(document).ready(function() {
 	<tbody>
 		<tr class="main_tr">
 			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
-			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?><div class="show_result"></div>
 			</td>
 			<td>
 				<div class="row">
@@ -587,7 +639,7 @@ $(document).ready(function() {
 						<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
 					</div>
 					<div class="col-md-5  " style="padding-left: 0;">
-						<select name="cr_dr" class="form-control input-sm cr_dr" >
+						<select name="cr_dr" class="form-control input-sm cr_dr_amount" >
 							<option value="Cr">Cr</option>
 							<option value="Dr">Dr</option>
 						</select>
@@ -619,7 +671,7 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
-				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm cr_dr_amount','value'=>'Dr']); ?></td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>

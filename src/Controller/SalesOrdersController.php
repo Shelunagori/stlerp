@@ -533,28 +533,9 @@ class SalesOrdersController extends AppController
 							->execute();
 						}
 					}
-					foreach($salesOrder->sales_order_rows as $sales_order_row){
-					$quotation_rows = $this->SalesOrders->Quotations->QuotationRows->find()->where(['QuotationRows.item_id'=>$sales_order_row->item_id,'quotation_id'=>$salesOrder->quotation_id])->first();
-				
-						if($quotation_rows){ 
-							$query1 = $this->SalesOrders->Quotations->QuotationRows->query();
-							$query1->update()
-							->set(['proceed_qty' =>$quotation_rows->proceed_qty-$sales_order_row->old_quantity+$sales_order_row->quantity])
-							->where(['id' => $quotation_rows->id])
-							->execute();
-						}
-					}
+					
 						
 					$falg=0;
-					if($salesOrder->quotation_id > 0){
-					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
-						foreach($quotation_rows_datas as $quotation_rows_data){
-							if($quotation_rows_data->quantity != $quotation_rows_data->proceed_qty){ 
-							$falg=1;	
-							}
-						} 
-					} 
-					
 					
 					if($falg==1){
 						$query_pending = $this->SalesOrders->Quotations->query();
@@ -598,6 +579,24 @@ class SalesOrdersController extends AppController
 							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 						}
 					)->order(['Items.name' => 'ASC']);
+					
+			////start unique validation and procees qty
+			$SalesOrders = $this->SalesOrders->get($id, [
+            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}],'SalesOrderRows'=>['Items']])
+			]);
+				
+			$sales_orders_qty=[];
+				foreach($SalesOrders->invoices as $invoices){ 
+					foreach($invoices->invoice_rows as $invoice_row){ 
+						$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+						
+					}
+				}	
+
+			////end unique validation and procees qty		
+					
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 						'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -612,7 +611,7 @@ class SalesOrdersController extends AppController
 							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 						} 
 					);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year'));
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
@@ -977,7 +976,7 @@ class SalesOrdersController extends AppController
 					} 
 				);
 				
-			////
+			////start unique validation and procees qty
 			$SalesOrders = $this->SalesOrders->get($id, [
             'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
@@ -992,7 +991,7 @@ class SalesOrdersController extends AppController
 				}
 			}	
 
-		
+			////end unique validation and procees qty
 			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty'));
 			$this->set('_serialize', ['salesOrder']);
 		}

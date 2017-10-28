@@ -179,6 +179,7 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 							?>
 							<td style="white-space: nowrap;"><?php echo $grn_rows->item->name; ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value' => @$grn_rows->item->id,'popup_id'=>$q]); ?>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.grn_row_id', ['label' => false,'class' => 'invoice','type'=>'hidden','value' => @$grn_rows->id]); ?>
 							</td>
 							
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.unit_rate_from_po',['value'=>$item_po_info[$grn_rows->item->id]->rate,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox','readonly']); ?></td>

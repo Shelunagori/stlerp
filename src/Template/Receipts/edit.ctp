@@ -93,11 +93,14 @@ if($transaction_date <  $start_date ) {
 				<th width="3%"></th>
 			</thead>
 			<tbody id="main_tbody">
-			<?php foreach($receipt->receipt_rows as $receipt_row){ ?> 
+			<?php foreach($receipt->receipt_rows as $receipt_row){ //pr($receipt_row->ReceivedFrom->bill_to_bill_account);  ?> 
 				<tr class="main_tr" old_received_from_id="<?php echo $receipt_row->received_from_id; ?>">
 					<td>
 					<?php echo $this->Form->input('id', ['type' => 'hidden','class' => 'form-control input-sm receipt_row_id','value'=>$receipt_row->id]); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+					
+					<?php echo $this->Form->input('bill_to_bill_account', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm bill_to_bill_account','value'=>$receipt_row->ReceivedFrom->bill_to_bill_account]); ?>
+					
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$receipt_row->received_from_id]); ?></td>
 					<td>
 					<div class="row">
@@ -110,7 +113,7 @@ if($transaction_date <  $start_date ) {
 					</div>
 					</td>
 					<td>
-					
+					<?php if($receipt_row->ReceivedFrom->bill_to_bill_account=="Yes"){ ?>
 					<div class="ref" style="padding:4px;">
 						<table width="100%" class="ref_table">
 							<thead>
@@ -166,9 +169,8 @@ if($transaction_date <  $start_date ) {
 								</tr>
 							</tfoot>
 						</table>
-						
 						</div>
-						
+						<?php } ?>
 					</td>
 					<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 				</tr>
@@ -314,10 +316,20 @@ $(document).ready(function() {
 	
 	
 	$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-		var sel=$(this);
-		rename_ref_rows(sel);
+		var bill_to_bill_account=$(this).find('.bill_to_bill_account').val(); 
+		if(bill_to_bill_account=="Yes"){ 
+			var sel=$(this);
+			rename_ref_rows(sel);
+		}
 	});
-
+	
+	$('.deleterefrow').live("click",function() {
+		var l=$(this).closest("table.ref_table tbody").find("tr").length;
+			if(l>1){
+				$(this).closest("tr").remove();
+			}
+		do_ref_total();
+	});
 	
 	
 	
@@ -352,13 +364,6 @@ $(document).ready(function() {
 		
 	}
 	
-	$('.deleterefrow').live("click",function() {
-		var l=$(this).closest("table.ref_table tbody").find("tr").length;
-			if(l>1){
-				$(this).closest("tr").remove();
-			}
-		do_ref_total();
-	});
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
@@ -371,6 +376,9 @@ $(document).ready(function() {
 		do_mian_amount_total();
 	});
 	 */
+	 
+
+
 	function load_ref_section(sel){
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
 		var sel2=$(sel).closest('tr.main_tr');
@@ -479,10 +487,8 @@ $(document).ready(function() {
 					onAcc_dr_cr="Dr";
 				}
 				if(onAcc>=0){
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
-				
-				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
-				//total_ref_cr=total_ref_cr+on_acc;
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
 				}else{
 					onAcc=Math.abs(onAcc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
@@ -522,9 +528,7 @@ $(document).ready(function() {
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
 					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
 				}
-				
 				var total_amt_ref=0;
-				
 				if(onAcc_dr_cr=="Dr"){
 					var total_amt_ref=(onAcc+total_ref_dr)-total_ref_cr;
 				}else{ 
@@ -537,7 +541,7 @@ $(document).ready(function() {
 		});
 	}
 	
-	$('.mian_amount').live("blur",function() {
+	/* $('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
 		$(this).val(v.toFixed(2));
@@ -564,7 +568,7 @@ $(document).ready(function() {
 			$('#receipt_amount').text(mian_amount_total.toFixed(2));
 		});
 	}
-	
+	 */
 	
 	
 });
