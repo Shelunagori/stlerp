@@ -161,7 +161,15 @@ if($transaction_date <  $start_date ) {
 								<?php  
 								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id]]); 
 								?>
-								<span>Max: <?= h($grn_rows->quantity-@$existing_rows[$grn_rows->item_id]) ?></span>
+								<span>Max: <?php
+								if(!empty($maxQty[$grn_rows->id]))
+								{
+									echo @$maxQty[$grn_rows->id];
+								}
+								else{
+									echo $grn_rows->quantity;
+								}
+								?></span>
 								
 								</td>
 								<td>
@@ -398,13 +406,7 @@ $(document).ready(function() {
 			if(val){
 				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').attr({ name:"grn_rows["+val+"][item_id]"});
 				
-				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly').attr('max',qty).rules('add', {
-						    
-							max: qty,
-							messages: {
-								max: "please select equal to the max quantity",
-							}
-					});
+				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly').attr('max',qty);
 				$(this).css('background-color','#fffcda');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}

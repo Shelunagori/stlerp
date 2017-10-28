@@ -115,18 +115,20 @@
 									 echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->item->item_companies[0]->serial_number_enable]);
 									 echo $purchase_order_rows->item->name;
 
-									 echo $this->Form->input('purchase_order_row_id', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$purchase_order_rows->id]);
+									 echo $this->Form->input('q', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$purchase_order_rows->id]);
 									?>								
 								</td>
 									
 								<td>
-									<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$purchase_order_rows->quantity-$purchase_order_rows->processed_quantity,'readonly','min'=>'1','max'=>@$purchase_order_rows->quantity-$purchase_order_rows->processed_quantity]); 
+									<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$actuleQty[$purchase_order_rows->id],'readonly','max'=>@$actuleQty[$purchase_order_rows->id]]); 
 									echo "In Purchase-Order Quantity:- ";
-									echo $purchase_order_rows->quantity;
+									echo @$actuleQty[$purchase_order_rows->id];
 									?>
 								</td>
 								<td>
-									<label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$purchase_order_rows->id]); ?></label>
+									<label><?php
+									if(@$actuleQty[$purchase_order_rows->id]>0){
+									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$purchase_order_rows->id]); }?></label>
 								</td>
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$purchase_order_rows->id; ?>'>
@@ -306,7 +308,7 @@ $(document).ready(function() {
 	
 	
 	var p=0;
-	
+	rename_rows();
 	function rename_rows(){
 				
 		var r=1;
@@ -327,8 +329,8 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
+				$(this).find('td:nth-child(1) input').attr({ name:"q"});
 				$(this).find('td:nth-child(2) input').attr({ name:"q"});
-				
 				$(this).find('td:nth-child(3) input').attr({ name:"q", id:"q",readonly:"readonly"});
 				
 				$(this).css('background-color','#FFF');
