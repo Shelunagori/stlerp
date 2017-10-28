@@ -313,13 +313,7 @@ $(document).ready(function() {
 				
 				//$(this).find("td:nth-child(2) select").attr({name:"job_card_rows["+i+"][item_id]", id:"job_card_rows-"+i+"-item_id"}).select2();
 				
-				$(this).find("td:nth-child(2) select").select2().attr({name:"job_card_rows["+i+"][item_id]", id:"job_card_rows-"+i+"-item_id"}).addClass("item_name-"+sales_order_row_id).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_name-'+sales_order_row_id],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
-					});
+				$(this).find("td:nth-child(2) select").select2().attr({name:"job_card_rows["+i+"][item_id]", id:"job_card_rows-"+i+"-item_id"}).addClass("item_name-"+sales_order_row_id);
 				
 				
 				$(this).find("td:nth-child(3) input").attr({name:"job_card_rows["+i+"][quantity]", id:"job_card_rows-"+i+"-quantity"});
@@ -352,7 +346,7 @@ $(document).ready(function() {
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
 			<?php echo $this->Form->input('sales_order_item_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm ','label'=>false,'required']); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm ','label'=>false]); ?>
 			</td>
 			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','label'=>false,'placeholder'=>'Quantity','required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
