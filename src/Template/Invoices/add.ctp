@@ -424,8 +424,9 @@ $('.closetin').on("click",function() {
 						<thead>
 							<tr>
 								<th width="25%">Ref Type</th>
-								<th width="40%">Ref No.</th>
+								<th width="25%">Ref No.</th>
 								<th width="30%">Amount</th>
+								<th width="10%"></th>
 								<th width="5%"></th>
 							</tr>
 						</thead>
@@ -434,6 +435,10 @@ $('.closetin').on("click",function() {
 								<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 								<td class="ref_no"></td>
 								<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+								<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+								<?php 
+								echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+								</td>
 								<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 							</tr>
 						</tbody>
@@ -443,11 +448,12 @@ $('.closetin').on("click",function() {
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
 								<td></td>
+								<td></td>
 							</tr>
 							<tr>
 								<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
 								<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
-								<td></td>
+								<td></td><td></td>
 							</tr>
 						</tfoot>
 					</table>
@@ -1069,18 +1075,10 @@ $(document).ready(function() {
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/<?php echo $c_LedgerAccount->id; ?>/'+i;
+				//var url='<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'checkRefNumberUnique']); ?>';
+				//url=url+'/<?php echo $c_LedgerAccount->id; ?>/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true,
-							noSpace: true,
-							notEqualToGroup: ['.ref_number'],
-							remote: {
-								url: url,
-							},
-							messages: {
-								remote: "Not an unique."
-							}
+							required: true
 						});
 			}
 			
@@ -1127,7 +1125,9 @@ $(document).ready(function() {
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 	});
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_ref_total();
+	});
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
@@ -1137,20 +1137,58 @@ $(document).ready(function() {
 		if(!main_amount){ main_amount=0; }
 		
 		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
 		$("table.main_ref_table tbody tr").each(function(){
 			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
+			
 			if(!am){ am=0; }
-			total_ref=total_ref+am;
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
 		});
+		var on_acc=0;
+		var total_ref=0;
+		var on_acc_cr_dr='Dr';
+		if(total_ref_dr > total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
+		}
+		else if(total_ref_dr < total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
+		}
+		else
+		{
+			on_acc=main_amount;
+		}
 		
-		var on_acc=main_amount-total_ref; 
+		if(on_acc>=0){
+			on_acc=Math.abs(on_acc);
+			//$(this).find("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			//$(this).find("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+		}else{
+			on_acc=Math.abs(on_acc);
+			//$(this).find("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			//$(this).find("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+		}
+		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+		/* var on_acc=main_amount-total_ref; 
 		if(on_acc>=0){
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
 			total_ref=total_ref+on_acc;
 		}else{
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
 		}
-		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2)); */
 	}
 	
 });
@@ -1204,6 +1242,10 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+				</td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>
