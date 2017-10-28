@@ -50,6 +50,10 @@ class InvoiceRowsTable extends Table
             'foreignKey' => 'sales_order_row_id',
             'joinType' => 'INNER'
         ]);
+		$this->hasMany('SaleReturnRows', [
+            'foreignKey' => 'invoice_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

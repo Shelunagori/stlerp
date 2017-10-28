@@ -104,7 +104,9 @@ class InvoicesTable extends Table
 		$this->belongsTo('LedgerAccounts');
 		$this->belongsTo('ReceiptVouchers');
 		$this->belongsTo('Ledgers');
-		$this->belongsTo('SaleReturns');
+		$this->hasMany('SaleReturns', [
+            'foreignKey' => 'invoice_id'
+        ]);
 		$this->belongsTo('InvoiceBookings');
 		$this->belongsTo('Filenames');
 		

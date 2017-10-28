@@ -254,14 +254,17 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$q=0; foreach ($invoice->invoice_rows as $invoice_row): 
 					?>
 						<tr class="tr1  firsttr " row_no='<?php echo @$invoice_row->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+							<td rowspan="2">
+								<?php echo ++$q; --$q; ?>
+								<?php echo $this->Form->input('invoice_row_id', ['label' => false,'type' => 'hidden','value' => @$invoice_row->id,'readonly']); ?>
+							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row->item_id,'readonly']); ?>
 								<?php echo $invoice_row->item->name; ?>
 								<?php echo $invoice_row->item->name; ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','value' => @$invoice_row->quantity,'max'=>$invoice_row->quantity-$invoice_row->sale_return_quantity]); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity row_textbox','placeholder'=>'Quantity','max'=>$invoice_row->quantity-@$sales_orders_qty[$invoice_row->id],'value'=>0,'required']); ?>
 							</td>
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Rate','value' => @$invoice_row->rate,'readonly','step'=>0.01]); ?>
@@ -674,6 +677,7 @@ $(document).ready(function() {
 		
 			if(val){ 
 				i++;
+				$(this).find('td:nth-child(1) input').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
 				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+val+"][item_id]").attr("id","sale_return_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+val+"][quantity]").removeAttr("readonly").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+val+"][rate]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-rate").rules("add", "required");

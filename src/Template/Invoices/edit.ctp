@@ -194,7 +194,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; $q--; ?>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_row->id,'readonly']); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row_id[@$sales_order_row->id],'readonly','class'=>'invoiceid']); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_row->id,'readonly','class'=>'hiddenid']); ?>
 							</td>
 							<td>
 								<?php 
@@ -708,7 +709,8 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
 				i++;
-				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
+				$(this).find('td:nth-child(1) input.hiddenid').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
+				$(this).find('td:nth-child(1) input.invoiceid').attr("name","invoice_rows["+val+"][id]").attr("id","invoice_rows-"+val+"-id");
 				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
@@ -745,6 +747,8 @@ $(document).ready(function() {
 				
 			}else{
 				$(this).find("td:nth-child(1)").html(++i); i--;
+				$(this).find("td:nth-child(1) input.salesId").attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find("td:nth-child(1) input.hiddenid").attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
