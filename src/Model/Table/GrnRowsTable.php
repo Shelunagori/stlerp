@@ -48,7 +48,7 @@ class GrnRowsTable extends Table
 		
 		$this->belongsTo('PurchaseOrderRows', [
             'foreignKey' => 'purchase_order_row_id',
-            'joinType' => 'LEFT'
+            'joinType' => 'INNER'
         ]);
 		
     }

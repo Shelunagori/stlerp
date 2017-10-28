@@ -139,7 +139,7 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_quantity',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->quantity]); ?>
 							</td>
-							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>$invoice_booking_row->quantity,'max'=>$invoice_booking_row->quantity]); ?></td>
+							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>@$remainingQty[@$invoice_booking_row->id],'max'=>@$remainingQty[@$invoice_booking_row->id]]); ?></td>
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.total',['label' => false,'class' => 'form-control input-sm','type'=>'text','value'=>$invoice_booking_row->total]); ?></td>
 							<td>

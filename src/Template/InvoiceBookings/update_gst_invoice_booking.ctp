@@ -194,7 +194,10 @@
 					
 					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+							<td rowspan="2"><?php echo ++$q; --$q; ?>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
+							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.grn_row_id', ['label' => false,'class' => 'invoice','type'=>'hidden','value' => @$grn_rows->id]); ?>
+							</td>
 							
 							<td style="white-space: nowrap;"><?php echo @$invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal','type'=>'hidden','value' => @$invoice_booking_row->item->id,'popup_id'=>$q]); ?>

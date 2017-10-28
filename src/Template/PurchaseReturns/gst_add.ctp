@@ -189,18 +189,22 @@
 								
 							}
 							
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
+					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): 
+							if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+					?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
 							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 							
 							<td style="white-space: nowrap;"><?php echo @$invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal item','type'=>'hidden','value' => @$invoice_booking_row->item->id,'popup_id'=>$q]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
+
 							</td>
 							
 							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.unit_rate_from_po',['value'=>$invoice_booking_row->unit_rate_from_po,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
 							
-							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>@$invoice_booking_row->quantity,'readonly','max'=>@$invoice_booking_row->quantity,'type'=>'text','style'=>'width:50px;']); ?></td>
+							<td><?php 
+							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>'0','readonly','max'=>@$remainingQty[@$invoice_booking_row->id],'type'=>'text','style'=>'width:50px;']); ?></td>
 							
 							<td align="center">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.misc',['type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly','value'=>0,'value'=>$invoice_booking_row->misc]); ?>
@@ -268,7 +272,7 @@
 							<td></td>
 						</tr>
 
-					<?php $q++;  endforeach; ?>
+							<?php } $q++;  endforeach; ?>
 				
 				</tbody>
 				<tfoot>
