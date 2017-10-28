@@ -2538,17 +2538,11 @@ class InvoicesController extends AppController
        
 		
 		
-<<<<<<< HEAD
+
 		$customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
 	   
-	 /*   $invoicesMaxQty = $this->Invoices->get($id, [
-            'contain' => (['InvoiceRows'=>function ($q) {
-					return $q->select(['total_invoice_qty' => $q->func()->sum('InvoiceRows.quantity'),'InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id']);
-=======
-			$customers = $this->Invoices->Customers->find('all');
-			$companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
-
+	
 			//start array declaration for unique validation and proceed quantity
 		$sales_order_id = $invoice_old_data->sales_order_id;
 		 
@@ -2556,7 +2550,7 @@ class InvoicesController extends AppController
             'contain' => (['SalesOrderRows' => function ($q) {
 					$q->select(['SalesOrderRows.sales_order_id','SalesOrderRows.id','total_sales_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group(['SalesOrderRows.id']);
 					return $q;
->>>>>>> origin/master
+
 				}])
         ]);
 		
@@ -2574,15 +2568,15 @@ class InvoicesController extends AppController
 			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
 		}
 		
-<<<<<<< HEAD
-			pr($invoicesMaxQty);exit;
-		$invoice_sales_orders_qty=[];
+
+			//pr($invoicesMaxQty);exit;
+		/*$invoice_sales_orders_qty=[];
 			foreach($invoicesMaxQty->invoice_rows as $invoice_row){ 
 					$invoice_sales_orders_qty[@$invoice_row->sales_order_row_id]+=$invoice_row->total_qty;
 					
 				}
 				pr($invoice_sales_orders_qty);exit; */
-=======
+
 		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
 			@$sales_order_qty[@$sales_order_row->id]+=@$sales_order_row->total_sales_qty;
 		}
@@ -2590,7 +2584,7 @@ class InvoicesController extends AppController
 		
 		//end array declaration for unique validation and proceed quantity			
 	   
->>>>>>> origin/master
+
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
