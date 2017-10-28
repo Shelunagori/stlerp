@@ -1,2 +1,0 @@
-IB6		STL
-IB1		FMSL
