@@ -195,8 +195,10 @@ class ReceiptsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $receipt = $this->Receipts->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'ReceiptRows' => ['ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes', 'Companies', 'ReceiptRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
+		
+		
 		$ref_bal=[];
 		foreach($receipt->receipt_rows as $receipt_rows){
 			$ReferenceBalancess=$this->Receipts->ReferenceDetails->find()->where(['ledger_account_id'=>$receipt_rows->received_from_id,'receipt_id'=>$receipt->id]);
@@ -292,6 +294,8 @@ class ReceiptsController extends AppController
 					$ledger->transaction_date = $receipt->transaction_date;
 					$this->Receipts->Ledgers->save($ledger);
 					
+					if(!empty($receipt_row->ref_rows))
+					{
 					foreach($receipt_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -328,10 +332,9 @@ class ReceiptsController extends AppController
 						if($receipt_row->on_acc > 0){ 
 							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
 						}
+					}	
 				}
 				$bankAmt=$total_dr-$total_cr;
-				//pr($bankAmt); exit;
-				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $receipt->bank_cash_id;
@@ -435,9 +438,9 @@ class ReceiptsController extends AppController
 		$financial_month_last = $this->Receipts->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		
         $receipt = $this->Receipts->get($id, [
-            'contain' => ['ReceiptRows'=>['ReferenceDetails']]
+            'contain' => ['ReceiptRows'=>['ReferenceDetails','ReceivedFroms']]
         ]);
-		
+		//pr($receipt); exit;
 
 			   $session = $this->request->session();
 			   $st_year_id = $session->read('st_year_id');
@@ -501,6 +504,8 @@ class ReceiptsController extends AppController
 					$ledger->transaction_date = $receipt->transaction_date;
 					$this->Receipts->Ledgers->save($ledger);
 					
+					if(!empty($receipt_row->ref_rows))
+					{
 					foreach($receipt_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -537,14 +542,9 @@ class ReceiptsController extends AppController
 						if($receipt_row->on_acc > 0){ 
 							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
 						}
-						
-					
-					
+					}
 				}
 				$bankAmt=$total_dr-$total_cr;
-				//pr($bankAmt); exit;
-
-				//Ledger posting for bankcash
 				$ledger = $this->Receipts->Ledgers->newEntity();
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $receipt->bank_cash_id;

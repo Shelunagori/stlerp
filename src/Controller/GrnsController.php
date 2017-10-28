@@ -281,7 +281,6 @@ class GrnsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
 		$purchase_order_id=@(int)$this->request->query('purchase-order');
-		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
@@ -291,7 +290,8 @@ class GrnsController extends AppController
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$purchase_order=array();
 		
-		if(!empty($purchase_order_id)){
+		if(!empty($purchase_order_id))
+		{
 			$purchase_order = $this->Grns->PurchaseOrders->get($purchase_order_id, [
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) use($st_company_id){
@@ -302,31 +302,10 @@ class GrnsController extends AppController
 						},'Companies','Vendors'
 					]
 			]);
-/* 
-			 foreach($purchase_order->purchase_order_rows as $data)
-			{
-			 $purchase_order_row_ids=$data->id;
-			 $purchaseOrders = $this->Grns->GrnRows->find()
-			 ->where(['GrnRows.purchase_order_row_id'=>$purchase_order_row_ids])
-			 
-			 function($query){
-				return $query->select([
-			 ->select(['total' => $query->func()->sum('quantity')])
-				->group('GrnRows.purchase_order_row_id')
-				->autoFields(true);
-             
-			 pr($purchaseOrders->toArray());
-			 
-				  if($purchaseOrders)
-				 {
-					$grn_quantity=$purchaseOrders->quantity;
-				 }
-				 else{
-					$grn_quantity=0;
-				 } */ 
-			} 
-			exit;
-		}
+ 
+		} 
+			
+	
 		
 		$this->set(compact('purchase_order'));
 		
@@ -395,9 +374,9 @@ class GrnsController extends AppController
 						foreach($grn->check as $purchase_order_row_id){
 							$qty=$grn->grn_rows[$i]['quantity'];
 							$item_id=$grn->grn_rows[$i]['item_id'];
-							$PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
+							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
 							$PurchaseOrderRows->processed_quantity=$PurchaseOrderRows->processed_quantity+$qty;
-							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows);
+							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows); */
 							$i++;
 							
 							//Insert in Item Ledger//

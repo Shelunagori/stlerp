@@ -464,11 +464,7 @@ $(document).ready(function() {
 				if(len>0){
 					//$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
 					$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-							required: true,
-							notEqualToGroup: ['.item_id'],
-							messages: {
-								notEqualToGroup: "Do not select same Item again."
-							}
+							required: true
 						});
 				}else{
 					$(this).find("td:nth-child(2) input").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");

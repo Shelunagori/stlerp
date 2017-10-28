@@ -152,7 +152,7 @@ class PaymentsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $payment = $this->Payments->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'PaymentRows' => ['ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes', 'Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		$petty_cash_voucher_row_data=[];
 		$petty_cash_grn_data=[];
