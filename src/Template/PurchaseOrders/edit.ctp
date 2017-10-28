@@ -107,7 +107,7 @@
 									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','value'=>@$purchase_order_rows->processed_quantity]);
 									?>
 									</td>
-									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity]); 
+									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity,'min'=>@$minItemQty[@$purchase_order_rows->id]]); 
 										
 									?></td>
 									<?php } else { ?>
@@ -475,11 +475,7 @@ $(document).ready(function() {
 			if(len>0){
 				
 				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
 					});
 				$(this).find("td:nth-child(2) input[type='hidden']").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
 			}else{

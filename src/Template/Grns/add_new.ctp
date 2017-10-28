@@ -107,7 +107,9 @@
 							$q=0; foreach ($purchase_order->purchase_order_rows as $purchase_order_rows): ?>
 							<tr class="tr1" row_no='<?php echo @$purchase_order_rows->id; ?>'>
 								
-								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+								<td rowspan="2"><?php echo ++$q; --$q; 
+									 echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->id,'class'=>'hide']);
+								?></td>
 								<td>
 									<?php echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->item_id]);
 									 echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->item->item_companies[0]->serial_number_enable]);
@@ -316,6 +318,7 @@ $(document).ready(function() {
 			
 			
 			if(val){
+				$(this).find('td:nth-child(1) input[type="hidden"]:nth-child(1)').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
 				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').attr({ name:"grn_rows["+val+"][item_id]"});
 				
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({name:'grn_rows['+val+'][purchase_order_row_id]'});

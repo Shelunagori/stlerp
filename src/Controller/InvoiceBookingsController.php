@@ -342,7 +342,7 @@ class InvoiceBookingsController extends AppController
 		$this->set(compact('grn','last_ib_no','discount','tot_sale_tax','chkdate','item_total_rate','excise_duty'));
 		$invoiceBooking = $this->InvoiceBookings->newEntity();
 		if ($this->request->is('post')) { 
-		$ref_rows=$this->request->data['ref_rows'];
+		@$ref_rows=@$this->request->data['ref_rows'];
 		
             $invoiceBooking = $this->InvoiceBookings->patchEntity($invoiceBooking, $this->request->data);
 			$invoiceBooking->grn_id=$grn_id; 
@@ -1031,8 +1031,8 @@ class InvoiceBookingsController extends AppController
 		} 
 		$this->set(compact('grn','last_ib_no','discount','tot_sale_tax','chkdate','item_total_rate','excise_duty'));
 		$invoiceBooking = $this->InvoiceBookings->newEntity();
-		if ($this->request->is('post')) {
-        $ref_rows=$this->request->data['ref_rows'];
+		if ($this->request->is('post')) { //pr($this->request->data());exit;
+        $ref_rows=@$this->request->data['ref_rows'];
 		
             $invoiceBooking = $this->InvoiceBookings->patchEntity($invoiceBooking, $this->request->data);
 			$invoiceBooking->grn_id=$grn_id; 
