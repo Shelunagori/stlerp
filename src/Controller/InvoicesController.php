@@ -782,13 +782,7 @@ class InvoicesController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		 
 		$this->viewBuilder()->layout('index_layout');
-		$invoice = $this->Invoices->get($id, [
-            'contain' => ['ItemSerialNumbers','InvoiceRows','SalesOrders' => ['Invoices'=>['InvoiceRows'],'SalesOrderRows' => ['Items'=>['ItemSerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
-									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
-								}],'SaleTaxes']],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
-						return $q
-						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
-        ]);
+		
 		
 		$invoice = $this->Invoices->get($id, [
             'contain' => ['ItemSerialNumbers','InvoiceRows','SalesOrders' => ['SalesOrderRows' => ['Items'=>['ItemSerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
@@ -1148,6 +1142,15 @@ class InvoicesController extends AppController
 		
 		 
 		//start array declaration for unique validation and proceed quantity
+		$invoice_qty = $this->Invoices->get($id, [
+            'contain' => ['ItemSerialNumbers','InvoiceRows','SalesOrders' => ['Invoices'=>['InvoiceRows'],'SalesOrderRows' => ['Items'=>['ItemSerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}],'SaleTaxes']],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
+						return $q
+						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
+        ]);
+		
+		
 		$sales_order_id = $invoice_old_data->sales_order_id;
 		 
 		$sales_qty = $this->Invoices->SalesOrders->get($sales_order_id, [
@@ -1159,7 +1162,7 @@ class InvoicesController extends AppController
 		
 		$sales_order_qty=[];$existing_invoice_rows=[]; $current_invoice_rows=[];$invoice_row_id=[];
 		
-		foreach($invoice->sales_order->invoices as $all_invoice){
+		foreach($invoice_qty->sales_order->invoices as $all_invoice){
 			foreach($all_invoice->invoice_rows as $all_invoice_row){
 				if($all_invoice_row->sales_order_row_id != 0){
 					@$existing_invoice_rows[$all_invoice_row->sales_order_row_id]+=@$all_invoice_row->quantity;
@@ -1167,7 +1170,7 @@ class InvoicesController extends AppController
 			}
 		}
 		
-		foreach($invoice->invoice_rows as $current_invoice_row){
+		foreach($invoice_qty->invoice_rows as $current_invoice_row){
 			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
 			@$invoice_row_id[$current_invoice_row->sales_order_row_id]=@$current_invoice_row->id;
 		}
