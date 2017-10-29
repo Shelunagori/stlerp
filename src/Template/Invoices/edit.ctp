@@ -263,7 +263,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
 							</tr><?php } ?>
 					
-					<?php $q++;   ?>
+					<?php $q++; }  ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
