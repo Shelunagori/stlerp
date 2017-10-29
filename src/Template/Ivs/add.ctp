@@ -24,10 +24,12 @@
 						</tr>
 					</thead>
 					<tbody>
+						<?php foreach($Invoice->invoice_rows as $invoice_row){ ?>
 						<tr>
-							<td>1</td>
+							<td><?php pr($invoice_row); ?></td>
 							<td>2</td>
 						</tr>
+						<?php } ?>
 					</tbody>
 				</table>
 			</div>
