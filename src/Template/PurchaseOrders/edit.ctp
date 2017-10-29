@@ -96,14 +96,25 @@
 							</tr>
 						</thead>
 						<tbody id="main_tbody">
-							<?php $q=0; foreach ($purchaseOrder->purchase_order_rows as $purchase_order_rows): ?>
+							<?php $q=0; foreach ($purchaseOrder->purchase_order_rows as $purchase_order_rows): 
+							
+							
+							if(@$minItemQty[@$purchase_order_rows->id]==$purchase_order_rows->quantity)
+							{
+								$disable= "disabled='true'";
+							}
+							else
+							{
+								$disable= "";
+							}
+							?>
 							<tr class="tr1 main_tr" row_no='<?php echo @$purchase_order_rows->id; ?>'>
 									<td rowspan="2"><?= h($q) ?></td>
 									<?php if($purchase_order_rows->pull_status =='Direct'){ ?>
 									<td>
 									
 									<?php 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]); 
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id,$disable]); 
 									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','value'=>@$purchase_order_rows->processed_quantity]);
 									?>
 									</td>
@@ -129,7 +140,7 @@
 									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount','value'=>$purchase_order_rows->amount]); ?></td>
 									
 									<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-									<?php if($purchase_order_rows->processed_quantity > 0){ }else{ ?>
+									<?php if(@$minItemQty[@$purchase_order_rows->id] > 0){ }else{ ?>
 									<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
 									<?php }?>
 									</td>
