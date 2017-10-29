@@ -560,11 +560,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1)").html(++i); --i;
 			//$(this).find("td:nth-child(2) select").select2().attr({name:"quotation_rows["+i+"][item_id]", id:"quotation_rows-"+i+"-item_id",popup_id:i}).rules("add", "required");
 			$(this).find("td:nth-child(2) select").select2().attr({name:"quotation_rows["+i+"][item_id]", id:"quotation_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
 					});
 			
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);

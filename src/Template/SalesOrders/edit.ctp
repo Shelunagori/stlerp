@@ -143,7 +143,7 @@
 					}
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
 					
-					if(@$sales_orders_qty[$sales_order_rows->id] > 0){
+					if(@$quotation_qty[$sales_order_rows->id] > 0){
 						
 						$disable_class=" disabled='true'";
 						$disable_class_item="disabledbutton";
@@ -151,12 +151,13 @@
 						$disable_class=""; 
 						$disable_class_item=""; 
 						} 
+					 if(@$current_invoice_rows[$sales_order_rows->id]!=$sales_order_rows->quantity) { ?>
 					
-					?>
 					<tr class="tr1 main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
 						<td rowspan="2">
 							<?= h($q) ?>
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id]); ?>	
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id,'class'=>'salesid']); ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$invoice_row_id[@$sales_order_row->id],'readonly','class'=>'invoiceid']); ?>							
 						</td>
 						<td>						
 							<div class="row">
@@ -236,7 +237,7 @@
 						<td></td>
 					</tr>
 
-					<?php $q++; endforeach; ?>
+					 <?php $q++; } endforeach; ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">

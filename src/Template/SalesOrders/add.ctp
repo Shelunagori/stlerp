@@ -212,18 +212,46 @@ if(!empty($copy))
 					if(!empty($process_status=="Pulled From Quotation") || !empty($quotation)) 
 					{ 
 					if(!empty($quotation->quotation_rows)){
+						
 					$q=0; foreach ($quotation->quotation_rows as $quotation_rows): 
-					if($quotation_rows->quantity==$quotation_rows->proceed_qty){$disable_class="disabledbutton";
-					}else{ $disable_class=""; } 
+					if($quotation_rows->quantity != @$sales_orders_qty[@$quotation_rows->id]){
+					/* if(@$sales_orders_qty[$quotation_rows->id] > 0){
+						
+						$disable_class=" disabled='true'";
+						$disable_class_item="disabledbutton";
+					}else{
+						$disable_class=""; 
+						$disable_class_item=""; 
+						} */
+					if(!empty($quotation)){
+						
+						$disable_class=" disabled='true'";
+						$disable_class_item="disabledbutton";
+					}else{
+						$disable_class=""; 
+						$disable_class_item=""; 
+						}	
 					?>
-						<tr class="tr1 <?php echo $disable_class; ?> maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+						<tr class="tr1 maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
+							<td rowspan="2"><?php echo ++$q; --$q; ?>
+								
+							</td>
+							
 							<td>
-
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->id,'readonly','class'=>'rowid']);
+							if(!empty($quotation)){ ?>
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->item->id,'readonly','class'=>'itemsid']);?>
+							<div class="row">
+									<div class="col-md-10 padding-right-decrease">	
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+								</div>
+							<?php }else{			
+								?>
 								<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									</div>
+							<?php } ?>		
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
 										<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;" popup_div_id="<?php echo $q; ?>"><div class="modal-backdrop fade in" ></div>
@@ -241,7 +269,7 @@ if(!empty($copy))
 									</div>
 								</div>
 							</td>
-							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','max'=>@$quotation_rows->quantity-$quotation_rows->proceed_qty,'placeholder'=>'Quantity','value' => @$quotation_rows->quantity-$quotation_rows->proceed_qty]); ?></td>
+							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','value' => @$quotation_rows->quantity-@$sales_orders_qty[@$quotation_rows->id],'max'=>@$quotation_rows->quantity-@$sales_orders_qty[@$quotation_rows->id]]); ?></td>
 							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','min'=>'0.01','value' => @$quotation_rows->rate,'r_popup_id'=>$q,'required']); ?></td>
 							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$quotation_rows->amount,'required']); ?></td>
 							<td><?php 
@@ -264,7 +292,7 @@ if(!empty($copy))
 							</td>
 							<td></td>
 						</tr>
-					<?php $q++; endforeach; } } elseif(!empty($copy)) { 
+						<?php $q++; } endforeach; } } elseif(!empty($copy)) { 
 					if(!empty($salesOrder->sales_order_rows)){
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): ?>
 						<tr class="tr1 maintr" row_no='<?php echo @$sales_order_rows->id; ?>'>
@@ -808,13 +836,10 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 		    $(this).find('span.help-block-error').remove();
 			$(this).find("td:nth-child(1)").html(++i); --i;
-			//$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules("add", "required");
-			$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+			$(this).find("td:nth-child(2) input.rowid").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
+			$(this).find("td:nth-child(2) input.itemsid").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id"});
+			$(this).find("td:nth-child(2) select.item_id").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
+						required: true
 					});
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,

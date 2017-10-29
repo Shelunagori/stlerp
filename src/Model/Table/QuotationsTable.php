@@ -45,6 +45,10 @@ class QuotationsTable extends Table
             'foreignKey' => 'customer_id',
             'joinType' => 'INNER'
         ]);
+		$this->hasMany('SalesOrders', [
+            'foreignKey' => 'quotation_id',
+            'joinType' => 'INNER'
+        ]);
 		$this->belongsTo('Companies', [
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'

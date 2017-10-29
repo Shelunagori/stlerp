@@ -266,11 +266,7 @@ class SalesOrdersController extends AppController
 		$process_status='New';
 		if(!empty($quotation_id)){
 			$quotation = $this->SalesOrders->Quotations->get($quotation_id, [
-				'contain' => ['QuotationRows.Items' => function ($q) use($st_company_id) {
-						   return $q
-								->where(['QuotationRows.quantity > QuotationRows.proceed_qty']);
-								
-						}
+				'contain' => ['QuotationRows.Items'
 					],'Customers'=>['CustomerAddress' => function($q){
 					return $q->where(['default_address'=>1]);
 				}]
@@ -335,20 +331,7 @@ class SalesOrdersController extends AppController
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
 				
-			foreach($salesOrder->sales_order_rows as $sales_order_row){
-				
-					$quotation_rows = $this->SalesOrders->Quotations->QuotationRows->find()->where(['QuotationRows.item_id'=>$sales_order_row->item_id,'quotation_id'=>$salesOrder->quotation_id])->first();
-					
-						if($quotation_rows){
-							//pr($quotation_rows); exit;
-							$query1 = $this->SalesOrders->Quotations->QuotationRows->query();
-							$query1->update()
-							->set(['proceed_qty' =>$quotation_rows->proceed_qty+$sales_order_row->quantity])
-							->where(['id' => $quotation_rows->id])
-							->execute();
-						}
-						
-				}  	
+			  	
 				
 			
 				if(!empty($status_close)){
@@ -362,8 +345,11 @@ class SalesOrdersController extends AppController
 					if($salesOrder->quotation_id > 0){ 
 					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
 						foreach($quotation_rows_datas as $quotation_rows_data){
-							if($quotation_rows_data->quantity != $quotation_rows_data->proceed_qty){ 
-							$falg=1;	
+							$salesorders_rows_datas = $this->SalesOrders->SalesOrderRows->find()->where(['quotation_row_id'=>$quotation_rows_data->id])->toArray();
+							foreach($salesorders_rows_datas as $salesorders_rows_data){
+								if($quotation_rows_data->quantity != $salesorders_rows_data->quantity){ 
+								$falg=1;	
+								}
 							}
 						} 
 					} 
@@ -410,6 +396,21 @@ class SalesOrdersController extends AppController
 		}else{
 			$Filenames = $this->SalesOrders->Filenames->find();
 		}
+		if(!empty(@$quotation_id)){
+			 $SalesOrders = $this->SalesOrders->Quotations->get($quotation_id, [
+            'contain' => (['SalesOrders'=>['SalesOrderRows' => function($q) {
+				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
+			}]])
+        ]);
+			
+		$sales_orders_qty=[];
+			foreach($SalesOrders->sales_orders as $sales_orders){ 
+				foreach($sales_orders->sales_order_rows as $sales_order_row){ 
+					$sales_orders_qty[@$sales_order_row->quotation_row_id]=@$sales_orders_qty[$sales_order_row->quotation_row_id]+$sales_order_row->total_qty;
+					
+				}
+			}	
+		}
 		
         $companies = $this->SalesOrders->Companies->find('all');
 		$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
@@ -433,7 +434,7 @@ class SalesOrdersController extends AppController
 				);
 		
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data'));
+        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','sales_orders_qty'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
@@ -467,7 +468,7 @@ class SalesOrdersController extends AppController
 		$financial_year = $this->SalesOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 			foreach($salesOrder->quotation->quotation_rows as $quotation_row){
 				$qt_data[$quotation_row->item_id]=$quotation_row->quantity;
-				$qt_data1[$quotation_row->item_id]=$quotation_row->proceed_qty;
+				//$qt_data1[$quotation_row->item_id]=$quotation_row->proceed_qty;
 			}
 		}
 //pr($qt_data1); exit;
@@ -580,22 +581,43 @@ class SalesOrdersController extends AppController
 						}
 					)->order(['Items.name' => 'ASC']);
 					
-			////start unique validation and procees qty
-			$SalesOrders = $this->SalesOrders->get($id, [
-            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
-				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
-			}],'SalesOrderRows'=>['Items']])
-			]);
+			//start array declaration for unique validation and proceed quantity
+		$salesorders_qty = $this->SalesOrders->get($id, [
+            'contain' => ['SalesOrderRows','Quotations' => ['SalesOrders'=>['SalesOrderRows'],'QuotationRows']]]
+        );
+		
+		$salesOrders_id = $this->SalesOrders->get($id);
+		$quotation_id = $salesOrders_id->quotation_id;
+		 
+		$sales_qty = $this->SalesOrders->Quotations->get($quotation_id, [
+            'contain' => (['QuotationRows' => function ($q) {
+					$q->select(['QuotationRows.quotation_id','QuotationRows.id','total_sales_qty' => $q->func()->sum('QuotationRows.quantity')])->group(['QuotationRows.id']);
+					return $q;
+				}])
+        ]);
+		
+		$quotation_qty=[];$existing_quotation_rows=[]; $current_quotation_rows=[];$quotation_row_id=[];
+		
+		foreach($salesorders_qty->quotation->sales_orders as $all_sales_orders){
+			foreach($all_sales_orders->sales_order_rows as $sales_order_row){
+				if($sales_order_row->quotation_row_id != 0){
+					@$existing_quotation_rows[$$sales_order_row->quotation_row_id]+=@$sales_order_row->quantity;
+				}
+			}
+		}
+		
+		
+		foreach($salesorders_qty->sales_order_rows as $current_salesorder_row){
+			@$current_quotation_rows[$current_salesorder_row->quotation_row_id]+=@$current_salesorder_row->quantity;
+			@$quotation_row_id[$current_salesorder_row->quotation_row_id]=@$current_salesorder_row->id;
+		}
+		
+		foreach($sales_qty->quotation_rows as $quotation_rows){ 
+			@$quotation_qty[@$quotation_rows->id]+=@$quotation_rows->total_sales_qty;
+		}
 				
-			$sales_orders_qty=[];
-				foreach($SalesOrders->invoices as $invoices){ 
-					foreach($invoices->invoice_rows as $invoice_row){ 
-						$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
-						
-					}
-				}	
-
-			////end unique validation and procees qty		
+		
+		//end array declaration for unique validation and proceed quantity		
 					
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -611,7 +633,7 @@ class SalesOrdersController extends AppController
 							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 						} 
 					);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty'));
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','quotation_qty','current_quotation_rows','quotation_row_id','existing_quotation_rows'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
@@ -685,11 +707,7 @@ class SalesOrdersController extends AppController
 		$process_status='New';
 		if(!empty($quotation_id)){
 			$quotation = $this->SalesOrders->Quotations->get($quotation_id, [
-				'contain' => ['QuotationRows.Items' => function ($q) use($st_company_id) {
-						   return $q
-								->where(['QuotationRows.quantity > QuotationRows.proceed_qty']);
-								
-						}
+				'contain' => ['QuotationRows.Items'
 					],'Customers'=>['CustomerAddress' => function($q){
 					return $q->where(['default_address'=>1]);
 				}]
@@ -753,22 +771,7 @@ class SalesOrdersController extends AppController
 			
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
-				
-			foreach($salesOrder->sales_order_rows as $sales_order_row){
-				
-					$quotation_rows = $this->SalesOrders->Quotations->QuotationRows->find()->where(['QuotationRows.item_id'=>$sales_order_row->item_id,'quotation_id'=>$salesOrder->quotation_id])->first();
-					
-						if($quotation_rows){
-							//pr($quotation_rows); exit;
-							$query1 = $this->SalesOrders->Quotations->QuotationRows->query();
-							$query1->update()
-							->set(['proceed_qty' =>$quotation_rows->proceed_qty+$sales_order_row->quantity])
-							->where(['id' => $quotation_rows->id])
-							->execute();
-						}
-						
-				}  	
-				
+			
 			
 				if(!empty($status_close)){
 				$query = $this->SalesOrders->Quotations->query();
@@ -781,8 +784,11 @@ class SalesOrdersController extends AppController
 					if($salesOrder->quotation_id > 0){ 
 					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
 						foreach($quotation_rows_datas as $quotation_rows_data){
-							if($quotation_rows_data->quantity != $quotation_rows_data->proceed_qty){ 
-							$falg=1;	
+							$salesorders_rows_datas = $this->SalesOrders->SalesOrderRows->find()->where(['quotation_row_id'=>$quotation_rows_data->id])->toArray();
+							foreach($salesorders_rows_datas as $salesorders_rows_data){
+								if($quotation_rows_data->quantity != $salesorders_rows_data->quantity){ 
+								$falg=1;	
+								}
 							}
 						} 
 					} 
@@ -830,7 +836,23 @@ class SalesOrdersController extends AppController
 		}else{
 			$Filenames = $this->SalesOrders->Filenames->find();
 		}
-		
+		////
+		if(!empty(@$quotation_id)){
+			 $SalesOrders = $this->SalesOrders->Quotations->get($quotation_id, [
+            'contain' => (['SalesOrders'=>['SalesOrderRows' => function($q) {
+				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
+			}]])
+        ]);
+			
+		$sales_orders_qty=[];
+			foreach($SalesOrders->sales_orders as $sales_orders){ 
+				foreach($sales_orders->sales_order_rows as $sales_order_row){ 
+					$sales_orders_qty[@$sales_order_row->quotation_row_id]=@$sales_orders_qty[$sales_order_row->quotation_row_id]+$sales_order_row->total_qty;
+					
+				}
+			}	
+		}
+		//////	
         $companies = $this->SalesOrders->Companies->find('all');
 		$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
 		$items = $this->SalesOrders->Items->find('list')->matching(
@@ -857,7 +879,7 @@ class SalesOrdersController extends AppController
 					} 
 				);
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes'));
+        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty'));
         $this->set('_serialize', ['salesOrder']);
     }
 	

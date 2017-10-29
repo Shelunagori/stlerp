@@ -218,7 +218,7 @@ $('.closetin').on("click",function() {
 							<td>
 							<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item->id,'readonly']); ?>
 							<?php echo $sales_order_rows->item->name; ?></td>
-							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','min'=>'1','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?></td>
+							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount,'readonly','step'=>0.01]); ?></td>
 							<td><?php echo @$sales_order_rows->sale_tax->tax_figure.'('.@$sales_order_rows->sale_tax->invoice_description.')'; ?></td>
