@@ -42,8 +42,9 @@ class InvoicesTable extends Table
 		$this->belongsTo('CustomerGroups');
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('Ledgers');
-		$this->belongsTo('ReferenceDetails');
-		$this->belongsTo('ReferenceBalances');
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'invoice_id'
+        ]);
         $this->belongsTo('Customers', [
             'foreignKey' => 'customer_id',
             'joinType' => 'INNER'

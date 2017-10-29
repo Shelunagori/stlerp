@@ -577,11 +577,6 @@ $(document).ready(function() {
 		
 	});
 	
-	$('.ref_type').live("change",function() {
-		var sel=$(this);
-		//delete_one_ref_no(sel);
-	});
-	
 	$('.ref_list').live("change",function() {
 		var sel=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
