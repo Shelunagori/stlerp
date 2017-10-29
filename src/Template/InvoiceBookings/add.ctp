@@ -365,6 +365,7 @@ $(document).ready(function() {
 			var pnf=(amount_after_discount/total)*totalpnf;
 			$(this).find("td:nth-child(8) input").val(pnf.toFixed(5))
 		});
+		calculate_total();
 	});
 
 	var purchase_ledger_account=$('select[name="purchase_ledger_account"]').val();
@@ -585,6 +586,7 @@ $(document).ready(function() {
 		$('input[name="total_saletax"]').val(total_cst.toFixed(2));
 		$('input[name="total_other_charges"]').val(total_other.toFixed(2));
 		$('input[name="total"]').val(total_row_amount.toFixed(2));
+		do_ref_total();
 	}
 	
 
