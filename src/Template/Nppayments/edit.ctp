@@ -100,6 +100,9 @@ if($transaction_date <  $start_date ) {
                    <td width="20%">
 					<?php echo $this->Form->input('id', ['type' => 'hidden','class' => 'form-control input-sm nppayment_row_id','value'=>$nppayment_row->id]); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+					
+					<?php echo $this->Form->input('bill_to_bill_account', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm bill_to_bill_account','value'=>$nppayment_row->ReceivedFrom->bill_to_bill_account]); ?>
+					
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm  received_from','value'=>$nppayment_row->received_from_id,'style'=>'width: 266px; display: block;']); ?>
 					<div class="show_result">
 					<?php if($nppayment_row->received_from_id=='101' || $nppayment_row->received_from_id=="165" || $nppayment_row->received_from_id=='313'){
@@ -161,7 +164,7 @@ if($transaction_date <  $start_date ) {
                     </div>
                     </td>
                     <td width="60%">
-                    
+                    <?php if($nppayment_row->ReceivedFrom->bill_to_bill_account=="Yes"){ ?>
                         <div class="ref" style="padding:4px;">
                         <table width="100%" class="ref_table">
                             <thead>
@@ -218,7 +221,7 @@ if($transaction_date <  $start_date ) {
                         </table>
                         
                         </div>
-                        
+                       <?php } ?>  
                     </td>
                     <td width="5%"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration','value'=>$nppayment_row->narration]); ?></td>
                     <td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
@@ -393,9 +396,12 @@ $(document).ready(function() {
         rename_ref_rows(sel);
     }
 	
-    $("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-		var sel=$(this);
-		rename_ref_rows(sel);
+ 	$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var bill_to_bill_account=$(this).find('.bill_to_bill_account').val(); 
+		if(bill_to_bill_account=="Yes"){ 
+			var sel=$(this);
+			rename_ref_rows(sel);
+		}
 	});
 	
 	function rename_ref_rows(sel){
@@ -462,7 +468,7 @@ $(document).ready(function() {
             url: url,
             type: 'GET',
             dataType: 'text'
-        }).done(function(response) { alert(response);
+        }).done(function(response) { 
             if(response.trim()=="Yes"){
                 var ref_table=$("#sample_ref div.ref").clone();
                 $(sel).closest("tr").find("td:nth-child(3)").html(ref_table);
