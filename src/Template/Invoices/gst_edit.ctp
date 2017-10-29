@@ -270,7 +270,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$q=0; 
 					
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ ?>
-						<?php if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
+						
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; --$q; ?>
@@ -342,7 +342,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
 							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
 							</tr><?php } ?>
-						<?php } $q++;  } ?>
+						<?php  $q++;  } ?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -445,43 +445,59 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						<thead>
 							<tr>
 								<th width="25%">Ref Type</th>
-								<th width="40%">Ref No.</th>
+								<th width="25%">Ref No.</th>
 								<th width="30%">Amount</th>
+								<th width="10%"></th>
 								<th width="5%"></th>
 							</tr>
 						</thead>
+						
 						<tbody>
-							<?php  foreach($ReferenceDetails as $old_ref_row){ ?>
+							<?php foreach($invoice->reference_details as $reference_detail){
+								if($reference_detail->reference_type!='On_account'){
+								?>
 								<tr>
-									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
+									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
 									<td class="ref_no">
-									<?php if($old_ref_row->reference_type=="Against Reference"){
-										echo $this->requestAction('Invoices/fetchRefNumbersEdit/'.$c_LedgerAccount->id.'/'.$old_ref_row->reference_no.'/'.$old_ref_row->debit);
+										<?php 
+										if($reference_detail->reference_type=='Against Reference')
+										{
+											echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$c_LedgerAccount->id.'&ref_name='.$reference_detail->reference_no);
+										}
+										else
+										{
+											echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$reference_detail->reference_no.'"  is_old="yes">';
+										}
+										?> 
+									</td>
+									<td><?php 
+									if(!empty($reference_detail->credit)){
+										$amount=$reference_detail->credit;
+										$dr_cr="Cr";
 									}else{
-										echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$old_ref_row->reference_no.'" readonly="readonly" is_old="yes">';
-									}?>
-									</td>
-									<td>
-									<?php 
-											echo $this->Form->input('old_amount', ['label' => false,'class' => 'old_amount_data','type'=>'hidden','value'=>$old_ref_row->debit]);
-											echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->debit]);
-																
-									?>
-									</td>
-									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button" old_ref="<?php echo $old_ref_row->reference_no; ?>" old_ref_type="<?php echo $old_ref_row->reference_type; ?>"><i class="fa fa-times"></i></a></td>
+										$amount=$reference_detail->debit;
+										$dr_cr="Dr";
+									}
+									echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$amount]); ?></td>
+									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm cr_dr_amount','value'=>$dr_cr]); ?></td>
+									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 								</tr>
-							<?php } ?>
-						</tbody>
+								<?php }
+							} ?>
+							
+							</tbody>
 						<tfoot>
 							<tr>
 								<td align="center" style="vertical-align: middle !important;">On Account</td>
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+								<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 								<td></td>
 							</tr>
 							<tr>
 								<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-								<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+								<td></td>
+								<td></td>
 								<td></td>
 							</tr>
 						</tfoot>
@@ -796,8 +812,8 @@ $(document).ready(function() {
 				p++;
 			}			
 			else{
-				$(this).find('td:nth-child(1) input.invoiceid').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
-				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(1) input.invoiceid').attr({ name:"q", readonly:"readonly"});
+				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
@@ -1043,7 +1059,7 @@ $(document).ready(function() {
 		
 		var ref_type=$(this).find('option:selected').val();
 		if(ref_type=="Against Reference"){
-			var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'fetchRefNumbers']); ?>";
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url,
 			$.ajax({
 				url: url+'/<?php echo $c_LedgerAccount->id; ?>',
@@ -1061,34 +1077,23 @@ $(document).ready(function() {
 	});
 	rename_ref_rows();
 	function rename_ref_rows(){
-		var i=0; var customer_suppiler_id = $('#customer_suppiler_id').val();
+		var i=0;
 		$("table.main_ref_table tbody tr").each(function(){
-			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+i+"][ref_type]", id:"ref_rows-"+i+"-ref_type"}).rules("add", "required");
+			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+i+"][ref_type]", id:"ref_rows-"+i+"-ref_type"});
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
 			
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
-			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/<?php echo $c_LedgerAccount->id; ?>/'+i;
-				//alert(url);
+			}else if(is_input){ 
+				
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true,
-							noSpace: true,
-							
+							required: true
 						});
 			}
-			var is_ref_old_amount=$(this).find("td:nth-child(3) input.old_amount_data").length;
-			if(is_ref_old_amount){
-				$(this).find("td:nth-child(3) input:eq(0)").attr({name:"ref_rows["+i+"][ref_old_amount]", id:"ref_rows-"+i+"-ref_old_amount"});
-				$(this).find("td:nth-child(3) input:eq(1)").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
-
-			}else{
-				$(this).find("td:nth-child(3) input:eq(0)").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
-
-			}
 			
+			$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules( "add", "required" );
+			$(this).find("td:nth-child(4) select").attr({name:"ref_rows["+i+"][ref_cr_dr]", id:"ref_rows-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
 		
@@ -1101,18 +1106,15 @@ $(document).ready(function() {
 	$('.deleterefrow').live("click",function() {
 		$(this).closest("tr").remove();
 		do_ref_total();
-		var sel=$(this);
-		delete_one_ref_no(sel);
 	});
 	
 	
 	
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-		delete_one_ref_no(sel);
 	});
 	
 	$('.ref_amount_textbox').live("keyup",function() {
