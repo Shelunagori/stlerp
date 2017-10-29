@@ -478,7 +478,7 @@ class InvoiceBookingsController extends AppController
 						
 						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
+							/* if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
 								$query = $this->InvoiceBookings->ReferenceBalances->query();
 								
 								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
@@ -495,7 +495,7 @@ class InvoiceBookingsController extends AppController
 								$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
 								
 								$this->InvoiceBookings->ReferenceBalances->save($ReferenceBalance);
-							}
+							} */
 							
 							$query = $this->InvoiceBookings->ReferenceDetails->query();
 							$query->insert(['ledger_account_id', 'invoice_booking_id', 'reference_no', 'credit', 'debit', 'reference_type'])
