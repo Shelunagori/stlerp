@@ -387,12 +387,12 @@ class GrnsController extends AppController
 			//pr($grn->serial_numbers);exit;
 			
 			 if ($this->Grns->save($grn)) {
-
+					pr($grn); exit;
 					foreach($grn->grn_rows as  $grn_row){
-						if(sizeof($serial_numbers) > 0){
-								foreach($serial_numbers as $item_id=>$data){
-									foreach($data as $sr){ 
-										$query = $this->Grns->SerialNumbers->query();
+						if(sizeof($serial_numbers) > 0){ 
+								foreach($serial_numbers as $item_id=>$data){ 
+									foreach($data as $sr){ pr($sr);
+										/* $query = $this->Grns->SerialNumbers->query();
 										$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
 										->values([
 										'name' => $sr,
@@ -402,11 +402,12 @@ class GrnsController extends AppController
 										'grn_row_id' => $grn_row->id,
 										'company_id'=>$st_company_id
 										]);
-										$query->execute();										
+										$query->execute();		 */								
 								}
 							}
 						}					
-					}				
+					}		
+					exit;
 					if(!empty($purchase_order_id)){
 
 						$grn->check=array_filter($grn->check);
