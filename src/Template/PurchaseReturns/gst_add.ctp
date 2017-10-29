@@ -560,8 +560,11 @@ $(document).ready(function() {
 			row_total=taxable_value+cgst_amount+sgst_amount+igst_amount+other;
 			
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
-			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val());
-			$(this).find("td:nth-child(20) input").val((taxable_amount/qty).toFixed(5));
+			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val()); 
+			if(qty!=0)
+			{
+				$(this).find("td:nth-child(20) input").val((taxable_amount/qty).toFixed(5));
+			}			
 			total_rate_to_post = total_rate_to_post+parseFloat(((taxable_amount/qty).toFixed(5)));
 			$(this).find("td:nth-child(19) input").val(row_total.toFixed(2));
 			total_row_amount = total_row_amount+row_total;
@@ -575,7 +578,10 @@ $(document).ready(function() {
 		$('input[name="total_igst_amount"]').val(total_igst.toFixed(2));
 		$('input[name="total_other_charge"]').val(total_other.toFixed(2));
 		$('input[name="total"]').val(total_row_amount.toFixed(2));
-		$('input[name="total_rate_to_post"]').val(total_rate_to_post);
+		if(total_rate_to_post!="Infinity")
+		{
+			$('input[name="total_rate_to_post"]').val(total_rate_to_post);
+		}
 	}
 	
 

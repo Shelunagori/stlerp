@@ -123,6 +123,7 @@
 									<?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$actuleQty[$purchase_order_rows->id],'readonly','max'=>@$actuleQty[$purchase_order_rows->id]]); 
 									echo "In Purchase-Order Quantity:- ";
 									echo @$actuleQty[$purchase_order_rows->id];
+									
 									?>
 								</td>
 								<td>
