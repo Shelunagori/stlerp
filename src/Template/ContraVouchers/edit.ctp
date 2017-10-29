@@ -84,6 +84,7 @@ if($transaction_date <  $start_date ) {
         </div>
         
         <div style="overflow: auto;">
+
         <table width="100%" id="main_table">
             <thead>
                 <th width="25%"><label class="control-label">Paid To</label></th>
@@ -98,6 +99,8 @@ if($transaction_date <  $start_date ) {
                     <td>
 					<?php echo $this->Form->input('id', ['type' => 'hidden','class' => 'form-control input-sm nppayment_row_id','value'=>$contra_voucher_row->id]); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+					
+					<?php echo $this->Form->input('bill_to_bill_account', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm bill_to_bill_account','value'=>$contra_voucher_row->ReceivedFrom->bill_to_bill_account]); ?>
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$contra_voucher_row->received_from_id]); ?></td>
                     <td>
                     <div class="row">
@@ -110,7 +113,7 @@ if($transaction_date <  $start_date ) {
                     </div>
                     </td>
                     <td>
-                    
+                    <?php if($contra_voucher_row->ReceivedFrom->bill_to_bill_account=="Yes"){ ?>
                         <div class="ref" style="padding:4px;">
                         <table width="100%" class="ref_table">
                             <thead>
@@ -169,7 +172,7 @@ if($transaction_date <  $start_date ) {
                         </table>
                         
                         </div>
-                        
+                      <?php } ?>  
                     </td>
                     <td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration','value'=>$contra_voucher_row->narration]); ?></td>
                     <td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
@@ -330,9 +333,12 @@ $(document).ready(function() {
         rename_ref_rows(sel);
     }
 	
-    $("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-		var sel=$(this);
-		rename_ref_rows(sel);
+   $("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var bill_to_bill_account=$(this).find('.bill_to_bill_account').val(); 
+		if(bill_to_bill_account=="Yes"){ 
+			var sel=$(this);
+			rename_ref_rows(sel);
+		}
 	});
 	
 	function rename_ref_rows(sel){

@@ -109,7 +109,7 @@ margin-bottom: 0;
             <td><?= h($nppayment_row->narration) ?></td>
         </tr>
 		
-		<?php if(!empty($nppayment_row->received_from_id)):?>
+		<?php if(!empty($nppayment_row->reference_details)):?>
 		<tr>
 		
 		<td colspan="3" style="border-top:none !important;">

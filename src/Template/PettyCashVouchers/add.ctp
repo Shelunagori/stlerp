@@ -157,20 +157,12 @@ $(document).ready(function() {
 		errorClass: 'help-block help-block-error', // default input error message class
 		focusInvalid: true, // do not focus the last invalid input
 		rules: {
-				debitamount:{
-					
+				bank_cash_id:{
+					required: true,
 				},
-				creditamount:{
-					
-					equalTo: "#debitamount",
-					
-				}
 			},
 		messages: {
-			creditamount:{
-					equalTo: "Must be equal to Debit Amount",
-					
-				}
+			
 		},
 
 		errorPlacement: function (error, element) { // render error placement for each input type
