@@ -307,6 +307,7 @@ class GrnsController extends AppController
 				}
 			}
 		}
+		//pr($totalQty);exit;
 		foreach($PurchaseOrdersDetail->purchase_order_rows as $purchase_order_row)
 		{
 			@$actuleQty[@$purchase_order_row->id]=@$purchase_order_row->quantity-$totalQty[@$purchase_order_row->id];

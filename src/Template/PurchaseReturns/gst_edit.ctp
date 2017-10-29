@@ -712,7 +712,10 @@ $(document).ready(function() {
 			
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
 			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val());
-			$(this).find("td:nth-child(20) input").val((taxable_amount/qty).toFixed(5));
+			if(qty!=0)
+			{
+			  $(this).find("td:nth-child(20) input").val((taxable_amount/qty).toFixed(5));
+			}
 			total_rate_to_post = total_rate_to_post+parseFloat(((taxable_amount/qty).toFixed(5)));
 			$(this).find("td:nth-child(19) input").val(row_total.toFixed(2));
 			total_row_amount = total_row_amount+row_total;

@@ -376,10 +376,13 @@ $(document).ready(function() {
 				var id_qty=parseFloat($(this).find("td:nth-child(3) input:eq(1)").val());
 				var per_qty=Rate/id_qty;
 				var qty=parseInt($(this).find("td:nth-child(4) input").val());
-				var Amount=per_qty*qty;
-				
-				grand_total=grand_total+Amount;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+					if(!isNaN(qty))
+					{
+					var Amount=per_qty*qty;
+					
+					grand_total=grand_total+Amount;
+					$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+					}
 				}
 				$('input[name="grand_total"]').val(grand_total.toFixed(2));
 		});
