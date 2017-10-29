@@ -190,7 +190,11 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
 					
 						?>
+<<<<<<< HEAD
 						<?php /* if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) */ {  ?> 
+=======
+						
+>>>>>>> 53157a6d14e440efba5081198af181c7944d6ec0
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; $q--; ?>
@@ -264,7 +268,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
 							</tr><?php } ?>
 					<?php } ?>
-					<?php $q++; }  ?>
+					<?php $q++;   ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
@@ -717,8 +721,11 @@ $(document).ready(function() {
 				
 			}else{
 				$(this).find("td:nth-child(1)").html(++i); i--;
+
 				$(this).find("td:nth-child(1) input.invoiceid").attr({ name:"q", readonly:"readonly"});
 				$(this).find("td:nth-child(1) input.hiddenid").attr({ name:"q", readonly:"readonly"});
+
+				
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );

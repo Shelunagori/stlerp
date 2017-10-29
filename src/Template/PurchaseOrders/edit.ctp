@@ -97,10 +97,8 @@
 						</thead>
 						<tbody id="main_tbody">
 							<?php $q=0; foreach ($purchaseOrder->purchase_order_rows as $purchase_order_rows): 
-							
-							
 							if(@$minItemQty[@$purchase_order_rows->id]==$purchase_order_rows->quantity)
-							{
+							{   
 								$disable= "disabled='true'";
 							}
 							else
@@ -114,9 +112,16 @@
 									<td>
 									
 									<?php 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id,$disable]); 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','value'=>@$purchase_order_rows->processed_quantity]);
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id,$disable]);
+									if($disable!="")
+									{
+										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['class' => 'itemId','value'=>$purchase_order_rows->item_id,'type'=>'hidden']);
+									}
+									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','class'=>'p','value'=>@$purchase_order_rows->processed_quantity]);
 									?>
+									 <?php
+									   echo $this->Form->input('purchase_order_rows.'.$q.'.id', ['value'=>$purchase_order_rows->id,'type'=>'hidden','class'=>'idd']);
+									   ?>
 									</td>
 									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity,'min'=>@$minItemQty[@$purchase_order_rows->id]]); 
 										
@@ -488,7 +493,8 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
 						required: true
 					});
-				$(this).find("td:nth-child(2) input[type='hidden']").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input[type='hidden'].p").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 			}else{
 				$(this).find("td:nth-child(2) input:eq(0)").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
 				

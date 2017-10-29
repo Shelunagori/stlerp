@@ -581,43 +581,23 @@ class SalesOrdersController extends AppController
 						}
 					)->order(['Items.name' => 'ASC']);
 					
-			//start array declaration for unique validation and proceed quantity
-		$salesorders_qty = $this->SalesOrders->get($id, [
-            'contain' => ['SalesOrderRows','Quotations' => ['SalesOrders'=>['SalesOrderRows'],'QuotationRows']]]
-        );
-		
-		$salesOrders_id = $this->SalesOrders->get($id);
-		$quotation_id = $salesOrders_id->quotation_id;
-		 
-		$sales_qty = $this->SalesOrders->Quotations->get($quotation_id, [
-            'contain' => (['QuotationRows' => function ($q) {
-					$q->select(['QuotationRows.quotation_id','QuotationRows.id','total_sales_qty' => $q->func()->sum('QuotationRows.quantity')])->group(['QuotationRows.id']);
-					return $q;
-				}])
-        ]);
-		
-		$quotation_qty=[];$existing_quotation_rows=[]; $current_quotation_rows=[];$quotation_row_id=[];
-		
-		foreach($salesorders_qty->quotation->sales_orders as $all_sales_orders){
-			foreach($all_sales_orders->sales_order_rows as $sales_order_row){
-				if($sales_order_row->quotation_row_id != 0){
-					@$existing_quotation_rows[$$sales_order_row->quotation_row_id]+=@$sales_order_row->quantity;
-				}
-			}
-		}
-		
-		
-		foreach($salesorders_qty->sales_order_rows as $current_salesorder_row){
-			@$current_quotation_rows[$current_salesorder_row->quotation_row_id]+=@$current_salesorder_row->quantity;
-			@$quotation_row_id[$current_salesorder_row->quotation_row_id]=@$current_salesorder_row->id;
-		}
-		
-		foreach($sales_qty->quotation_rows as $quotation_rows){ 
-			@$quotation_qty[@$quotation_rows->id]+=@$quotation_rows->total_sales_qty;
-		}
+			////start unique validation and procees qty
+			$SalesOrders = $this->SalesOrders->get($id, [
+            'contain' => (['Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}],'SalesOrderRows'=>['Items']])
+			]);
 				
-		
-		//end array declaration for unique validation and proceed quantity		
+			$sales_orders_qty=[];
+				foreach($SalesOrders->invoices as $invoices){ 
+					foreach($invoices->invoice_rows as $invoice_row){ 
+						$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+						@$invoice_row_id[$invoice_row->sales_order_row_id]=@$invoice_row->id;
+						
+					}
+				}	
+
+			////end unique validation and procees qty		
 					
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -633,7 +613,7 @@ class SalesOrdersController extends AppController
 							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 						} 
 					);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','quotation_qty','current_quotation_rows','quotation_row_id','existing_quotation_rows'));
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
