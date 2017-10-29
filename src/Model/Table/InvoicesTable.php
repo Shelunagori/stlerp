@@ -111,6 +111,10 @@ class InvoicesTable extends Table
 		$this->belongsTo('InvoiceBookings');
 		$this->belongsTo('Filenames');
 		
+		 $this->hasOne('Ivs', [
+            'foreignKey' => 'invoice_id'
+        ]);
+		
     }
 
     /**
