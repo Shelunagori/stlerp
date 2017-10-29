@@ -64,14 +64,7 @@ class SerialNumbersTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
-            ->requirePresence('name', 'create')
-            ->notEmpty('name');
-
-        $validator
-            ->requirePresence('status', 'create')
-            ->notEmpty('status');
-
+        
         return $validator;
     }
 
