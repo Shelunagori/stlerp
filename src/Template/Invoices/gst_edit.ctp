@@ -1120,55 +1120,60 @@ $(document).ready(function() {
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total(); 
 	});
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_ref_total();
+	});
 	do_ref_total();
 	function do_ref_total(){
 		var main_amount=parseFloat($('input[name="grand_total"]').val());
+		
 		if(!main_amount){ main_amount=0; }
 		
 		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
 		$("table.main_ref_table tbody tr").each(function(){
-			var am=parseFloat($(this).find('td:nth-child(3) input.ref_amount_textbox').val());
+			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
 			
 			if(!am){ am=0; }
-			total_ref=total_ref+am;
-			 
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
 		});
-		
-		var on_acc=main_amount-total_ref; 
-		if(on_acc>=0){
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-			total_ref=total_ref+on_acc;
-		}else{
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
+		var on_acc=0;
+		var total_ref=0;
+		var on_acc_cr_dr='Dr';
+		if(total_ref_dr > total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
 		}
-		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
-	}
-	
-	$('.ref_type').live("change",function() {
-		var sel=$(this);
-		delete_one_ref_no(sel);
-	});
-	
-	
-	
-	
-	function delete_one_ref_no(sel){
-		var old_received_from_id='<?php echo $c_LedgerAccount->id; ?>';
+		else if(total_ref_dr < total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
+		}
+		else
+		{
+			on_acc=main_amount;
+		}
 		
-		var old_ref=sel.closest('tr').find('a.deleterefrow').attr('old_ref');
-		var old_ref_type=sel.closest('tr').find('a.deleterefrow').attr('old_ref_type');
-		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'deleteOneRefNumbers']); ?>";
-		url=url+'?old_received_from_id='+old_received_from_id+'&invoice_id=<?php echo $invoice->id; ?>&old_ref='+old_ref+'&old_ref_type='+old_ref_type;
-		
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-			//alert(response);
-		});
+		if(on_acc>=0){
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+		}else{
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+		}
 	}
-	
 });
 </script>
 
