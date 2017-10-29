@@ -155,6 +155,7 @@ class ReferenceDetailsController extends AppController
     {
 		$ledger_id=$this->request->query('ledger_account_id');
 		$ref_name=$this->request->query('ref_name');
+		
 		$this->viewBuilder()->layout('');
         $query = $this->ReferenceDetails->find();
 		$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
@@ -170,7 +171,8 @@ class ReferenceDetailsController extends AppController
 			}else if($remider<0){
 				$bal=abs($remider).' Cr';
 			}
-			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
+			//if($referenceDetail->total_debit!=$referenceDetail->total_credit)
+			{
 				$option[]=['text' =>$referenceDetail->reference_no.' ('.$bal.')', 'value' => $referenceDetail->reference_no, 'amt' => abs($remider)];
 			}
 		}

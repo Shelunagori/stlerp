@@ -447,7 +447,7 @@ $('.closetin').on("click",function() {
 								<td align="center" style="vertical-align: middle !important;">On Account</td>
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
-								<td><?php echo $this->Form->input('cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
+								<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 								<td></td>
 							</tr>
 						</tfoot>
