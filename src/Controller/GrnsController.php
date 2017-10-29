@@ -380,9 +380,9 @@ class GrnsController extends AppController
 			//pr($grn->transaction_date); exit;
 			$transaction_date=date("Y-m-d",strtotime($grn->transaction_date));
 			$grn->purchase_order_id=$purchase_order_id;
-			$grn->company_id=$st_company_id ;
+			$grn->company_id=$st_company_id;
 			$grn->created_by=$this->viewVars['s_employee_id'];
-			//
+			
 			
 			//pr($grn);
 			//exit;
@@ -390,11 +390,13 @@ class GrnsController extends AppController
 			
 			 if ($this->Grns->save($grn)) {
 				
-					if(!empty($purchase_order_id)){
+					if(!empty($purchase_order_id))
+					{
 						$grn->check=array_filter($grn->check);
 						$i=0; 
 						
-						foreach($grn->check as $purchase_order_row_id){
+						foreach($grn->check as $purchase_order_row_id)
+						{
 							$qty=$grn->grn_rows[$i]['quantity'];
 							$item_id=$grn->grn_rows[$i]['item_id'];
 							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
