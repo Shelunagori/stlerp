@@ -290,6 +290,28 @@ class GrnsController extends AppController
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$purchase_order=array();
 		
+		$totalQty=[];
+		$actuleQty=[];
+		$PurchaseOrdersDetail = $this->Grns->PurchaseOrders->get($purchase_order_id, [
+	'contain' => ['Grns'=>['GrnRows'],'PurchaseOrderRows']]);
+	    if(!empty($PurchaseOrdersDetail->grns))
+		{
+			foreach($PurchaseOrdersDetail->grns as $grn)
+			{
+				if(!empty($grn->grn_rows))
+				{
+					foreach($grn->grn_rows as $grn_row)
+					{
+						@$totalQty[@$grn_row->purchase_order_row_id] +=$grn_row->quantity;
+					}
+				}
+			}
+		}
+		foreach($PurchaseOrdersDetail->purchase_order_rows as $purchase_order_row)
+		{
+			@$actuleQty[@$purchase_order_row->id]=@$purchase_order_row->quantity-$totalQty[@$purchase_order_row->id];
+		}
+		
 		if(!empty($purchase_order_id))
 		{
 			$purchase_order = $this->Grns->PurchaseOrders->get($purchase_order_id, [
@@ -332,7 +354,7 @@ class GrnsController extends AppController
 
 
 		 $grn = $this->Grns->newEntity();
-        if ($this->request->is('post')) {
+        if ($this->request->is('post')) { 
 			$grn->vendor_id=$purchase_order->vendor_id;
 			$last_grn_no=$this->Grns->find()->select(['grn2'])->where(['company_id' => $st_company_id])->order(['grn2' => 'DESC'])->first();
 			if($last_grn_no){
@@ -399,6 +421,8 @@ class GrnsController extends AppController
 					$this->Flash->error(__('The grn could not be saved. Please, try again.'));
 				}
 			}
+		
+		//pr($actuleQty);exit;
 		$items = $this->Grns->Items->find('list');
 		$companies = $this->Grns->Companies->find('all');
         $purchaseOrders = $this->Grns->PurchaseOrders->find('all');
@@ -406,7 +430,7 @@ class GrnsController extends AppController
 		//pr($purchase_order->toArray());
 		//exit;
 		
-        $this->set(compact('grn', 'purchaseOrders', 'companies','customers','chkdate','financial_year','financial_month_first','financial_month_last'));
+        $this->set(compact('grn', 'purchaseOrders', 'companies','customers','chkdate','financial_year','financial_month_first','financial_month_last','actuleQty'));
         $this->set('_serialize', ['grn']);
     }
     /**
@@ -432,17 +456,51 @@ class GrnsController extends AppController
 		$financial_month_first = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$this->viewBuilder()->layout('index_layout');
-		
+		$grnDetail = $this->Grns->get($id, [
+			'contain' => [
+					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows']
+				]
+		]);
+		$Qty=[];
+				$POItemQty=[];$maxQty=[];
+				if(!empty($grnDetail->purchase_order->purchase_order_rows))
+				{
+					foreach($grnDetail->purchase_order->purchase_order_rows as $purchase_order_row)
+					{
+					$POItemQty[@$purchase_order_row->id] =$purchase_order_row->quantity;
+					}
+				}	
+
+				if(!empty($grnDetail->purchase_order->grns))
+				{
+					foreach($grnDetail->purchase_order->grns as $grn)
+					{
+						if(!empty($grn->grn_rows))
+						{	
+							foreach($grn->grn_rows as $grn_row)
+							{
+								@$Qty[$grn_row->purchase_order_row_id] +=@$grn_row->quantity;
+							}
+						}
+					}
+				}	
+				foreach($grnDetail->grn_rows as $grn_row)
+				{ 
+					$maxQty[@$grn_row->purchase_order_row_id] =$POItemQty[@$grn_row->purchase_order_row_id]-@$Qty[$grn_row->purchase_order_row_id]+$grn_row->quantity;
+				}
+				
 		$grn = $this->Grns->get($id, [
 				'contain' => [
 						'Companies','ItemSerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
-								}]],'Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
+								}]],'Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
 					]
 			]);
-
+			 //pr($grn);exit;
+		
+        
 			   $st_year_id = $session->read('st_year_id');
 
 			   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
@@ -517,7 +575,7 @@ class GrnsController extends AppController
 			}
         $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
         $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('grn', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last'));
+        $this->set(compact('grn', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
         $this->set('_serialize', ['grn']);
     }
     /**

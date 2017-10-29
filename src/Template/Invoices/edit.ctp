@@ -220,11 +220,12 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<label><?php 
-								if(in_array($sales_order_row->item_id,$current_rows)){
-									$check='checked';
-								}else{
-									$check='';
-								}
+								if(@$current_invoice_rows[@$sales_order_row->id] == 0){ 
+											$check='';
+									} 
+									else{	$check='checked';
+									} 
+								
 								echo $this->Form->input('q', ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$sales_order_row->id,$check]);
 								?></label>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_row->sale_tax->tax_figure]); ?>
