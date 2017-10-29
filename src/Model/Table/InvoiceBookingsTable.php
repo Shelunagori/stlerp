@@ -80,8 +80,8 @@ class InvoiceBookingsTable extends Table
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('AccountReferences');
 		$this->belongsTo('Ledgers');
-		$this->belongsTo('ReferenceBalances');
-		$this->belongsTo('ReferenceDetails');
+		//$this->belongsTo('ReferenceBalances');
+		//$this->belongsTo('ReferenceDetails');
 		$this->belongsTo('LedgerAccounts');
 		$this->belongsTo('Invoices');
 		
@@ -89,7 +89,9 @@ class InvoiceBookingsTable extends Table
             'foreignKey' => 'invoice_booking_id',
 			'saveStrategy' => 'replace'
         ]);
-		
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'invoice_booking_id'
+        ]);
     }
 
     /**

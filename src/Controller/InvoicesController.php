@@ -671,7 +671,7 @@ class InvoicesController extends AppController
 							$ReferenceDetail->invoice_id = $invoice->id;
 							$ReferenceDetail->transaction_date = $invoice->date_created;
 							
-							$tt=$this->Invoices->ReferenceDetails->save($ReferenceDetail);
+							$this->Invoices->ReferenceDetails->save($ReferenceDetail);
 							
 						}
 						$ReferenceDetail = $this->Invoices->ReferenceDetails->newEntity();
@@ -2494,7 +2494,7 @@ class InvoicesController extends AppController
 								$ReferenceDetail->invoice_id = $invoice->id;
 								$ReferenceDetail->transaction_date = $invoice->date_created;
 								
-								$tt=$this->Invoices->ReferenceDetails->save($ReferenceDetail);
+								$this->Invoices->ReferenceDetails->save($ReferenceDetail);
 								
 							}
 							$ReferenceDetail = $this->Invoices->ReferenceDetails->newEntity();
