@@ -86,7 +86,7 @@ margin-bottom: 0;
 				<?php $name=""; if(empty($nppayment_row->ReceivedFrom->alias)){
 				 echo $nppayment_row->ReceivedFrom->name;
 				} else{
-					 echo $nppayment_row->ReceivedFrom->name.'('; echo $nppayment_row->ReceivedFrom->alias.')'; 
+					 echo $nppayment_row->ReceivedFrom->name.'<br>('; echo $nppayment_row->ReceivedFrom->alias.')'; 
 				}?>
 			</td>	
 			<?php if($aval==1){ ?>
@@ -108,6 +108,35 @@ margin-bottom: 0;
             <td style="white-space: nowrap;"><?= h($this->Number->format($nppayment_row->amount,[ 'places' => 2])) ?> <?= h($nppayment_row->cr_dr) ?></td>
             <td><?= h($nppayment_row->narration) ?></td>
         </tr>
+		
+		<?php if(!empty($nppayment_row->reference_details)):?>
+		<tr>
+		
+		<td colspan="3" style="border-top:none !important;">
+			<table width="100%">
+			
+			<?php $dr_amt=0; $cr_amt=0; foreach($nppayment_row->reference_details as $refbal): ?>
+			<tr>
+					<td style="width :180px !important;"> <?= h($refbal->reference_type). '-' .h($refbal->reference_no) ?></td>
+					
+					<td > <?php if($refbal->credit != '0' ){ ?> 
+					<?= h($this->Number->format($refbal->credit,[ 'places' => 2])) ?> Cr 
+					<?php } elseif( $refbal->debit != '0'){?>
+					<?= h($this->Number->format($refbal->debit,[ 'places' => 2])) ?> Dr
+					<?php } ?></td>
+					</tr>
+					<?php 
+					//pr($ref_bal); exit;
+					if($refbal->credit != '0' ){ 
+						$cr_amt=$cr_amt+$refbal->credit;
+					} elseif( $refbal->debit != '0'){
+						$dr_amt=$dr_amt+$refbal->debit;
+					} ?>
+			<?php endforeach; ?>
+			</table>
+		</td>
+		
+		</tr><?php endif; ?>
         <?php if($nppayment_row->cr_dr=="Cr"){
             $total_cr=$total_cr+$nppayment_row->amount;
         }else{

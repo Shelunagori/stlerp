@@ -100,7 +100,7 @@ class PettyCashVouchersController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $pettycashvoucher = $this->PettyCashVouchers->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'PettyCashVoucherRows' => ['ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes', 'Companies', 'PettyCashVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		
 		$petty_cash_voucher_row_data=[];
@@ -228,7 +228,6 @@ class PettyCashVouchersController extends AppController
 				$petty_cash_voucher_row->invoice_ids =@$invoiceIds[$key];
 			}
 			
-			//pr($pettycashvoucher); exit;
 			
 			
             if ($this->PettyCashVouchers->save($pettycashvoucher)) {
@@ -277,7 +276,8 @@ class PettyCashVouchersController extends AppController
 					$ledger->voucher_source = 'Petty Cash Payment Voucher';
 					$ledger->transaction_date = $pettycashvoucher->transaction_date;
 					$this->PettyCashVouchers->Ledgers->save($ledger);
-					
+					if(!empty($petty_cash_voucher_row->ref_rows))
+					{
 					foreach($petty_cash_voucher_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -314,6 +314,7 @@ class PettyCashVouchersController extends AppController
 						if($petty_cash_voucher_row->on_acc > 0){ 
 							$this->PettyCashVouchers->ReferenceDetails->save($ReferenceDetail);
 						} 
+					}
                 }
 
 				
@@ -500,7 +501,7 @@ class PettyCashVouchersController extends AppController
             $pettycashvoucher->transaction_date=date("Y-m-d",strtotime($pettycashvoucher->transaction_date));
                 
             //Save receipt
-            //pr($payment); exit;
+          
 			$grn    = $this->PettyCashVouchers->Grns->query();
 				    $grn->update()
 				    ->set(['purchase_thela_bhada_status' => 'no','pettycashvoucher_id' => ''])

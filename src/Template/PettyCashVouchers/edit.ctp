@@ -352,7 +352,21 @@ $(document).ready(function() {
 
 	});
 	//--	 END OF VALIDATION
-	$('.invoices').select2(); 
+	$('input[name="payment_mode"]').die().live("click",function() {
+		var payment_mode=$(this).val();
+		if(payment_mode=="Cheque"){
+			$("#chq_no").show();
+		}else{
+			$("#chq_no").hide();
+		}
+	});
+	
+	var payment_mode=$('input[name="payment_mode"]:checked').val();
+	if(payment_mode=="Cheque"){
+		$("#chq_no").show();
+	}else{
+		$("#chq_no").hide();
+	}
 	
 	//rename_rows();
 	$('.addrow').live("click",function() {

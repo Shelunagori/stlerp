@@ -151,7 +151,7 @@ class ContraVouchersController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $contravoucher = $this->ContraVouchers->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'ContraVoucherRows' => ['ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes', 'Companies', 'ContraVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		//pr($contravoucher);exit;
 		$ref_bal=[];
@@ -247,7 +247,8 @@ class ContraVouchersController extends AppController
 					$ledger->voucher_source = 'Contra Voucher';
 					$ledger->transaction_date = $contravoucher->transaction_date;
 					$this->ContraVouchers->Ledgers->save($ledger);
-					
+					if(!empty($contra_voucher_row->ref_rows))
+					{
 					foreach($contra_voucher_row->ref_rows as $ref_rows){
 						$ReferenceDetail = $this->ContraVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -284,6 +285,7 @@ class ContraVouchersController extends AppController
 						if($contra_voucher_row->on_acc > 0){ 
 							$this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
 						} 
+					}
                 }
                 
                 //Ledger posting for bankcash
@@ -395,7 +397,7 @@ class ContraVouchersController extends AppController
 		
         
         $contravoucher = $this->ContraVouchers->get($id, [
-            'contain' => ['ContraVoucherRows'=>['ReferenceDetails']]
+            'contain' => ['ContraVoucherRows'=>['ReferenceDetails','ReceivedFroms']]
         ]);
 		//pr($contravoucher); exit;
         $old_ref_rows=[];
@@ -453,7 +455,8 @@ class ContraVouchersController extends AppController
 					$ledger->voucher_source = 'Contra Voucher';
 					$ledger->transaction_date = $contravoucher->transaction_date;
 					$this->ContraVouchers->Ledgers->save($ledger);
-					
+					if(!empty($contra_voucher_row->ref_rows))
+					{
 					foreach($contra_voucher_row->ref_rows as $ref_rows){  // pr($ref_rows); 
 						$ReferenceDetail = $this->ContraVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
@@ -490,6 +493,7 @@ class ContraVouchersController extends AppController
 						if($contra_voucher_row->on_acc > 0){ 
 							$this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
 						} 
+					}
                 }
                 
                 //Ledger posting for bankcash
