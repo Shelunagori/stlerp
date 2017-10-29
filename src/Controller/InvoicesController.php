@@ -2183,7 +2183,7 @@ class InvoicesController extends AppController
 			$ReferenceBalances='';
 		} */
 		
-		 if ($this->request->is(['patch', 'post'])){ 
+		 if ($this->request->is(['patch', 'post', 'put'])){ 
 			 $ref_rows=@$this->request->data['ref_rows'];
 			
             $invoice = $this->Invoices->patchEntity($invoice, $this->request->data);
@@ -2402,8 +2402,8 @@ class InvoicesController extends AppController
 					$this->Invoices->SalesOrderRows->save($salesorderrow);
 					$qq++; 
 				}
+				$this->Invoices->ReferenceDetails->deleteAll(['invoice_id' => $invoice->id]);
 				
-				$this->Invoices->ItemLedgers->deleteAll(['source_id' => $invoice->id, 'source_model'=> 'Invoices']);
 				
 				 $discount=$invoice->discount;
 				 $pf=$invoice->pnf;
@@ -2460,57 +2460,60 @@ class InvoicesController extends AppController
 				
 				
 				//Reference Number coding 
-					if(sizeof(@$ref_rows)>0){
-						foreach($ref_rows as $ref_row){
-							$ref_row=(object)$ref_row;
-							$ReferenceDetail=$this->Invoices->ReferenceDetails->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'invoice_id'=>$invoice->id])->first();
+					if(sizeof(@$ref_rows)== 0){
+						
+						$query = $this->Invoices->ReferenceDetails->query();
+							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type'])
+							->values([
+								'ledger_account_id' => $c_LedgerAccount->id,
+								'invoice_id' => $invoice->id,
+								'reference_no' => 'i'.$invoice->in2,
+								'credit' => 0,
+								'debit' => $invoice->grand_total,
+								'reference_type' => 'New Reference'
+							]);
 							
-							/* if($ReferenceDetail){
-								$ReferenceBalance=$this->Invoices->ReferenceBalances->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->Invoices->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->debit=$ReferenceBalance->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								
-								$this->Invoices->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->Invoices->ReferenceDetails->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'invoice_id'=>$invoice->id])->first();
-								$ReferenceDetail=$this->Invoices->ReferenceDetails->get($ReferenceDetail->id);
-								$ReferenceDetail->debit=$ReferenceDetail->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->Invoices->ReferenceDetails->save($ReferenceDetail);
-							}else{
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									$query = $this->Invoices->ReferenceBalances->query();
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $c_LedgerAccount->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => 0,
-										'debit' => $ref_row->ref_amount
-									])
-									->execute();
-									
+							$query->execute();
+						
+					}else if(sizeof(@$ref_rows)>0){ 
+			
+						foreach($ref_rows as $ref_row){  	
+							$ref_row=(object)$ref_row; 
+								$ReferenceDetail = $this->Invoices->ReferenceDetails->newEntity();
+								$ReferenceDetail->company_id=$st_company_id;
+								$ReferenceDetail->reference_type=$ref_row->ref_type;
+								$ReferenceDetail->reference_no=$ref_row->ref_no;
+								$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+								if($ref_row->ref_cr_dr=="Dr"){
+									$ReferenceDetail->debit = $ref_row->ref_amount;
+									$ReferenceDetail->credit = 0;
 								}else{
-									$ReferenceBalance=$this->Invoices->ReferenceBalances->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->Invoices->ReferenceBalances->get($ReferenceBalance->id);
-									$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-									
-									$this->Invoices->ReferenceBalances->save($ReferenceBalance);
+									$ReferenceDetail->credit = $ref_row->ref_amount;
+									$ReferenceDetail->debit = 0;
 								}
+								$ReferenceDetail->invoice_id = $invoice->id;
+								$ReferenceDetail->transaction_date = $invoice->date_created;
 								
-								$query = $this->Invoices->ReferenceDetails->query();
-								$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $c_LedgerAccount->id,
-									'invoice_id' => $invoice->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount,
-									'reference_type' => $ref_row->ref_type
-								])
-								->execute();
+								$tt=$this->Invoices->ReferenceDetails->save($ReferenceDetail);
 								
-							} */
+							}
+							$ReferenceDetail = $this->Invoices->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type="On_account";
+							$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+							if($invoice->on_acc_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $invoice->on_account;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $invoice->on_account;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->invoice_id = $invoice->id;
+							$ReferenceDetail->transaction_date = $invoice->date_created;
+							if($invoice->on_account > 0){
+								$this->Invoices->ReferenceDetails->save($ReferenceDetail);
+							}
 						}
-					}
 				
 				
                 $this->Flash->success(__('The invoice has been saved.'));
