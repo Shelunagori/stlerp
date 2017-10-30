@@ -350,7 +350,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					</div>
 				</div>
 			</div><br/>
-			
+			 
 			<div class="row">
 				<div class="col-md-4">
 					<div class="form-group">
