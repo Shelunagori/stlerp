@@ -498,7 +498,7 @@ class InvoicesController extends AppController
 			}
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
-			
+			pr($invoice);exit;
             if ($this->Invoices->save($invoice)) {
 				foreach($invoice->invoice_rows as $invoice_row){
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
@@ -603,7 +603,7 @@ class InvoicesController extends AppController
 					$item_serial_no=$invoice_row->item_serial_number;
 					$serial_no=explode(",",$item_serial_no);
 					foreach($serial_no as $serial){
-					$query = $this->Invoices->InvoiceRows->ItemSerialNumbers->query();
+					$query = $this->Invoices->InvoiceRows->SerialNumbers->query();
 						$query->update()
 							->set(['status' => 'Out','invoice_id' => $invoice->id])
 							->where(['id' => $serial])
@@ -758,7 +758,7 @@ class InvoicesController extends AppController
 			}	
 		
 		
-		$item_serial_no=$this->Invoices->ItemSerialNumbers->find('list');
+		$item_serial_no=$this->Invoices->SerialNumbers->find('list');
 		$employees = $this->Invoices->Employees->find('list');
         $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','sales_orders_qty'));
         $this->set('_serialize', ['invoice']);
