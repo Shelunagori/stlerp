@@ -958,7 +958,7 @@ class SaleReturnsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
-	function checkRefNumberUnique($received_from_id,$i){
+	/* function checkRefNumberUnique($received_from_id,$i){
 		$reference_no=$this->request->query['ref_rows'][$i]['ref_no'];
 		$ReferenceBalances=$this->SaleReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$received_from_id,'reference_no'=>$reference_no]);
 		if($ReferenceBalances->count()==0){
@@ -1020,7 +1020,7 @@ class SaleReturnsController extends AppController
 		}
 		
 		exit;
-	}
+	} */
 	
 	public function exportSaleExcel(){
 		$session = $this->request->session();
@@ -1336,71 +1336,46 @@ class SaleReturnsController extends AppController
 				}
 				//Reference Number coding
 				
-				/* 	if(sizeof(@$ref_rows)== 0){
-						//$ref_row->ref_no='i'.$invoice->in2;
-						$query = $this->Invoices->ReferenceBalances->query();
-								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-								->values([
-									'ledger_account_id' => $c_LedgerAccount->id,
-									'reference_no' => 'i'.$invoice->in2,
-									'credit' => 0,
-									'debit' => $invoice->grand_total
-								]);
-								$query->execute();
-								
-						$query = $this->Invoices->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-							->values([
-								'ledger_account_id' => $c_LedgerAccount->id,
-								'invoice_id' => $invoice->id,
-								'reference_no' => 'i'.$invoice->in2,
-								'credit' => 0,
-								'debit' => $invoice->grand_total,
-								'reference_type' => 'New Reference'
-							]);
-							
-								$query->execute();
+				if(sizeof(@$ref_rows)>0){
 						
-					}else  */
-						
-					if(sizeof(@$ref_rows)>0){ 
-			
-						foreach($ref_rows as $ref_row){  	
-							$ref_row=(object)$ref_row; 
+						foreach($ref_rows as $ref_row){ 
+							$ref_row=(object)$ref_row;
 							
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-								$query = $this->SaleReturns->ReferenceBalances->query();
-								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-								->values([
-									'ledger_account_id' => $c_LedgerAccount->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => $ref_row->ref_amount,
-									'debit' => 0
-								]);
-								$query->execute();
-								
+							$ReferenceDetail = $this->SaleReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
 							}else{
-								$ReferenceBalance=$this->SaleReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->SaleReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-								$this->SaleReturns->ReferenceBalances->save($ReferenceBalance);
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
 							}
+							$ReferenceDetail->sale_return_id = $saleReturn->id;
+							$ReferenceDetail->transaction_date = $saleReturn->transaction_date;
 							
-							$query = $this->SaleReturns->ReferenceDetails->query(); 
-							$query->insert(['ledger_account_id', 'sale_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-							->values([
-								'ledger_account_id' => $c_LedgerAccount->id,
-								'sale_return_id' => $saleReturn->id,
-								'reference_no' => $ref_row->ref_no,
-								'credit' => $ref_row->ref_amount,
-								'debit' => 0,
-								'reference_type' => $ref_row->ref_type
-							]);
+							$this->SaleReturns->ReferenceDetails->save($ReferenceDetail);
 							
-								$query->execute();
-						} 
+						}
+						$ReferenceDetail = $this->SaleReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type="On_account";
+							$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+							if($saleReturn->on_acc_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $saleReturn->on_account;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $saleReturn->on_account;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->sale_return_id = $saleReturn->id;
+							$ReferenceDetail->transaction_date = $saleReturn->transaction_date;
+							if($saleReturn->on_account > 0){
+								$this->SaleReturns->ReferenceDetails->save($ReferenceDetail);
+							}
 					}
-			
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'Index']);
@@ -1463,7 +1438,7 @@ class SaleReturnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$saleReturn = $this->SaleReturns->get($id, [
-				'contain' => ['Customers']]);
+				'contain' => ['ReferenceDetails','Customers']]);
 		$saleReturn_id = $this->SaleReturns->get($id);
 		$invoice_id=$saleReturn_id->invoice_id;		
 		$invoice = $this->SaleReturns->Invoices->get($saleReturn->invoice_id, [
@@ -1555,7 +1530,7 @@ class SaleReturnsController extends AppController
 				$this->SaleReturns->Ledgers->deleteAll(['voucher_id' => $saleReturn->id, 'voucher_source' => 'Sale Return','company_id'=>$st_company_id]);
 				$this->SaleReturns->SerialNumbers->deleteAll(['SerialNumbers.sale_return_id' => $saleReturn->id,'SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.invoice_id'=>0]);
 				$this->SaleReturns->ItemLedgers->deleteAll(['source_id' => $saleReturn->id, 'source_model' => 'Sale Return','company_id'=>$st_company_id]);
-				
+				$this->SaleReturns->ReferenceDetails->deleteAll(['sale_return_id' => $saleReturn->id]);
 				
 				$query1 = $this->SaleReturns->SerialNumbers->query();
 						$query1->update()
@@ -1747,57 +1722,44 @@ class SaleReturnsController extends AppController
 			
 						
 					if(sizeof(@$ref_rows)>0){
-						foreach($ref_rows as $ref_row){
+						
+						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-
-							$ReferenceDetail=$this->SaleReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'sale_return_id'=>$saleReturn->id])->first();
 							
-							if($ReferenceDetail){ //pr($ref_row->ref_old_amount); exit;
-								$ReferenceBalance=$this->SaleReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->SaleReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->SaleReturns->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->SaleReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'sale_return_id'=>$saleReturn->id])->first();
-								
-								$ReferenceDetail=$this->SaleReturns->ReferenceDetails->get($ReferenceDetail->id);
-								$ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->SaleReturns->ReferenceDetails->save($ReferenceDetail);
+							$ReferenceDetail = $this->SaleReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
 							}else{
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									$query = $this->SaleReturns->ReferenceBalances->query();
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $c_LedgerAccount->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => $ref_row->ref_amount,
-										'debit' => 0
-									])
-									->execute();
-									
-								}else{
-									$ReferenceBalance=$this->SaleReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->SaleReturns->ReferenceBalances->get($ReferenceBalance->id);
-									$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-									
-									$this->SaleReturns->ReferenceBalances->save($ReferenceBalance);
-								}
-								
-
-								$query = $this->SaleReturns->ReferenceDetails->query();
-								$query->insert(['ledger_account_id', 'sale_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $c_LedgerAccount->id,
-									'sale_return_id' => $saleReturn->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => $ref_row->ref_amount,
-									'debit' => 0,
-									'reference_type' => $ref_row->ref_type
-								])
-								->execute();
-								
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
 							}
+							$ReferenceDetail->sale_return_id = $saleReturn->id;
+							$ReferenceDetail->transaction_date = $saleReturn->transaction_date;
+							
+							$this->SaleReturns->ReferenceDetails->save($ReferenceDetail);
+							
 						}
+						$ReferenceDetail = $this->SaleReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type="On_account";
+							$ReferenceDetail->ledger_account_id = $c_LedgerAccount->id;
+							if($saleReturn->on_acc_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $saleReturn->on_account;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $saleReturn->on_account;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->sale_return_id = $saleReturn->id;
+							$ReferenceDetail->transaction_date = $saleReturn->transaction_date;
+							if($saleReturn->on_account > 0){
+								$this->SaleReturns->ReferenceDetails->save($ReferenceDetail);
+							}
 					}
 			
                 $this->Flash->success(__('The invoice has been saved.'));
