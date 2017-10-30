@@ -866,10 +866,8 @@ $(document).ready(function() {
 		}
 	$('select[name="purchase_ledger_account"]').on("change",function() { alert();
 		var gst_ledger_id=$('select[name="purchase_ledger_account"] option:selected').val();
-	
 		if(gst_ledger_id=="799" || gst_ledger_id=="800" )
 		{  
-			
 				$('.igst_display').css("display", "none");
 				$('.cgst_display').css("display", "");
 				$('.sgst_display').css("display", "");
