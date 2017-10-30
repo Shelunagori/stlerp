@@ -255,12 +255,12 @@ $(document).ready(function() {
 	//$('input[name="showthis"]').hide();
 
 	function update_sr_textbox(){
-	   var r=0;
+	
+		var r=0;
 		$("#main_tb tbody tr.tr1").each(function(){
 			var row_no=$(this).attr('row_no');
 			var serial_number_enable=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
 			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
-			
 			var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 			var item_id=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val();
 			var l=$('.tr2[row_no="'+row_no+'"]').find('input').length;
@@ -279,7 +279,7 @@ $(document).ready(function() {
 						
 						for(i=l;i<=qty;i++){
 						
-						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="[grn_rows][serial_number]['+val+'][name]['+i+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'"/></div>');
+						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'"/></div>');
 						
 						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
 						r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
