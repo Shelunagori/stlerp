@@ -50,6 +50,10 @@ class SerialNumbersTable extends Table
             'foreignKey' => 'iv_row_item_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('Items', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
