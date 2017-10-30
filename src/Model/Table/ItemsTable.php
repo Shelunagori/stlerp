@@ -92,6 +92,10 @@ class ItemsTable extends Table
         ]);
 		$this->belongsTo('FinancialYears');
 		$this->belongsTo('NewItem');
+		
+		$this->hasMany('SerialNumbers', [
+            'foreignKey' => 'item_id'
+        ]);
     }
 
     /**
