@@ -137,7 +137,7 @@ if($transaction_date <  $start_date ) {
 							<?php  
 							$min_val=0;
 							$min_val1=0;
-							foreach($grn->item_serial_numbers as $item_serial_number){
+							foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ 
 										if($item_serial_number->status=='Out'){ 
 										$min_val=$min_val+1;
@@ -185,7 +185,7 @@ if($transaction_date <  $start_date ) {
 								
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$grn_rows->id; ?>'>
-								<?php  $i=1; foreach($grn->item_serial_numbers as $item_serial_number){
+								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
 									<div style="margin-bottom:6px;">
 									<?php echo $this->Form->input('serial_numbers['.$grn_rows->item_id.']['.$i.']', ['label' => false,'type'=>'hidden','class'=>'sr_no','ids'=>'sr_no['.$i.']','value' => $item_serial_number->serial_no,'readonly']); ?>
@@ -196,7 +196,7 @@ if($transaction_date <  $start_date ) {
 								</td>
 								<td colspan="1" class="demo">
 									
-								<?php  $i=1; foreach($grn->item_serial_numbers as $item_serial_number){
+								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
 										<?php if($item_serial_number->status=='Out'){  ?>
 										<div class="row">
