@@ -129,7 +129,7 @@ class GrnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn = $this->Grns->get($id, [
-            'contain' => ['Companies','ItemSerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['ItemSerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Companies','SerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
         ]]);
@@ -640,7 +640,11 @@ class GrnsController extends AppController
 		$PO=$this->Grns->PurchaseOrders->get($GRN->purchase_order_id);
 		$PurchaseOrderRow=$this->Grns->PurchaseOrderRows->find()->where(['item_id'=>$item_id,'purchase_order_id'=>$GRN->purchase_order_id])->first();
 		
+<<<<<<< HEAD
+		$ItemSerialNumber = $this->Grns->SerialNumbers->get($id);
+=======
 		$SerialNumber = $this->Grns->SerialNumbers->get($id);
+>>>>>>> origin/master
 		
 		if($SerialNumber->status=='In'){
 			$query = $this->Grns->ItemLedgers->query();
@@ -659,7 +663,11 @@ class GrnsController extends AppController
 				->where(['item_id' => $item_id,'purchase_order_id'=>$PO->id])
 				->execute(); */
 						
+<<<<<<< HEAD
+			$this->Grns->SerialNumbers->delete($ItemSerialNumber);
+=======
 			$this->Grns->SerialNumbers->delete($SerialNumber);
+>>>>>>> origin/master
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 		}
 		
