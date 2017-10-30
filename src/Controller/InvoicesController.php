@@ -411,9 +411,8 @@ class InvoicesController extends AppController
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) {
 						   return $q
-								
-								->contain(['ItemSerialNumbers'=>function($q) use($st_company_id){
-									return $q->where(['ItemSerialNumbers.status' => 'In','ItemSerialNumbers.company_id' => $st_company_id]); 
+								->contain(['SerialNumbers'=>function($q) use($st_company_id){
+									return $q->where(['SerialNumbers.status' => 'In','SerialNumbers.company_id' => $st_company_id]); 
 								},
 								'ItemCompanies'=>function($q) use($st_company_id){
 									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
