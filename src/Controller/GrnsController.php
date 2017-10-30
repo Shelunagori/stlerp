@@ -356,7 +356,7 @@ class GrnsController extends AppController
 
 		 $grn = $this->Grns->newEntity();
         if ($this->request->is('post')) { 
-			$grn->vendor_id=$purchase_order->vendor_id;
+		   $grn->vendor_id=$purchase_order->vendor_id;
 			$last_grn_no=$this->Grns->find()->select(['grn2'])->where(['company_id' => $st_company_id])->order(['grn2' => 'DESC'])->first();
 			if($last_grn_no){
 				$grn->grn2=(int)$last_grn_no->grn2+1;
@@ -374,6 +374,9 @@ class GrnsController extends AppController
 				
 				$this->request->data['item_serial_numbers']=$item_serial_numbers;
 			} */
+			
+			
+			
 			$grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->date_created = date("Y-m-d"); 
 			//pr($grn->transaction_date); exit;
@@ -384,30 +387,32 @@ class GrnsController extends AppController
 			
 			
 			
-			//pr($grn->serial_numbers);exit;
+			
 			
 			 if ($this->Grns->save($grn)) {
-					pr($grn); exit;
-					foreach($grn->grn_rows as  $grn_row){
-						if(sizeof($serial_numbers) > 0){ 
-								foreach($serial_numbers as $item_id=>$data){ 
-									foreach($data as $sr){ pr($sr);
-										/* $query = $this->Grns->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
-										->values([
-										'name' => $sr,
-										'item_id' => $item_id,
-										'status' => 'In',
-										'grn_id' => $grn->id,
-										'grn_row_id' => $grn_row->id,
-										'company_id'=>$st_company_id
-										]);
-										$query->execute();		 */								
-								}
+					//pr($grn); exit;
+					foreach($grn->grn_rows as $key => $grn_row){
+						if(isset($grn_row->serial_numbers))
+						{
+							foreach($grn_row->serial_numbers as $data){ 
+									
+								$query = $this->Grns->SerialNumbers->query();
+								$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+								->values([
+								'name' => $data,
+								'item_id' => $grn_row->item_id,
+								'status' => 'In',
+								'grn_id' => $grn->id,
+								'grn_row_id' => $grn_row->id,
+								'company_id'=>$st_company_id
+								]);
+								$query->execute();										
+								
 							}
-						}					
+														
+						}
 					}		
-					exit;
+					
 					if(!empty($purchase_order_id)){
 
 						$grn->check=array_filter($grn->check);

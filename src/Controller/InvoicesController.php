@@ -411,9 +411,8 @@ class InvoicesController extends AppController
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) {
 						   return $q
-								
-								->contain(['ItemSerialNumbers'=>function($q) use($st_company_id){
-									return $q->where(['ItemSerialNumbers.status' => 'In','ItemSerialNumbers.company_id' => $st_company_id]); 
+								->contain(['SerialNumbers'=>function($q) use($st_company_id){
+									return $q->where(['SerialNumbers.status' => 'In','SerialNumbers.company_id' => $st_company_id]); 
 								},
 								'ItemCompanies'=>function($q) use($st_company_id){
 									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
@@ -499,7 +498,7 @@ class InvoicesController extends AppController
 			}
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
-			
+			//pr($invoice);exit;
             if ($this->Invoices->save($invoice)) {
 				foreach($invoice->invoice_rows as $invoice_row){
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
@@ -601,17 +600,33 @@ class InvoicesController extends AppController
 				foreach($invoice->invoice_rows as $invoice_row){
 					$amt=$invoice_row->amount;
 					$total_amt=$total_amt+$amt;
-					$item_serial_no=$invoice_row->item_serial_number;
-					$serial_no=explode(",",$item_serial_no);
-					foreach($serial_no as $serial){
-					$query = $this->Invoices->InvoiceRows->ItemSerialNumbers->query();
+					$item_serial_no=$invoice_row->serial_numbers;
+					foreach($item_serial_no as $serial){
+						$query = $this->Invoices->SerialNumbers->query();
+							$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+							->values([
+							'name' => $sr,
+							'item_id' => $item_id,
+							'status' => 'In',
+							'grn_id' => $grn->id,
+							'grn_row_id' => $grn_row->id,
+							'company_id'=>$st_company_id
+							]);
+						$query->execute();
+					
+					
+					$query = $this->Invoices->InvoiceRows->SerialNumbers->query();
+					
+					
+					
+					
 						$query->update()
-							->set(['status' => 'Out','invoice_id' => $invoice->id])
+							->set(['status' => 'Out','invoice_id' => $invoice->id,'invoice_row_id'=>$invoice_row->id,'company_id'=>$st_company_id])
 							->where(['id' => $serial])
 							->execute();
 					}
 				}
-				
+				exit;
 				
 				if(!empty($sales_order_id)){
 					$invoice->check=array_filter($invoice->check);
@@ -759,7 +774,7 @@ class InvoicesController extends AppController
 			}	
 		
 		
-		$item_serial_no=$this->Invoices->ItemSerialNumbers->find('list');
+		$item_serial_no=$this->Invoices->SerialNumbers->find('list');
 		$employees = $this->Invoices->Employees->find('list');
         $this->set(compact('invoice', 'customers', 'companies', 'salesOrders','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoicespay','creditlimit','old_due_payment','item_serial_no','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','sales_orders_qty'));
         $this->set('_serialize', ['invoice']);

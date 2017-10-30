@@ -242,8 +242,8 @@ $('.closetin').on("click",function() {
 						<?php 
 						
 						$options1=[]; 
-							foreach($sales_order_rows->item->item_serial_numbers as $item_serial_number){
-								$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
+							foreach($sales_order_rows->item->serial_numbers as $item_serial_number){
+								$options1[]=['text' =>$item_serial_number->name, 'value' => $item_serial_number->id];
 							} 
 							if($sales_order_rows->item->item_companies[0]->serial_number_enable==1) { ?>
 							<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
@@ -814,7 +814,7 @@ $(document).ready(function() {
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,

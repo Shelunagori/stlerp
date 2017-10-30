@@ -236,12 +236,12 @@ class ItemsController extends AppController
 			$ItemLedger->in_out = 'In';
 			$ItemLedger->left_item_id = 0;
 			$ItemLedger->processed_on = date('Y-m-d',strtotime($this->request->data['date']));
-			
+			//pr($this->request->data());exit;
 			$this->Items->ItemLedgers->save($ItemLedger);
 			
 			if($this->request->data['serial_number_enable']==1){
 				
-				foreach($this->request->data['serial_numbers'] as $serial_number){
+				/* foreach($this->request->data['serial_numbers'] as $serial_number){
 					$ItemSerialNumber = $this->Items->ItemSerialNumbers->newEntity();
 					$ItemSerialNumber->item_id = $this->request->data['Item_id'];
 					$ItemSerialNumber->serial_no = $serial_number[0];
@@ -249,6 +249,16 @@ class ItemsController extends AppController
 					$ItemSerialNumber->master_item_id = $this->request->data['Item_id'];
 					$ItemSerialNumber->company_id = $st_company_id;
 					$this->Items->ItemSerialNumbers->save($ItemSerialNumber);
+				} */
+				foreach($this->request->data['serial_numbers'] as $serial_number)
+				{
+					$ItemSerialNumber = $this->Items->SerialNumbers->newEntity();
+					$ItemSerialNumber->name = $serial_number[0];
+					$ItemSerialNumber->item_id = $this->request->data['Item_id'];
+					$ItemSerialNumber->status = 'In';
+					$ItemSerialNumber->company_id = $st_company_id;
+					$ItemSerialNumber->is_opening_balance = 'Yes';
+					$this->Items->SerialNumbers->save($ItemSerialNumber);
 				}
 			}
 			$this->Flash->success(__('Item Opening Balance has been saved.'));
@@ -294,8 +304,8 @@ class ItemsController extends AppController
 		$Items = $this->Items->find()->where(['id'=>$ItemLedger->item_id])->first();
 		$SerialNumberEnable = $this->Items->ItemCompanies->find()->where(['item_id'=>$ItemLedger->item_id
 		,'company_id'=>$st_company_id])->toArray();
-		$ItemSerialNumbers = $this->Items->ItemSerialNumbers->find()->where(['item_id'=>$ItemLedger->item_id
-		,'company_id'=>$st_company_id,'grn_id'=>0])->toArray();
+		$ItemSerialNumbers = $this->Items->SerialNumbers->find()->where(['item_id'=>$ItemLedger->item_id
+		,'company_id'=>$st_company_id,'is_opening_balance'=>'Yes'])->toArray();
 		//pr($ItemSerialNumbers);exit;
 		
 		if ($this->request->is(['patch', 'post', 'put'])) {
@@ -315,13 +325,13 @@ class ItemsController extends AppController
 			
 			if($serial_number_enable == '1'){
 			foreach($this->request->data['serial_numbers'] as $serial_number){
-					$ItemSerialNumber = $this->Items->ItemSerialNumbers->newEntity();
+					$ItemSerialNumber = $this->Items->SerialNumbers->newEntity();
+					$ItemSerialNumber->name = $serial_number[0];
 					$ItemSerialNumber->item_id = $ItemLedger->item_id;
-					$ItemSerialNumber->serial_no = $serial_number[0];
 					$ItemSerialNumber->status = 'In';
-					$ItemSerialNumber->master_item_id = $item_id;
 					$ItemSerialNumber->company_id = $st_company_id;
-					$this->Items->ItemSerialNumbers->save($ItemSerialNumber);
+					$ItemSerialNumber->is_opening_balance = 'Yes';
+					$this->Items->SerialNumbers->save($ItemSerialNumber);
 				}
 			}	
 		}
@@ -384,21 +394,21 @@ class ItemsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$ItemLedger=$this->Items->ItemLedgers->find()->where(['item_id'=>$item_id,'source_model'=>'Items'])->first();
 		//pr($ItemLedger);exit;
-		$ItemSerialNumber = $this->Items->ItemSerialNumbers->get($id);
-		$ItemSerialNumber_invoice_id= $this->Items->ItemSerialNumbers->Invoices->find()->where(['id'=>$ItemSerialNumber->invoice_id])->first();
+		$ItemSerialNumber = $this->Items->SerialNumbers->get($id);
+		$ItemSerialNumber_invoice_id= $this->Items->SerialNumbers->Invoices->find()->where(['id'=>$ItemSerialNumber->invoice_id])->first();
 		//pr($ItemSerialNumber->invoice_id);exit;
-		$ItemSerialNumber_inventory_vouch__id= $this->Items->ItemSerialNumbers->InventoryVouchers->find()->where(['id'=>$ItemSerialNumber->in_inventory_voucher_id])->first();
+		$ItemSerialNumber_inventory_vouch__id= $this->Items->SerialNumbers->InventoryVouchers->find()->where(['id'=>$ItemSerialNumber->in_inventory_voucher_id])->first();
 		//pr($ItemSerialNumber_inventory_vouch__id);exit;
-		$ItemSerialNumber_inventory_transfer_vouch= $this->Items->ItemSerialNumbers->InventoryTransferVouchers->find()->where(['id'=>$ItemSerialNumber->inventory_transfer_voucher_id])->first();
+		$ItemSerialNumber_inventory_transfer_vouch= $this->Items->SerialNumbers->InventoryTransferVouchers->find()->where(['id'=>$ItemSerialNumber->inventory_transfer_voucher_id])->first();
 		
-		$ItemSerialNumber_purchase_return= $this->Items->ItemSerialNumbers->PurchaseReturns->find()->where(['id'=>$ItemSerialNumber->purchase_return_id])->first();
+		$ItemSerialNumber_purchase_return= $this->Items->SerialNumbers->PurchaseReturns->find()->where(['id'=>$ItemSerialNumber->purchase_return_id])->first();
 		
 		if($ItemSerialNumber->status=='In'){
 			$ItemQuantity = $ItemLedger->quantity-1;
 			//pr($ItemQuantity);exit;
 			if($ItemQuantity == 0){
 				$this->Items->ItemLedgers->delete($ItemLedger);
-				$this->Items->ItemSerialNumbers->delete($ItemSerialNumber);
+				$this->Items->SerialNumbers->delete($ItemSerialNumber);
 				$this->Flash->success(__('The Item has been deleted.'));
 				return $this->redirect(['action' => 'Opening-Balance']);
 				
@@ -408,7 +418,7 @@ class ItemsController extends AppController
 				->set(['quantity' => $ItemQuantity])
 				->where(['item_id' => $item_id,'company_id'=>$st_company_id,'source_model'=>'Items'])
 				->execute();
-			$this->Items->ItemSerialNumbers->delete($ItemSerialNumber);
+			$this->Items->SerialNumbers->delete($ItemSerialNumber);
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 			}	
 			
