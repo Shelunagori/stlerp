@@ -1412,55 +1412,42 @@ class InvoiceBookingsController extends AppController
 				//Reference Number coding 
 				if(sizeof(@$ref_rows)>0){
 						
-						foreach($ref_rows as $ref_row){  
+						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							$ReferenceDetail=$this->InvoiceBookings->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'invoice_booking_id'=>$invoiceBooking->id])->first();
 							
-							if($ReferenceDetail){
-								$ReferenceBalance=$this->InvoiceBookings->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->InvoiceBookings->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								
-								$this->InvoiceBookings->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->InvoiceBookings->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'invoice_booking_id'=>$invoiceBooking->id])->first();
-								$ReferenceDetail=$this->InvoiceBookings->ReferenceDetails->get($ReferenceDetail->id);
-								$ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
-								
-							}else{ 
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									$query = $this->InvoiceBookings->ReferenceBalances->query();
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $v_LedgerAccount->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => $ref_row->ref_amount,
-										'debit' => 0
-									])
-									->execute();
-									
-								}else{ 
-									$ReferenceBalance=$this->InvoiceBookings->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->InvoiceBookings->ReferenceBalances->get($ReferenceBalance->id);
-									$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-									
-									$this->InvoiceBookings->ReferenceBalances->save($ReferenceBalance);
-								}
-								
-								$query = $this->InvoiceBookings->ReferenceDetails->query();
-								$query->insert(['ledger_account_id', 'invoice_booking_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $v_LedgerAccount->id,
-									'invoice_booking_id' => $invoiceBooking->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' =>$ref_row->ref_amount,
-									'debit' => 0, 
-									'reference_type' =>$ref_row->ref_type
-								])
-								->execute();
-								
+							$ReferenceDetail = $this->InvoiceBookings->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
 							}
+							$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
+							$ReferenceDetail->transaction_date = date("d-m-Y");
+							
+							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
+							
+						}
+						$ReferenceDetail = $this->InvoiceBookings->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+						if($invoiceBooking->on_acc_cr_dr=="Dr"){
+							$ReferenceDetail->debit = $invoiceBooking->on_account;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $invoiceBooking->on_account;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
+						$ReferenceDetail->transaction_date = date("d-m-Y");
+						if($invoiceBooking->on_account > 0){
+							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
 
