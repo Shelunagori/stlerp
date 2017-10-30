@@ -137,17 +137,21 @@ if($transaction_date <  $start_date ) {
 							<?php  
 							$min_val=0;
 							$min_val1=0;
+<<<<<<< HEAD
 							foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ 
 										if($item_serial_number->status=='Out'){ 
+=======
+							foreach($grn->serial_numbers as $serial_number){
+									if($serial_number->item_id == $grn_rows->item_id){ 
+										if($serial_number->status=='Out'){ 
+>>>>>>> origin/master
 										$min_val=$min_val+1;
 										}
 										$min_val1++;
 									}
 							} 
 							?>
-							<?php if(@$existing_rows[$grn_rows->item_id]!=$grn_rows->quantity) { 
-							//pr($grn_rows); ?> 
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 								<td>
@@ -180,15 +184,20 @@ if($transaction_date <  $start_date ) {
 											$check=' ';
 										}
 									
-									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
+									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($grn->serial_numbers),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
 								</td>
 								
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$grn_rows->id; ?>'>
+<<<<<<< HEAD
 								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
+=======
+								<?php  $i=1; foreach($grn->serial_numbers as $serial_number){
+									if($serial_number->item_id == $grn_rows->item_id){ ?>
+>>>>>>> origin/master
 									<div style="margin-bottom:6px;">
-									<?php echo $this->Form->input('serial_numbers['.$grn_rows->item_id.']['.$i.']', ['label' => false,'type'=>'hidden','class'=>'sr_no','ids'=>'sr_no['.$i.']','value' => $item_serial_number->serial_no,'readonly']); ?>
+									<?php echo $this->Form->input('serial_numbers['.$grn_rows->item_id.']['.$i.']', ['label' => false,'type'=>'hidden','class'=>'sr_no','ids'=>'sr_no['.$i.']','value' => $serial_number->name,'readonly']); ?>
 									</div>
 									<?php  $i++;  }  }?><br/>
 								<td colspan="2" class="td_append">
@@ -196,24 +205,39 @@ if($transaction_date <  $start_date ) {
 								</td>
 								<td colspan="1" class="demo">
 									
+<<<<<<< HEAD
 								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
 										<?php if($item_serial_number->status=='Out'){  ?>
+=======
+								<?php  $i=1;  
+								foreach($grn->serial_numbers as $serial_number){
+									if($serial_number->item_id == $grn_rows->item_id){
+									 
+									if($i==1)
+									{
+										$count_serial_no = sizeof($grn->serial_numbers);
+										echo $this->Form->input('count_serial_no', ['label' => false,'type'=>'hidden','id'=>'count_serial_no','value' => $count_serial_no,'readonly']);
+									}
+								
+								?>
+										<?php if($serial_number->status=='Out'){  ?>
+>>>>>>> origin/master
 										<div class="row">
-										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $item_serial_number->serial_no,'readonly']); ?></div>
+										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										</div>
 										<div class="col-md-2"></div>
 										<?php  } else {?>
 										<div class="row">
-										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $item_serial_number->serial_no,'readonly']); ?></div>
+										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										
 										<div class="col-md-2">
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
-													['action' => 'DeleteSerialNumbers', $item_serial_number->id, $item_serial_number->item_id,$grn->id], 
+													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id], 
 													[
 														'escape' => false,
 														'class' => 'btn btn-xs red',
-														'confirm' => __('Are you sure, you want to delete {0}?', $item_serial_number->id)
+														'confirm' => __('Are you sure, you want to delete {0}?', $serial_number->id)
 													]
 												) ?>
 											
@@ -223,7 +247,7 @@ if($transaction_date <  $start_date ) {
 									
 								</td>
 							</tr>
-							<?php } 
+							<?php  
 							?>
 						<?php $q++; endforeach; ?>
 					</tbody>
@@ -366,19 +390,19 @@ $(document).ready(function() {
     });
 	$('.quantity').die().live("blur",function() {
 			var is_checked=$(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').val();
-			
+			var count_serial_no = $('#count_serial_no').val();
 			var serial_number_enable=$(this).closest('tr').find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
 			var qty=parseInt($(this).closest('tr').find('td:nth-child(3) input[type="text"]').val());
-			var old_qty=parseInt($(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').attr('old_qty'));
+			var old_qty=parseInt($(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').attr('old_qty_size'));
 			if(!old_qty){ old_qty=0; }
 			
 			var row_no=$(this).closest('tr').attr('row_no');
 			var l=$('.tr2[row_no="'+row_no+'"]').find('input').length;
 			var item_id=$(this).closest('tr').find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val();
-			console.log(is_checked);
+/* 			console.log(is_checked);
 			console.log(serial_number_enable);
 			console.log(old_qty);
-			console.log(row_no);
+			console.log(row_no); */
 			if(is_checked && serial_number_enable=='1'){
 			
 			for(i=0; i <= old_qty; i++){ 
@@ -390,8 +414,6 @@ $(document).ready(function() {
 				 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no" name="serial_numbers['+item_id+'][new_'+i+']" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
 				
 				$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true}); 
-				
-				
 			}
 		} 
     });

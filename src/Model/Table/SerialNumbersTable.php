@@ -38,10 +38,16 @@ class SerialNumbersTable extends Table
         $this->displayField('name');
         $this->primaryKey('id');
 
-        $this->belongsTo('Items', [
-            'foreignKey' => 'item_id',
+        $this->belongsTo('Grns', [
+            'foreignKey' => 'grn_id',
             'joinType' => 'INNER'
         ]);
+
+        $this->belongsTo('GrnRows', [
+            'foreignKey' => 'grn_row_id',
+            'joinType' => 'INNER'
+        ]);		
+		
         $this->belongsTo('IvRows', [
             'foreignKey' => 'iv_row_id',
             'joinType' => 'INNER'
