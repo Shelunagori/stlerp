@@ -374,6 +374,9 @@ class GrnsController extends AppController
 				
 				$this->request->data['item_serial_numbers']=$item_serial_numbers;
 			} */
+			
+			pr($this->request->data);exit;
+			
 			$grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->date_created = date("Y-m-d"); 
 			//pr($grn->transaction_date); exit;
@@ -384,7 +387,7 @@ class GrnsController extends AppController
 			
 			
 			
-			//pr($grn->serial_numbers);exit;
+			
 			
 			 if ($this->Grns->save($grn)) {
 					pr($grn); exit;
