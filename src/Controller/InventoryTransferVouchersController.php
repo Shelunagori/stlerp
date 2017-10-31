@@ -322,7 +322,7 @@ class InventoryTransferVouchersController extends AppController
 			
 					
 				}
-			pr($inventory_transfer_voucher_rows); exit;
+			//pr($inventory_transfer_voucher_rows); exit;
 			}	
 			$this->Flash->success(__('The inventory transfer voucher has been saved.'));
 
