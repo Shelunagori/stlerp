@@ -105,7 +105,7 @@ class SerialNumbersController extends AppController
 			
 		$query->select([
 			'total_in' => $query->func()->count($totalInCase),
-			'total_out' => $query->func()->count($totalOutCase),'id','item_id'
+			'total_out' => $query->func()->count($totalOutCase)
 		])
 		->where(['company_id'=>$st_company_id,'item_id'=>$item_id])
 		->group('SerialNumbers.name')
@@ -115,7 +115,7 @@ class SerialNumbersController extends AppController
 		foreach($SerialNumbers as $serialnumbers){
 			//if($serialnumbers->total_in > $serialnumbers->total_out){
 				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-		//	}	
+			//}	
 			$values=$sr_nos;
 		}
 		//pr($values);exit;
