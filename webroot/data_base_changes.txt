@@ -8,3 +8,7 @@ Add New Field in invoice_booking_rows: grn_row_id int(10)
 Add New Field in Refrence_details opening_balance varchar(255).
 
 
+
+<---------------Dimpal---->
+change item_serial_number to serial_number in invoice_rows table
+

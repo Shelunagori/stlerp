@@ -239,18 +239,12 @@ $('.closetin').on("click",function() {
 							<td></td>
 						</tr>
 				
-						<?php 
-						
-						$options1=[]; 
-							foreach($sales_order_rows->item->serial_numbers as $item_serial_number){
-								$options1[]=['text' =>$item_serial_number->name, 'value' => $item_serial_number->id];
-							} 
-							if($sales_order_rows->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
+						<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
 							<td></td>
 							<td colspan="5">
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']);  ?></td>
-							</tr><?php } ?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_rows->item_id); ?>
+							</td>
+						</tr>
 					<?php $q++; } endforeach; }?>
 				</tbody>
 			</table>
@@ -838,7 +832,7 @@ $(document).ready(function() {
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
-				if(serial_l>0){
+				if(serial_l > 0){
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).select2().rules( "remove", "required" );
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
 				}
