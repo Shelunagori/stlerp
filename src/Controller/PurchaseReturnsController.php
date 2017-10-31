@@ -503,7 +503,7 @@ class PurchaseReturnsController extends AppController
 				$this->PurchaseReturns->Ledgers->deleteAll(['voucher_id' => $purchaseReturn->id, 'voucher_source' => 'Purchase Return','company_id'=>$st_company_id]);
 
 				$this->PurchaseReturns->ItemLedgers->deleteAll(['source_id' => $purchaseReturn->id, 'source_model' => 'Purchase Return','company_id'=>$st_company_id]);
-				$this->PurchaseReturns->ReferenceDetails->deleteAll(['invoice_booking_id' => $purchaseReturn->id]);
+				$this->PurchaseReturns->ReferenceDetails->deleteAll(['purchase_return_id' => $purchaseReturn->id]);
 				
 				
 				//Ledger posting for SUPPLIER
@@ -970,18 +970,7 @@ class PurchaseReturnsController extends AppController
 			
 			
 			
-			$ReferenceDetails = $this->PurchaseReturns->InvoiceBookings->ReferenceDetails->find()->where(['ledger_account_id'=>$vendor_ledger_acc_id,'invoice_booking_id'=>$invoiceBooking->id])->toArray();
-		
-			if(!empty($ReferenceDetails))
-			{
-				foreach($ReferenceDetails as $ReferenceDetail)
-				{  //pr($ReferenceDetail->ledger_account_id); exit;
-					$ReferenceBalances[] = $this->PurchaseReturns->InvoiceBookings->ReferenceBalances->find()->where(['ledger_account_id'=>$ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])->toArray();
-				}
-			}
-			else{
-				$ReferenceBalances='';
-			}
+			
 			
 			$Em = new FinancialYearsController;
 			$financial_year_data = $Em->checkFinancialYear($invoiceBooking->created_on);
