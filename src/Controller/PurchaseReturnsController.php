@@ -408,7 +408,7 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
 		$purchase_return_id=@(int)$this->request->query('purchase-return');
-		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id);
+		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, ['contain'=>['ReferenceDetails']]);
 		
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
@@ -661,12 +661,13 @@ class PurchaseReturnsController extends AppController
 							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
-					$this->Flash->success(__('The Purchase Return has been saved.'));
+					$this->Flash->success(__('The Purchase Return has been updated.'));
 					return $this->redirect(['action' => 'index']);
 				}
 				
 				else{
-					pr($purchaseReturn); exit;
+					$this->Flash->error(__('The Purchase Return could not been updated.'));
+					return $this->redirect(['action' => 'index']);
 				}
 			}
 				//}
@@ -679,7 +680,7 @@ class PurchaseReturnsController extends AppController
 			
 			
 			
-			$ReferenceDetails = $this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id])->toArray();
+			/* $ReferenceDetails = $this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id])->toArray();
 		
 		
 		//pr($ReferenceDetails);exit;
@@ -692,7 +693,7 @@ class PurchaseReturnsController extends AppController
 			}
 			else{
 				$ReferenceBalances='';
-			}
+			} */
 			
 			
 			$Em = new FinancialYearsController;
@@ -703,7 +704,7 @@ class PurchaseReturnsController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','ReferenceBalances','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
+			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
 			$this->set('_serialize', ['purchaseReturn']);
 	}
 	
