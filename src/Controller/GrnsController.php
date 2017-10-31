@@ -640,11 +640,9 @@ class GrnsController extends AppController
 		$PO=$this->Grns->PurchaseOrders->get($GRN->purchase_order_id);
 		$PurchaseOrderRow=$this->Grns->PurchaseOrderRows->find()->where(['item_id'=>$item_id,'purchase_order_id'=>$GRN->purchase_order_id])->first();
 		
-<<<<<<< HEAD
-		$ItemSerialNumber = $this->Grns->SerialNumbers->get($id);
-=======
+
 		$SerialNumber = $this->Grns->SerialNumbers->get($id);
->>>>>>> origin/master
+
 		
 		if($SerialNumber->status=='In'){
 			$query = $this->Grns->ItemLedgers->query();
@@ -663,11 +661,8 @@ class GrnsController extends AppController
 				->where(['item_id' => $item_id,'purchase_order_id'=>$PO->id])
 				->execute(); */
 						
-<<<<<<< HEAD
-			$this->Grns->SerialNumbers->delete($ItemSerialNumber);
-=======
+
 			$this->Grns->SerialNumbers->delete($SerialNumber);
->>>>>>> origin/master
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 		}
 		

@@ -256,7 +256,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$current_cgst=[];
 					$current_sgst=[];
 					$current_igst=[];
-					
+					$sr_nos=[];
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
 						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
@@ -266,6 +266,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						$current_cgst[$current_invoice_row->item_id]=$current_invoice_row->cgst_percentage;
 						$current_sgst[$current_invoice_row->item_id]=$current_invoice_row->sgst_percentage;
 						$current_igst[$current_invoice_row->item_id]=$current_invoice_row->igst_percentage;
+						$sr_nos=$current_invoice_row->serial_number;
 					}
 					$q=0; 
 					
@@ -322,26 +323,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td></td>
 						</tr>
-						<?php $options1=[]; $choosen=[];
-							if(sizeof(@$ItemSerialNumber[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber[@$sales_order_row->item_id] as $item_serial_number){
-									if($item_serial_number->status=="Out"){
-										$choosen[]=$item_serial_number->id;
-									}
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}else if(sizeof(@$ItemSerialNumber2[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber2[@$sales_order_row->item_id] as $item_serial_number){
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}
-							if($sales_order_row->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no="<?= h($q) ?>">
+						<?php if($sales_order_row->item->item_companies[0]->serial_number_enable==1) { ?>
+						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
-							</tr><?php } ?>
+							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
+							</td>
+						</tr><?php } ?>
 						<?php  $q++;  } ?>
 				</tbody>
 				<tfoot><?php 
@@ -795,7 +784,7 @@ $(document).ready(function() {
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
