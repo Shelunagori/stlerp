@@ -353,8 +353,8 @@ $(document).ready(function() {
 	
 	
    old_quantity();
-   function old_quantity(){
-	   var total_out=$('input[name="new_quantity"]').val();
+   function old_quantity(){ 
+	   var total_out=$('input[name="new_quantity"]').val(); 
 			if(total_out < 1){
 				$('#itm_srl_num').find('input.sr_no').remove();
 				}

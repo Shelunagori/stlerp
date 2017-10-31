@@ -129,7 +129,7 @@ class GrnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn = $this->Grns->get($id, [
-            'contain' => ['Companies','ItemSerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['ItemSerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Companies','SerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
         ]]);
@@ -386,7 +386,7 @@ class GrnsController extends AppController
 			$grn->created_by=$this->viewVars['s_employee_id'];
 			
 			
-			
+			//pr($grn);exit;
 			
 			
 			 if ($this->Grns->save($grn)) {
@@ -418,9 +418,12 @@ class GrnsController extends AppController
 						$grn->check=array_filter($grn->check);
 						$i=0; 
 						
+						
+						
 						foreach($grn->check as $purchase_order_row_id)
 						{
 							$qty=$grn->grn_rows[$i]['quantity'];
+							
 							$item_id=$grn->grn_rows[$i]['item_id'];
 							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
 							$PurchaseOrderRows->processed_quantity=$PurchaseOrderRows->processed_quantity+$qty;
@@ -443,7 +446,7 @@ class GrnsController extends AppController
 					$this->Flash->success(__('The grn has been saved.'));
 
 					return $this->redirect(['action' => 'index']);
-				} else { pr($grn); exit;
+				} else { //pr($grn); exit;
 					$this->Flash->error(__('The grn could not be saved. Please, try again.'));
 				}
 			}
@@ -517,7 +520,7 @@ class GrnsController extends AppController
 				
 		$grn = $this->Grns->get($id, [
 				'contain' => [
-						'Companies','ItemSerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
+						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]],'Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
@@ -629,15 +632,21 @@ class GrnsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$ItemLedger=$this->Grns->ItemLedgers->find()->where(['item_id'=>$item_id,'source_model'=>'Grns'])->first();
 		
+		//pr($ItemLedger);exit;
+		
 		$GrnRow=$this->Grns->GrnRows->find()->where(['item_id'=>$item_id,'grn_id'=>$grn_id])->first();
 		
 		$GRN=$this->Grns->get($grn_id);
 		$PO=$this->Grns->PurchaseOrders->get($GRN->purchase_order_id);
 		$PurchaseOrderRow=$this->Grns->PurchaseOrderRows->find()->where(['item_id'=>$item_id,'purchase_order_id'=>$GRN->purchase_order_id])->first();
 		
-		$ItemSerialNumber = $this->Grns->ItemSerialNumbers->get($id);
+<<<<<<< HEAD
+		$ItemSerialNumber = $this->Grns->SerialNumbers->get($id);
+=======
+		$SerialNumber = $this->Grns->SerialNumbers->get($id);
+>>>>>>> origin/master
 		
-		if($ItemSerialNumber->status=='In'){
+		if($SerialNumber->status=='In'){
 			$query = $this->Grns->ItemLedgers->query();
 			$query->update()
 				->set(['quantity' => $ItemLedger->quantity-1])
@@ -648,13 +657,17 @@ class GrnsController extends AppController
 				->set(['quantity' => $GrnRow->quantity-1])
 				->where(['item_id'=>$item_id,'grn_id'=>$grn_id])
 				->execute();
-			$query2 = $this->Grns->PurchaseOrderRows->query();
+/* 			$query2 = $this->Grns->PurchaseOrderRows->query();
 			$query2->update()
 				->set(['processed_quantity' => $PurchaseOrderRow->processed_quantity-1])
 				->where(['item_id' => $item_id,'purchase_order_id'=>$PO->id])
-				->execute();
+				->execute(); */
 						
-			$this->Grns->ItemSerialNumbers->delete($ItemSerialNumber);
+<<<<<<< HEAD
+			$this->Grns->SerialNumbers->delete($ItemSerialNumber);
+=======
+			$this->Grns->SerialNumbers->delete($SerialNumber);
+>>>>>>> origin/master
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 		}
 		
