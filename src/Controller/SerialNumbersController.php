@@ -116,7 +116,7 @@ class SerialNumbersController extends AppController
 			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_no))){
 				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
 			}	
-			$values=$sr_nos;
+			$values=$sr_no;
 		}
 		//pr($values);exit;
         $this->set(compact('options', 'values'));
