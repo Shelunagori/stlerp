@@ -56,14 +56,19 @@ class IvsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		$Invoice=$this->Ivs->Invoices->get($invoice_id, [
-			'contain' => ['InvoiceRows']
+			'contain' => ['InvoiceRows'=>['Items']]
 		]);
 		
 			
         $iv = $this->Ivs->newEntity();
         if ($this->request->is('post')) {
-            $iv = $this->Ivs->patchEntity($iv, $this->request->data);
-            if ($this->Ivs->save($iv)) {
+            $iv = $this->Ivs->patchEntity($iv, $this->request->data, [
+								'associated' => ['IvRows', 'IvRows.IvRowItems']
+							]);
+			
+			$iv->voucher_no=1;
+            //pr($iv); exit;
+			if ($this->Ivs->save($iv)) {
                 $this->Flash->success(__('The iv has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -71,7 +76,9 @@ class IvsController extends AppController
                 $this->Flash->error(__('The iv could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('iv', 'Invoice'));
+		
+		$Items=$this->Ivs->IvRows->Items->find('list');
+        $this->set(compact('iv', 'Invoice', 'Items'));
         $this->set('_serialize', ['iv']);
     }
 

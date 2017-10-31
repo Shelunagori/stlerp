@@ -11,7 +11,6 @@ use Cake\Validation\Validator;
  *
  * @property \Cake\ORM\Association\BelongsTo $Items
  * @property \Cake\ORM\Association\BelongsTo $IvRows
- * @property \Cake\ORM\Association\BelongsTo $IvRowItems
  *
  * @method \App\Model\Entity\SerialNumber get($primaryKey, $options = [])
  * @method \App\Model\Entity\SerialNumber newEntity($data = null, array $options = [])
@@ -36,7 +35,6 @@ class SerialNumbersTable extends Table
 
         $this->table('serial_numbers');
         $this->displayField('name');
-        $this->primaryKey('id');
 
         $this->belongsTo('Items', [
             'foreignKey' => 'item_id',
@@ -44,10 +42,6 @@ class SerialNumbersTable extends Table
         ]);
         $this->belongsTo('IvRows', [
             'foreignKey' => 'iv_row_id',
-            'joinType' => 'INNER'
-        ]);
-        $this->belongsTo('IvRowItems', [
-            'foreignKey' => 'iv_row_item_id',
             'joinType' => 'INNER'
         ]);
     }
@@ -62,7 +56,8 @@ class SerialNumbersTable extends Table
     {
         $validator
             ->integer('id')
-            ->allowEmpty('id', 'create');
+            ->requirePresence('id', 'create')
+            ->notEmpty('id');
 
         $validator
             ->requirePresence('name', 'create')
@@ -71,6 +66,11 @@ class SerialNumbersTable extends Table
         $validator
             ->requirePresence('status', 'create')
             ->notEmpty('status');
+
+        $validator
+            ->integer('iv_row_items')
+            ->requirePresence('iv_row_items', 'create')
+            ->notEmpty('iv_row_items');
 
         return $validator;
     }
@@ -86,7 +86,6 @@ class SerialNumbersTable extends Table
     {
         $rules->add($rules->existsIn(['item_id'], 'Items'));
         $rules->add($rules->existsIn(['iv_row_id'], 'IvRows'));
-        $rules->add($rules->existsIn(['iv_row_item_id'], 'IvRowItems'));
 
         return $rules;
     }
