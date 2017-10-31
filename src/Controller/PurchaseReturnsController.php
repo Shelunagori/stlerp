@@ -164,7 +164,7 @@ class PurchaseReturnsController extends AppController
 				}
 			}				
 		}
-		//pr($PurchaseReturnQty);exit;
+		pr($invoiceBooking);exit;
 			   $st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
