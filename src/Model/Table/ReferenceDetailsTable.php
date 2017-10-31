@@ -85,6 +85,10 @@ class ReferenceDetailsTable extends Table
             'foreignKey' => 'sale_return_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('PurchaseReturns', [
+            'foreignKey' => 'purchase_return_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
