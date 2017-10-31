@@ -166,24 +166,36 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 						<thead>
 							<tr>
 								<th width="25%">Ref Type</th>
-								<th width="40%">Ref No.</th>
+								<th width="25%">Ref No.</th>
 								<th width="30%">Amount</th>
+								<th width="10%"></th>
 								<th width="5%"></th>
 							</tr>
 						</thead>
 						<tbody>
-							
+							<tr>
+								<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+								<td class="ref_no"></td>
+								<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+								<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+								<?php 
+								echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+								</td>
+								<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
+							</tr>
 						</tbody>
 						<tfoot>
 							<tr>
 								<td align="center" style="vertical-align: middle !important;">On Account</td>
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+								<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 								<td></td>
 							</tr>
 							<tr>
 								<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-								<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+								<td></td>
+								<td></td>
 								<td></td>
 							</tr>
 						</tfoot>

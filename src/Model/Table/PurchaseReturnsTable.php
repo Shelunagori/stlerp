@@ -60,8 +60,9 @@ class PurchaseReturnsTable extends Table
 			'propertyName' => 'creator',
 		]);
 		
-		$this->belongsTo('ReferenceDetails');
-		$this->belongsTo('ReferenceBalances');
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'purchase_return_id'
+        ]);
 		$this->belongsTo('Ledgers');
 		
 		$this->belongsTo('Creator', [
