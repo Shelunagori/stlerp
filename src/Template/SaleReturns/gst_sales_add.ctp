@@ -1041,15 +1041,15 @@ $(document).ready(function() {
 		});
 		var on_acc=0;
 		var total_ref=0;
-		var on_acc_cr_dr='Dr';
-		if(total_ref_dr > total_ref_cr)
+		var on_acc_cr_dr='Cr';
+		if(total_ref_dr < total_ref_cr)
 		{
-			total_ref=total_ref_dr-total_ref_cr;
+			total_ref=total_ref_cr-total_ref_dr;
 			on_acc=main_amount-total_ref;
 		}
-		else if(total_ref_dr < total_ref_cr)
+		else if(total_ref_dr > total_ref_cr)
 		{
-			total_ref=total_ref_dr-total_ref_cr;
+			total_ref=total_ref_cr-total_ref_dr;
 			on_acc=main_amount-total_ref;
 		}
 		else
@@ -1064,7 +1064,7 @@ $(document).ready(function() {
 		}else{
 			on_acc=Math.abs(on_acc);
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 		}
 	}
 	

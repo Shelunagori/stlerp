@@ -93,7 +93,7 @@ class ItemsTable extends Table
 		$this->belongsTo('FinancialYears');
 		$this->belongsTo('NewItem');
 		
-		$this->hasMany('SerialNumbers', [
+		$this->hasMany('PurchaseReturnRows', [
             'foreignKey' => 'item_id'
         ]);
     }
