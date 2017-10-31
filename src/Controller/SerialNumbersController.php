@@ -79,7 +79,7 @@ class SerialNumbersController extends AppController
 	public function getSerialNumberEditList(){
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
-		$sr_nos=explode(',',$sr_nos);
+		$sr_no=explode(',',$sr_nos);
 		
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -113,9 +113,9 @@ class SerialNumbersController extends AppController
 		$SerialNumbers =$query->toArray();
 		
 		foreach($SerialNumbers as $serialnumbers){
-			//if($serialnumbers->total_in > $serialnumbers->total_out){
+			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_no))){
 				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-			//}	
+			}	
 			$values=$sr_nos;
 		}
 		//pr($values);exit;
