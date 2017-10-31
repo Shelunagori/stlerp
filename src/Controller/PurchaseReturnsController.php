@@ -1127,7 +1127,7 @@ class PurchaseReturnsController extends AppController
             if ($this->PurchaseReturns->save($purchaseReturn)) {
 				$this->PurchaseReturns->Ledgers->deleteAll(['voucher_id' => $purchaseReturn->id, 'voucher_source' => 'Purchase Return']);
 				$this->PurchaseReturns->ItemLedgers->deleteAll(['source_id' => $purchaseReturn->id, 'source_model' => 'Purchase Return','company_id'=>$st_company_id]);
-				$this->PurchaseReturns->ReferenceDetails->deleteAll(['invoice_booking_id' => $purchaseReturn->id]);
+				$this->PurchaseReturns->ReferenceDetails->deleteAll(['purchase_return_id' => $purchaseReturn->id]);
 				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
 					
 					
