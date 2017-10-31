@@ -252,13 +252,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					}
 				if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
-					/* if(@$sales_orders_qty[@$sales_order_rows->id] == @$sales_order_rows->quantity){
-						$disable_class="disabledbutton";
-					}else{
-						$disable_class="";
-					} */
-					
-					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){
+					/*
+					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ */
 					?>
 					
 						<tr class="tr1 firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
@@ -301,20 +296,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td></td>
 						</tr>
 						<?php 
-						
-							$options1=[]; 
-							foreach($sales_order_rows->item->item_serial_numbers as $item_serial_number){
-								$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-							} 
 							if($sales_order_rows->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
+						<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%']);  ?></td>
+							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_rows->item_id); ?>
 							<td></td>
-					</tr><?php }  ?>
-					<?php $q++; } endforeach; }?>
+						</tr><?php }  ?>
+					<?php $q++;  endforeach; }?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -722,7 +712,7 @@ $(document).ready(function() {
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,

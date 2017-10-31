@@ -250,8 +250,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan="6">
-								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$dmjain1992
-								); ?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
 							</td>
 						</tr><?php } ?>
 					
