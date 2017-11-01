@@ -72,25 +72,15 @@ if($transaction_date <  $start_date ) {
 								</td>
 								
 								<td width="30%">
-									<div class="row">
-										<div class="col-md-6 offset sr_container"></div>
-										<div class="col-md-6">
-											<table width="20%">
-												<tbody>
-													<tr>
-														<td>
-															<?php 
+									<div class="row" style="padding-left:2%">
+										
+									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; foreach($inventory_transfer_voucher_row_in->item->item_serial_numbers as $item_serial_number){
-										if($item_serial_number->item_id == $inventory_transfer_voucher_row_in->item_id && $item_serial_number->inventory_transfer_voucher_id == $inventoryTransferVouchers->id ){ ?>
-											<?php  if($item_serial_number->status=='Out'){   ?>
-											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 100px;','value' => $item_serial_number->serial_no,'disabled'=>true]); ?>
-											
-											<?php  } else {?>
-											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 100px;','value' => $item_serial_number->serial_no,'disabled'=>true]); ?>
-											
-											
-												<?=  $this->Html->link('<i class="fa fa-trash"></i> ',
+									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
+										&& $item_serial_number->status=='In'){ ?>
+											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name,'class'=>'sr_no']); ?>
+											<?=  $this->Html->link('<i class="fa fa-trash"></i> ',
 														['action' => 'DeleteSerialNumberIn', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 														[
 															'escape' => false,
@@ -99,12 +89,8 @@ if($transaction_date <  $start_date ) {
 														]
 													) ?>
 												
-										<?php  $i++; } }  }?>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
+										<?php echo "<br>"; $i++; } }  ?>
+										<div class="col-md-6 offset sr_container"></div>				
 									</div>
 									
 								</td>
@@ -114,7 +100,7 @@ if($transaction_date <  $start_date ) {
 								<td width="30%">
 									<?php echo $this->Form->input('amount', ['type' => 'textarea','label' => false,'value'=>$inventory_transfer_voucher_row_in->narration,'class' => 'form-control input-sm ','placeholder' => 'Narration']); ?>
 								</td>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a></td>
+								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a></td>
 							</tr>
 						<?php }?>
 						</tbody>
@@ -292,12 +278,27 @@ $(document).ready(function() {
 			var row_no=tr_obj.attr('row_no');
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');
 			for(var w=1; w<=qty-old_qty; w++){ 
-				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" />');
+				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" class="sr_no" style=" width: 120px;" />');
 			}
+			rename_input();
 		}else{
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');
 		}
 		
+	}
+	
+	rename_input();
+	function rename_input()
+	{
+		
+		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
+			var row_no =$(this).attr('row_no');
+			
+				$(this).find("td:nth-child(3) .sr_no").each(function()
+				{
+					$(this).attr({name:"inventory_transfer_voucher_rows["+row_no+"][sr_no][]"}).rules("add", "required");
+				});
+			});
 	}
 	
 rename_rows_in();

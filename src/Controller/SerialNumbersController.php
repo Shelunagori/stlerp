@@ -28,7 +28,7 @@ class SerialNumbersController extends AppController
     }
 	
 	
-	public function getSerialNumberList(){
+	public function getSerialNumberList($item_id=null){
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
 		$sr_nos=explode(',',$sr_nos);
@@ -123,6 +123,52 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['serialNumbers']);
 	}
 
+	public function getSerialNumberEditListById(){
+		$row_id=$this->request->query('inventory_transfer_voucher_row_id');
+		$sr_nos=$this->request->query('sr_nos');
+		$sr_no=explode(',',$sr_nos);//pr($sr_no);exit;
+		
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
+		
+		$totalInCase = $query->newExpr()
+			->addCase(
+				$query->newExpr()->add(['status' => 'In']),
+				$query->newExpr()->add(['name']),
+				'integer'
+			);
+		$totalOutCase = $query->newExpr()
+			->addCase(
+				$query->newExpr()->add(['status' => 'Out']),
+				$query->newExpr()->add(['name']),
+				'integer'
+			);
+
+			
+		$query->select([
+			'total_in' => $query->func()->count($totalInCase),
+			'total_out' => $query->func()->count($totalOutCase)
+		])
+		->where(['company_id'=>$st_company_id,'itv_row_id'=>$row_id])
+		->group('SerialNumbers.name')
+		->autoFields(true);
+		$SerialNumbers =$query->toArray();
+		
+		foreach($SerialNumbers as $serialnumbers){
+			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_no))){
+				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
+			}	
+			$values=$sr_no;
+		}
+		//pr($options);exit;
+        $this->set(compact('options', 'values'));
+        $this->set('_serialize', ['serialNumbers']);
+	}
     /**
      * View method
      *
