@@ -31,26 +31,28 @@
 							<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm ','data-date-format' => 'dd-mm-yyyy','value' =>date("d-m-Y",strtotime($financial_year->date_from)),'readonly']); ?>
 						</div>
 				</div>
-				<div class="col-md-1">
-						<div class="form-group">
-							<label class="control-label">Dr/Cr</label>
-							<?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm   refDrCr','value'=>'Dr']); ?>
-						</div>
-				</div>
 				
 				<div class="col-md-3">
 					<div class="form-group">
 						<label class="col-md-6 control-label">Amount</label>
-						<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm amount','placeholder'=>'Amount']); ?>
+						<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm mian_amount','placeholder'=>'Amount']); ?>
 						</div>
 				</div>
 				
+				<div class="col-md-1">
+						<div class="form-group">
+							<label class="control-label">Dr/Cr</label>
+							<?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Dr']); ?>
+						</div>
+				</div>
 				
 			<?= $this->Form->hidden('voucher_source',['value'=>'Opening Balance']) ?>
 			</div>
+			<?php $ref_types=['New Reference'=>'New Ref','Advance Reference'=>'Advance']; ?>
 	<table class="table table-bordered" id="main_table" style="width:83%">
 	<thead>
 	<tr>
+	<th>Ref Type</th>
 	<th>Ref. No.</th>
 	<th>Amount</th>
 	<th>Dr/Cr</th>
@@ -59,26 +61,24 @@
 	</thead>
 	<tbody id="main_tbody">
 		<tr id="main_tr">
-			<td width="28%"><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'distinctreference','label'=>false,'id'=>'reference_no_1']) ?></td>
-			<td width="35%"><?= $this->Form->input('amount[]',['type'=>'text','class'=>'credit','label'=>false, 'value'=>0]) ?></td>
-			<td width="15%"><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+			<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+			<td width="28%"><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'form-control input-sm','label'=>false,'id'=>'reference_no_1']) ?></td>
+			<td width="35%"><?= $this->Form->input('amount[]',['type'=>'text','class'=>'form-control input-sm mian_amount','label'=>false, 'value'=>0]) ?></td>
+			<td width="15%"><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Dr']); ?></td>
 			<td width="15%"><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row','label'=>false]) ?></td>
 		</tr>
 	</tbody>
+	<tfoot>
+			<tr>
+				<td colspan="2" align="center" style="vertical-align: middle !important;">On Account</td>
+				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+				<td><?php echo $this->Form->input('on_ac_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
+			</tr>
+		</tfoot>
 	</table>
-	
-	<div class="row">
-			<div class="col-md-3">
-			</div>
-			<div class="col-md-2">
-			<input type="text" class="form-control input-sm rightAligntextClass noBorder " name="totalMainDr" id="totalMainDr" readonly>
-			</div>
-	</div>
-	
 	<button class="btn btn-sm btn-primary" name="submit" value="save" type="submit">Submit</button>
 	</div>
     
-    <?= $this->Form->end() ?>
     <?= $this->Form->end() ?>
 	
 </div>
@@ -86,9 +86,10 @@
 <table class="table table-bordered" id="temp_table" style="display:none;">
 <tbody id="temp_tbody">
 	<tr id="main_tr">
-	<td><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'distinctreference','label'=>false,'id'=>'reference_no_2']) ?></td>
-	<td><?= $this->Form->input('amount[]',['type'=>'text','class'=>'credit','label'=>false, 'value'=>0]) ?></td>
-	<td><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+	<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+	<td><?= $this->Form->input('reference_no[]',['type'=>'text','class'=>'form-control input-sm','label'=>false,'id'=>'reference_no_2']) ?></td>
+	<td><?= $this->Form->input('amount[]',['type'=>'text','class'=>'form-control input-sm mian_amount','label'=>false, 'value'=>0]) ?></td>
+	<td><?php echo $this->Form->input('type_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Dr']); ?></td>
 	<td><?= $this->Form->button(__('<i class="fa fa-plus"></i>'),['type'=>'button','class'=>'add_row add_row1','label'=>false]) ?><?= $this->Form->button(__('<i class="fa fa-minus"></i>'),['type'=>'button','class'=>'remove_row','label'=>false]) ?></td>
 	</tr>
 </tbody>
@@ -119,12 +120,6 @@ $(document).ready(function() {
 				},
 			},
 
-		messages: { // custom messages for radio buttons and checkboxes
-			'reference_no[]': {
-				remote: "Reference no. is alredy taken."
-			},
-			
-		},
 
 		errorPlacement: function (error, element) { // render error placement for each input type
 			if (element.parent(".input-group").size() > 0) {
@@ -170,8 +165,6 @@ $(document).ready(function() {
 			
 			var total_amt=$('.amount').val();
 			var totalMainDr=$('#totalMainDr').val();
-			alert(totalMainDr)
-			alert(total_amt)
 			
 			success3.show();
 			error3.hide();
@@ -187,50 +180,118 @@ $(document).ready(function() {
 		var new_line=$('#temp_table tbody#temp_tbody').html(); 
 		$("#main_table tbody#main_tbody").append(new_line);
 		var i=1;
-		rename_rows();
+		rename_ref_rows();
 	});
-	
-	$('.credit').live("keyup",function() {
-		rename_rows();
-	});
-	
-	$('.drcrChange').live("change",function() { 
-		rename_rows();
-	});
-	
-	
-	function rename_rows(){
-		var total_dr=0;
-		var total_cr=0;
-		var type=$('.refDrCr').val();
-		
-		
-		$("#main_table tbody#main_tbody tr").each(function(){
-			var dr_cr=$(this).find("td:nth-child(3) select").val();
-			if(dr_cr=="Cr"){
-				var amt=parseFloat($(this).find("td:nth-child(2) input").val());
-				total_cr=total_cr+amt;
-			}else{
-				var amt=parseFloat($(this).find("td:nth-child(2) input").val());
-				total_dr=total_dr+amt;
-			}
+	rename_ref_rows();
+	function rename_ref_rows(){
+		var i=0;
+		$("#main_table tbody#main_tbody tr").each(function(){ 
+			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+i+"][ref_type]", id:"ref_rows-"+i+"-ref_type"}).rules("add", "required");
+			
+			$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
+			
+			$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
+			
+			$(this).find("td:nth-child(4) select").attr({name:"ref_rows["+i+"][ref_cr_dr]", id:"ref_rows-"+i+"-ref_cr_dr"}).rules("add", "required"); 
+			i++;
 		});
 		
-		if(total_dr > total_cr){
-			var total_amt=$('.amount').val();
-			var refamt=total_dr-total_cr;
-			$('#totalMainDr').val(refamt.toFixed(2));
-		}else if(total_dr < total_cr){
-			var total_amt=$('.amount').val();
-			var refamt=total_cr-total_dr;
-			$('#totalMainDr').val(refamt.toFixed(2));
+	}
+	$('.cr_dr_amount').live("change",function() {
+		do_ref_total();
+	});
+	$('.mian_amount').live("blur",function() {
+		var v=parseFloat($(this).val());
+		if(!v){ v=0; }
+		$(this).val(v.toFixed(2));
+	});
+	
+	$('.mian_amount').live("keyup",function() {
+		do_ref_total();
+	});
+	function do_ref_total(){
+		var main_amount=$('input[name=amount]').val();
+		var main_cr_dr=$('select[name=type_cr_dr]').val();
+		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
+		$("#main_table tbody#main_tbody tr").each(function(){
+			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
+			if(!am){ am=0; }
+			
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
+			
+		});
+		var on_acc=0;
+		var total_ref=0;
+		var on_acc_cr_dr='';
+		if(main_cr_dr=='Dr')
+		{
+			on_acc_cr_dr='Dr';
+			if(total_ref_dr > total_ref_cr)
+			{
+				total_ref=total_ref_dr-total_ref_cr;
+				on_acc=main_amount-total_ref;
+				
+			}
+			else if(total_ref_dr < total_ref_cr)
+			{
+				total_ref=total_ref_dr-total_ref_cr;
+				on_acc=main_amount-total_ref;
+			}
+			else
+			{
+				on_acc=main_amount;
+			}
+			if(on_acc>=0){
+				on_acc=Math.abs(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc_cr_dr);
+			}else{
+				on_acc=Math.abs(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val('Cr');
+			}
 		}
-		else{
-			$('#totalMainDr').val(0);
+		else
+		{
+			on_acc_cr_dr='Cr';
+			if(total_ref_dr < total_ref_cr)
+			{
+				total_ref=total_ref_cr-total_ref_dr;
+				on_acc=main_amount-total_ref;
+			}
+			else if(total_ref_dr > total_ref_cr)
+			{
+				total_ref=total_ref_cr-total_ref_dr;
+				on_acc=main_amount-total_ref;
+			}
+			else
+			{
+				on_acc=main_amount;
+			}
+			if(on_acc>=0){
+				on_acc=Math.abs(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc_cr_dr);
+				
+			}else{
+				on_acc=Math.abs(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val('Dr');
+			}
 		}
-		
 		
 	}
+	
 	
 	$('.remove_row').live("click",function() {
 		$(this).closest("#main_table tr").remove();
