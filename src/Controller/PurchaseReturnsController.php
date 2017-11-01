@@ -162,9 +162,13 @@ class PurchaseReturnsController extends AppController
 					$PurchaseReturnQty[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->totalQty;
 					$remainingQty[$purchase_return_row->invoice_booking_row_id]=$invoice_booking_row->quantity-$purchase_return_row->totalQty;
 				}
-			}				
+			}
+            else
+            {
+				    $remainingQty[$invoice_booking_row->id] = $invoice_booking_row->quantity;
+            }				
 		}
-		pr($invoiceBooking);exit;
+		//pr($invoiceBooking);exit;
 			   $st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
@@ -1028,6 +1032,7 @@ class PurchaseReturnsController extends AppController
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
         ]);
+		
 		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
             'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])

@@ -16,7 +16,7 @@
 						<tr>
 							<th>Sr. No.</th>
 							<th>Employee Name</th>
-							<th>No Of Days</th>
+							<th>No of Days</th>
 							<th class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>

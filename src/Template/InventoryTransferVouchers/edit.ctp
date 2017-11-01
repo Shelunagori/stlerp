@@ -62,7 +62,7 @@ if($transaction_date <  $start_date ) {
 										</tr>
 									</thead>
 							<tbody id="maintbody">
-						<?php $options1= [];	foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
+						<?php $options1= []; foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
 										?>
 								<tr class="main">
 									<td width="30%">
@@ -76,23 +76,22 @@ if($transaction_date <  $start_date ) {
 									<?php
 									$selected=[]; $options=[];
 									
-									foreach($inventory_transfer_voucher_row->item->item_serial_numbers as $item_serial_number){
-									
-										if($item_serial_number->inventory_transfer_voucher_id == $id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id 
+									foreach($inventory_transfer_voucher_row->item->serial_numbers as $item_serial_number){
+									   if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row->id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id 
 										&&$item_serial_number->status=='Out'){
-										
 										$selected[$item_serial_number->id]=$item_serial_number->id;
 										}
 									} 
 								
-									foreach($inventory_transfer_voucher_row->item->item_serial_numbers as $item_serial_number){
+									foreach($inventory_transfer_voucher_row->item->serial_numbers as $item_serial_number){
 										if(
-($item_serial_number->inventory_transfer_voucher_id == $id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id ) || $item_serial_number->status=='In'){
+($item_serial_number->itv_row_id == $inventory_transfer_voucher_row->id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id ) || $item_serial_number->status=='In'){
 										$options[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
 										
 									}}
 									if(!empty($options)){
 									 echo $this->Form->input('q', ['label'=>false,'options' => $options,'multiple' => 'multiple','class'=>'form-control input-sm ','required ','style'=>'width:100%','value'=>$selected]); 
+									 
 									}else{
 										//echo "Serial No Not Selected";
 									} 
@@ -145,7 +144,7 @@ if($transaction_date <  $start_date ) {
 														<td>
 															<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; foreach($inventory_transfer_voucher_row_in->item->item_serial_numbers as $item_serial_number){
+									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										if($item_serial_number->item_id == $inventory_transfer_voucher_row_in->item_id && $item_serial_number->inventory_transfer_voucher_id == $inventoryTransferVouchersins->id ){ ?>
 											<?php if($item_serial_number->status=='Out'){  ?>
 											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 65px;','value' => $item_serial_number->serial_no,'disabled'=>true]); ?>
