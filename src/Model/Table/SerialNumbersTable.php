@@ -64,6 +64,11 @@ class SerialNumbersTable extends Table
             'foreignKey' => 'invoice_row_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('SaleReturnRows', [
+            'foreignKey' => 'sales_return_row_id',
+            'joinType' => 'INNER'
+        ]);
+		
     }
 
     /**

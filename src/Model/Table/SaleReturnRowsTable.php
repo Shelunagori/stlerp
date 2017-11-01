@@ -49,6 +49,10 @@ class SaleReturnRowsTable extends Table
             'foreignKey' => 'invoice_row_id',
             'joinType' => 'INNER'
         ]);
+		$this->hasMany('SerialNumbers', [
+            'foreignKey' => 'sales_return_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
