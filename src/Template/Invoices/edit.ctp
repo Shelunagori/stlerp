@@ -247,14 +247,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							
 							</td>
 						</tr>
+					<?php if(@$sales_order_row->item->item_companies[0]->serial_number_enable==1){ ?>
 						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan="6">
 								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
 							</td>
-						</tr><?php } ?>
+					</tr><?php } ?>
 					
-					<?php $q++;   ?>
+					<?php $q++; }  ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">

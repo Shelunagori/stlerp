@@ -122,7 +122,70 @@ class SerialNumbersController extends AppController
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
 	}
+	
+	
+	public function getSerialNumberSalesReturnList(){
+		 $item_id=$this->request->query('item_id'); 
+		 $in_row_id=$this->request->query('in_row_id'); 
+		
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+        $query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
+		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out']);
+		$SerialNumbers_out = $query->toArray();
+		
+		$serialnumbers_in = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In'])->toArray();
 
+		$out_dropdown = array_diff($SerialNumbers_out,$serialnumbers_in);
+		foreach($out_dropdown as $option){  	
+			$options[]=['text' =>$option, 'value' => $option];
+		}
+		
+        $this->set(compact('options', 'values','out_dropdown'));
+        $this->set('_serialize', ['out_dropdown']);
+	}
+
+	
+	public function getSerialNumberSalesReturnEditList(){
+		
+		$item_id=$this->request->query('item_id'); 
+		$in_row_id=$this->request->query('in_row_id'); 
+		$sale_row_id=$this->request->query('sale_row_id'); 
+		
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+        $query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
+		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out']);
+		$SerialNumbers_out = $query->toArray();
+		
+		$serialnumbers_in = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In'])->toArray();
+		
+		$serialnumbers_in1 = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In','sales_return_row_id'=>$sale_row_id])->toArray();
+		
+		
+		foreach($serialnumbers_in1 as $sr_in) {
+			$values=$sr_in;
+			$options[]=['text' =>$sr_in, 'value' => $sr_in];
+		}
+		
+		$out_dropdown = array_diff($SerialNumbers_out,$serialnumbers_in);
+		
+		foreach($out_dropdown as $option){  	
+			$options[]=['text' =>$option, 'value' => $option];
+			
+		}
+		
+        $this->set(compact('options', 'values','out_dropdown'));
+        $this->set('_serialize', ['out_dropdown']);
+	}
     /**
      * View method
      *

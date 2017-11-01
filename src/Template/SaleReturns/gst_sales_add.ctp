@@ -300,11 +300,12 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							} 
 							if($invoice_row->item->item_companies[0]->serial_number_enable==1) { ?>
 							<tr class="tr3" row_no='<?php echo @$invoice_row->id; ?>'>
-							<td></td>
-							<td colspan="<?php echo $tr2_colspan; ?>">
-							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']);  ?></td>
-							<td></td>
+								<td></td>
+								<td colspan="<?php echo $tr2_colspan; ?>">
+								<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnList?item_id='.$invoice_row->item_id.'&in_row_id='.$invoice_row->id); ?>
+								</td>
+								<td></td>
 							</tr><?php } ?>
 						<?php $q++; endforeach; }?>
 				</tbody>
@@ -715,7 +716,7 @@ $(document).ready(function() {
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][itm_serial_number][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,

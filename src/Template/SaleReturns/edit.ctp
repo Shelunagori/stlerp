@@ -149,31 +149,18 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 							</td>
 						</tr>
 						
-						<?php if(@$invoice_row->item->item_companies[0]->serial_number_enable==1){
+						<?php if($invoice_row->item->item_companies[0]->serial_number_enable==1){
 						?>
 						
 						<tr class="tr2" row_no="<?= h($q) ?>">
-						<?php $options1=[]; $choosen=[];
-							 
-								foreach(@$invoice_row->item->serial_numbers as $item_serial_numbers){
-
-									$options1[]=['text' =>$item_serial_numbers->serial_name, 'value' => $item_serial_numbers->id];
-									
-									if($item_serial_numbers->sale_return_id==$saleReturn->id){
-										$item_serial_no=$invoice_row->item_serial_number;
-										$choosen[]=$item_serial_no;
-									}
-										//pr()
-								}
-						?>
 							<td></td>
 							<td colspan="6">
-							<?php echo $this->Form->input('itm_serial_number', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me itm_serial_number','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
+							</td>
 						</tr>
 					<?php  } 
 					$q++; 
 					}?>
-					<?php   ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
@@ -475,9 +462,9 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
 				$(this).css('background-color','#fffcda');
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').length;
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){ 	
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) .itm_serial_number').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][itm_serial_number][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,

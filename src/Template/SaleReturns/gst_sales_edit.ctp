@@ -308,37 +308,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</tr>
 						<?php 
 						
-							/* $options1=[]; 
-							foreach($invoice_row->item->item_serial_numbers as $item_serial_number){
-								$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-							}  */
-							
-							 $options1=[]; $choosen=[];
-							if(sizeof(@$invoice_row->item->serial_numbers)>0){
-								foreach($invoice_row->item->serial_numbers as $item_serial_numbers){
-								
-								if($item_serial_numbers->invoice_id ==$invoice->id){
-									$options1[]=['text' =>$item_serial_numbers->serial_name, 'value' => $item_serial_numbers->id];
-									//pr($item_serial_numbers->serial_no);
-								}
-								
-								if($item_serial_numbers->sale_return_id ==$saleReturn->id){
-									$choosen[]=$item_serial_numbers->id;
-									//pr($item_serial_numbers->serial_no);
-								}
-							}
-							}		//$item_serial_no=$invoice_row->item_serial_number;
-									//$choosen=explode(",",$item_serial_no);
-							
-							
-							if($invoice_row->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no='<?php echo @$invoice_row->id; ?>'>
+						if($invoice_row->item->item_companies[0]->serial_number_enable==1) { ?>
+						<tr class="tr3" row_no='<?php echo @$invoice_row->id; ?>'>
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%','value'=>$choosen]);  ?></td>
+							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
+							</td>
 							<td></td>
-							</tr><?php } ?>
+						</tr><?php } ?>
 						<?php $q++; endforeach; }?>
 				</tbody>
 				<tfoot><?php 
@@ -766,7 +744,7 @@ $(document).ready(function() {
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][itm_serial_number][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
