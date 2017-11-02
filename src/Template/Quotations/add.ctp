@@ -568,7 +568,6 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input").attr({name:"quotation_rows["+i+"][quantity]", id:"quotation_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
-						digits: true,
 						min: 1,
 						messages: {
 							min: "Quantity can't be zero."
@@ -626,10 +625,10 @@ $(document).ready(function() {
 			var unit=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
 			var Amount=unit*Rate;
-			$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			total=total+Amount;
 		});
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 	}
 	
 	$('.select_address').on("click",function() { 
