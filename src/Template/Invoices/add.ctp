@@ -871,10 +871,10 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
-				var qty=parseInt($(this).find("td:nth-child(3) input").val());
+				var qty=parseFloat($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=qty*Rate;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
 				if(isNaN(sale_tax)) { var sale_tax = 0; }
