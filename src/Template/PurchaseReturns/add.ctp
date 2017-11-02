@@ -127,11 +127,11 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 				</thead>
 				<tbody>
 					<?php
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
+					$q=0; $p=1; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
 						//if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
 					?>
-						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td ><?php echo ++$q; ?></td>
+						<tr class="tr1" row_no='<?php echo @$q; ?>'>
+							<td ><?php echo $p++; ?></td>
 							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
@@ -148,15 +148,15 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 						</tr>
 						
 						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
-						<tr class="tr2" row_no="<?php echo @$invoice_booking_row->id; ?>">
+						<tr class="tr2" row_no="<?php echo @$q; ?>">
 							<td></td>
 							<td colspan="6">
 								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?item_id='.$invoice_booking_row->item_id); ?>
 							</td>
 						</tr>
-					<?php }  ?>
+					<?php } $q++;  ?>
 					
-						<?php  //}
+						<?php  
 						endforeach; ?>
 				</tbody>
 			</table>
@@ -246,33 +246,7 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
-	jQuery.validator.addMethod("noSpace", function(value, element) { 
-	  return value.indexOf(" ") < 0 && value != ""; 
-	}, "No space please and don't leave it empty");
 	
-	jQuery.validator.addMethod("notEqualToGroup", function (value, element, options) {
-		// get all the elements passed here with the same class
-		var elems = $(element).parents('form').find(options[0]);
-		// the value of the current element
-		var valueToCompare = value;
-		// count
-		var matchesFound = 0;
-		// loop each element and compare its value with the current value
-		// and increase the count every time we find one
-		jQuery.each(elems, function () {
-			thisVal = $(this).val();
-			if (thisVal == valueToCompare) {
-				matchesFound++;
-			}
-		});
-		// count should be either 0 or 1 max
-		if (this.optional(element) || matchesFound <= 1) {
-			//elems.removeClass('error');
-			return true;
-		} else {
-			//elems.addClass('error');
-		}
-	}, jQuery.format("Please enter a Unique Value."));
 	//--------- FORM VALIDATION
 	var form3 = $('#form_sample_3');
 	var error3 = $('.alert-danger', form3);
@@ -339,19 +313,16 @@ $(document).ready(function() {
 
 		submitHandler: function (form) {
 			
-			rename_rows();
 			success3.show();
 			error3.hide();
 			form[0].submit();
 		}
 	});	
 
-	
 	$('.rename_check').die().live("click",function() {
 		rename_rows();    calculate_total();
     });	
-	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
+	$('.quantity').die().live("keyup",function() {  
 			rename_rows(); 
     });
 	rename_rows();
@@ -370,10 +341,10 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","purchase_return_rows["+row_no+"][total]").attr("id","purchase_return_rows-"+row_no+"-total").rules("add", "required");
 				$(this).css('background-color','#fffcda');
-				var qty=$(this).find('td:nth-child(4) input[type="text"]').val();
-				
+				var qty=$(this).find('td:nth-child(4) input').val();
 				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
-				if(serial_l>0){ 	
+				
+				if(serial_l>0){
 					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qty,
@@ -383,8 +354,9 @@ $(document).ready(function() {
 								minlength: "select serial number equal to quantity."
 							}
 					});
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 				}
+				
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
 				$(this).find('td:nth-child(2) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
@@ -403,10 +375,6 @@ $(document).ready(function() {
 			
 		});
 	}
-	
-	$('.quantity').die().live("keyup",function() {
-			calculate_total(); 
-    });
 	
 	calculate_total();
 	function calculate_total(){

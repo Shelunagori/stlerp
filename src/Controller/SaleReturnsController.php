@@ -601,14 +601,7 @@ class SaleReturnsController extends AppController
             $saleReturn = $this->SaleReturns->patchEntity($saleReturn, $this->request->data);
 			$ref_rows=@$this->request->data['ref_rows'];
             $saleReturn = $this->SaleReturns->patchEntity($saleReturn, $this->request->data);
-			foreach($saleReturn->sale_return_rows as $sale_return_row){  
-		
-				if($sale_return_row->itm_serial_number){
-					$item_serial_no=implode(",",$sale_return_row->itm_serial_number );
-					$sale_return_row->itm_serial_number=$item_serial_no;
-				}
-					
-			}
+			
 			//pr($sale_return_row->itm_serial_number); exit;
 			$saleReturn->date_created=$date_created;
 			$saleReturn->invoice_id=$invoice_id;

@@ -8,8 +8,12 @@
 .add_check_text{
 	font-size:9px;
 }	
-.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table > thead > tr > td, table > tbody > tr > td, table > tfoot > tr > td{
 	vertical-align: top !important;
+	border-bottom:solid 1px #CCC;
+}
+.help-block-error{
+	font-size: 10px;
 }
 #main_tb thead th {
 	font-size:10px;
@@ -125,7 +129,7 @@ if($transaction_date <  $start_date ) {
 					<?php } ?>
 				</div>
 			<div style="overflow: auto;">
-			<input type="text"  name="checked_row_length" id="checked_row_length" style="height: 0px;padding: 0;border: none;" value="" />
+			<input type="text"  name="checked_row_length" id="checked_row_length" style="height: 0px;padding: 0;border: none;" />
 				<table class="table tableitm" id="main_tb">
 				<thead>
 					<tr>
@@ -135,37 +139,42 @@ if($transaction_date <  $start_date ) {
 						<th align="center" width="10%">Quantity</th>
 						<th align="center" width="10%">Ammount</th>
 						<th  width="4%"></th>
-						
 					</tr>
 				</thead>
-				<tbody>
+				<tbody id='main_tbody'>
 					<?php
 					foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
 						//pr($purchase_return_row);
 					}
 					
 					
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
-						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td ><?php echo ++$q; ?>
-							<?php echo $this->Form->input('purchase_return_rows.'.$q.'id', ['class' => 'invoice','type'=>'hidden','value' => @$purchaseReturnRowId[@$invoice_booking_row->id]]); ?>
+					$q=0; $p=1;  foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
+						<tr class="tr1" row_no='<?= h($q) ?>'>
+							<td ><?php echo $p++; ?>
+								<?php echo $this->Form->input('purchase_return_rows.'.$q.'id', ['class' => 'invoice','type'=>'hidden','value' => @$purchaseReturnRowId[@$invoice_booking_row->id]]); ?>
 							</td>
-							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
+							<td style="white-space: nowrap;">
+								<?php echo $invoice_booking_row->item->name; ?>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
 							</td>
-							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_quantity',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->quantity]); ?>
+							<td>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_quantity',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->quantity]); ?>
 							</td>
-							<td><?php 
-							if(!empty(@$purchaseReturnRowItemDetail[@$invoice_booking_row->id]))
-							{
-								$data = explode(',',$purchaseReturnRowItemDetail[@$invoice_booking_row->id]);
-							}
+							<td>
+								<?php 
+								if(!empty(@$purchaseReturnRowItemDetail[@$invoice_booking_row->id]))
+								{
+									$data = explode(',',$purchaseReturnRowItemDetail[@$invoice_booking_row->id]);
+								}
 							
-							echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>@$data[0],'max'=>@$maxQty[@$invoice_booking_row->id]]); ?></td>
-							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
-							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.total',['label' => false,'class' => 'form-control input-sm','type'=>'text','value'=>@$data[1]]); ?></td>
+								echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm quantity','type'=>'text','value'=>@$data[0],'max'=>@$maxQty[@$invoice_booking_row->id]]); ?>
+							</td>
+							<td>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.ib_ammount',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->total]); ?>
+								<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.total',['label' => false,'class' => 'form-control input-sm','type'=>'text','value'=>@$data[1]]); ?>
+							</td>
 							<td>
 								<?php $checked2="";
 									if(@$data[0] > 0)
@@ -175,10 +184,23 @@ if($transaction_date <  $start_date ) {
 										$checked2="";
 									} 
 								?>
-								<label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->item->id,$checked2]); ?></label>
+								<label>
+								<div class="checkbox-list" data-error-container="#form_2_services_error">
+								<label>
+									<?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->item->id,$checked2]); ?>
+								</label>
+								</div>
 							</td>
 						</tr>
-					<?php   endforeach; ?>
+						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						
+						<tr class="tr2" row_no="<?= h($q) ?>">
+							<td></td>
+							<td colspan='7'>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnEditList?item_id='.$invoice_booking_row->item_id.'&purchsereturn_row_id='.@$purchaseReturnRowId[@$invoice_booking_row->id]); ?>
+							</td>
+						</tr>
+					<?php }   $q++;   endforeach; ?>
 				</tbody>
 			</table>
 			</div>
@@ -384,7 +406,6 @@ $(document).ready(function() {
 		submitHandler: function (form) {
 			$('#add_submit').prop('disabled', true);
 			$('#add_submit').text('Submitting.....');
-			rename_rows();
 			success3.show();
 			error3.hide();
 			form[0].submit();
@@ -392,13 +413,15 @@ $(document).ready(function() {
 	});	
 
 	
-	$('.rename_check').die().live("click",function() {
+
+	$('.rename_check').die().live("click",function() { 
 		rename_rows();    calculate_total();
     });	
-	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
+	
+	$('.quantity').die().live("keyup",function() {  
 			rename_rows(); 
     });
+
 	rename_rows();
 	function rename_rows(){
 		var i=0;
@@ -416,6 +439,21 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","purchase_return_rows["+row_no+"][total]").attr("id","purchase_return_rows-"+row_no+"-total").rules("add", "required");
 				$(this).css('background-color','#fffcda');
+				var qty=$(this).find('td:nth-child(4) input[type="text"]').val();
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+						    required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+				}
+				
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
 				$(this).find('td:nth-child(2) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
@@ -423,17 +461,22 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(5) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).css('background-color','#FFF');
-				
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
+				}
 			} 
 			
 			$('input[name="checked_row_length"]').val(i);
 			
 		});
-		calculate_total();
+		
 	}
-	$('.quantity').die().live("keyup",function() {
-			calculate_total(); 
-    });
+	
+	
+	
+	
 	calculate_total();
 	function calculate_total(){
 		var grand_total=0;
@@ -529,6 +572,7 @@ rename_ref_rows();
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
+	
 	do_ref_total();
 	function do_ref_total(){
 		var main_amount=parseFloat($('input[name="grand_total"]').val());
