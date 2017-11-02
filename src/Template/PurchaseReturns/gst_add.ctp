@@ -189,11 +189,11 @@
 								
 							}
 							
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): 
-							if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+					$q=0; $p=1; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): 
+							//if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
 					?>
-						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
+						<tr class="tr1" row_no='<?php echo @$q; ?>'>
+							<td rowspan="2"><?php echo $p++; ?></td>
 							
 							<td style="white-space: nowrap;"><?php echo @$invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal item','type'=>'hidden','value' => @$invoice_booking_row->item->id,'popup_id'=>$q]); ?>
@@ -264,15 +264,23 @@
 							<td><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->id]); ?>
 							</td>
 						</tr>
-						<tr class="tr2" row_no='<?php echo @$invoice_booking_row->id; ?>'>
+						<tr class="tr2" row_no='<?php echo @$q; ?>'>
 							<td colspan="15">
 							<?php echo $this->Text->autoParagraph($invoice_booking_row->description); ?>
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.description',['label' => false,'class' => 'form-control input-sm','type'=>'hidden','value'=>$invoice_booking_row->description]); ?>
 							</td>
 							<td></td>
 						</tr>
-
-							<?php } $q++;  endforeach; ?>
+						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						<tr class="tr3" row_no="<?php echo @$q; ?>">
+							<td></td>
+							<td colspan="18">
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?item_id='.$invoice_booking_row->item_id); ?>
+							</td>
+						</tr>
+					<?php } ?>
+							<?php //}
+							$q++;  endforeach; ?>
 				
 				</tbody>
 				<tfoot>
@@ -657,6 +665,24 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').find('td:nth-child(1) input').attr("name","purchase_return_rows["+row_no+"][description]").attr("id","purchase_return_rows-"+row_no+"-description").rules("add", "required");
+				
+				var qty=$(this).find('td:nth-child(4) input').val();
+				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				
+				if(serial_l>0){
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+						    required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+				}
+				
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
+				
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
