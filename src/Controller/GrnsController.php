@@ -170,7 +170,7 @@ class GrnsController extends AppController
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) {
 						   return $q
-								->where(['PurchaseOrderRows.quantity > PurchaseOrderRows.processed_quantity'])
+								//->where(['PurchaseOrderRows.quantity > PurchaseOrderRows.processed_quantity'])
 								->contain(['ItemCompanies']);
 						},'Companies','Vendors'
 					]

@@ -149,7 +149,9 @@ class PurchaseReturnsController extends AppController
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
 										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
 		$PurchaseReturnQty=[];
 		$remainingQty=[];

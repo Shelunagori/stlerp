@@ -137,15 +137,10 @@ if($transaction_date <  $start_date ) {
 							<?php  
 							$min_val=0;
 							$min_val1=0;
-<<<<<<< HEAD
 							foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ 
 										if($item_serial_number->status=='Out'){ 
-=======
-							foreach($grn->serial_numbers as $serial_number){
-									if($serial_number->item_id == $grn_rows->item_id){ 
-										if($serial_number->status=='Out'){ 
->>>>>>> origin/master
+
 										$min_val=$min_val+1;
 										}
 										$min_val1++;
@@ -189,13 +184,10 @@ if($transaction_date <  $start_date ) {
 								
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$grn_rows->id; ?>'>
-<<<<<<< HEAD
-								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
-									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
-=======
+
 								<?php  $i=1; foreach($grn->serial_numbers as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){ ?>
->>>>>>> origin/master
+
 									<div style="margin-bottom:6px;">
 									<?php echo $this->Form->input('serial_numbers['.$grn_rows->item_id.']['.$i.']', ['label' => false,'type'=>'hidden','class'=>'sr_no','ids'=>'sr_no['.$i.']','value' => $serial_number->name,'readonly']); ?>
 									</div>
@@ -204,12 +196,7 @@ if($transaction_date <  $start_date ) {
 								
 								</td>
 								<td colspan="1" class="demo">
-									
-<<<<<<< HEAD
-								<?php  $i=1; foreach($grn->serial_numbers as $item_serial_number){
-									if($item_serial_number->item_id == $grn_rows->item_id){ ?>
-										<?php if($item_serial_number->status=='Out'){  ?>
-=======
+
 								<?php  $i=1;  
 								foreach($grn->serial_numbers as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){
@@ -222,7 +209,7 @@ if($transaction_date <  $start_date ) {
 								
 								?>
 										<?php if($serial_number->status=='Out'){  ?>
->>>>>>> origin/master
+
 										<div class="row">
 										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										</div>

@@ -128,7 +128,7 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 				<tbody>
 					<?php
 					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
-						if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+						//if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
 					?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
 							<td ><?php echo ++$q; ?></td>
@@ -146,7 +146,18 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 								<label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->item->id]); ?></label>
 							</td>
 						</tr>
-						<?php  } endforeach; ?>
+						
+						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						<tr class="tr2" row_no="<?php echo @$invoice_booking_row->id; ?>">
+							<td></td>
+							<td colspan="6">
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?item_id='.$invoice_booking_row->item_id); ?>
+							</td>
+						</tr>
+					<?php }  ?>
+					
+						<?php  //}
+						endforeach; ?>
 				</tbody>
 			</table>
 			</div>
@@ -359,6 +370,21 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","purchase_return_rows["+row_no+"][total]").attr("id","purchase_return_rows-"+row_no+"-total").rules("add", "required");
 				$(this).css('background-color','#fffcda');
+				var qty=$(this).find('td:nth-child(4) input[type="text"]').val();
+				
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){ 	
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+						    required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+				}
 			}else{
 				$(this).find('td:nth-child(2) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
@@ -366,7 +392,11 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(5) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).css('background-color','#FFF');
-				
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
+				}
 			} 
 			
 			$('input[name="checked_row_length"]').val(i);

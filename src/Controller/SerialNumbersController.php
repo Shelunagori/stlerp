@@ -186,6 +186,31 @@ class SerialNumbersController extends AppController
         $this->set(compact('options', 'values','out_dropdown'));
         $this->set('_serialize', ['out_dropdown']);
 	}
+	
+	public function getSerialNumberPurchaseReturnList(){
+		$item_id=$this->request->query('item_id'); 
+		
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+        $query = $this->SerialNumbers->find('list')->contain(['Grns'=>['GrnRows']]);
+		$query->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'SerialNumbers.status'=>'In']);
+		$SerialNumbers_in = $query->toArray();
+		
+		$serialnumbers_out = $this->SerialNumbers->find('list')->contain(['Grns'=>['GrnRows']])->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.status'=>'Out'])->toArray();
+
+		
+		$out_dropdown = array_diff($SerialNumbers_in,$serialnumbers_out);
+		foreach($out_dropdown as $option){  	
+			$options[]=['text' =>$option, 'value' => $option];
+		}
+		
+        $this->set(compact('options', 'values','out_dropdown'));
+        $this->set('_serialize', ['out_dropdown']);
+	}
     /**
      * View method
      *
