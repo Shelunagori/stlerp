@@ -28,7 +28,7 @@ class SerialNumbersController extends AppController
     }
 	
 	
-	public function getSerialNumberList(){
+	public function getSerialNumberList($item_id=null){
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
 		$sr_nos=explode(',',$sr_nos);
@@ -149,7 +149,7 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['out_dropdown']);
 	}
 
-	
+
 	public function getSerialNumberSalesReturnEditList(){
 		
 		$item_id=$this->request->query('item_id'); 
@@ -162,6 +162,7 @@ class SerialNumbersController extends AppController
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
+
         $query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
 		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out']);
 		$SerialNumbers_out = $query->toArray();
