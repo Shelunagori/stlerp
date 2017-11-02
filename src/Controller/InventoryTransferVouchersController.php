@@ -518,7 +518,7 @@ class InventoryTransferVouchersController extends AppController
 					}
 					
 					
-					$Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row_data['item_id'],'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0 ,'quantity >'=>0]);
+					/* $Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row_data['item_id'],'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0 ,'quantity >'=>0]);
 					$ledger_data=$Itemledgers->count();
 					
 					if($ledger_data>0){ 
@@ -535,9 +535,53 @@ class InventoryTransferVouchersController extends AppController
 						$total_amount=0;
 						$qty_total=1;
 					}
-				
-				
-					$per_unit_cost=$total_amount/$qty_total;
+				 */
+				    $stock=[];  $sumValue=[];
+					
+					$StockLedgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$inventory_transfer_voucher_row_data['item_id'],'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+					foreach($StockLedgers as $StockLedger)
+					{ 
+						if($StockLedger->in_out=='In')
+						{
+							if($StockLedger->source_model=='Inventory Transfer Voucher')
+							{
+								for($inc=0;$inc<$StockLedger->quantity;$inc++)
+								{
+									$stock[$inventory_transfer_voucher_row_data['item_id']][]=$StockLedger->rate;
+								}
+							}
+						}
+					}
+					foreach($StockLedgers as $StockLedger)
+					{
+						if($StockLedger->in_out=='Out')
+						{
+							if(sizeof(@$stock[$inventory_transfer_voucher_row_data['item_id']])>0)
+							{
+								$stock[$inventory_transfer_voucher_row_data['item_id']] = array_slice($stock[$inventory_transfer_voucher_row_data['item_id']], $StockLedger->quantity); 
+							}
+						}
+					}
+					//echo "hello"; exit;
+					$totalNo=[];
+					if(sizeof(@$stock[$inventory_transfer_voucher_row_data['item_id']]) > 0){ 
+					 $total_no=1;
+						foreach(@$stock[$inventory_transfer_voucher_row_data['item_id']] as $stockRate){
+							@$sumValue[$inventory_transfer_voucher_row_data['item_id']]+=@$stockRate;
+							$total_no++;
+						}
+						@$totalNo[$inventory_transfer_voucher_row_data['item_id']]=@$total_no;
+					}
+					else
+					{
+						@$sumValue[$inventory_transfer_voucher_row_data['item_id']]=0;
+						@$totalNo[$inventory_transfer_voucher_row_data['item_id']]=1;
+					}
+					
+					
+					$per_unit_cost=@$sumValue[$inventory_transfer_voucher_row_data['item_id']]/@$totalNo[$inventory_transfer_voucher_row_data['item_id']];
+					
+					//$per_unit_cost=$total_amount/$qty_total;
 					//pr($per_unit_cost); exit;
 					$today_date =  Time::now();
 					//pr($today_date);exit;
@@ -872,7 +916,7 @@ class InventoryTransferVouchersController extends AppController
 				if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 				
 			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
-				$Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
+				/* $Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
 				//pr($Itemledgers->toArray());exit;
 				$ledger_data=$Itemledgers->count();
 				
@@ -893,8 +937,53 @@ class InventoryTransferVouchersController extends AppController
 				}
 				
 				
-				$per_unit_cost=$total_amount/$qty_total;
-			
+				$per_unit_cost=$total_amount/$qty_total; */
+				
+				$stock=[];  $sumValue=[];
+					
+					$StockLedgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$inventory_transfer_voucher_row->item_id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+					foreach($StockLedgers as $StockLedger)
+					{ 
+						if($StockLedger->in_out=='In')
+						{
+							if($StockLedger->source_model=='Inventory Transfer Voucher')
+							{
+								for($inc=0;$inc<$StockLedger->quantity;$inc++)
+								{
+									$stock[$inventory_transfer_voucher_row->item_id][]=$StockLedger->rate;
+								}
+							}
+						}
+					}
+					foreach($StockLedgers as $StockLedger)
+					{
+						if($StockLedger->in_out=='Out')
+						{
+							if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id])>0)
+							{
+								$stock[$inventory_transfer_voucher_row->item_id] = array_slice($stock[$inventory_transfer_voucher_row->item_id], $StockLedger->quantity); 
+							}
+						}
+					}
+					//echo "hello"; exit;
+					$totalNo=[];
+					if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id]) > 0){ 
+					 $total_no=1;
+						foreach(@$stock[$inventory_transfer_voucher_row->item_id] as $stockRate){
+							@$sumValue[$inventory_transfer_voucher_row->item_id]+=@$stockRate;
+							$total_no++;
+						}
+						@$totalNo[$inventory_transfer_voucher_row->item_id]=@$total_no;
+					}
+					else
+					{
+						@$sumValue[$inventory_transfer_voucher_row->item_id]=0;
+						@$totalNo[$inventory_transfer_voucher_row->item_id]=1;
+					}
+					
+					
+					$per_unit_cost=@$sumValue[$inventory_transfer_voucher_row->item_id]/@$totalNo[$inventory_transfer_voucher_row->item_id];
+				
 				$today_date =  Time::now();
 				$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id'])
@@ -999,7 +1088,7 @@ class InventoryTransferVouchersController extends AppController
 				$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id]);
 				
 			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
-				$Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
+				/* $Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
 				
 				$ledger_data=$Itemledgers->count();
 				
@@ -1021,8 +1110,51 @@ class InventoryTransferVouchersController extends AppController
 				}
 				
 				
-				$per_unit_cost=$total_amount/$qty_total;
-			
+				$per_unit_cost=$total_amount/$qty_total; */
+			    $stock=[];  $sumValue=[];
+					
+					$StockLedgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$inventory_transfer_voucher_row->item_id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+					foreach($StockLedgers as $StockLedger)
+					{ 
+						if($StockLedger->in_out=='In')
+						{
+							if($StockLedger->source_model=='Inventory Transfer Voucher')
+							{
+								for($inc=0;$inc<$StockLedger->quantity;$inc++)
+								{
+									$stock[$inventory_transfer_voucher_row->item_id][]=$StockLedger->rate;
+								}
+							}
+						}
+					}
+					foreach($StockLedgers as $StockLedger)
+					{
+						if($StockLedger->in_out=='Out')
+						{
+							if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id])>0)
+							{
+								$stock[$inventory_transfer_voucher_row->item_id] = array_slice($stock[$inventory_transfer_voucher_row->item_id], $StockLedger->quantity); 
+							}
+						}
+					}
+					//echo "hello"; exit;
+					$totalNo=[];
+					if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id]) > 0){ 
+					 $total_no=1;
+						foreach(@$stock[$inventory_transfer_voucher_row->item_id] as $stockRate){
+							@$sumValue[$inventory_transfer_voucher_row->item_id]+=@$stockRate;
+							$total_no++;
+						}
+						@$totalNo[$inventory_transfer_voucher_row->item_id]=@$total_no;
+					}
+					else
+					{
+						@$sumValue[$inventory_transfer_voucher_row->item_id]=0;
+						@$totalNo[$inventory_transfer_voucher_row->item_id]=1;
+					}
+					
+					
+					$per_unit_cost=@$sumValue[$inventory_transfer_voucher_row->item_id]/@$totalNo[$inventory_transfer_voucher_row->item_id];
 				$today_date =  Time::now();
 				$query= $this->InventoryTransferVouchers->ItemLedgers ->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id'])

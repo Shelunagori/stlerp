@@ -296,9 +296,10 @@ $(document).ready(function() {
 	$('.select_item_out').die().live("change",function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
-		var select_item_id=$(this).find('option:selected').val();
+		var select_item_id=$(this).find('option:selected').val(); 
 		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
 		url1=url1+'?item_id='+select_item_id,
+		//alert(url1);
 		$.ajax({
 			url: url1
 		}).done(function(response) { 

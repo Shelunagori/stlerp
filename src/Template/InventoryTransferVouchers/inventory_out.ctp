@@ -240,7 +240,7 @@ $(document).ready(function() {
 	
 	function validate_serial(){
 		$("#main_table tbody#maintbody tr.main").each(function(){
-			var qty=$(this).find('td:nth-child(2) input').val();
+			var qty=$(this).find('td:nth-child(2) input').val(); 
 			if($(this).find('td:nth-child(3) select').length>0){
 				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,

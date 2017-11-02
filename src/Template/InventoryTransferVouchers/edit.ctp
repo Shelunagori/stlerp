@@ -345,11 +345,11 @@ $(document).ready(function() {
 			var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
 		} 
 		var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
-		//alert(serial_number_enable);
+		
 		if(serial_number_enable==1){
 			var qty=tr_obj.find('td:nth-child(2) input').val();
 			var row_no=tr_obj.attr('row_no'); 
-			tr_obj.find('td:nth-child(3) div.sr_container').html('');
+			tr_obj.find('td:nth-child(3) div.sr_container').html(''); 
 			for(var w=0; w < (qty-old_qty); w++){
 				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" style=" width: 120px;" required="required" placeholder="serial number '+w+'" class="sr_no" /><br/>');
 			}
