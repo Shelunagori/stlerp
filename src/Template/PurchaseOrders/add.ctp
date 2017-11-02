@@ -500,10 +500,10 @@ $(document).ready(function() {
 			var unit=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
 			var Amount=unit*Rate;
-			$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			total=total+Amount;
 		});
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 		
 	}
 	
