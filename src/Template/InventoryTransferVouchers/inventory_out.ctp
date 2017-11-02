@@ -205,8 +205,8 @@ $(document).ready(function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val();
-		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumber']); ?>";
-		url1=url1+'/'+select_item_id,
+		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumbers']); ?>";
+		url1=url1+'/'+select_item_id, 
 		$.ajax({
 			url: url1,
 		}).done(function(response) { 
@@ -240,7 +240,7 @@ $(document).ready(function() {
 	
 	function validate_serial(){
 		$("#main_table tbody#maintbody tr.main").each(function(){
-			var qty=$(this).find('td:nth-child(2) input').val(); 
+			var qty=$(this).find('td:nth-child(2) input').val();
 			if($(this).find('td:nth-child(3) select').length>0){
 				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,

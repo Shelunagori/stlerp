@@ -416,7 +416,39 @@ class InventoryTransferVouchersController extends AppController
 		}
 		$this->set(compact('SerialNumbers','flag','select_item_id','selectedSerialNumbers'));
     }
-
+     
+	public function ItemSerialNumbers($select_item_id = null)
+    {
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$flag=0; 
+		$Item = $this->InventoryTransferVouchers->Items->get($select_item_id, [
+            'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]
+        ]);
+		//pr($Item->item_companies[0]->serial_number_enable);
+		if($Item->item_companies[0]->serial_number_enable=="1"){
+			$SerialNumbers=$this->InventoryTransferVouchers->Items->SerialNumbers->find()->where(['item_id'=>$select_item_id,'status'=>'In','company_id'=>$st_company_id]);
+			$inArr=[];
+			foreach($SerialNumbers as $SerialNumber)
+			{
+				$inArr[$SerialNumber->name]=$SerialNumber->name;
+			}
+			$selectedSerialNumbers=$this->InventoryTransferVouchers->Items->SerialNumbers->find()->where(['item_id'=>$select_item_id,'status'=>'Out','company_id'=>$st_company_id]);
+			foreach($selectedSerialNumbers as $selectedSerialNumber)
+			{
+				if(!empty($inArr[$selectedSerialNumber->name]))
+				{
+					unset($inArr[$selectedSerialNumber->name]);
+				}
+			}
+			//pr($SerialNumbers->toArray());exit;
+			$flag=1;
+		}
+		$this->set(compact('SerialNumbers','flag','select_item_id','selectedSerialNumbers','inArr'));
+    }
 
     public function edit($id = null)
     {
@@ -718,7 +750,7 @@ class InventoryTransferVouchersController extends AppController
 	}
 
 
-	function DeleteSerialNumberIn($id=null,$in_id=null,$in_voucher_id=null,$item_id=null){
+	/* function DeleteSerialNumberIn($id=null,$in_id=null,$in_voucher_id=null,$item_id=null){
 		//pr($in_id);
 		//pr($in_voucher_id);exit;
 		$session = $this->request->session();
@@ -728,9 +760,10 @@ class InventoryTransferVouchersController extends AppController
 		
 		$ItemSerialNumber = $this->InventoryTransferVouchers->SerialNumbers->get($id);
 		$InventoryTransferVoucherRows = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->get($in_id);
-		//pr($ItemSerialNumber);exit;
+		//pr($InventoryTransferVoucherRows);exit;
 		
-		if($ItemSerialNumber->status=='In'){
+		if($ItemSerialNumber->status=='In')
+		{
 			$ItemQuantity = $ItemLedger->quantity-1;
 			//pr($ItemQuantity);exit;
 			
@@ -750,10 +783,66 @@ class InventoryTransferVouchersController extends AppController
 					
 			$this->InventoryTransferVouchers->SerialNumbers->delete($ItemSerialNumber);
 			$this->Flash->success(__('The Serial Number has been deleted.'));
+		}
+		
+		return $this->redirect(['action' => 'editInventoryIn/'.$in_voucher_id]);
+	} */ 
+	
+	
+	function DeleteSerialNumberIn($name=null,$in_id=null,$in_voucher_id=null,$item_id=null,$id=null){
+		//$this->request->allowMethod(['post', 'delete']);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->Items->ItemLedgers->find()->where(['source_id'=>$in_voucher_id,'item_id'=>$item_id,'in_out'=>'In','source_model'=>'Inventory Transfer Voucher'])->first();
+		
+		$ItemSerialNumbers = $this->InventoryTransferVouchers->SerialNumbers->find()->where(['SerialNumbers.name'=>$name,'SerialNumbers.item_id'=>$item_id]);
+		foreach($ItemSerialNumbers as $ItemSerialNumber1)
+		{
+			if($ItemSerialNumber1->status=='In')
+			{
+				$serialINOUT='In';
+		    }
+			if($ItemSerialNumber1->status=='Out')
+			{
+				$serialINOUT='Out';
 			}
+		}
+		
+		$InventoryTransferVoucherRows = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->get($in_id);
+		
+		
+		if($serialINOUT=='In')
+		{
+			$ItemQuantity = $ItemLedger->quantity-1;
+			
+				
+			$query_in = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
+			
+			$query_in->update()
+				->set(['quantity' => $InventoryTransferVoucherRows->quantity-1])
+				->where(['inventory_transfer_voucher_id' => $in_voucher_id,'item_id'=>$item_id])
+				->execute();	
+				
+			$query = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->Items->ItemLedgers->query();
+			$query->update()
+				->set(['quantity' => $ItemLedger->quantity-1])
+				->where(['item_id'=>$item_id,'company_id'=>$st_company_id,'source_model'=>'Inventory Transfer Voucher','in_out'=>'In'])
+				->execute();
+			$ItemSerialNumber = $this->InventoryTransferVouchers->SerialNumbers->get($id);
+			$this->InventoryTransferVouchers->SerialNumbers->delete($ItemSerialNumber);
+			$this->Flash->success(__('The Serial Number has been deleted.'));
+		}
+		//row delete code
+		$ItemSerialNumberExist = $this->InventoryTransferVouchers->SerialNumbers->find()->where(['SerialNumbers.itv_row_id'=>$in_id,'SerialNumbers.item_id'=>$item_id])->count();
+		if($ItemSerialNumberExist<1)
+		{
+			$InventoryTransferVoucherRowdetail = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->get($in_id);
+			$this->InventoryTransferVouchers->InventoryTransferVoucherRows->delete($InventoryTransferVoucherRowdetail);
+		}
 		
 		return $this->redirect(['action' => 'editInventoryIn/'.$in_voucher_id]);
 	}
+	
     /**
      * Delete method
      *
@@ -1087,8 +1176,8 @@ class InventoryTransferVouchersController extends AppController
 		if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) { 
 				$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id]);
 				
-			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
-				/* $Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
+			 foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
+				/*$Itemledgers = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['item_id'=>$inventory_transfer_voucher_row->item_id,'in_out'=>'In','processed_on <='=>$inventoryTransferVoucher->transaction_date,'rate >'=>0,'quantity >'=>0]);
 				
 				$ledger_data=$Itemledgers->count();
 				
@@ -1127,18 +1216,21 @@ class InventoryTransferVouchersController extends AppController
 							}
 						}
 					}
+					
 					foreach($StockLedgers as $StockLedger)
 					{
 						if($StockLedger->in_out=='Out')
-						{
+						{ 
 							if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id])>0)
 							{
 								$stock[$inventory_transfer_voucher_row->item_id] = array_slice($stock[$inventory_transfer_voucher_row->item_id], $StockLedger->quantity); 
 							}
 						}
 					}
+					
 					//echo "hello"; exit;
 					$totalNo=[];
+					
 					if(sizeof(@$stock[$inventory_transfer_voucher_row->item_id]) > 0){ 
 					 $total_no=1;
 						foreach(@$stock[$inventory_transfer_voucher_row->item_id] as $stockRate){
@@ -1152,7 +1244,6 @@ class InventoryTransferVouchersController extends AppController
 						@$sumValue[$inventory_transfer_voucher_row->item_id]=0;
 						@$totalNo[$inventory_transfer_voucher_row->item_id]=1;
 					}
-					
 					
 					$per_unit_cost=@$sumValue[$inventory_transfer_voucher_row->item_id]/@$totalNo[$inventory_transfer_voucher_row->item_id];
 				$today_date =  Time::now();
