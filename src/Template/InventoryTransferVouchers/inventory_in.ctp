@@ -222,7 +222,7 @@ $(document).ready(function() {
 			var row_no=tr_obj.attr('row_no');
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');
 			for(var w=1; w<=qty; w++){ 
-				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" />');
+				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" required/>');
 			}
 		}else{
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');

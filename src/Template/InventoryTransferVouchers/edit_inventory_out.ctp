@@ -263,7 +263,7 @@ $(document).ready(function() {
 			}
 			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows["+i+"][quantity]", id:"inventory_transfer_voucher_rows-"+i+"-quantity"}).rules("add", "required");
 			if($(this).find('td:nth-child(3) select').length>0){
-				$(this).find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+i+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+i+"-serial_number_data"}).rules("add", "required");
+				$(this).find('td:nth-child(3) select').select2().attr({name:"inventory_transfer_voucher_rows["+i+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+i+"-serial_number_data"}).rules("add", "required");
 			}
 			$(this).find('td:nth-child(4) textarea').attr({name:"inventory_transfer_voucher_rows["+i+"][narration]", id:"inventory_transfer_voucher_rows-"+i+"-narration"}).rules("add", "required");
 			

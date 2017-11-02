@@ -81,7 +81,7 @@ if($transaction_date <  $start_date ) {
 										&& $item_serial_number->status=='In'){ ?>
 											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name,'class'=>'sr_no']); ?>
 											<?=  $this->Html->link('<i class="fa fa-trash"></i> ',
-														['action' => 'DeleteSerialNumberIn', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
+														['action' => 'DeleteSerialNumberIn', $item_serial_number->name, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id,$item_serial_number->id], 
 														[
 															'escape' => false,
 															'class' => 'btn btn-xs red',
@@ -287,12 +287,12 @@ $(document).ready(function() {
 		
 	}
 	
-	rename_input();
+	
 	function rename_input()
 	{
 		
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
-			var row_no =$(this).attr('row_no');
+			var row_no = $(this).attr('row_no');
 			
 				$(this).find("td:nth-child(3) .sr_no").each(function()
 				{
@@ -326,7 +326,7 @@ rename_rows_in();
 	   });
 	}	
 
-	
+	rename_input();
 	$('.qty_bx').die().live("keyup",function() {
 		validate_serial();
     });
