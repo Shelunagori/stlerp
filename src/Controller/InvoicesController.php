@@ -499,7 +499,8 @@ class InvoicesController extends AppController
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
 			
-            if ($this->Invoices->save($invoice)) {
+            if ($this->Invoices->save($invoice)) 
+			{
 				foreach($invoice->invoice_rows as $invoice_row){
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
 					$items_source=$this->Invoices->Items->get($invoice_row->item_id);
