@@ -241,9 +241,9 @@ class GrnsController extends AppController
 						foreach($grn->check as $purchase_order_row_id){
 							$qty=$grn->grn_rows[$i]['quantity'];
 							$item_id=$grn->grn_rows[$i]['item_id'];
-							$PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
+							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
 							$PurchaseOrderRows->processed_quantity=$PurchaseOrderRows->processed_quantity+$qty;
-							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows);
+							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows); */
 							$i++;
 							
 							//Insert in Item Ledger//
@@ -496,7 +496,7 @@ class GrnsController extends AppController
 				{
 					foreach($grnDetail->purchase_order->purchase_order_rows as $purchase_order_row)
 					{
-					$POItemQty[@$purchase_order_row->id] =$purchase_order_row->quantity;
+						$POItemQty[@$purchase_order_row->id] =$purchase_order_row->quantity;
 					}
 				}	
 
@@ -590,12 +590,12 @@ class GrnsController extends AppController
 							$this->Grns->ItemLedgers->save($itemLedger);
 						} 
 					$qq=0; foreach($grn->grn_rows as $grn_row){
-						//pr($grn->purchase_order_id); exit;
+					/* 	//pr($grn->purchase_order_id); exit;
 						$purchaseorderrow=$this->Grns->PurchaseOrderRows->find()->where(['purchase_order_id'=>$grn->purchase_order_id,'item_id'=>$grn_row->item_id])->first();
 						$purchaseorderrow->processed_quantity=$purchaseorderrow->processed_quantity-@$grn->getOriginal('grn_rows')[$qq]->quantity+$grn_row->quantity;
 						$this->Grns->PurchaseOrderRows->save($purchaseorderrow);
 						$qq++; 
-					} 
+					} */ 
 					$this->Flash->success(__('The grn has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				} else {
