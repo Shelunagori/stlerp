@@ -87,11 +87,15 @@ class ItemsTable extends Table
 		$this->hasMany('JobCardRows', [
             'foreignKey' => 'item_id'
         ]);
-		$this->hasMany('ItemSerialNumbers', [
+		$this->hasMany('SerialNumbers', [
             'foreignKey' => 'item_id'
         ]);
 		$this->belongsTo('FinancialYears');
 		$this->belongsTo('NewItem');
+		
+		$this->hasMany('PurchaseReturnRows', [
+            'foreignKey' => 'item_id'
+        ]);
     }
 
     /**

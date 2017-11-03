@@ -149,8 +149,11 @@ class PurchaseReturnsController extends AppController
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
 										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
+		
 		$PurchaseReturnQty=[];
 		$remainingQty=[];
         foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
@@ -162,9 +165,13 @@ class PurchaseReturnsController extends AppController
 					$PurchaseReturnQty[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->totalQty;
 					$remainingQty[$purchase_return_row->invoice_booking_row_id]=$invoice_booking_row->quantity-$purchase_return_row->totalQty;
 				}
-			}				
+			}
+            else
+            {
+				    $remainingQty[$invoice_booking_row->id] = $invoice_booking_row->quantity;
+            }				
 		}
-		//pr($PurchaseReturnQty);exit;
+		//pr($invoiceBooking);exit;
 			   $st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
@@ -215,7 +222,23 @@ class PurchaseReturnsController extends AppController
 			}
 			$purchaseReturn->transaction_date = date("Y-m-d",strtotime($this->request->data['transaction_date']));
 			 if ($this->PurchaseReturns->save($purchaseReturn)) {   
-				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
+			
+			 foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
+				 	////start updated serial number code Oct17 changes
+					foreach($purchase_return_row->serial_numbers as $serial_nos){
+						$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'purchse_return_id','purchase_return_row_id','company_id'])
+									->values([
+									'name' => $serial_nos,
+									'item_id' => $purchase_return_row->item_id,
+									'status' => 'Out',
+									'purchse_return_id' => $purchaseReturn->id,
+									'purchase_return_row_id' => $purchase_return_row->id,
+									'company_id'=>$st_company_id
+									]);
+								$query->execute();  	
+					}	
+				////end updated serial number code Oct17 changes
 					$results=$this->PurchaseReturns->ItemLedgers->find()->where(['ItemLedgers.item_id' => $purchase_return_row->item_id,'ItemLedgers.in_out' => 'In','rate_updated' => 'Yes','company_id' => $st_company_id,'source_model'=>'Grns','source_id'=>$invoiceBooking['grn_id']])->first();
 					$itemLedger = $this->PurchaseReturns->ItemLedgers->newEntity();
 					$itemLedger->item_id = $purchase_return_row->item_id;
@@ -266,16 +289,7 @@ class PurchaseReturnsController extends AppController
 							  ->execute();
 
 				}
-
-				/* foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
-						$query = $this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->query();
-						$query->update()
-							->set(['purchase_return_quantity'=>$purchase_return_row->quantity])
-							->where(['invoice_booking_id' => $invoiceBooking->id,'item_id'=>$purchase_return_row->item_id])
-							->execute();
-					} */
-						
-						$query = $this->PurchaseReturns->InvoiceBookings->query();
+					$query = $this->PurchaseReturns->InvoiceBookings->query();
 						$query->update()
 						->set(['purchase_return_status' => 'Yes','purchase_return_id'=>$purchaseReturn->id])
 						->where(['id' => $invoiceBooking->id])
@@ -286,6 +300,7 @@ class PurchaseReturnsController extends AppController
 						->set(['invoice_booking_id'=>$invoiceBooking->id])
 						->where(['id' => $purchaseReturn->id])
 						->execute();
+						
 					$cst_purchase=0;
 					if($st_company_id=='25'){
 						$cst_purchase=35;
@@ -341,42 +356,47 @@ class PurchaseReturnsController extends AppController
 				$ledger->voucher_source = 'Purchase Return';
 				
 				$this->PurchaseReturns->Ledgers->save($ledger);
-
+				
+					
+					
 					if(sizeof(@$ref_rows)>0){
 						
 						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-								$query = $this->PurchaseReturns->ReferenceBalances->query();
-								
-								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-								->values([
-									'ledger_account_id' => $v_LedgerAccount->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount
-								]);
-								$query->execute();
-							}else{
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-								
-								$this->PurchaseReturns->ReferenceBalances->save($ReferenceBalance);
-							}
 							
-							$query = $this->PurchaseReturns->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'purchase_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-							->values([
-								'ledger_account_id' => $v_LedgerAccount->id,
-								'purchase_return_id' => $purchaseReturn->id,
-								'reference_no' => $ref_row->ref_no,
-								'credit' =>  0,
-								'debit' =>$ref_row->ref_amount,
-								'reference_type' => $ref_row->ref_type
-							]);
-						
-							$query->execute();
+							$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
+							
+						}
+						$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+						if($purchaseReturn->on_acc_cr_dr=="Dr"){
+							$ReferenceDetail->debit = $purchaseReturn->on_account;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $purchaseReturn->on_account;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						if($purchaseReturn->on_account > 0){
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
 				
@@ -405,7 +425,7 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
 		$purchase_return_id=@(int)$this->request->query('purchase-return');
-		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id);
+		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, ['contain'=>['ReferenceDetails']]);
 		
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
@@ -415,7 +435,9 @@ class PurchaseReturnsController extends AppController
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
 										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
 		
 		$Qty=[];
@@ -494,14 +516,35 @@ class PurchaseReturnsController extends AppController
 			$purchaseReturn->purchase_ledger_account=$invoiceBooking->purchase_ledger_account;
 			$purchaseReturn->vendor_id=$invoiceBooking->vendor_id;	
 				
-			
+			//pr($purchaseReturn);exit;
 			if ($this->PurchaseReturns->save($purchaseReturn)) {
 				
 				$this->PurchaseReturns->Ledgers->deleteAll(['voucher_id' => $purchaseReturn->id, 'voucher_source' => 'Purchase Return','company_id'=>$st_company_id]);
 
 				$this->PurchaseReturns->ItemLedgers->deleteAll(['source_id' => $purchaseReturn->id, 'source_model' => 'Purchase Return','company_id'=>$st_company_id]);
-				
-				
+				$this->PurchaseReturns->ReferenceDetails->deleteAll(['purchase_return_id' => $purchaseReturn->id]);
+				//////start serial Number database changes Oct17	  
+				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){ 
+					
+					$item_serial_no=$purchase_return_row->serial_numbers;
+				/////for delete serial number in table					
+					$this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->deleteAll(['SerialNumbers.purchse_return_id'=>$purchaseReturn->id,'SerialNumbers.purchase_return_row_id' => $purchase_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
+				 foreach($item_serial_no as $serial){
+				 $query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id'])
+									->values([
+									'name' => $serial,
+									'item_id' => $purchase_return_row->item_id,
+									'status' => 'Out',
+									'purchase_return_row_id' => $purchase_return_row->id,
+									'purchse_return_id' => $purchaseReturn->id,
+									'company_id'=>$st_company_id
+									]);
+								$query->execute();  
+						
+					}
+				}
+			//////End serial Number database changes Oct17	
 				
 				//Ledger posting for SUPPLIER
 				$c_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();
@@ -619,45 +662,52 @@ class PurchaseReturnsController extends AppController
 					
 				//Reference Number coding
 					if(sizeof(@$ref_rows)>0){
+						
 						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-								$query = $this->PurchaseReturns->ReferenceBalances->query();
-								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-								->values([
-									'ledger_account_id' => $v_LedgerAccount->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount
-								]);
-								$query->execute();
-							}else{
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-								
-								$this->PurchaseReturns->ReferenceBalances->save($ReferenceBalance);
-							}
 							
-							$query = $this->PurchaseReturns->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'purchase_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-							->values([
-								'ledger_account_id' => $v_LedgerAccount->id,
-								'purchase_return_id' => $purchaseReturn->id,
-								'reference_no' => $ref_row->ref_no,
-								'credit' =>  0,
-								'debit' =>$ref_row->ref_amount,
-								'reference_type' => $ref_row->ref_type
-							]);
-							$query->execute();
+							$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
+							
+						}
+						$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+						if($purchaseReturn->on_acc_cr_dr=="Dr"){
+							$ReferenceDetail->debit = $purchaseReturn->on_account;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $purchaseReturn->on_account;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						if($purchaseReturn->on_account > 0){
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
-					$this->Flash->success(__('The Purchase Return has been saved.'));
+					$this->Flash->success(__('The Purchase Return has been updated.'));
 					return $this->redirect(['action' => 'index']);
 				}
 				
 				else{
-					pr($purchaseReturn); exit;
+					$this->Flash->error(__('The Purchase Return could not been updated.'));
+					return $this->redirect(['action' => 'index']);
 				}
 			}
 				//}
@@ -670,7 +720,7 @@ class PurchaseReturnsController extends AppController
 			
 			
 			
-			$ReferenceDetails = $this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id])->toArray();
+			/* $ReferenceDetails = $this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id])->toArray();
 		
 		
 		//pr($ReferenceDetails);exit;
@@ -683,7 +733,7 @@ class PurchaseReturnsController extends AppController
 			}
 			else{
 				$ReferenceBalances='';
-			}
+			} */
 			
 			
 			$Em = new FinancialYearsController;
@@ -694,7 +744,7 @@ class PurchaseReturnsController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','ReferenceBalances','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
+			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
 			$this->set('_serialize', ['purchaseReturn']);
 	}
 	
@@ -711,7 +761,9 @@ class PurchaseReturnsController extends AppController
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
 										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
 		
 		$PurchaseReturnQty=[];
@@ -875,6 +927,24 @@ class PurchaseReturnsController extends AppController
 				$i=0;
 			foreach($purchaseReturn->purchase_return_rows as $purchase_return_row)
 				{
+					
+					////start updated serial number code Oct17 changes
+					foreach($purchase_return_row->serial_numbers as $serial_nos){
+						$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'purchse_return_id','purchase_return_row_id','company_id'])
+									->values([
+									'name' => $serial_nos,
+									'item_id' => $purchase_return_row->item_id,
+									'status' => 'Out',
+									'purchse_return_id' => $purchaseReturn->id,
+									'purchase_return_row_id' => $purchase_return_row->id,
+									'company_id'=>$st_company_id
+									]);
+								$query->execute();  	
+					}	
+				////end updated serial number code Oct17 changes
+					
+					
 						$item_id=$purchase_return_row['item_id'];
 						$qty=$purchase_return_row['quantity'];
 						$itemLedger_data = $this->PurchaseReturns->ItemLedgers->find()->where(['item_id'=>$item_id,'in_out'=>'In','company_id' => $st_company_id,'source_model'=>'Grns','source_id'=>$invoiceBooking->grn_id])->first();
@@ -903,40 +973,44 @@ class PurchaseReturnsController extends AppController
 							->execute();
 					
 				//Reference Number coding
-				//pr($purchaseReturn->ref_rows); exit;
-					if(sizeof(@$ref_rows) > 0){
-						foreach($ref_rows as $ref_row){ 
+				if(sizeof(@$ref_rows)>0){
 						
+						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-								$query = $this->PurchaseReturns->ReferenceBalances->query();
-								$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-								->values([
-									'ledger_account_id' => $v_LedgerAccount->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount
-								]);
-								$query->execute();
-							}else{
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-								
-								$this->PurchaseReturns->ReferenceBalances->save($ReferenceBalance);
-							}
 							
-							$query = $this->PurchaseReturns->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'purchase_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-							->values([
-								'ledger_account_id' => $v_LedgerAccount->id,
-								'purchase_return_id' => $purchaseReturn->id,
-								'reference_no' => $ref_row->ref_no,
-								'credit' =>  0,
-								'debit' =>$ref_row->ref_amount,
-								'reference_type' => $ref_row->ref_type
-							]);
-							$query->execute();
+							$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
+							}else{
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
+							}
+							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
+							
+						}
+						$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+						if($purchaseReturn->on_acc_cr_dr=="Dr"){
+							$ReferenceDetail->debit = $purchaseReturn->on_account;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $purchaseReturn->on_account;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						if($purchaseReturn->on_account > 0){
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
 					$this->Flash->success(__('The Purchase Return has been saved.'));
@@ -957,18 +1031,7 @@ class PurchaseReturnsController extends AppController
 			
 			
 			
-			$ReferenceDetails = $this->PurchaseReturns->InvoiceBookings->ReferenceDetails->find()->where(['ledger_account_id'=>$vendor_ledger_acc_id,'invoice_booking_id'=>$invoiceBooking->id])->toArray();
-		
-			if(!empty($ReferenceDetails))
-			{
-				foreach($ReferenceDetails as $ReferenceDetail)
-				{  //pr($ReferenceDetail->ledger_account_id); exit;
-					$ReferenceBalances[] = $this->PurchaseReturns->InvoiceBookings->ReferenceBalances->find()->where(['ledger_account_id'=>$ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])->toArray();
-				}
-			}
-			else{
-				$ReferenceBalances='';
-			}
+			
 			
 			$Em = new FinancialYearsController;
 			$financial_year_data = $Em->checkFinancialYear($invoiceBooking->created_on);
@@ -1025,12 +1088,15 @@ class PurchaseReturnsController extends AppController
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
         ]);
+		
 		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
             'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
 										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
+			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
 		
 		$Qty=[];
@@ -1065,11 +1131,9 @@ class PurchaseReturnsController extends AppController
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();
 		
 		$purchase_return_id=$invoiceBooking->purchase_return_id;
-		//echo $purchase_return_id;exit;
-		$ReferenceDetails=$this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchase_return_id]);
-//pr($purchase_return_id); exit;
+		
 		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, [
-            'contain' => ['PurchaseReturnRows'=>['Items']]
+            'contain' => ['ReferenceDetails','PurchaseReturnRows'=>['Items']]
         ]);
 
 			  	$st_year_id = $session->read('st_year_id');
@@ -1112,11 +1176,11 @@ class PurchaseReturnsController extends AppController
 			$purchaseReturn->edited_on = date("Y-m-d"); 
 			$purchaseReturn->edited_by=$this->viewVars['s_employee_id'];
 			//pr($invoiceBooking['grn_id']); exit;
-			
+			//pr($purchaseReturn);exit;
             if ($this->PurchaseReturns->save($purchaseReturn)) {
 				$this->PurchaseReturns->Ledgers->deleteAll(['voucher_id' => $purchaseReturn->id, 'voucher_source' => 'Purchase Return']);
 				$this->PurchaseReturns->ItemLedgers->deleteAll(['source_id' => $purchaseReturn->id, 'source_model' => 'Purchase Return','company_id'=>$st_company_id]);
-			
+				$this->PurchaseReturns->ReferenceDetails->deleteAll(['purchase_return_id' => $purchaseReturn->id]);
 				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
 					
 					
@@ -1173,14 +1237,29 @@ class PurchaseReturnsController extends AppController
 							->execute();
 
 				}
-
-				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
-						$query = $this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->query();
-						$query->update()
-							->set(['purchase_return_quantity'=>$purchase_return_row->quantity])
-							->where(['invoice_booking_id' => $invoiceBooking->id,'item_id'=>$purchase_return_row->item_id])
-							->execute();
+				//////start serial Number database changes Oct17	  
+				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){ 
+					
+					$item_serial_no=$purchase_return_row->serial_numbers;
+				/////for delete serial number in table					
+					$this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->deleteAll(['SerialNumbers.purchse_return_id'=>$purchaseReturn->id,'SerialNumbers.purchase_return_row_id' => $purchase_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
+				 foreach($item_serial_no as $serial){
+				 $query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id'])
+									->values([
+									'name' => $serial,
+									'item_id' => $purchase_return_row->item_id,
+									'status' => 'Out',
+									'purchase_return_row_id' => $purchase_return_row->id,
+									'purchse_return_id' => $purchaseReturn->id,
+									'company_id'=>$st_company_id
+									]);
+								$query->execute();  
+						
+					}
 				}
+			//////End serial Number database changes Oct17	
+				
 						
 					$query = $this->PurchaseReturns->InvoiceBookings->query();
 					$query->update()
@@ -1249,57 +1328,43 @@ class PurchaseReturnsController extends AppController
 				$this->PurchaseReturns->Ledgers->save($ledger);
 				
 				if(sizeof(@$ref_rows)>0){
-					//pr($ref_rows); exit;
-					foreach($ref_rows as $ref_row){
+						
+						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
-							//pr($ref_row); exit;
-							$ReferenceDetail=$this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'purchase_return_id'=>$purchaseReturn->id])->first();
 							
-							if($ReferenceDetail){ //pr($ref_row->ref_old_amount); exit;
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-								$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->get($ReferenceBalance->id);
-								$ReferenceBalance->debit=$ReferenceBalance->debit-@$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->PurchaseReturns->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no,'purchase_return_id'=>$purchaseReturn->id])->first();
-								
-								$ReferenceDetail=$this->PurchaseReturns->ReferenceDetails->get($ReferenceDetail->id);
-								$ReferenceDetail->debit=$ReferenceDetail->debit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
+							$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$st_company_id;
+							$ReferenceDetail->reference_type=$ref_row->ref_type;
+							$ReferenceDetail->reference_no=$ref_row->ref_no;
+							$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+							if($ref_row->ref_cr_dr=="Dr"){
+								$ReferenceDetail->debit = $ref_row->ref_amount;
+								$ReferenceDetail->credit = 0;
 							}else{
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									$query = $this->PurchaseReturns->ReferenceBalances->query();
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $v_LedgerAccount->id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' => 0,
-										'debit' => $ref_row->ref_amount
-									])
-									->execute();
-									
-								}else{
-									$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->PurchaseReturns->ReferenceBalances->get($ReferenceBalance->id);
-									$ReferenceBalance->debit=$ReferenceBalance->debit+$ref_row->ref_amount;
-									
-									$this->PurchaseReturns->ReferenceBalances->save($ReferenceBalance);
-								}
-								
-
-								$query = $this->PurchaseReturns->ReferenceDetails->query();
-								$query->insert(['ledger_account_id', 'purchase_return_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $v_LedgerAccount->id,
-									'purchase_return_id' => $purchaseReturn->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => 0,
-									'debit' => $ref_row->ref_amount,
-									'reference_type' => $ref_row->ref_type
-								])
-								->execute();
-								
+								$ReferenceDetail->credit = $ref_row->ref_amount;
+								$ReferenceDetail->debit = 0;
 							}
+							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
+							
+						}
+						$ReferenceDetail = $this->PurchaseReturns->ReferenceDetails->newEntity();
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type="On_account";
+						$ReferenceDetail->ledger_account_id = $v_LedgerAccount->id;
+						if($purchaseReturn->on_acc_cr_dr=="Dr"){
+							$ReferenceDetail->debit = $purchaseReturn->on_account;
+							$ReferenceDetail->credit = 0;
+						}else{
+							$ReferenceDetail->credit = $purchaseReturn->on_account;
+							$ReferenceDetail->debit = 0;
+						}
+						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
+						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						if($purchaseReturn->on_account > 0){
+							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
 					}
 

@@ -75,14 +75,17 @@ class SaleReturnsTable extends Table
 		$this->belongsTo('AccountReferences');
 		$this->belongsTo('AccountFirstSubgroups');
 		$this->belongsTo('AccountSecondSubgroups');
-		$this->belongsTo('ReferenceDetails');
 		$this->belongsTo('ReferenceBalances');
+		$this->belongsTo('SerialNumbers', [
+            'foreignKey' => 'sale_return_id'
+			]);
 		$this->belongsTo('Ledgers');
 		$this->belongsTo('ItemLedgers');
-		$this->belongsTo('ItemSerialNumbers');
 		$this->belongsTo('Items');
 		$this->belongsTo('InventoryVouchers');
-
+		$this->hasMany('ReferenceDetails', [
+            'foreignKey' => 'sale_return_id'
+        ]);
         $this->hasMany('SaleReturnRows', [
             'foreignKey' => 'sale_return_id',
 			'saveStrategy'=>'replace'

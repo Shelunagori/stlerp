@@ -127,11 +127,11 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 				</thead>
 				<tbody>
 					<?php
-					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
-						if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+					$q=0; $p=1; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row):
+						//if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
 					?>
-						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
-							<td ><?php echo ++$q; ?></td>
+						<tr class="tr1" row_no='<?php echo @$q; ?>'>
+							<td ><?php echo $p++; ?></td>
 							<td style="white-space: nowrap;"><?php echo $invoice_booking_row->item->name; ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item','type'=>'hidden','value' => @$invoice_booking_row->item->id]); ?>
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'hidden','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
@@ -146,7 +146,18 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 								<label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_booking_row->item->id]); ?></label>
 							</td>
 						</tr>
-						<?php  } endforeach; ?>
+						
+						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						<tr class="tr2" row_no="<?php echo @$q; ?>">
+							<td></td>
+							<td colspan="6">
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?item_id='.$invoice_booking_row->item_id); ?>
+							</td>
+						</tr>
+					<?php } $q++;  ?>
+					
+						<?php  
+						endforeach; ?>
 				</tbody>
 			</table>
 			</div>
@@ -166,24 +177,36 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 						<thead>
 							<tr>
 								<th width="25%">Ref Type</th>
-								<th width="40%">Ref No.</th>
+								<th width="25%">Ref No.</th>
 								<th width="30%">Amount</th>
+								<th width="10%"></th>
 								<th width="5%"></th>
 							</tr>
 						</thead>
 						<tbody>
-							
+							<tr>
+								<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+								<td class="ref_no"></td>
+								<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+								<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+								<?php 
+								echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+								</td>
+								<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
+							</tr>
 						</tbody>
 						<tfoot>
 							<tr>
 								<td align="center" style="vertical-align: middle !important;">On Account</td>
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+								<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 								<td></td>
 							</tr>
 							<tr>
 								<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-								<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+								<td></td>
+								<td></td>
 								<td></td>
 							</tr>
 						</tfoot>
@@ -223,33 +246,7 @@ $this->Form->templates(['inputContainer' => '{{content}}']); ?>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
-	jQuery.validator.addMethod("noSpace", function(value, element) { 
-	  return value.indexOf(" ") < 0 && value != ""; 
-	}, "No space please and don't leave it empty");
 	
-	jQuery.validator.addMethod("notEqualToGroup", function (value, element, options) {
-		// get all the elements passed here with the same class
-		var elems = $(element).parents('form').find(options[0]);
-		// the value of the current element
-		var valueToCompare = value;
-		// count
-		var matchesFound = 0;
-		// loop each element and compare its value with the current value
-		// and increase the count every time we find one
-		jQuery.each(elems, function () {
-			thisVal = $(this).val();
-			if (thisVal == valueToCompare) {
-				matchesFound++;
-			}
-		});
-		// count should be either 0 or 1 max
-		if (this.optional(element) || matchesFound <= 1) {
-			//elems.removeClass('error');
-			return true;
-		} else {
-			//elems.addClass('error');
-		}
-	}, jQuery.format("Please enter a Unique Value."));
 	//--------- FORM VALIDATION
 	var form3 = $('#form_sample_3');
 	var error3 = $('.alert-danger', form3);
@@ -316,19 +313,16 @@ $(document).ready(function() {
 
 		submitHandler: function (form) {
 			
-			rename_rows();
 			success3.show();
 			error3.hide();
 			form[0].submit();
 		}
 	});	
 
-	
 	$('.rename_check').die().live("click",function() {
 		rename_rows();    calculate_total();
     });	
-	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
+	$('.quantity').die().live("keyup",function() {  
 			rename_rows(); 
     });
 	rename_rows();
@@ -347,6 +341,22 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr("name","purchase_return_rows["+row_no+"][quantity]").attr("id","purchase_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","purchase_return_rows["+row_no+"][total]").attr("id","purchase_return_rows-"+row_no+"-total").rules("add", "required");
 				$(this).css('background-color','#fffcda');
+				var qty=$(this).find('td:nth-child(4) input').val();
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				
+				if(serial_l>0){
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
+						    required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+				}
+				
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
 				$(this).find('td:nth-child(2) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
@@ -354,17 +364,17 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(4) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(5) input').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
 				$(this).css('background-color','#FFF');
-				
+				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
+				}
 			} 
 			
 			$('input[name="checked_row_length"]').val(i);
 			
 		});
 	}
-	
-	$('.quantity').die().live("keyup",function() {
-			calculate_total(); 
-    });
 	
 	calculate_total();
 	function calculate_total(){
@@ -386,6 +396,7 @@ $(document).ready(function() {
 				}
 				$('input[name="grand_total"]').val(grand_total.toFixed(2));
 		});
+		do_ref_total();
 	}
 	$('.addrefrow').live("click",function() { 
 		 add_ref_row();
@@ -408,29 +419,20 @@ $(document).ready(function() {
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'PurchaseReturns','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/<?php echo $v_LedgerAccount->id; ?>/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true,
-							noSpace: true,
-							notEqualToGroup: ['.ref_number'],
-							remote: {
-								url: url,
-							},
-							messages: {
-								remote: "Not an unique."
-							}
+							required: true
 						});
 			}
-					$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(4) select").attr({name:"ref_rows["+i+"][ref_cr_dr]", id:"ref_rows-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 			
 		});
 		
-		var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
+		/* var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
 		if(is_tot_input){
 			$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total", id:"ref_rows_total"}).rules('add', { equalTo: "#grand-total" });
-		}
+		} */
 	}
 	$('.deleterefrow').live("click",function() {
 		$(this).closest("tr").remove();
@@ -441,8 +443,7 @@ $(document).ready(function() {
 		
 		var ref_type=$(this).find('option:selected').val();
 		if(ref_type=="Against Reference"){ 
-			var url="<?php echo $this->Url->build(['controller'=>'PurchaseReturns','action'=>'fetchRefNumbers']); ?>";
-			//alert(<?php echo $v_LedgerAccount->id; ?>);
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url,
 			$.ajax({
 				url: url+'/<?php echo $v_LedgerAccount->id; ?>',
@@ -460,7 +461,7 @@ $(document).ready(function() {
 	});
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 	});
@@ -468,26 +469,58 @@ $(document).ready(function() {
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_ref_total();
+	});
 	function do_ref_total(){
 		var main_amount=parseFloat($('input[name="grand_total"]').val());
+		
 		if(!main_amount){ main_amount=0; }
 		
 		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
 		$("table.main_ref_table tbody tr").each(function(){
 			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
+			
 			if(!am){ am=0; }
-			total_ref=total_ref+am;
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
 		});
-		
-		var on_acc=main_amount-total_ref; 
-		if(on_acc>=0){
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-			total_ref=total_ref+on_acc;
-		}else{
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
+		var on_acc=0;
+		var total_ref=0;
+		var on_acc_cr_dr='Dr';
+		if(total_ref_dr > total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
 		}
-		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
+		else if(total_ref_dr < total_ref_cr)
+		{
+			total_ref=total_ref_dr-total_ref_cr;
+			on_acc=main_amount-total_ref;
+		}
+		else
+		{
+			on_acc=main_amount;
+		}
+		
+		if(on_acc>=0){
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+		}else{
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
+		}
 	}
 	
 	
@@ -503,6 +536,10 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+				</td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>

@@ -93,7 +93,7 @@ margin-bottom: 0;
 			<td align="right"><?= h($this->Number->format($receiptRows->amount,[ 'places' => 2])) ?> <?= h($receiptRows->cr_dr) ?></td>
 		</tr>
 		<?php if(!empty($ref_bal[$receiptRows->received_from_id])):?>
-		<tr >
+		<tr>
 		
 		<td colspan="3" style="border-top:none !important;">
 			<table width="100%">

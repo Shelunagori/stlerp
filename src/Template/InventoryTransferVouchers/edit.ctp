@@ -62,7 +62,7 @@ if($transaction_date <  $start_date ) {
 										</tr>
 									</thead>
 							<tbody id="maintbody">
-						<?php $options1= [];	foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
+						<?php $options1= []; foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
 										?>
 								<tr class="main">
 									<td width="30%">
@@ -74,35 +74,28 @@ if($transaction_date <  $start_date ) {
 									</td>
 									<td>
 									<?php
-									$selected=[]; $options=[];
+									$selected_sr_nos=[]; 
 									
-									foreach($inventory_transfer_voucher_row->item->item_serial_numbers as $item_serial_number){
-									
-										if($item_serial_number->inventory_transfer_voucher_id == $id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id 
-										&&$item_serial_number->status=='Out'){
+									foreach($inventory_transfer_voucher_row->item->serial_numbers as $item_serial_number){
 										
-										$selected[$item_serial_number->id]=$item_serial_number->id;
+									   if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row->id 
+										&& $item_serial_number->status=='Out'){
+											
+										$selected_sr_nos[]=$item_serial_number->name;
 										}
-									} 
-								
-									foreach($inventory_transfer_voucher_row->item->item_serial_numbers as $item_serial_number){
-										if(
-($item_serial_number->inventory_transfer_voucher_id == $id && $item_serial_number->item_id == $inventory_transfer_voucher_row->item_id ) || $item_serial_number->status=='In'){
-										$options[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
 										
-									}}
-									if(!empty($options)){
-									 echo $this->Form->input('q', ['label'=>false,'options' => $options,'multiple' => 'multiple','class'=>'form-control input-sm ','required ','style'=>'width:100%','value'=>$selected]); 
-									}else{
-										//echo "Serial No Not Selected";
 									} 
-									 ?>
+									$sr_nos=implode(',',$selected_sr_nos); 
+									?>
+									
+									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$inventory_transfer_voucher_row->item_id.'&sr_nos='.$sr_nos); ?> 
+									 
 										
 									</td>
 									<td width="20%">
 								<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control','placeholder' => 'Narration','style' => 'width:100%;','value'=>$inventory_transfer_voucher_row->narration]); ?>
 								</td>
-									<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
+									<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a></td>
 							</tr>
 							<?php } ?>
 						</tbody>
@@ -137,21 +130,13 @@ if($transaction_date <  $start_date ) {
 								
 								<td width="30%">
 									<div class="row">
-										<div class="col-md-6 offset sr_container"></div>
-										<div class="col-md-6">
-											<table width="20%">
-												<tbody>
-													<tr>
-														<td>
-															<?php 
+										
+									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; foreach($inventory_transfer_voucher_row_in->item->item_serial_numbers as $item_serial_number){
-										if($item_serial_number->item_id == $inventory_transfer_voucher_row_in->item_id && $item_serial_number->inventory_transfer_voucher_id == $inventoryTransferVouchersins->id ){ ?>
-											<?php if($item_serial_number->status=='Out'){  ?>
-											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 65px;','value' => $item_serial_number->serial_no,'disabled'=>true]); ?>
-											
-											<?php  } else {?>
-											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 65px;','value' => $item_serial_number->serial_no,'disabled'=>true]); ?>
+									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
+										&& $item_serial_number->status=='In'){ 
+											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name,'class'=>'sr_no']); ?>
 											
 											
 												<?= $this->Html->link('<i class="fa fa-trash"></i> ',
@@ -163,19 +148,15 @@ if($transaction_date <  $start_date ) {
 														]
 													) ?>
 												
-										<?php  $i++; } }  }?>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-										</div>
+										<?php echo "<br>"; $i++; } }  ?>
+										<div class="col-md-12 offset sr_container"></div>
 									</div>
 									
 								</td>
 								<td width="20%">
 									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'style'=>'width: 79px;','value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
 								</td>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a></td>
+								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a></td>
 							</tr>
 						<?php }?>
 						</tbody>
@@ -362,22 +343,38 @@ $(document).ready(function() {
 			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
 		}else{
 			var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
-		}
+		} 
 		var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
+		
 		if(serial_number_enable==1){
 			var qty=tr_obj.find('td:nth-child(2) input').val();
-			var row_no=tr_obj.attr('row_no');
-			tr_obj.find('td:nth-child(3) div.sr_container').html('');
+			var row_no=tr_obj.attr('row_no'); 
+			tr_obj.find('td:nth-child(3) div.sr_container').html(''); 
 			for(var w=0; w < (qty-old_qty); w++){
-				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" style=" width: 92px;" required="required" placeholder="serial number '+w+'" /><br/>');
+				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" style=" width: 120px;" required="required" placeholder="serial number '+w+'" class="sr_no" /><br/>');
 			}
+			rename_input();
 		}else{
 			tr_obj.find('td:nth-child(3)').html('');
 		}
 	}
+	rename_input();
+	function rename_input()
+	{
+		
+		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
+			var row_no =$(this).attr('row_no');
+			
+				$(this).find("td:nth-child(3) .sr_no").each(function()
+				{
+					$(this).attr({name:"inventory_transfer_voucher_rows[in]["+row_no+"][sr_no][]"}).rules("add", "required");
+				});
+			});
+	}
 	
 	rename_rows_in();
-	function rename_rows_in(){
+	function rename_rows_in()
+	{
 		var j=0;
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
 			$(this).attr('row_no',j);

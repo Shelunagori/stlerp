@@ -36,14 +36,44 @@ class SerialNumbersTable extends Table
         $this->table('serial_numbers');
         $this->displayField('name');
 
-        $this->belongsTo('Items', [
-            'foreignKey' => 'item_id',
+        $this->belongsTo('Grns', [
+            'foreignKey' => 'grn_id',
             'joinType' => 'INNER'
         ]);
+
+        $this->belongsTo('GrnRows', [
+            'foreignKey' => 'grn_row_id',
+            'joinType' => 'INNER'
+        ]);		
+		
         $this->belongsTo('IvRows', [
             'foreignKey' => 'iv_row_id',
             'joinType' => 'INNER'
         ]);
+<<<<<<< HEAD
+=======
+        $this->belongsTo('IvRowItems', [
+            'foreignKey' => 'iv_row_item_id',
+            'joinType' => 'INNER'
+        ]);
+		$this->belongsTo('Items', [
+            'foreignKey' => 'item_id',
+            'joinType' => 'INNER'
+        ]);
+		$this->belongsTo('InvoiceRows', [
+            'foreignKey' => 'invoice_row_id',
+            'joinType' => 'INNER'
+        ]);
+		$this->belongsTo('SaleReturnRows', [
+            'foreignKey' => 'sales_return_row_id',
+            'joinType' => 'INNER'
+        ]);
+		$this->belongsTo('PurchaseReturnRows', [
+            'foreignKey' => 'purchase_return_row_id',
+            'joinType' => 'INNER'
+        ]);
+		
+>>>>>>> origin/master
     }
 
     /**
@@ -59,6 +89,7 @@ class SerialNumbersTable extends Table
             ->requirePresence('id', 'create')
             ->notEmpty('id');
 
+<<<<<<< HEAD
         $validator
             ->requirePresence('name', 'create')
             ->notEmpty('name');
@@ -72,6 +103,9 @@ class SerialNumbersTable extends Table
             ->requirePresence('iv_row_items', 'create')
             ->notEmpty('iv_row_items');
 
+=======
+        
+>>>>>>> origin/master
         return $validator;
     }
 

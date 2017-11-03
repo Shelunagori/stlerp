@@ -8,7 +8,7 @@
     }
 }
 p{
-margin-bottom: 0;
+margin-bottom: 0; 
 }
 </style>
 <style type="text/css" media="print">
@@ -109,13 +109,13 @@ margin-bottom: 0;
             <td style="white-space: nowrap;"><?= h($this->Number->format($petty_cash_voucher_row->amount,[ 'places' => 2])) ?> <?= h($petty_cash_voucher_row->cr_dr) ?></td>
             <td><?= h($petty_cash_voucher_row->narration) ?></td>
         </tr>
-		<?php if(!empty($ref_bal[$petty_cash_voucher_row->received_from_id])):?>
+		<?php if(!empty($petty_cash_voucher_row->reference_details)):?>
 		<tr >
 		
 		<td colspan="3" style="border-top:none !important;">
 			<table width="100%">
 			
-			<?php foreach($ref_bal[$petty_cash_voucher_row->received_from_id] as $refbal): ?>
+			<?php foreach($petty_cash_voucher_row->reference_details as $refbal): ?>
 			<tr>
 					<td style="width :180px !important;"> <?= h($refbal->reference_type). '-' .h($refbal->reference_no) ?></td>
 					
@@ -125,7 +125,7 @@ margin-bottom: 0;
 					<?= h($this->Number->format($refbal->debit,['places'=>2])) ?> Dr
 					<?php } ?></td>
 					</tr>
-			<?php endforeach; exit;?>
+			<?php endforeach;?>
 			</table>
 		</td>
 		

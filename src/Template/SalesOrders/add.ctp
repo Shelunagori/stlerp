@@ -902,7 +902,7 @@ $(document).ready(function() {
 			var qty=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
 			var Amount=qty*Rate;
-			$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			total=total+Amount;
 		});
 		
@@ -911,32 +911,32 @@ $(document).ready(function() {
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
 			var discount_amount=(total*discount_per)/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
+			$('input[name="discount"]').val(round(discount_amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 		}
 		total=total-discount_amount
 		
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
 			var pnf_amount=(total*pnf_per)/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
+			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}
 		var total_after_pnf=total+pnf_amount;
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
+		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		var sale_tax=(total_after_pnf*sale_tax_per)/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));
+		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		
 
 		

@@ -296,12 +296,12 @@ $(document).ready(function() {
 	$('.select_item_out').die().live("change",function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
-		var select_item_id=$(this).find('option:selected').val();
-		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumber']); ?>";
-		url1=url1+'/'+select_item_id,
-		
+		var select_item_id=$(this).find('option:selected').val(); 
+		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
+		url1=url1+'?item_id='+select_item_id,
+		//alert(url1);
 		$.ajax({
-			url: url1,
+			url: url1
 		}).done(function(response) { 
 		$(t).closest('tr').find('td:nth-child(3)').html(response);
 		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows[out]["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});

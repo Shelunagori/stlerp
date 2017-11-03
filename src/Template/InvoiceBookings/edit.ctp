@@ -254,43 +254,59 @@
 						<thead>
 							<tr>
 								<th width="25%">Ref Type</th>
-								<th width="40%">Ref No.</th>
+								<th width="25%">Ref No.</th>
 								<th width="30%">Amount</th>
+								<th width="10%"></th>
 								<th width="5%"></th>
 							</tr>
 						</thead>
+						
 						<tbody>
-							<?php foreach($ReferenceDetails as $old_ref_row){  ?>
+							<?php foreach($invoiceBooking->reference_details as $reference_detail){
+								if($reference_detail->reference_type!='On_account'){
+								?>
 								<tr>
-									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$old_ref_row->reference_type]); ?></td>
+									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
 									<td class="ref_no">
-									<?php if($old_ref_row->reference_type=="Against Reference"){
-										echo $this->requestAction('InvoiceBookings/fetchRefNumbersEdit/'.$v_LedgerAccount->id.'/'.$old_ref_row->reference_no.'/'.$old_ref_row->credit);
+										<?php 
+										if($reference_detail->reference_type=='Against Reference')
+										{
+											echo $this->requestAction('/ReferenceDetails/listRefEdit?ledger_account_id='.$v_LedgerAccount->id.'&ref_name='.$reference_detail->reference_no);
+										}
+										else
+										{
+											echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$reference_detail->reference_no.'"  is_old="yes">';
+										}
+										?> 
+									</td>
+									<td><?php 
+									if(!empty($reference_detail->credit)){
+										$amount=$reference_detail->credit;
+										$dr_cr="Cr";
 									}else{
-										echo '<input type="text" class="form-control input-sm" placeholder="Ref No." value="'.$old_ref_row->reference_no.'" readonly="readonly" is_old="yes">';
-									}?>
-									</td>
-									<td>
-									<?php 
-											echo $this->Form->input('old_amount', ['label' => false,'class' => '','type'=>'hidden','value'=>$old_ref_row->credit]);
-											echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$old_ref_row->credit]);
-																
-									?>
-									</td>
-									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button" old_ref="<?php echo $old_ref_row->reference_no; ?>" old_ref_type="<?php echo $old_ref_row->reference_type; ?>"><i class="fa fa-times"></i></a></td>
+										$amount=$reference_detail->debit;
+										$dr_cr="Dr";
+									}
+									echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$amount]); ?></td>
+									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm cr_dr_amount','value'=>$dr_cr]); ?></td>
+									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 								</tr>
-							<?php } ?>
-						</tbody>
+								<?php }
+							} ?>
+							
+							</tbody>
 						<tfoot>
 							<tr>
 								<td align="center" style="vertical-align: middle !important;">On Account</td>
 								<td></td>
 								<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+								<td><?php echo $this->Form->input('on_acc_cr_dr', ['label' => false,'class' => 'form-control input-sm on_acc_cr_dr','placeholder'=>'Cr_Dr','readonly']); ?></td>
 								<td></td>
 							</tr>
 							<tr>
 								<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-								<td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+								<td></td>
+								<td></td>
 								<td></td>
 							</tr>
 						</tfoot>
@@ -364,6 +380,7 @@ $(document).ready(function() {
 			var pnf=(amount_after_discount/total)*totalpnf;
 			$(this).find("td:nth-child(8) input").val(pnf.toFixed(5))
 		});
+		calculate_total();
 	});
 	
 	
@@ -521,8 +538,6 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(6) input").val(amount_after_misc.toFixed(2));
 		
 			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
-			//var discount=(discount.toFixed(2));
-			
 			if(!discount){ discount=0; }
 			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){
 				var amount_after_discount=amount_after_misc*(100-discount)/100;
@@ -551,6 +566,7 @@ $(document).ready(function() {
 			var amount_after_ex=amount_after_pnf*(100+ex)/100;
 			total_ex=total_ex+(amount_after_pnf*ex/100);
 			row_total=row_total+(amount_after_pnf*ex/100);
+			
 			var total_for_rate=amount_after_ex;
 			
 			var vat_cst=$('select[name="purchase_ledger_account"]').val();
@@ -595,44 +611,29 @@ $(document).ready(function() {
 			
 			var other=parseFloat($(this).find("td:nth-child(11) input").val());
 			if(!other){ other=0; }
-			
 			var amount_after_other=amount_after_cst+misc;
-			other=parseFloat(other.toFixed(2));
 			row_total=row_total+other;
 			total_for_rate=total_for_rate+other;
 			total_other=total_other+other;
-			//alert(row_total);
-			row_amount=total_for_rate/qty;
-			$(this).find("td:nth-child(12) input").val(row_total.toFixed(2));
-			$(this).find("td:nth-child(13) input").val((row_amount).toFixed(2));
 			
-			row_total=parseFloat(row_total.toFixed(2));
-			//row_total=row_total.toFixed(2);
+			$(this).find("td:nth-child(12) input").val(row_total.toFixed(2));
+			$(this).find("td:nth-child(13) input").val((total_for_rate/qty).toFixed(5));
+			
+			
 			total_row_amount=total_row_amount+row_total;
-			//alert(total_row_amount);
+			
 			
 		});
-		//total_discount=parseFloat(total_discount.toFixed(2));
 		$('input[name="total_amount"]').val(total_amount.toFixed(2));
 		$('input[name="total_discount"]').val(total_discount.toFixed(2));
 		$('input[name="total_pnf"]').val(total_pnf.toFixed(2));
 		$('input[name="total_ex"]').val(total_ex.toFixed(2));
 		$('input[name="total_saletax"]').val(total_cst.toFixed(2));
 		$('input[name="total_other_charges"]').val(total_other.toFixed(2));
-		
-		
-		total_discount=parseFloat(total_discount.toFixed(2));
-		total_amount=parseFloat(total_amount.toFixed(2));
-		total_pnf=parseFloat(total_pnf.toFixed(2));
-		total_ex=parseFloat(total_ex.toFixed(2));
-		total_cst=parseFloat(total_cst.toFixed(2));
-		total_other=parseFloat(total_other.toFixed(2));
-		
-		var total_data = total_amount-total_discount+total_pnf+total_ex+total_cst+total_other;
-		//alert(total_data);
-		$('input[name="total"]').val(total_data.toFixed(2));
+		$('input[name="total"]').val(total_row_amount.toFixed(2));
+		do_ref_total();
 	}
-   
+	
 	  function truncateToDecimals(num, dec = 2) {
 		  const calcDec = Math.pow(10, dec);
 		  return Math.trunc(num * calcDec) / calcDec;
@@ -742,7 +743,9 @@ $(document).ready(function() {
 	$('.addrefrow').live("click",function() { 
 		add_ref_row();
 	});
-	
+	$('.cr_dr_amount').live("change",function() {
+		do_ref_total();
+	});
 	function add_ref_row(){
 		var tr=$("#sample_ref table.ref_table tbody tr").clone();
 		$("table.main_ref_table tbody").append(tr);
@@ -759,42 +762,32 @@ $(document).ready(function() {
 			if(is_select){
 				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
-				var url='<?php echo $this->Url->build(['controller'=>'InvoiceBookings','action'=>'checkRefNumberUnique']); ?>';
-				url=url+'/<?php echo $v_LedgerAccount->id; ?>/'+i;
-				
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true,
-							noSpace: true,
-							
+							required: true
 						});
 			}
-			var is_ref_old_amount=$(this).find("td:nth-child(3) input:eq(0)").length;
-			if(is_ref_old_amount){
-				$(this).find("td:nth-child(3) input:eq(0)").attr({name:"ref_rows["+i+"][ref_old_amount]", id:"ref_rows-"+i+"-ref_old_amount"});
-				$(this).find("td:nth-child(3) input:eq(1)").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
-			}
 			
+			$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
+			$(this).find("td:nth-child(4) select").attr({name:"ref_rows["+i+"][ref_cr_dr]", id:"ref_rows-"+i+"-ref_cr_dr"}).rules("add", "required");
 			i++;
 		});
 		
-		var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
+		/* var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
 		if(is_tot_input){
 			$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total", id:"ref_rows_total"}).rules('add', { equalTo: "#total" });
-		}
+		} */
 	}
 	
 	$('.deleterefrow').live("click",function() {
 		$(this).closest("tr").remove();
 		do_ref_total();
-		var sel=$(this);
-		delete_one_ref_no(sel);
 	});
 	
 	$('.ref_type').live("change",function() {
 		var current_obj=$(this);
 		var ref_type=$(this).find('option:selected').val();
 		if(ref_type=="Against Reference"){
-			var url="<?php echo $this->Url->build(['controller'=>'InvoiceBookings','action'=>'fetchRefNumbers']); ?>";
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url,
 			$.ajax({
 				url: url+'/<?php echo $v_LedgerAccount->id; ?>',
@@ -813,10 +806,9 @@ $(document).ready(function() {
 	
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
-		var due_amount=$(this).find('option:selected').attr('due_amount');
+		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
-		delete_one_ref_no(sel);
 	});
 	
 	$('.ref_amount_textbox').live("keyup",function() {
@@ -825,46 +817,56 @@ $(document).ready(function() {
 	do_ref_total();
 	function do_ref_total(){
 		var main_amount=parseFloat($('input[name="total"]').val());
+		
 		if(!main_amount){ main_amount=0; }
 		
 		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
 		$("table.main_ref_table tbody tr").each(function(){
-			var am=parseFloat($(this).find('td:nth-child(3) input:eq(1)').val());
+			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
 			
-			//am=am.toFixed(2);
 			if(!am){ am=0; }
-			
-			total_ref=total_ref+am;
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
 		});
-		
-		var on_acc=main_amount-total_ref; 
-		if(on_acc>=0){
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc.toFixed(2));
-			total_ref=total_ref+on_acc;
-		}else{
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(0);
+		var on_acc=0;
+		var total_ref=0;
+		var on_acc_cr_dr='Cr';
+		if(total_ref_dr < total_ref_cr)
+		{
+			total_ref=total_ref_cr-total_ref_dr;
+			on_acc=main_amount-total_ref;
 		}
-		$("table.main_ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_ref.toFixed(2));
-	}
-	
-	$('.ref_type').live("change",function() {
-		var sel=$(this);
-		delete_one_ref_no(sel);
-	});
-	
-	function delete_one_ref_no(sel){
-		var old_received_from_id='<?php echo $v_LedgerAccount->id; ?>';
-		var old_ref=sel.closest('tr').find('a.deleterefrow').attr('old_ref');
-		var old_ref_type=sel.closest('tr').find('a.deleterefrow').attr('old_ref_type');
-		var url="<?php echo $this->Url->build(['controller'=>'InvoiceBookings','action'=>'deleteOneRefNumbers']); ?>";
-		url=url+'?old_received_from_id='+old_received_from_id+'&invoice_booking_id=<?php echo $invoiceBooking->id; ?>&old_ref='+old_ref+'&old_ref_type='+old_ref_type;
+		else if(total_ref_dr > total_ref_cr)
+		{
+			total_ref=total_ref_cr-total_ref_dr;
+			on_acc=main_amount-total_ref;
+		}
+		else
+		{
+			on_acc=main_amount;
+		}
 		
-		$.ajax({
-			url: url,
-			type: 'GET',
-		}).done(function(response) {
-		});
+		if(on_acc>=0){
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+		}else{
+			on_acc=Math.abs(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
+		}
 	}
+	
+	
 	
 
 
@@ -879,8 +881,10 @@ $(document).ready(function() {
 			<tr>
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
-				<td><?php echo $this->Form->input('amount', ['type' =>'hidden','class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?>
-				<?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?>
+				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
 				</td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>

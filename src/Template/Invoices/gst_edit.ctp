@@ -256,7 +256,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$current_cgst=[];
 					$current_sgst=[];
 					$current_igst=[];
-					
+					$sr_nos=[];
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
 						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
@@ -266,6 +266,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						$current_cgst[$current_invoice_row->item_id]=$current_invoice_row->cgst_percentage;
 						$current_sgst[$current_invoice_row->item_id]=$current_invoice_row->sgst_percentage;
 						$current_igst[$current_invoice_row->item_id]=$current_invoice_row->igst_percentage;
+						$sr_nos=$current_invoice_row->serial_number;
 					}
 					$q=0; 
 					
@@ -322,26 +323,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td></td>
 						</tr>
-						<?php $options1=[]; $choosen=[];
-							if(sizeof(@$ItemSerialNumber[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber[@$sales_order_row->item_id] as $item_serial_number){
-									if($item_serial_number->status=="Out"){
-										$choosen[]=$item_serial_number->id;
-									}
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}else if(sizeof(@$ItemSerialNumber2[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber2[@$sales_order_row->item_id] as $item_serial_number){
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}
-							if($sales_order_row->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no="<?= h($q) ?>">
+						<?php if($sales_order_row->item->item_companies[0]->serial_number_enable==1) { ?>
+						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
-							</tr><?php } ?>
+							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
+							</td>
+						</tr><?php } ?>
 						<?php  $q++;  } ?>
 				</tbody>
 				<tfoot><?php 
@@ -795,7 +784,7 @@ $(document).ready(function() {
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -868,38 +857,38 @@ $(document).ready(function() {
 		var fright_cgst_percent=parseFloat($('select[name="fright_cgst_percent"] option:selected').attr("percentage"));
 			if(isNaN(fright_cgst_percent)){ 
 				 var fright_cgst_amount = 0; 
-				$('input[name="fright_cgst_amount"]').val(fright_cgst_amount.toFixed(2));
+				$('input[name="fright_cgst_amount"]').val(round(fright_cgst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 				var fright_cgst_amount = (fright_amount*fright_cgst_percent)/100;
-				$('input[name="fright_cgst_amount"]').val(fright_cgst_amount.toFixed(2));
+				$('input[name="fright_cgst_amount"]').val(round(fright_cgst_amount,2));
 			}
 		
 		var fright_sgst_percent=parseFloat($('select[name="fright_sgst_percent"] option:selected').attr("percentage"));
 			if(isNaN(fright_sgst_percent)){ 
 				 var fright_sgst_amount = 0; 
-				$('input[name="fright_sgst_amount"]').val(fright_sgst_amount.toFixed(2));
+				$('input[name="fright_sgst_amount"]').val(round(fright_sgst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 				var fright_sgst_amount = (fright_amount*fright_sgst_percent)/100;
-				$('input[name="fright_sgst_amount"]').val(fright_sgst_amount.toFixed(2));
+				$('input[name="fright_sgst_amount"]').val(round(fright_sgst_amount,2));
 			}
 			
 		var fright_igst_percent=parseFloat($('select[name="fright_igst_percent"] option:selected').attr("percentage"));
 			if(isNaN(fright_igst_percent)){ 
 				 var fright_igst_amount = 0; 
-				$('input[name="fright_igst_amount"]').val(fright_igst_amount.toFixed(2));
+				$('input[name="fright_igst_amount"]').val(round(fright_igst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 				var fright_igst_amount = (fright_amount*fright_igst_percent)/100;
-				$('input[name="fright_igst_amount"]').val(fright_igst_amount.toFixed(2));
+				$('input[name="fright_igst_amount"]').val(round(fright_igst_amount,2));
 			}
 			var total_fright=fright_amount+fright_cgst_amount+fright_igst_amount+fright_sgst_amount;
 			if(isNaN(total_fright)){
 				 var total_fright = 0; 
-				 $('input[name="total_fright_amount"]').val(total_fright.toFixed(2));
+				 $('input[name="total_fright_amount"]').val(round(total_fright,2));
 			}else{
-				$('input[name="total_fright_amount"]').val(total_fright.toFixed(2));
+				$('input[name="total_fright_amount"]').val(round(total_fright,2));
 
 			}
 	}
@@ -913,79 +902,79 @@ $(document).ready(function() {
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=qty*Rate;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 				total_amt=total_amt+amount;
 				var discount_percentage=parseFloat($(this).find("td:nth-child(6) input").val());
 				if(isNaN(discount_percentage)){ 
 					 var discount_amount = 0; 
-					$(this).find("td:nth-child(7) input").val(discount_amount.toFixed(2));
+					$(this).find("td:nth-child(7) input").val(round(discount_amount,2));
 				}else{ 
 					var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 					var discount_amount = (amount*discount_percentage)/100;
-					$(this).find("td:nth-child(7) input").val(discount_amount.toFixed(2));
+					$(this).find("td:nth-child(7) input").val(round(discount_amount,2));
 				}
 				total_discount=total_discount+discount_amount;
 				var pnf_percentage=parseFloat($(this).find("td:nth-child(8) input").val());
 				if(isNaN(pnf_percentage)){ 
 					 var pnf_amount = 0; 
-					$(this).find("td:nth-child(9) input").val(pnf_amount.toFixed(2));
+					$(this).find("td:nth-child(9) input").val(round(pnf_amount,2));
 				}else{ 
 					var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 					var amount_after_dis=amount-discount_amount;
 					var pnf_amount = (amount_after_dis*pnf_percentage)/100;
-					$(this).find("td:nth-child(9) input").val(pnf_amount.toFixed(2));
+					$(this).find("td:nth-child(9) input").val(round(pnf_amount,2));
 				}
 				total_pnf=total_pnf+pnf_amount;
 				var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 				var discount_amount=parseFloat($(this).find("td:nth-child(7) input").val());
 				var pnf_amount=parseFloat($(this).find("td:nth-child(9) input").val());
 				var taxable_value=(amount-discount_amount)+pnf_amount;
-				$(this).find("td:nth-child(10) input").val(taxable_value.toFixed(2));
+				$(this).find("td:nth-child(10) input").val(round(taxable_value,2));
 				total_taxable_value=total_taxable_value+taxable_value;
 				var cgst_percentage=parseFloat($(this).find("td:nth-child(11) option:selected").attr("percentage"));
 				if(isNaN(cgst_percentage)){ 
 					 var cgst_amount = 0; 
-					$(this).find("td:nth-child(12) input").val(cgst_amount.toFixed(2));
+					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 					var cgst_amount = (taxable_value*cgst_percentage)/100;
-					$(this).find("td:nth-child(12) input").val(cgst_amount.toFixed(2));
+					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 				}
 				total_cgst=total_cgst+cgst_amount;
 				var sgst_percentage=parseFloat($(this).find("td:nth-child(13) option:selected").attr("percentage"));
 				if(isNaN(sgst_percentage)){ 
 					 var sgst_amount = 0; 
-					$(this).find("td:nth-child(14) input").val(sgst_amount.toFixed(2));
+					$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 					var sgst_amount = (taxable_value*sgst_percentage)/100;
-					$(this).find("td:nth-child(14) input").val(sgst_amount.toFixed(2));
+					$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 				}
 				total_sgst=total_sgst+sgst_amount;
 				var igst_percentage=parseFloat($(this).find("td:nth-child(15) option:selected").attr("percentage"));
 				if(isNaN(igst_percentage)){ 
 					 var igst_amount = 0; 
-					$(this).find("td:nth-child(16) input").val(igst_amount.toFixed(2));
+					$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 					var igst_amount = (taxable_value*igst_percentage)/100;
-					$(this).find("td:nth-child(16) input").val(igst_amount.toFixed(2));
+					$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 				}
 				total_igst=total_igst+igst_amount;
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 					var cgst_amount=parseFloat($(this).find("td:nth-child(12) input").val());
 					var sgst_amount=parseFloat($(this).find("td:nth-child(14) input").val());
 					var igst_amount=parseFloat($(this).find("td:nth-child(16) input").val());
-					taxable_value=parseFloat(taxable_value.toFixed(2));
-					cgst_amount=parseFloat(cgst_amount.toFixed(2));
-					sgst_amount=parseFloat(sgst_amount.toFixed(2));
-					igst_amount=parseFloat(igst_amount.toFixed(2));
+					taxable_value=parseFloat(round(taxable_value,2));
+					cgst_amount=parseFloat(round(cgst_amount,2));
+					sgst_amount=parseFloat(round(sgst_amount,2));
+					igst_amount=parseFloat(round(igst_amount,2));
 					
 					var row_total=taxable_value+cgst_amount+sgst_amount+igst_amount;
-					row_total=parseFloat(row_total.toFixed(2));
+					row_total=parseFloat(round(row_total,2));
 					total_row_amount=total_row_amount+row_total;
-					$(this).find("td:nth-child(17) input").val(row_total.toFixed(2));
+					$(this).find("td:nth-child(17) input").val(round(row_total,2));
 					grand_total=grand_total+row_total;
 			}
 			
@@ -1005,41 +994,41 @@ $(document).ready(function() {
 			if(isNaN(total_fright_amount)){ var total_fright_amount = 0;  }
 			total_tax=total_taxable_value+fright_amount;
 			
-			$('input[name="total_amt"]').val(total_amt.toFixed(2));
-			$('input[name="total_discount"]').val(total_discount.toFixed(2));
-			$('input[name="total_pnf"]').val(total_pnf.toFixed(2));
-			$('input[name="total_taxable_value"]').val(total_tax.toFixed(2));
+			$('input[name="total_amt"]').val(round(total_amt,2));
+			$('input[name="total_discount"]').val(round(total_discount,2));
+			$('input[name="total_pnf"]').val(round(total_pnf,2));
+			$('input[name="total_taxable_value"]').val(round(total_tax,2));
 			
-			total_row_amount=parseFloat(total_row_amount.toFixed(2));
-			total_cgst=parseFloat(total_cgst.toFixed(2));
-			total_sgst=parseFloat(total_sgst.toFixed(2));
-			total_igst=parseFloat(total_igst.toFixed(2));
-			total_fright_amount=parseFloat(total_fright_amount.toFixed(2));
+			total_row_amount=parseFloat(round(total_row_amount,2));
+			total_cgst=parseFloat(round(total_cgst,2));
+			total_sgst=parseFloat(round(total_sgst,2));
+			total_igst=parseFloat(round(total_igst,2));
+			total_fright_amount=parseFloat(round(total_fright_amount,2));
 			total_debit=total_row_amount+total_fright_amount;
 			total_cgst_amt=total_cgst+fcgst;
 			total_sgst_amt=total_sgst+fsgst;
 			total_igst_amt=total_igst+figst;
-			$('input[name="fright_amt"]').val(fright_amount.toFixed(2));
-			$('input[name="total_cgst"]').val(total_cgst_amt.toFixed(2));
-			$('input[name="total_sgst"]').val(total_sgst_amt.toFixed(2));
-			$('input[name="total_igst"]').val(total_igst_amt.toFixed(2));
-			$('input[name="all_row_total"]').val(total_debit.toFixed(2));
+			$('input[name="fright_amt"]').val(round(fright_amount,2));
+			$('input[name="total_cgst"]').val(round(total_cgst_amt,2));
+			$('input[name="total_sgst"]').val(round(total_sgst_amt,2));
+			$('input[name="total_igst"]').val(round(total_igst_amt,2));
+			$('input[name="all_row_total"]').val(round(total_debit,2));
 			
 			var all_row_total=parseFloat($('input[name="all_row_total"]').val());
 					
-			total_taxable_value1=parseFloat(total_taxable_value.toFixed(2));
-			total_cgst_amt1=parseFloat(total_cgst_amt.toFixed(2));
-			total_sgst_amt1=parseFloat(total_sgst_amt.toFixed(2));
-			total_igst_amt1=parseFloat(total_igst_amt.toFixed(2));
-			fright_amount1=parseFloat(fright_amount.toFixed(2));
+			total_taxable_value1=parseFloat(round(total_taxable_value,2));
+			total_cgst_amt1=parseFloat(round(total_cgst_amt,2));
+			total_sgst_amt1=parseFloat(round(total_sgst_amt,2));
+			total_igst_amt1=parseFloat(round(total_igst_amt,2));
+			fright_amount1=parseFloat(round(fright_amount,2));
 					
 					
 			grand_total=total_taxable_value1+total_cgst_amt1+total_sgst_amt1+total_igst_amt1+fright_amount1;
-			$('input[name="total"]').val(total_taxable_value.toFixed(2));
-			$('input[name="total_cgst_amount"]').val(total_cgst_amt.toFixed(2));
-			$('input[name="total_igst_amount"]').val(total_igst_amt.toFixed(2));
-			$('input[name="total_sgst_amount"]').val(total_sgst_amt.toFixed(2));
-			$('input[name="grand_total"]').val(grand_total.toFixed(2));
+			$('input[name="total"]').val(round(total_taxable_value,2));
+			$('input[name="total_cgst_amount"]').val(round(total_cgst_amt,2));
+			$('input[name="total_igst_amount"]').val(round(total_igst_amt,2));
+			$('input[name="total_sgst_amount"]').val(round(total_sgst_amt,2));
+			$('input[name="grand_total"]').val(round(grand_total,2));
 		});
 		do_ref_total();
 	}
@@ -1097,10 +1086,10 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
+		/* var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
 		if(is_tot_input){
 			$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total", id:"ref_rows_total"}).rules('add', { equalTo: "#grand-total" });
-		}
+		} */
 	}
 	
 	$('.deleterefrow').live("click",function() {
@@ -1166,11 +1155,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}
@@ -1186,6 +1175,10 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Cr','style'=>'vertical-align: top !important;']); ?>
+				</td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>

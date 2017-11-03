@@ -178,12 +178,17 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					<?php 
 					$current_rows=[];
 					$current_row_items=[];
+					$descriptions=[];
+					$sr_nos=[];
 					
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
 						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
 						$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
+						$sr_nos=$current_invoice_row->serial_number;
 					}
+					//$sr_nos=explode(',',$current_item_serial_number);
+					
 					$q=0; 
 						
 			
@@ -198,7 +203,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php 
-								echo $this->Form->input('q', ['type'=>'hidden','value'=>$sales_order_row->item_id]);
+								echo $this->Form->input('q', ['type'=>'hidden','value'=>$sales_order_row->item_id,'class'=>'item_ids']);
 								echo $sales_order_row->item->name;
 								?>
 							</td>
@@ -242,26 +247,13 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							
 							</td>
 						</tr>
-						
-						<?php $options1=[]; $choosen=[];
-							if(sizeof(@$ItemSerialNumber[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber[@$sales_order_row->item_id] as $item_serial_number){
-									if($item_serial_number->status=="Out"){
-										$choosen[]=$item_serial_number->id;
-									}
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}else if(sizeof(@$ItemSerialNumber2[@$sales_order_row->item_id])>0){
-								foreach($ItemSerialNumber2[@$sales_order_row->item_id] as $item_serial_number){
-									$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-								} 
-							}
-							if($sales_order_row->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no="<?= h($q) ?>">
+					<?php if(@$sales_order_row->item->item_companies[0]->serial_number_enable==1){ ?>
+						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan="6">
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>$choosen,'readonly']);  ?></td>
-							</tr><?php } ?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
+							</td>
+					</tr><?php } ?>
 					
 					<?php $q++; }  ?>
 				</tbody>
@@ -513,7 +505,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
-	
+	jQuery.validator.addMethod("noSpace", function(value, element) { 
+	  return value.indexOf(" ") < 0 && value != ""; 
+	}, "No space please and don't leave it empty");
 	
 	//--------- FORM VALIDATION
 	var form3 = $('#form_sample_3');
@@ -701,7 +695,7 @@ $(document).ready(function() {
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -774,7 +768,7 @@ $(document).ready(function() {
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=qty*Rate;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
 				if(isNaN(sale_tax)) { var sale_tax = 0; }
@@ -794,7 +788,7 @@ $(document).ready(function() {
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
 			var discount_amount=(total*discount_per)/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
+			$('input[name="discount"]').val(round(discount_amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
@@ -804,45 +798,45 @@ $(document).ready(function() {
 		var exceise_duty=parseFloat($('input[name="exceise_duty"]').val());
 		if(isNaN(exceise_duty)) { var exceise_duty = 0; }
 		total=total+exceise_duty
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
 			var pnf_amount=(total*pnf_per)/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
+			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}
 		var total_after_pnf=total+pnf_amount;
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
+		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		
 		var sale_tax=(total_after_pnf*sale_tax_per)/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));
+		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		
 		var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 		//alert(fright_amount);
 		if(isNaN(fright_amount)) { var fright_amount = 0; }
 		
 		grand_total=total_after_pnf+sale_tax+fright_amount;
-		$('input[name="grand_total"]').val(grand_total.toFixed(2));
+		$('input[name="grand_total"]').val(round(grand_total,2));
 		
 		var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
 		
 		var	new_due_payment=grand_total+old_due_payment1;
-		$('input[name="new_due_payment"]').val(new_due_payment.toFixed(2));
+		$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 		
 	}
 		
 			var grand_total=parseFloat($('input[name="grand_total"]').val());
 			var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
 			var	new_due_payment=grand_total+old_due_payment1;
-			$('input[name="new_due_payment"]').val(new_due_payment.toFixed(2));
+			$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 			
 	
 			var credit_limit=parseFloat($('input[name="credit_limit"]').val());
@@ -1024,7 +1018,7 @@ $(document).ready(function() {
 				var qty=parseFloat($(this).find('.amount_box').val());
 				total_left=total_left+qty;
 			} 
-			$('input[name="total_amount_agst"]').val(total_left.toFixed(2));	
+			$('input[name="total_amount_agst"]').val(round(total_left,2));	
 			
 		});
 		do_ref_total();
@@ -1052,7 +1046,8 @@ $(document).ready(function() {
 			}else if(is_input){
 				
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true
+							required: true,
+							noSpace: true
 						});
 			}
 			
@@ -1061,10 +1056,10 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
+		/* var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
 		if(is_tot_input){
 			$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total", id:"ref_rows_total"}).rules('add', { equalTo: "#grand-total" });
-		}
+		} */
 	}
 	
 	$('.deleterefrow').live("click",function() {
@@ -1149,11 +1144,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}

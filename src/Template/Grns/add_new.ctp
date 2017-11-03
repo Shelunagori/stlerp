@@ -231,7 +231,8 @@ $(document).ready(function() {
 
 		submitHandler: function (form) {
 			var check_d=0;
-				$(".rename_check").each(function () {
+				$(".rename_check").each(function () 
+				{
 					if($(this).prop('checked'))
 					{
 						check_d=1;
@@ -279,7 +280,7 @@ $(document).ready(function() {
 						
 						for(i=l;i<=qty;i++){
 						
-						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="serial_numbers['+item_id+']['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'"/></div>');
+						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'"/></div>');
 						
 						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
 						r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
@@ -288,7 +289,7 @@ $(document).ready(function() {
 				}
 				
 				else{
-				$('tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input.sr_no').remove();
+					$('tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input.sr_no').remove();
 				}
 			
 		});

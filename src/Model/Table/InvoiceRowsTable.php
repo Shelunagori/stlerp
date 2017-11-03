@@ -36,7 +36,9 @@ class InvoiceRowsTable extends Table
         $this->table('invoice_rows');
         $this->displayField('id');
         $this->primaryKey('id');
-		$this->belongsTo('ItemSerialnumbers');
+		$this->hasMany('SerialNumbers',[
+			'foreignKey' => 'invoice_row_id'
+		]);
 		$this->belongsTo('InventoryVouchers');
         $this->belongsTo('Invoices', [
             'foreignKey' => 'invoice_id',
@@ -72,7 +74,7 @@ class InvoiceRowsTable extends Table
             ->allowEmpty('id', 'create');
 		
         $validator
-            ->integer('quantity')
+            ->decimal('quantity')
             ->requirePresence('quantity', 'create')
             ->notEmpty('quantity');
 

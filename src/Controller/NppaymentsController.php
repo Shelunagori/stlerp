@@ -152,7 +152,7 @@ class NppaymentsController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $nppayment = $this->Nppayments->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'NppaymentRows' => ['ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes', 'Companies', 'NppaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		
 		$petty_cash_voucher_row_data=[];
@@ -495,7 +495,7 @@ class NppaymentsController extends AppController
 
         
         $nppayment = $this->Nppayments->get($id, [
-            'contain' => ['NppaymentRows'=>['ReferenceDetails']]
+            'contain' => ['NppaymentRows'=>['ReferenceDetails','ReceivedFroms']]
         ]);
    // pr( $nppayment); exit;
         if ($this->request->is(['patch', 'post', 'put'])) {

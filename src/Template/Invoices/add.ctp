@@ -207,7 +207,7 @@ $('.closetin').on("click",function() {
 					if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
 						$ed_des[]=$sales_order_rows->excise_duty;
-					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){	
+					/* if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ */	
 					?>
 						<tr class="tr1  firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
 						
@@ -238,20 +238,14 @@ $('.closetin').on("click",function() {
 							</td>
 							<td></td>
 						</tr>
-				
-						<?php 
-						
-						$options1=[]; 
-							foreach($sales_order_rows->item->item_serial_numbers as $item_serial_number){
-								$options1[]=['text' =>$item_serial_number->serial_no, 'value' => $item_serial_number->id];
-							} 
-							if($sales_order_rows->item->item_companies[0]->serial_number_enable==1) { ?>
-							<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
+						<?php if(@$sales_order_rows->item->item_companies[0]->serial_number_enable==1){ ?>
+						<tr class="tr3" row_no='<?php echo @$sales_order_rows->id; ?>'>
 							<td></td>
 							<td colspan="5">
-							<?php echo $this->Form->input('q', ['label'=>false,'options' => $options1,'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']);  ?></td>
-							</tr><?php } ?>
-					<?php $q++; } endforeach; }?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_rows->item_id); ?>
+							</td>
+						</tr>
+						<?php } $q++;  endforeach; }?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
@@ -814,7 +808,7 @@ $(document).ready(function() {
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][item_serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -838,7 +832,7 @@ $(document).ready(function() {
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
-				if(serial_l>0){
+				if(serial_l > 0){
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).select2().rules( "remove", "required" );
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
 				}
@@ -877,10 +871,10 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
-				var qty=parseInt($(this).find("td:nth-child(3) input").val());
+				var qty=parseFloat($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=qty*Rate;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
 				if(isNaN(sale_tax)) { var sale_tax = 0; }
@@ -899,7 +893,7 @@ $(document).ready(function() {
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
 			var discount_amount=(total*discount_per)/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
+			$('input[name="discount"]').val(round(discount_amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
@@ -909,38 +903,38 @@ $(document).ready(function() {
 		var exceise_duty=parseFloat($('input[name="exceise_duty"]').val());
 		if(isNaN(exceise_duty)) { var exceise_duty = 0; }
 		total=total+exceise_duty
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
 			var pnf_amount=(total*pnf_per)/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
+			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}
 		var total_after_pnf=total+pnf_amount;
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
+		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		
 		var sale_tax=(total_after_pnf*sale_tax_per)/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));
+		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		
 		var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 		//alert(fright_amount);
 		if(isNaN(fright_amount)) { var fright_amount = 0; }
 		
 		grand_total=total_after_pnf+sale_tax+fright_amount;
-		$('input[name="grand_total"]').val(grand_total.toFixed(2));
+		$('input[name="grand_total"]').val(round(grand_total,2));
 		
 		var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
 		
 		var	new_due_payment=grand_total+old_due_payment1;
-		$('input[name="new_due_payment"]').val(new_due_payment.toFixed(2));
+		$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 		do_ref_total();
 	}
 	<?php } ?>
@@ -1044,7 +1038,7 @@ $(document).ready(function() {
 				var qty=parseFloat($(this).find('.amount_box').val());
 				total_left=total_left+qty;
 			} 
-			$('input[name="total_amount_agst"]').val(total_left.toFixed(2));	
+			$('input[name="total_amount_agst"]').val(round(total_left,2));	
 			
 		});
 	}
@@ -1074,7 +1068,8 @@ $(document).ready(function() {
 				//var url='<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'checkRefNumberUnique']); ?>';
 				//url=url+'/<?php echo $c_LedgerAccount->id; ?>/'+i;
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true
+							required: true,
+							noSpace:true
 						});
 			}
 			
@@ -1083,10 +1078,10 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
+		/* var is_tot_input=$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").length;
 		if(is_tot_input){
 			$("table.main_ref_table tfoot tr:eq(1) td:eq(1) input").attr({name:"ref_rows_total", id:"ref_rows_total"}).rules('add', { equalTo: "#grand-total" });
-		}
+		} */
 	}
 	
 	$('.deleterefrow').live("click",function() {
@@ -1171,11 +1166,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}
