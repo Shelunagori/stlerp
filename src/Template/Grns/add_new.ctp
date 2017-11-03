@@ -231,7 +231,8 @@ $(document).ready(function() {
 
 		submitHandler: function (form) {
 			var check_d=0;
-				$(".rename_check").each(function () {
+				$(".rename_check").each(function () 
+				{
 					if($(this).prop('checked'))
 					{
 						check_d=1;
@@ -288,7 +289,7 @@ $(document).ready(function() {
 				}
 				
 				else{
-				$('tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input.sr_no').remove();
+					$('tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input.sr_no').remove();
 				}
 			
 		});
