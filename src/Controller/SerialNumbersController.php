@@ -224,13 +224,16 @@ class SerialNumbersController extends AppController
 		
 		$options=[];$values=[];
         $query = $this->SerialNumbers->find('list');
-		$query->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'SerialNumbers.status'=>'In']);
-		$SerialNumbers_in = $query->toArray();
 		
-		$serialnumbers_out = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.status'=>'Out','purchase_return_row_id'=>$purchsereturn_row_id])->toArray();
+		$query->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.status'=>'In']);
+		$SerialNumbers_in = $query->toArray();
+		//pr($SerialNumbers_in);exit;
+		$serialnumbers_out = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.status'=>'Out','purchase_return_row_id >'=>0])->toArray();
 		
 		$serialnumbers_out1 = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'SerialNumbers.status'=>'Out','purchase_return_row_id'=>$purchsereturn_row_id])->toArray();
 		
+		//pr($SerialNumbers_in);
+		// pr($serialnumbers_out1);
 		foreach($serialnumbers_out1 as $sr_in) {
 			$values[]=$sr_in;
 			$options[]=['text' =>$sr_in, 'value' => $sr_in];
@@ -238,10 +241,10 @@ class SerialNumbersController extends AppController
 		//pr($values);
 		$out_dropdown = array_diff($SerialNumbers_in,$serialnumbers_out);
 		
-		foreach($out_dropdown as $option){  	
+		 foreach($out_dropdown as $option){  	
 			$options[]=['text' =>$option, 'value' => $option];
 			
-		}
+		} 
 		
         $this->set(compact('options', 'values','out_dropdown'));
         $this->set('_serialize', ['out_dropdown']);

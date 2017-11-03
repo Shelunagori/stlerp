@@ -478,7 +478,8 @@ $(document).ready(function() {
 	
 	
    calculate_total();
-	$('.cal').die().live("keyup",function() { 
+	$('.cal').die().live("keyup",function() {  
+		rename_rows();
 		calculate_total();
     });
 	
@@ -710,7 +711,11 @@ $(document).ready(function() {
 				$(uncheck).find('td:nth-child(1) input').attr({ name:"q", readonly:"readonly"});
 				$(uncheck).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
-				
+				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				if(serial_l>0){
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).removeAttr("required" );
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
+				}
 			} 
 			
 			$('input[name="checked_row_length"]').val(i);
