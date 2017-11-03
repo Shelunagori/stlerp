@@ -1166,7 +1166,6 @@ $(document).ready(function() {
 });
 </script>
 
-
 <?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
 <div id="sample_ref" style="display:none;">
 	<table width="100%" class="ref_table">

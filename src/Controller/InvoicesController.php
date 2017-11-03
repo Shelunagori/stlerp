@@ -507,7 +507,8 @@ class InvoicesController extends AppController
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
 					$items_source=$this->Invoices->Items->get($invoice_row->item_id);
 						if($items_source->source=='Purchessed/Manufactured'){ 
-							if($SalesOrderRow->source_type=="Manufactured"){
+							if($SalesOrderRow->source_type=="Manufactured")
+							{
 								$query = $this->Invoices->query();
 								$query->update()
 									->set(['inventory_voucher_create' => 'Yes'])
