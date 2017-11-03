@@ -409,7 +409,8 @@ class InvoicesController extends AppController
 		$sales_order=array(); $process_status='New';
 		if(!empty($sales_order_id)){
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
-				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) {
+				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) 
+						{
 						   return $q
 								->contain(['SerialNumbers'=>function($q) use($st_company_id){
 									return $q->where(['SerialNumbers.status' => 'In','SerialNumbers.company_id' => $st_company_id]); 
@@ -499,8 +500,10 @@ class InvoicesController extends AppController
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
 			
-            if ($this->Invoices->save($invoice)) {
-				foreach($invoice->invoice_rows as $invoice_row){
+            if ($this->Invoices->save($invoice)) 
+			{
+				foreach($invoice->invoice_rows as $invoice_row)
+				{
 					$SalesOrderRow=$this->Invoices->SalesOrderRows->find()->where(['sales_order_id'=>$invoice->sales_order_id,'item_id'=>$invoice_row->item_id])->first();
 					$items_source=$this->Invoices->Items->get($invoice_row->item_id);
 						if($items_source->source=='Purchessed/Manufactured'){ 

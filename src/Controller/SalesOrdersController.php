@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Datasource\ConnectionManager;
 /**
  * SalesOrders Controller
  *
@@ -22,10 +23,17 @@ class SalesOrdersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
+
 		$salesOrders = $this->SalesOrders->find();
 		$this->paginate(
 			$salesOrders
-			->select(['id'])
+			->select(['id']));
+
+		//$salesOrders = $this->SalesOrders->find();
+		/* $this->paginate(
+			$salesOrders->select(['id','total_sales'=>$salesOrders->func()->sum('SalesOrderRows.quantity')])
+            ->group(['SalesOrderRows.sales_order_id'])
+>>>>>>> 05bb44b630ba19ac12f6b2a3d40af24dd7bd46d1
 			->innerJoinWith('SalesOrderRows', function ($q) {
 				return $q->group(['SalesOrderRows.sales_order_id'])->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity')]);
 			})
@@ -33,9 +41,47 @@ class SalesOrdersController extends AppController
 				return $q->group(['InvoiceRows.sales_order_row_id'])->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
 			})
 			->where(['SalesOrders.company_id'=>$st_company_id])
-			->group(['SalesOrderRows.sales_order_id'])
 			->group(['SalesOrders.id'])
+<<<<<<< HEAD
 		);
+=======
+		); */
+		//$this->paginate(
+			/* $salesOrders->select(['id','total_sales'=>$salesOrders->func()->sum('SalesOrderRows.quantity')])
+            ->group(['SalesOrderRows.sales_order_id'])
+			->innerJoinWith('SalesOrderRows');
+			
+			$salesOrders->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
+				return $q->group(['InvoiceRows.sales_order_row_id'])
+				->distinct('InvoiceRows.sales_order_row_id')
+				->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
+			});
+			$salesOrders->where(['SalesOrders.company_id'=>$st_company_id])
+			->group(['SalesOrders.id']); */
+		//);
+		
+		$InvoiceRows = $this->SalesOrders->SalesOrderRows->InvoiceRows->find();
+		$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+		$salesOrders = $this->SalesOrders->find();
+		
+		$SalesOrderRows->select(['id','total_invoice_row_wise'=>$InvoiceRows->func()->sum('InvoiceRows.quantity')])
+		->innerJoinWith('InvoiceRows')
+		->group(['InvoiceRows.sales_order_row_id', 'SalesOrderRows.full_name'])
+		->autoFields(true);
+		//echo $SalesOrderRows[0]->full_name;
+		/* foreach($SalesOrderRows as $SalesOrderRow){
+			echo $SalesOrderRow->full_name;
+		}		exit; */
+		
+		$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+		->innerJoinWith('SalesOrderRows')
+		->innerJoinWith('SalesOrderRows.InvoiceRows')
+		->group(['SalesOrders.id'])
+		->autoFields(true);
+		
+		
+		/* $salesOrders->union($SalesOrderRows);
+		pr($salesOrders->toArray()); exit; */
 		
 		pr($salesOrders->toArray());
 		/* $salesOrders = $this->SalesOrders->find();
@@ -62,6 +108,49 @@ class SalesOrdersController extends AppController
 				}])
 				->group(['FaqTutorials.id'])
 				->enableAutoFields(true);   */
+		/* $salesOrders = $this->SalesOrders->find();
+		
+		$matchingComment = $salesOrders->association('SalesOrderRows')->find()
+			->select(['sales_order_id','salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
+			->group(['SalesOrderRows.sales_order_id']);
+
+		$query = $salesOrders->find()
+			->select(['sqty' => $matchingComment]); */
+			
+			/* $conn = ConnectionManager::get('default');
+			$stmt = $conn->execute('SELECT sales_order_rows.salesQty,invoice_rows.InvoiceQty FROM sales_orders
+					  INNER JOIN sales_order_rows ON sales_order_rows.sales_order_id = sales_orders.id
+					  INNER JOIN invoice_rows ON invoice_rows.sales_order_row_id = sales_order_rows.id 
+					  INNER JOIN (
+						SELECT SUM(sales_order_rows.quantity) AS salesQty
+						  FROM sales_order_rows
+						  GROUP BY sales_order_rows.sales_order_id
+					  ) sales_order_rows ON sales_order_rows.sales_order_id = sales_orders.id
+					  INNER JOIN (
+						SELECT SUM(invoice_rows.quantity) AS InvoiceQty
+						FROM invoice_rows
+						GROUP BY invoice_rows.sales_order_row_id
+					  ) invoice_rows ON invoice_rows.sales_order_row_id = sales_order_rows.id 
+					  GROUP BY sales_orders.id
+					');
+					
+		
+		
+		//$qw=$this->paginate($stmt);
+		pr($stmt->fetchAll('assoc')); */
+		
+		/* $salesOrders = $this->SalesOrders->find();
+		$salesOrders->select(['salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
+		->contain([
+			'SalesOrderRows' => [
+					'strategy' => 'subquery',
+					'queryBuilder' => function ($q) {
+						return $q;
+					}
+			]
+		]); */
+		//$salesOrders = $this->paginate($salesOrders);
+		pr($salesOrders->toArray());
 		exit;
     }
 	

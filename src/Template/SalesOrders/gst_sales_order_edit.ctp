@@ -834,7 +834,7 @@ $(document).ready(function() {
 			var qty=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
 			var Amount=qty*Rate;
-			$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			//total=total+Amount;
 			row_total =row_total+Amount;
 			var discount=$(this).find("td:nth-child(6) input").val();
@@ -845,7 +845,7 @@ $(document).ready(function() {
 			{   
 		         row_total =row_total-parseFloat(discount_value);
 				 total_discount_amt = total_discount_amt+parseFloat(discount_value);
-				 $(this).find("td:nth-child(7) input").val(discount_value.toFixed(2));
+				 $(this).find("td:nth-child(7) input").val(round(discount_value,2));
 			}
 			var pnf=$(this).find("td:nth-child(8) input").val(); 
 			if(!pnf){ pnf=0; $(this).find("td:nth-child(9) input").val('');}
@@ -855,20 +855,20 @@ $(document).ready(function() {
 			{
 				total_pnf_amt =total_pnf_amt+parseFloat(pnf_value);
 				row_total =value_after_pnf;
-				$(this).find("td:nth-child(9) input").val(pnf_value.toFixed(2));
+				$(this).find("td:nth-child(9) input").val(round(pnf_value,2));
 			}
 			tatal_taxable_amt = tatal_taxable_amt+parseFloat(value_after_pnf);
-			$(this).find("td:nth-child(10) input").val(value_after_pnf.toFixed(2));
+			$(this).find("td:nth-child(10) input").val(round(value_after_pnf,2));
 			var cgst_percentage=parseFloat($(this).find("td:nth-child(11) option:selected").attr("percentage"));
 			if(isNaN(cgst_percentage))
 			{ 
 					var cgst_amount = 0; 
-					$(this).find("td:nth-child(12) input").val(cgst_amount.toFixed(2));
+					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 			}else
 			{  
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 					var cgst_amount = (taxable_value*cgst_percentage)/100;
-					$(this).find("td:nth-child(12) input").val(cgst_amount.toFixed(2));
+					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 					row_total=row_total+((taxable_value*cgst_percentage)/100);
 			}
 			total_cgst=total_cgst+cgst_amount;
@@ -876,68 +876,68 @@ $(document).ready(function() {
 			var sgst_percentage=parseFloat($(this).find("td:nth-child(13) option:selected").attr("percentage"));
 			if(isNaN(sgst_percentage)){ 
 				 var sgst_amount = 0; 
-				$(this).find("td:nth-child(14) input").val(sgst_amount.toFixed(2));
+				$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 			}else{ 
 			    var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 				var sgst_amount = (taxable_value*sgst_percentage)/100;
-				$(this).find("td:nth-child(14) input").val(sgst_amount.toFixed(2));
+				$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 				row_total=row_total+((taxable_value*sgst_percentage)/100);
 			}
 			total_sgst=total_sgst+sgst_amount;
 			var igst_percentage=parseFloat($(this).find("td:nth-child(15) option:selected").attr("percentage"));
 			if(isNaN(igst_percentage)){ 
 				 var igst_amount = 0; 
-				$(this).find("td:nth-child(16) input").val(igst_amount.toFixed(2));
+				$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 			}else{ 
 				var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
 				var igst_amount = (taxable_value*igst_percentage)/100;
-				$(this).find("td:nth-child(16) input").val(igst_amount.toFixed(2));
+				$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 				row_total=row_total+((taxable_value*igst_percentage)/100);
 			}
 			total_igst=total_igst+igst_amount;
-			$(this).find("td:nth-child(17) input").val(row_total.toFixed(2));
+			$(this).find("td:nth-child(17) input").val(round(row_total,2));
 			total = total+parseFloat(row_total);
 		});
 		
-		$('input[name="total_discount"]').val(total_discount_amt.toFixed(2));
-		$('input[name="total_after_pnf"]').val(total_pnf_amt.toFixed(2));
-		$('input[name="total_taxable_value"]').val(tatal_taxable_amt.toFixed(2));
-		$('input[name="total_cgst_value"]').val(total_cgst.toFixed(2));
-		$('input[name="total_sgst_value"]').val(total_sgst.toFixed(2));
-		$('input[name="total_igst_value"]').val(total_igst.toFixed(2));
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total_discount"]').val(round(total_discount_amt,2));
+		$('input[name="total_after_pnf"]').val(round(total_pnf_amt,2));
+		$('input[name="total_taxable_value"]').val(round(tatal_taxable_amt,2));
+		$('input[name="total_cgst_value"]').val(round(total_cgst,2));
+		$('input[name="total_sgst_value"]').val(round(total_sgst,2));
+		$('input[name="total_igst_value"]').val(round(total_igst,2));
+		$('input[name="total"]').val(round(total,2));
 		
 		
 		/*if($("#discount_per").is(':checked')){
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
 			var discount_amount=(total*discount_per)/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
+			$('input[name="discount"]').val(discount_amount.round(Amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 		}
 		total=total-discount_amount*/
 		
-		//$('input[name="total"]').val(total.toFixed(2));
+		//$('input[name="total"]').val(total.round(Amount,2));
 		
 		/*if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
 			var pnf_amount=(total*pnf_per)/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
+			$('input[name="pnf"]').val(pnf_amount.round(Amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}*/
 		//var total_after_pnf=total+pnf_amount;
 		//if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		//$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
+		//$('input[name="total_after_pnf"]').val(total_after_pnf.round(Amount,2));
 		
 		//var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		/*var sale_tax=(total_after_pnf*sale_tax_per)/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));*/
+		$('input[name="sale_tax_amount"]').val(sale_tax.round(Amount,2));*/
 		
 
 		

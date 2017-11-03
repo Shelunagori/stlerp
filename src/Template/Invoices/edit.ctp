@@ -505,7 +505,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
-	
+	jQuery.validator.addMethod("noSpace", function(value, element) { 
+	  return value.indexOf(" ") < 0 && value != ""; 
+	}, "No space please and don't leave it empty");
 	
 	//--------- FORM VALIDATION
 	var form3 = $('#form_sample_3');
@@ -766,7 +768,7 @@ $(document).ready(function() {
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=qty*Rate;
-				$(this).find("td:nth-child(5) input").val(Amount.toFixed(2));
+				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
 				if(isNaN(sale_tax)) { var sale_tax = 0; }
@@ -786,7 +788,7 @@ $(document).ready(function() {
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
 			var discount_amount=(total*discount_per)/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
-			$('input[name="discount"]').val(discount_amount.toFixed(2));
+			$('input[name="discount"]').val(round(discount_amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
@@ -796,45 +798,45 @@ $(document).ready(function() {
 		var exceise_duty=parseFloat($('input[name="exceise_duty"]').val());
 		if(isNaN(exceise_duty)) { var exceise_duty = 0; }
 		total=total+exceise_duty
-		$('input[name="total"]').val(total.toFixed(2));
+		$('input[name="total"]').val(round(total,2));
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
 			var pnf_amount=(total*pnf_per)/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
-			$('input[name="pnf"]').val(pnf_amount.toFixed(2));
+			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}
 		var total_after_pnf=total+pnf_amount;
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
-		$('input[name="total_after_pnf"]').val(total_after_pnf.toFixed(2));
+		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		
 		var sale_tax=(total_after_pnf*sale_tax_per)/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(sale_tax.toFixed(2));
+		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		
 		var fright_amount=parseFloat($('input[name="fright_amount"]').val());
 		//alert(fright_amount);
 		if(isNaN(fright_amount)) { var fright_amount = 0; }
 		
 		grand_total=total_after_pnf+sale_tax+fright_amount;
-		$('input[name="grand_total"]').val(grand_total.toFixed(2));
+		$('input[name="grand_total"]').val(round(grand_total,2));
 		
 		var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
 		
 		var	new_due_payment=grand_total+old_due_payment1;
-		$('input[name="new_due_payment"]').val(new_due_payment.toFixed(2));
+		$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 		
 	}
 		
 			var grand_total=parseFloat($('input[name="grand_total"]').val());
 			var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
 			var	new_due_payment=grand_total+old_due_payment1;
-			$('input[name="new_due_payment"]').val(new_due_payment.toFixed(2));
+			$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 			
 	
 			var credit_limit=parseFloat($('input[name="credit_limit"]').val());
@@ -1016,7 +1018,7 @@ $(document).ready(function() {
 				var qty=parseFloat($(this).find('.amount_box').val());
 				total_left=total_left+qty;
 			} 
-			$('input[name="total_amount_agst"]').val(total_left.toFixed(2));	
+			$('input[name="total_amount_agst"]').val(round(total_left,2));	
 			
 		});
 		do_ref_total();
@@ -1044,7 +1046,8 @@ $(document).ready(function() {
 			}else if(is_input){
 				
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true
+							required: true,
+							noSpace: true
 						});
 			}
 			
@@ -1141,11 +1144,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}
