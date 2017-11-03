@@ -8,3 +8,4 @@ src/Template/Invoices/edit.ctp
 src/Template/Invoices/add.ctp
 src/Template/Invoices/add.ctp
 src/Template/Invoices/edit.ctp
+src/Template/Invoices/add.ctp
