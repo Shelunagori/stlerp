@@ -22,21 +22,22 @@ class SalesOrdersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
-		/* $salesOrders = $this->SalesOrders->find();
+		$salesOrders = $this->SalesOrders->find();
 		$this->paginate(
 			$salesOrders
 			->select(['id'])
 			->innerJoinWith('SalesOrderRows', function ($q) {
 				return $q->group(['SalesOrderRows.sales_order_id'])->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity')]);
 			})
-			->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
+			->contain('SalesOrderRows.InvoiceRows', function ($q) {
 				return $q->group(['InvoiceRows.sales_order_row_id'])->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
 			})
 			->where(['SalesOrders.company_id'=>$st_company_id])
 			->group(['SalesOrderRows.sales_order_id'])
 			->group(['SalesOrders.id'])
-		); */
+		);
 		
+		pr($salesOrders->toArray());
 		/* $salesOrders = $this->SalesOrders->find();
 		$salesOrders
 		->contain(['SalesOrderRows'=>function($q){
@@ -49,15 +50,18 @@ class SalesOrdersController extends AppController
 			return $q->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
 		}); */
 		
-		$salesOrders = $this->SalesOrders->find();
-		
-		$matchingComment = $salesOrders->association('SalesOrderRows')->find()
-			->select(['sales_order_id','salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
-			->group(['SalesOrderRows.sales_order_id']);
-
-		$query = $salesOrders->find()
-			->select(['sqty' => $matchingComment]);
-		pr($query->toArray());
+		/* $faqTutorials = $this->SalesOrders->find();
+				$faqTutorials->leftJoinWith('FaqChapters', function ($q) {
+				return $q->select(['total_faq_sections' => $q->func()->count('FaqSections.id')])
+							->leftJoinWith('FaqSections');
+				})
+				->contain(['FaqChapters'=>function ($q) {
+					 $q->select(['FaqChapters.faq_tutorial_id','total_faq_chapters' => $q->func()->count('FaqChapters.faq_tutorial_id')])
+					->group(['FaqChapters.faq_tutorial_id']);
+					return $q;
+				}])
+				->group(['FaqTutorials.id'])
+				->enableAutoFields(true);   */
 		exit;
     }
 	
