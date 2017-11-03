@@ -1168,10 +1168,14 @@ $(document).ready(function() {
 			on_acc=Math.abs(on_acc);
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 <<<<<<< HEAD
+<<<<<<< HEAD
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 =======
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(round(on_acc_cr_dr,2));
 >>>>>>> 507996778d8e3009ebac9139850864e7f2e6f926
+=======
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
+>>>>>>> 15d92350c7542effe09c50eef3491ee9e32ea25b
 		}else{
 			on_acc=Math.abs(on_acc);
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
