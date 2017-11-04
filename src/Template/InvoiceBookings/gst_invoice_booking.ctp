@@ -618,20 +618,20 @@ $(document).ready(function() {
 			
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
 			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val());
-			$(this).find("td:nth-child(20) input").val((taxable_amount/qty).toFixed(5));
-			total_rate_to_post = total_rate_to_post+parseFloat(((taxable_amount/qty).toFixed(5)));
-			$(this).find("td:nth-child(19) input").val(row_total.toFixed(2));
+			$(this).find("td:nth-child(20) input").val(round((taxable_amount/qty),2));
+			total_rate_to_post = total_rate_to_post+parseFloat((round((taxable_amount/qty),2)));
+			$(this).find("td:nth-child(19) input").val(round(row_total,2));
 			total_row_amount = total_row_amount+row_total;
 		});
-		$('input[name="total_amount"]').val(total_amount.toFixed(2));
-		$('input[name="total_discount"]').val(total_discount.toFixed(2));
-		$('input[name="total_pnf"]').val(total_pnf.toFixed(2));
-		$('input[name="taxable_value"]').val(total_taxable_value.toFixed(2));
-		$('input[name="total_cgst"]').val(total_cgst.toFixed(2));
-		$('input[name="total_sgst"]').val(total_sgst.toFixed(2));
-		$('input[name="total_igst"]').val(total_igst.toFixed(2));
-		$('input[name="total_other_charge"]').val(total_other.toFixed(2));
-		$('input[name="total"]').val(total_row_amount.toFixed(2));
+		$('input[name="total_amount"]').val(round(total_amount,2));
+		$('input[name="total_discount"]').val(round(total_discount,2));
+		$('input[name="total_pnf"]').val(round(total_pnf,2));
+		$('input[name="taxable_value"]').val(round(total_taxable_value,2));
+		$('input[name="total_cgst"]').val(round(total_cgst,2));
+		$('input[name="total_sgst"]').val(round(total_sgst,2));
+		$('input[name="total_igst"]').val(round(total_igst,2));
+		$('input[name="total_other_charge"]').val(round(total_other,2));
+		$('input[name="total"]').val(round(total_row_amount,2));
 		$('input[name="total_rate_to_post"]').val(total_rate_to_post);
 		do_ref_total();
 	}
@@ -862,11 +862,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 		}
 	}

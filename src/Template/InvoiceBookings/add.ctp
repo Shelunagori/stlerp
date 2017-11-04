@@ -342,10 +342,10 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
 			
-			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
+			var discount=parseFloat($(this).find("td:nth-child(7) input").val()); 
 			if(!discount){ discount=0; }
-			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){
-				var amount_after_discount=amout*(100-discount)/100;
+			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){ 
+				var amount_after_discount=amout*(100-round(discount,2))/100;
 			}else{
 				var amount_after_discount=amout-discount;
 			}
@@ -356,14 +356,14 @@ $(document).ready(function() {
 			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
 			
 			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
-			if(!discount){ discount=0; }
-			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){
-				var amount_after_discount=amout*(100-discount)/100;
+			if(!discount){ discount=0; } 
+			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){ 
+				var amount_after_discount=amout*(100-round(discount,2))/100;
 			}else{
 				var amount_after_discount=amout-discount;
 			}
 			var pnf=(amount_after_discount/total)*totalpnf;
-			$(this).find("td:nth-child(8) input").val(pnf.toFixed(5))
+			$(this).find("td:nth-child(8) input").val(round(pnf,2))
 		});
 		calculate_total();
 	});
@@ -475,13 +475,14 @@ $(document).ready(function() {
 	$('#main_tb input:not(input[name="total_pnf"])').die().live("keyup",function() { 
 		calculate_total();
     });
-	function calculate_total(){
-		 var total_amount=0; var total_misc=0; var total_discount=0; 
+	function calculate_total()
+	{
+		var total_amount=0; var total_misc=0; var total_discount=0; 
 		var total_pnf=0; var total_ex=0; var total_cst=0; var total_other=0; var total_row_amount=0; 
 		$("#main_tb tbody tr.tr1").each(function(){ var row_total=0;
 			var urate=parseFloat($(this).find("td:nth-child(3) input").val());
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
-			var amount=urate*qty;
+			var amount=urate*round(qty,2);
 			row_total=row_total+amount;
 			
 			var misc=parseFloat($(this).find("td:nth-child(5) input").val());
@@ -490,14 +491,14 @@ $(document).ready(function() {
 			row_total=row_total+misc;
 			total_amount=total_amount+amount_after_misc;
 			
-			$(this).find("td:nth-child(6) input").val(amount_after_misc.toFixed(2));
+			$(this).find("td:nth-child(6) input").val(round(amount_after_misc,2));
 		
 			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
 			if(!discount){ discount=0; }
-			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){
-				var amount_after_discount=amount_after_misc*(100-discount)/100;
-				total_discount=total_discount+(amount_after_misc*discount/100);
-				row_total=row_total-(amount_after_misc*discount/100);
+			if($(this).find('td:nth-child(7) input[type="checkbox"]').is(':checked')==true){ 
+				var amount_after_discount=amount_after_misc*(100-round(discount,3))/100;
+				total_discount=total_discount+(amount_after_misc*round(discount,3)/100);
+				row_total=row_total-(amount_after_misc*round(discount,3)/100);
 			}else{
 				var amount_after_discount=amount_after_misc-discount;
 				total_discount=total_discount+discount;
@@ -508,9 +509,9 @@ $(document).ready(function() {
 			var pnf=parseFloat($(this).find("td:nth-child(8) input").val());
 			if(!pnf){ pnf=0; }
 			if($(this).find('td:nth-child(8) input[type="checkbox"]').is(':checked')==true){
-				var amount_after_pnf=amount_after_discount*(100+pnf)/100;
-				total_pnf=total_pnf+(amount_after_discount*pnf/100);
-				row_total=row_total+(amount_after_discount*pnf/100);
+				var amount_after_pnf=amount_after_discount*(100+round(pnf,3))/100;
+				total_pnf=total_pnf+(amount_after_discount*round(pnf,3)/100);
+				row_total=row_total+(amount_after_discount*round(pnf,3)/100);
 			}else{
 				var amount_after_pnf=amount_after_discount+pnf;
 				total_pnf=total_pnf+pnf;
@@ -518,9 +519,9 @@ $(document).ready(function() {
 			}
 			var ex=parseFloat($(this).find("td:nth-child(9) input").val());
 			if(!ex){ ex=0; }
-			var amount_after_ex=amount_after_pnf*(100+ex)/100;
-			total_ex=total_ex+(amount_after_pnf*ex/100);
-			row_total=row_total+(amount_after_pnf*ex/100);
+			var amount_after_ex=amount_after_pnf*(100+round(ex,3))/100;
+			total_ex=total_ex+(amount_after_pnf*round(ex,3)/100);
+			row_total=row_total+(amount_after_pnf*round(ex,3)/100);
 			
 			var total_for_rate=amount_after_ex;
 			
@@ -528,41 +529,41 @@ $(document).ready(function() {
 			if(vat_cst==35){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
-				total_for_rate=total_for_rate+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
+				total_for_rate=total_for_rate+(amount_after_ex*round(cst,3)/100);
 			}else if(vat_cst==538){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
 				total_for_rate=amount_after_ex;
 			}else if(vat_cst==161){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
-				total_for_rate=total_for_rate+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
+				total_for_rate=total_for_rate+(amount_after_ex*round(cst,3)/100);
 			}else if(vat_cst==160){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
 				total_for_rate=amount_after_ex;
 			}else if(vat_cst==309){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
-				total_for_rate=total_for_rate+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
+				total_for_rate=total_for_rate+(amount_after_ex*round(cst,3)/100);
 			}else if(vat_cst==308){
 				var cst=parseFloat($(this).find("td:nth-child(10) input").val());
 				if(!cst){ cst=0; }
-				var amount_after_cst=amount_after_ex*(100+cst)/100;
-				total_cst=total_cst+(amount_after_ex*cst/100);
+				var amount_after_cst=amount_after_ex*(100+round(cst,3))/100;
+				total_cst=total_cst+(amount_after_ex*round(cst,3)/100);
 				total_for_rate=amount_after_ex;
 			}
-			row_total=row_total+(amount_after_ex*cst/100);
+			row_total=row_total+(amount_after_ex*round(cst,3)/100);
 			
 			var other=parseFloat($(this).find("td:nth-child(11) input").val());
 			if(!other){ other=0; }
@@ -571,21 +572,21 @@ $(document).ready(function() {
 			total_for_rate=total_for_rate+other;
 			total_other=total_other+other;
 			
-			$(this).find("td:nth-child(12) input").val(row_total.toFixed(2));
-			$(this).find("td:nth-child(13) input").val((total_for_rate/qty).toFixed(5));
+			$(this).find("td:nth-child(12) input").val(round(row_total,2));
+			$(this).find("td:nth-child(13) input").val(round((total_for_rate/qty),2));
 			
 			
 			total_row_amount=total_row_amount+row_total;
 			
 			
 		});
-		$('input[name="total_amount"]').val(total_amount.toFixed(2));
-		$('input[name="total_discount"]').val(total_discount.toFixed(2));
-		$('input[name="total_pnf"]').val(total_pnf.toFixed(2));
-		$('input[name="total_ex"]').val(total_ex.toFixed(2));
-		$('input[name="total_saletax"]').val(total_cst.toFixed(2));
-		$('input[name="total_other_charges"]').val(total_other.toFixed(2));
-		$('input[name="total"]').val(total_row_amount.toFixed(2));
+		$('input[name="total_amount"]').val(round(total_amount,2));
+		$('input[name="total_discount"]').val(round(total_discount,2));
+		$('input[name="total_pnf"]').val(round(total_pnf,2));
+		$('input[name="total_ex"]').val(round(total_ex,2));
+		$('input[name="total_saletax"]').val(round(total_cst,2));
+		$('input[name="total_other_charges"]').val(round(total_other,2));
+		$('input[name="total"]').val(round(total_row_amount,2));
 		do_ref_total();
 	}
 	
@@ -720,7 +721,8 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
 			}else if(is_input){
 				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
-							required: true
+							required: true,
+							noSpace:true
 						});
 			}
 			
@@ -817,11 +819,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 		}
 	}
