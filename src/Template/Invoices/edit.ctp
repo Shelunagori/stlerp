@@ -692,7 +692,8 @@ $(document).ready(function() {
 				var s_tax=$(this).find('td:nth-child(6)').text();
 				
 				list.push(s_tax);
-				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
+				var OriginalQty=$(this).find('td:nth-child(3) input[type="text"]').val();
+				Quantity = OriginalQty.split('.'); qty=Quantity[0];
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){
 					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","invoice_rows["+val+"][serial_numbers][]").attr("id","invoice_rows-"+val+"-item_serial_no").attr('maxlength',qty).select2().rules('add', {
@@ -767,7 +768,7 @@ $(document).ready(function() {
 			if(val){
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
-				var Amount=qty*Rate;
+				var Amount=round(qty,2)*Rate;
 				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
@@ -784,12 +785,15 @@ $(document).ready(function() {
 			}
 		});
 		
-		if($("#discount_per").is(':checked')){
+		if($("#discount_per").is(':checked'))
+		{
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
-			var discount_amount=(total*discount_per)/100;
+			var discount_amount=(total*round(discount_per,3))/100;
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 			$('input[name="discount"]').val(round(discount_amount,2));
-		}else{
+		}
+		else
+		{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 		}
@@ -802,7 +806,7 @@ $(document).ready(function() {
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
-			var pnf_amount=(total*pnf_per)/100;
+			var pnf_amount=(total*round(pnf_per,3))/100;
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
@@ -815,7 +819,7 @@ $(document).ready(function() {
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		
-		var sale_tax=(total_after_pnf*sale_tax_per)/100;
+		var sale_tax=(total_after_pnf*round(sale_tax_per,3))/100;
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
 		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		
