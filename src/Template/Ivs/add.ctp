@@ -143,7 +143,9 @@ $(document).ready(function() {
 		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){
 			var row_no=$(this).attr('row_no');
 			var serial_number_enable=$(this).find('.serial_number').val();
-			var Qty=$(this).find('.quantity').val();
+			var OriginalQtyy=$(this).find('.quantity').val();
+				Quantitiess = OriginalQtyy.split('.'); 
+				Qty=Quantitiess[0];
 			if(serial_number_enable){
 				var p=1;
 				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
@@ -193,7 +195,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1) input.invoice_row_id").attr({name:"iv_rows["+q+"][invoice_row_id]", id:"iv_rows-"+q+"-invoice_row_id"});
 			$(this).find("td:nth-child(1) input.item_id").attr({name:"iv_rows["+q+"][item_id]", id:"iv_rows-"+q+"-item_id"});
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
-			
+			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
 			$(this).find('table.subTable tbody.subTbody tr').each(function(){
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
@@ -215,7 +217,9 @@ $(document).ready(function() {
 	
 	function validate_serial(){
 		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){ 
-			var qty=$(this).find('table.subTable tbody.subTbody tr td:nth-child(2) input').val();
+			var OriginalQty=$(this).find('table.subTable tbody.subTbody tr td:nth-child(2) input').val();
+				Quantities = OriginalQty.split('.'); 
+				qty=Quantities[0];
 			if($(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').length>0){
 				$(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,
@@ -237,7 +241,7 @@ $(document).ready(function() {
 				var row_no=$(this).closest("tr").attr("row_no");
 				var del=$(this).closest("tr");
 				$(del).remove();
-				rename_rows_out();
+				rename_rows_name();
 			}
 		} 
 	});
