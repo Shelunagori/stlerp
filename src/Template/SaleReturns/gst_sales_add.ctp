@@ -827,7 +827,7 @@ $(document).ready(function() {
 			if(val){
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
-				var Amount=qty*Rate;
+				var Amount=round(qty,2)*Rate;
 				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 				total_amt=total_amt+amount;
@@ -923,20 +923,20 @@ $(document).ready(function() {
 			total_cgst_amt=total_cgst+fcgst;
 			total_sgst_amt=total_sgst+fsgst;
 			total_igst_amt=total_igst+figst;
-			$('input[name="fright_amt"]').val(fright_amount.toFixed(2));
-			$('input[name="total_cgst"]').val(total_cgst_amt.toFixed(2));
-			$('input[name="total_sgst"]').val(total_sgst_amt.toFixed(2));
-			$('input[name="total_igst"]').val(total_igst_amt.toFixed(2));
-			$('input[name="all_row_total"]').val(total_debit.toFixed(2));
+			$('input[name="fright_amt"]').val(round(fright_amount,2));
+			$('input[name="total_cgst"]').val(round(total_cgst_amt,2));
+			$('input[name="total_sgst"]').val(round(total_sgst_amt,2));
+			$('input[name="total_igst"]').val(round(total_igst_amt,2));
+			$('input[name="all_row_total"]').val(round(total_debit,2));
 			
 			var all_row_total=parseFloat($('input[name="all_row_total"]').val());
 
 			grand_total=total_taxable_value+total_cgst_amt+total_sgst_amt+total_igst_amt+fright_amount;
-			$('input[name="total"]').val(total_taxable_value.toFixed(2));
-			$('input[name="total_cgst_amount"]').val(total_cgst_amt.toFixed(2));
-			$('input[name="total_igst_amount"]').val(total_igst_amt.toFixed(2));
-			$('input[name="total_sgst_amount"]').val(total_sgst_amt.toFixed(2));
-			$('input[name="grand_total"]').val(grand_total.toFixed(2));
+			$('input[name="total"]').val(round(total_taxable_value,2));
+			$('input[name="total_cgst_amount"]').val(round(total_cgst_amt,2));
+			$('input[name="total_igst_amount"]').val(round(total_igst_amt,2));
+			$('input[name="total_sgst_amount"]').val(round(total_sgst_amt,2));
+			$('input[name="grand_total"]').val(round(grand_total,2));
 		});
 		do_ref_total();
 	}
@@ -946,7 +946,8 @@ $(document).ready(function() {
 		add_ref_row();
 	});
 	
-	function add_ref_row(){
+	function add_ref_row()
+	{
 		var tr=$("#sample_ref table.ref_table tbody tr").clone();
 		$("table.main_ref_table tbody").append(tr);
 		rename_ref_rows();
@@ -1060,11 +1061,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 		}
 	}

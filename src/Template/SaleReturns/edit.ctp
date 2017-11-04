@@ -504,7 +504,7 @@ $(document).ready(function() {
 			if(val){
 			var qty=parseInt($(this).find("td:nth-child(3) input").val());
 			var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
-			var Amount=qty*Rate;
+			var Amount=round(qty,2)*Rate;
 			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			total=total+Amount;
 			}
