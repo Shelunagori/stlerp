@@ -1207,7 +1207,8 @@ class SaleReturnsController extends AppController
 				$this->SaleReturns->Ledgers->save($ledger); 
 				
 				////start updated serial number code Oct17 changes
-				 foreach($saleReturn->sale_return_rows as $sale_return_row){
+				foreach($saleReturn->sale_return_rows as $sale_return_row)
+				{
 					foreach($sale_return_row->serial_numbers as $serial_nos){
 						$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','invoice_row_id'])
@@ -1223,7 +1224,7 @@ class SaleReturnsController extends AppController
 								$query->execute();  	
 					}	
 				} 
-				////end updated serial number code Oct17 changes
+				//end updated serial number code Oct17 changes
 			$Invoice_data = $this->SaleReturns->Invoices->get($invoice->id);
 			$Invoice_data->sale_return_id=$saleReturn->id;
 			$this->SaleReturns->Invoices->save($Invoice_data);
