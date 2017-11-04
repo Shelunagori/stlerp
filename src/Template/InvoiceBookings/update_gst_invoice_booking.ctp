@@ -414,7 +414,7 @@ $(document).ready(function() {
 		{   var row_total=0;
 			var urate=parseFloat($(this).find("td:nth-child(3) input").val());
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
-			var amount=urate*qty;
+			var amount=urate*round(qty,2);
 			row_total=row_total+amount;
 			
 			var misc=parseFloat($(this).find("td:nth-child(5) input").val());
@@ -422,30 +422,31 @@ $(document).ready(function() {
 			var amount_after_misc=amount+misc;
 			total_amount = total_amount+amount_after_misc;
 			row_total=row_total+misc;
-			$(this).find("td:nth-child(6) input").val(amount_after_misc.toFixed(2));
+			$(this).find("td:nth-child(6) input").val(round(amount_after_misc,2));
 			
 			var discount_amt=parseFloat($(this).find("td:nth-child(8) input").val());
             total_discount = total_discount+discount_amt;			
 			var discount_per=100*(discount_amt)/amount_after_misc;
 			if(!discount_per){discount_per=0;}
-			$(this).find("td:nth-child(7) input").val(discount_per.toFixed(8));
+			$(this).find("td:nth-child(7) input").val(round(discount_per,3));
 			row_total=row_total-discount_amt;
 			var amount_after_discount = amount_after_misc-discount_amt;
 			var pnf_amt=parseFloat($(this).find("td:nth-child(10) input").val());
 			total_pnf = total_pnf+pnf_amt;
 			var pnf_per=100*(pnf_amt)/amount_after_discount;
 			if(!pnf_per){pnf_per=0;}
-			$(this).find("td:nth-child(9) input").val(pnf_per.toFixed(8));
+			$(this).find("td:nth-child(9) input").val(round(pnf_per,3));
 			row_total = row_total+pnf_amt;
-			total_taxable_value = total_taxable_value+parseFloat(row_total.toFixed(2));
-			$(this).find("td:nth-child(11) input").val(row_total.toFixed(2));
+			total_taxable_value = total_taxable_value+parseFloat(round(row_total,2));
+			$(this).find("td:nth-child(11) input").val(round(row_total,2));
 			
 			var cgst_percentage=parseFloat($(this).find("td:nth-child(12) option:selected").attr("percentage"));
 			if(isNaN(cgst_percentage))
 			{ 
 					var cgst_amount = 0; 
-					$(this).find("td:nth-child(13) input").val(cgst_amount.toFixed(2));
-			}else
+					$(this).find("td:nth-child(13) input").val(round(cgst_amount,2));
+			}
+			else
 			{  
 					var taxable_value=parseFloat($(this).find("td:nth-child(11) input").val());
 					var cgst_amount = (taxable_value*cgst_percentage)/100;
