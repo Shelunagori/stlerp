@@ -18,140 +18,129 @@ class SalesOrdersController extends AppController
      */
     public function index($status=null)
     {
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
-
-		$salesOrders = $this->SalesOrders->find();
-		$this->paginate(
-			$salesOrders
-			->select(['id']));
-
-		//$salesOrders = $this->SalesOrders->find();
-		/* $this->paginate(
-			$salesOrders->select(['id','total_sales'=>$salesOrders->func()->sum('SalesOrderRows.quantity')])
-            ->group(['SalesOrderRows.sales_order_id'])
->>>>>>> 05bb44b630ba19ac12f6b2a3d40af24dd7bd46d1
-			->innerJoinWith('SalesOrderRows', function ($q) {
-				return $q->group(['SalesOrderRows.sales_order_id'])->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity')]);
-			})
-			->contain('SalesOrderRows.InvoiceRows', function ($q) {
-				return $q->group(['InvoiceRows.sales_order_row_id'])->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
-			})
-			->where(['SalesOrders.company_id'=>$st_company_id])
-			->group(['SalesOrders.id'])
-<<<<<<< HEAD
-		);
-=======
-		); */
-		//$this->paginate(
-			/* $salesOrders->select(['id','total_sales'=>$salesOrders->func()->sum('SalesOrderRows.quantity')])
-            ->group(['SalesOrderRows.sales_order_id'])
-			->innerJoinWith('SalesOrderRows');
+		$copy_request=$this->request->query('copy-request');
+		$gst_copy_request=$this->request->query('gst-copy-request');
+		$job_card=$this->request->query('job-card');
+		
+		
+		$where=[];
+		//$company_alise=$this->request->query('company_alise');
+		$gst=$this->request->query('gst');
+		$sales_order_no=$this->request->query('sales_order_no');
+		$file=$this->request->query('file');
+		$customer=$this->request->query('customer');
+		$po_no=$this->request->query('po_no');
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$items=$this->request->query('items');
+		$salesman_name=$this->request->query('salesman_name');
+		$pull_request=$this->request->query('pull-request');
+		$this->set(compact('sales_order_no','customer','po_no','product','From','To','file','pull_request','items','gst'));
+		/* if(!empty($company_alise)){
+			$where['SalesOrders.so1 LIKE']='%'.$company_alise.'%';
+		} */
+		if(!empty($salesman_name)){
+			$where['SalesOrders.employee_id']=$salesman_name;
+		}
+		if(!empty($sales_order_no)){
+			$where['SalesOrders.so2 LIKE']=$sales_order_no;
+		}
+		if(!empty($file)){
+			$where['SalesOrders.so3 LIKE']='%'.$file.'%';
+		}
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
+		if(!empty($po_no)){
+			$where['SalesOrders.customer_po_no LIKE']='%'.$po_no.'%';
+		}
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['SalesOrders.created_on >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['SalesOrders.created_on <=']=$To;
+		}
+        $this->paginate = [
+            'contain' => ['Customers','Employees','Categories', 'Companies']
+        ];
+		
+        $this->paginate = [
+            'contain' => ['Customers']
+        ];
+		
+		if($status==null or $status=='Pending'){ 
+			$having=['total_sales >' => 0];
+		}elseif($status=='Converted Into Invoice'){ 
+			$having=['total_sales =' => 0];
+		}
+		
+		
+		
+		
+		if(!empty($items)){
 			
-			$salesOrders->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
-				return $q->group(['InvoiceRows.sales_order_row_id'])
-				->distinct('InvoiceRows.sales_order_row_id')
-				->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
-			});
-			$salesOrders->where(['SalesOrders.company_id'=>$st_company_id])
-			->group(['SalesOrders.id']); */
-		//);
-		
-		$InvoiceRows = $this->SalesOrders->SalesOrderRows->InvoiceRows->find();
-		$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-		$salesOrders = $this->SalesOrders->find();
-		
-		$SalesOrderRows->select(['id','total_invoice_row_wise'=>$InvoiceRows->func()->sum('InvoiceRows.quantity')])
-		->innerJoinWith('InvoiceRows')
-		->group(['InvoiceRows.sales_order_row_id', 'SalesOrderRows.full_name'])
-		->autoFields(true);
-		//echo $SalesOrderRows[0]->full_name;
-		/* foreach($SalesOrderRows as $SalesOrderRow){
-			echo $SalesOrderRow->full_name;
-		}		exit; */
-		
-		$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
-		->innerJoinWith('SalesOrderRows')
-		->innerJoinWith('SalesOrderRows.InvoiceRows')
-		->group(['SalesOrders.id'])
-		->autoFields(true);
-		
-		
-		/* $salesOrders->union($SalesOrderRows);
-		pr($salesOrders->toArray()); exit; */
-		
-		pr($salesOrders->toArray());
-		/* $salesOrders = $this->SalesOrders->find();
-		$salesOrders
-		->contain(['SalesOrderRows'=>function($q){
-			return $q->select(['salesQty' => $q->func()->sum('SalesOrderRows.quantity'),'SalesOrderRows.quantity','SalesOrderRows.id'])->group(['SalesOrderRows.sales_order_id'])->autoFields(true)
-			->contain(['InvoiceRows'=>function($w){
-				return $w->select(['invoiceQty' => $w->func()->sum('InvoiceRows.quantity'),'InvoiceRows.quantity','InvoiceRows.id'])->group(['InvoiceRows.sales_order_row_id'])->autoFields(true);
-			}]);
-		}])
-		->leftJoinWith('SalesOrderRows.InvoiceRows', function ($q) {
-			return $q->select(['invoiceQty' => $q->func()->sum('InvoiceRows.quantity')]);
-		}); */
-		
-		/* $faqTutorials = $this->SalesOrders->find();
-				$faqTutorials->leftJoinWith('FaqChapters', function ($q) {
-				return $q->select(['total_faq_sections' => $q->func()->count('FaqSections.id')])
-							->leftJoinWith('FaqSections');
-				})
-				->contain(['FaqChapters'=>function ($q) {
-					 $q->select(['FaqChapters.faq_tutorial_id','total_faq_chapters' => $q->func()->count('FaqChapters.faq_tutorial_id')])
-					->group(['FaqChapters.faq_tutorial_id']);
-					return $q;
-				}])
-				->group(['FaqTutorials.id'])
-				->enableAutoFields(true);   */
-		/* $salesOrders = $this->SalesOrders->find();
-		
-		$matchingComment = $salesOrders->association('SalesOrderRows')->find()
-			->select(['sales_order_id','salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
-			->group(['SalesOrderRows.sales_order_id']);
+				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+				$salesOrders = $this->SalesOrders->find();
 
-		$query = $salesOrders->find()
-			->select(['sqty' => $matchingComment]); */
-			
-			/* $conn = ConnectionManager::get('default');
-			$stmt = $conn->execute('SELECT sales_order_rows.salesQty,invoice_rows.InvoiceQty FROM sales_orders
-					  INNER JOIN sales_order_rows ON sales_order_rows.sales_order_id = sales_orders.id
-					  INNER JOIN invoice_rows ON invoice_rows.sales_order_row_id = sales_order_rows.id 
-					  INNER JOIN (
-						SELECT SUM(sales_order_rows.quantity) AS salesQty
-						  FROM sales_order_rows
-						  GROUP BY sales_order_rows.sales_order_id
-					  ) sales_order_rows ON sales_order_rows.sales_order_id = sales_orders.id
-					  INNER JOIN (
-						SELECT SUM(invoice_rows.quantity) AS InvoiceQty
-						FROM invoice_rows
-						GROUP BY invoice_rows.sales_order_row_id
-					  ) invoice_rows ON invoice_rows.sales_order_row_id = sales_order_rows.id 
-					  GROUP BY sales_orders.id
-					');
-					
+				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				->innerJoinWith('SalesOrderRows')
+				->group(['SalesOrders.id'])
+				->matching('SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
+											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+							})
+				->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+				->autoFields(true)
+				->where(['SalesOrders.company_id'=>$st_company_id])
+				->where($where);
+		
+		}else{ 
+				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+				$salesOrders = $this->SalesOrders->find();
+				
+				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				->innerJoinWith('SalesOrderRows')
+				->group(['SalesOrders.id'])
+				->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+				->autoFields(true)
+				->where(['SalesOrders.company_id'=>$st_company_id])
+				->where($where);
+		}
+		
+		//pr($salesOrders->toArray());exit;
+		$total_sales=[]; $total_qty=[];
+		foreach($salesOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->sales_order_rows as $sales_order_row){
+				foreach($sales_order_row->invoice_rows as $invoice_row){
+						if(sizeof($invoice_row) > 0){
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
 		
 		
-		//$qw=$this->paginate($stmt);
-		pr($stmt->fetchAll('assoc')); */
-		
-		/* $salesOrders = $this->SalesOrders->find();
-		$salesOrders->select(['salesQty' => $salesOrders->func()->sum('SalesOrderRows.quantity')])
-		->contain([
-			'SalesOrderRows' => [
-					'strategy' => 'subquery',
-					'queryBuilder' => function ($q) {
-						return $q;
+	
+		$Items = $this->SalesOrders->SalesOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
+        $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
+					'Departments', function ($q) use($items,$st_company_id) {
+						return $q->where(['Departments.id' =>1]);
 					}
-			]
-		]); */
-		//$salesOrders = $this->paginate($salesOrders);
-		pr($salesOrders->toArray());
-		exit;
+				);
+	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty'));
+		 $this->set('_serialize', ['salesOrders']);
+		$this->set(compact('url'));
+		
+		
     }
 	
 	

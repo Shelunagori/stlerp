@@ -56,10 +56,14 @@ class IvsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		$Invoice=$this->Ivs->Invoices->get($invoice_id, [
-			'contain' => ['InvoiceRows'=>['Items']]
+			'contain' => ['InvoiceRows'=>['Items'=>function($p){
+				return $p->where(['Items.source IN'=>['Assembled','Manufactured']]);
+			},'SalesOrderRows'=>function($q){
+				return $q->where(['SalesOrderRows.source_type'=>'Manufactured']);
+			}]]
 		]);
 		
-			
+		pr($Invoice);exit;	
         $iv = $this->Ivs->newEntity();
         if ($this->request->is('post')) {
             $iv = $this->Ivs->patchEntity($iv, $this->request->data, [
