@@ -193,7 +193,6 @@ $(document).ready(function() {
 			error3.hide();
 			form[0].submit(); // submit the form
 		}
-
 	});
 	
 	

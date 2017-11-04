@@ -97,10 +97,6 @@ class InvoicesTable extends Table
             'joinType' => 'INNER'
         ]);
 		
-		$this->belongsTo('InventoryVouchers', [
-            'foreignKey' => 'invoice_id',
-            'joinType' => 'INNER'
-        ]);
 		
 		$this->belongsTo('AccountReferences');
 		$this->belongsTo('AccountFirstSubgroups');
@@ -115,7 +111,8 @@ class InvoicesTable extends Table
 		$this->belongsTo('Filenames');
 		
 		 $this->hasOne('Ivs', [
-            'foreignKey' => 'invoice_id'
+            'foreignKey' => 'invoice_id',
+            'joinType' => 'INNER'
         ]);
 		
     }

@@ -39,7 +39,6 @@ class InvoiceRowsTable extends Table
 		$this->hasMany('SerialNumbers',[
 			'foreignKey' => 'invoice_row_id'
 		]);
-		$this->belongsTo('InventoryVouchers');
         $this->belongsTo('Invoices', [
             'foreignKey' => 'invoice_id',
             'joinType' => 'INNER'

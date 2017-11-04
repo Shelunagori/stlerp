@@ -1,3 +1,15 @@
+<style>
+.help-block-error{
+	font-size: 10px;
+}
+
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td{
+	vertical-align: top !important;
+}
+
+
+
+</style>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -32,12 +44,18 @@
 						</thead>
 						<tbody class="MainTbody">
 							<?php foreach($Invoice->invoice_rows as $invoice_row){ ?>
-							<tr class="MainTr">
+							<tr class="MainTr" row_no='<?php echo @$invoice_row->id; ?>'>
 								<td>
+									<input type="hidden" value="<?php echo $invoice_id; ?>" class="invoice_row_id"/>
 									<input type="hidden" value="<?php echo $invoice_row->id; ?>" class="invoice_row_id"/>
 									<input type="hidden" value="<?php echo $invoice_row->item_id; ?>" class="item_id"/>
 									<input type="hidden" value="<?php echo $invoice_row->quantity; ?>" class="quantity"/>
-									<?= h($invoice_row->item->name); ?>
+									<input type="hidden" value="<?php echo $invoice_row->item->item_companies[0]->serial_number_enable; ?>" class="serial_number"/>
+
+									<?php foreach($item_display as $item_name){ ?>
+										<?= h($item_name); 
+										}
+									?>
 								</td>
 								<td><?= h($invoice_row->quantity); ?></td>
 								<td></td>
@@ -69,13 +87,13 @@
 				</div>
 			</div>
 		</div>
-	<?= $this->Form->button(__('Submit')) ?>
+	<button type="submit" id='submitbtn' class="btn btn-primary">Submit</button>
     <?= $this->Form->end() ?>
 	</div>
 </div>
 <table id="sample_tb" style="display:none;">
 	<tbody>
-		<tr class="tr1 SampleTable">
+		<tr class="tr1 SampleTable" >
 			<td>
 			<?php echo $this->Form->input('item_id', ['options' => $Items,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item']); ?>
 			</td>
@@ -117,6 +135,47 @@ $(document).ready(function() {
 		tr.find('table.subTable tbody.subTbody').append(tr1);
 		rename_rows_name();
 	}
+	
+	addSrTextbox();
+	
+	function addSrTextbox(){
+		var r=0;
+		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){
+			var row_no=$(this).attr('row_no');
+			var serial_number_enable=$(this).find('.serial_number').val();
+			var Qty=$(this).find('.quantity').val();
+			if(serial_number_enable){
+				var p=1;
+				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
+				for (i = 0; i < Qty; i++) {
+					
+					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers][]" placeholder="serial number '+p+' " id="sr_no'+r+'" />');
+					p++;
+					r++;
+					rename_rows_name();
+				}
+			}
+		});
+	}
+	
+	$('.select_item ').die().live("change",function() {
+		var t=$(this);
+		var row_no=t.closest('.MainTable tbody.MainTbody tr.MainTr').attr('row_no');
+		var select_item_id=$(this).find('option:selected').val(); 
+		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
+		url1=url1+'?item_id='+select_item_id,
+		$.ajax({
+			url: url1
+		}).done(function(response) { 
+		$(t).closest('tr').find('td:nth-child(3)').html(response);
+		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+		rename_rows_name();
+			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+  			
+		});
+	});
+	
+	
 	addRowOnLoad();
 	function addRowOnLoad(){
 		$('.MainTable tbody.MainTbody tr.MainTr').each(function(){
@@ -139,16 +198,49 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
 				$(this).find("td:nth-child(2) input").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][quantity]", id:"iv_rows-"+q+"-iv_row_items"+i+"-quantity"}).rules('add', {
-							required: true,
-							digits: true
+							required: true
 					});
+				if($(this).find('td:nth-child(3) select').length>0){
+					$(this).find('td:nth-child(3) select').attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][serial_numbers][]", id:"iv_rows-"+q+"-iv_row_items"+i+"-serial_numbers"}).rules("add", "required");
+				}
 				i++;
 			});
 			q++;
 		});
 	}
 	
+	$('.qty_bx').die().live("keyup",function() {
+		validate_serial();
+    });
 	
+	function validate_serial(){
+		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){ 
+			var qty=$(this).find('table.subTable tbody.subTbody tr td:nth-child(2) input').val();
+			if($(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').length>0){
+				$(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').attr('test',qty).rules('add', {
+							required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+			}
+		});	
+	}
+	
+	$('.deleterow').live("click",function() {
+		var l=$(this).closest("table tbody").find("tr").length;
+		if (confirm("Are you sure to remove row ?") == true) {
+			if(l>1){
+				var row_no=$(this).closest("tr").attr("row_no");
+				var del=$(this).closest("tr");
+				$(del).remove();
+				rename_rows_out();
+			}
+		} 
+	});
 	
 });
 </script>
