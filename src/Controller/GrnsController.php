@@ -589,13 +589,13 @@ class GrnsController extends AppController
 							$itemLedger->processed_on = $grn->transaction_date;
 							$this->Grns->ItemLedgers->save($itemLedger);
 						} 
-					$qq=0; foreach($grn->grn_rows as $grn_row){
-					/* 	//pr($grn->purchase_order_id); exit;
+					/*$qq=0; foreach($grn->grn_rows as $grn_row){
+					 	//pr($grn->purchase_order_id); exit;
 						$purchaseorderrow=$this->Grns->PurchaseOrderRows->find()->where(['purchase_order_id'=>$grn->purchase_order_id,'item_id'=>$grn_row->item_id])->first();
 						$purchaseorderrow->processed_quantity=$purchaseorderrow->processed_quantity-@$grn->getOriginal('grn_rows')[$qq]->quantity+$grn_row->quantity;
 						$this->Grns->PurchaseOrderRows->save($purchaseorderrow);
-						$qq++; 
-					} */ 
+						$qq++;   
+					}*/
 					$this->Flash->success(__('The grn has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				} else {
