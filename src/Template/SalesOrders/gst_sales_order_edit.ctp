@@ -748,21 +748,11 @@ $(document).ready(function() {
 			$(this).find('span.help-block-error').remove();
 			$(this).find("td:nth-child(1)").html(++i); i--;
 			
-			//$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules("add", "required");
 			$(this).find("td:nth-child(2) select").select2().attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_id'],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
 					});
 			
-			//var hl=$(this).find("td:nth-child(2) input[type=hidden]:eq(0)").length();
-			//alert(hl);
-			//var serial_l=$('td:nth-child(2) input[type=hidden] :eq(3)').length;
-			//alert(serial_l);
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(0)").attr({name:"sales_order_rows["+i+"][height]", id:"sales_order_rows-"+i+"-height"});
-			/* $(this).find("td:nth-child(2) input[type=hidden]:eq(1)").attr({name:"sales_order_rows["+i+"][processed_quantity]", id:"sales_order_rows-"+i+"-processed_quantity"}); */
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(1)").attr({name:"sales_order_rows["+i+"][source_type]", id:"sales_order_rows-"+i+"-source_type"});
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(2)").attr({name:"sales_order_rows["+i+"][job_card_row_ids]", id:"sales_order_rows-"+i+"-job_card_row_ids"});
 			
@@ -774,8 +764,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
-						required: true,
-						digits: true,
+						required: true
 					});
 			$(this).find("td:nth-child(3) input[type=hidden]:eq(0)").attr({name:"sales_order_rows["+i+"][old_quantity]", id:"sales_order_rows-"+i+"-old_quantity"});
 			$(this).find("td:nth-child(4) input").attr({name:"sales_order_rows["+i+"][rate]", id:"sales_order_rows-"+i+"-rate",r_popup_id:i}).rules('add', {

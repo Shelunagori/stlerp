@@ -743,8 +743,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
-						required: true,
-						digits: true,
+						required: true
 					});
 			$(this).find("td:nth-child(3) input[type=hidden]:eq(0)").attr({name:"sales_order_rows["+i+"][old_quantity]", id:"sales_order_rows-"+i+"-old_quantity"});
 			$(this).find("td:nth-child(4) input").attr({name:"sales_order_rows["+i+"][rate]", id:"sales_order_rows-"+i+"-rate",r_popup_id:i}).rules('add', {
