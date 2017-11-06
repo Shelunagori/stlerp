@@ -504,6 +504,7 @@ class QuotationsController extends AppController
 				$quotation->finalisation_date=date("Y-m-d",strtotime($quotation->finalisation_date));
 				$quotation->company_id=$st_company_id;
 				//$quotation->company_id=$st_company_id;
+				//pr($quotation);exit;
 				if ($this->Quotations->save($quotation)) {
 					
 					
@@ -535,8 +536,24 @@ class QuotationsController extends AppController
 						}
 					);
 			$termsConditions = $this->Quotations->TermsConditions->find('all',['limit' => 200]);
+			////start unique validation and procees qty
+			$QuotationsId = $this->Quotations->get($id, [
+            'contain' => (['SalesOrders'=>['SalesOrderRows' => function($q) {
+				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
+			}]])
+        ]);
+		
+		$quotation_qty=[];
+			foreach($QuotationsId->sales_orders as $sales_orders){ 
+				foreach($sales_orders->sales_order_rows as $sales_order_row){ 
+					$quotation_qty[@$sales_order_row->quotation_row_id]=@$quotation_qty[$sales_order_row->quotation_row_id]+$sales_order_row->total_qty;
+					
+				}
+			}	
+
+			////end unique validation and procees qty
 			
-			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate'));
+			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate','quotation_qty'));
 			$this->set('_serialize', ['quotation']);
 		}
 		else

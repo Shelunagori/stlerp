@@ -180,7 +180,7 @@
 						<tr class="tr1 preimp" row_no='<?php echo @$quotation_row->id; ?>'>
 							<td rowspan="2" width="10">
 								<?php echo $q; ?>
-								<?php echo $this->Form->input('quotation_rows.'.$q.'.id'); ?>
+								
 							</td>
 							<td>
 								<div class="row">
@@ -213,12 +213,13 @@
 								<?php echo $this->Form->input('quotation_rows['.$q.'][rate]', ['label' => false,'class' => 'form-control input-sm rate','placeholder' => 'Rate','value' => $quotation_row->rate,'required','r_popup_id'=>$q ,'step'=>'0.01']); ?>
 							</td>
 							<td width="130">
-								<?php echo $this->Form->input('quotation_rows['.$q.'][amount]', ['label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount','value' => $quotation_row->amount]); ?>
+								<?php echo $this->Form->input('quotation_rows['.$q.'][amount]', ['label' => false,'class' => 'form-control input-sm amt','placeholder' => 'Amount','value' => $quotation_row->amount]); ?>
+								<?php echo $this->Form->input('quotation_rows['.$q.'][id]', ['type' => 'hidden','value'=>$quotation_row->id,'class'=>'qoid']); ?>
 							</td>
 							<td  width="70"><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-							<?php if($quotation_row->proceed_qty > 0){ ?>
-						
-							<?php }else{ ?>
+							<?php if(@$quotation_qty[$quotation_row->id] > 0){ ?>
+							
+							<?php }else{ ?> 
 							<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
 							<?php } ?>
 							</td>
@@ -520,7 +521,6 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			$(this).find('span.help-block-error').remove();
 			$(this).find("td:nth-child(1)").html(++i); i--;
-			//$(this).find("td:nth-child(2) select.item_box").select2().attr({name:"quotation_rows["+i+"][item_id]", id:"quotation_rows-"+i+"-item_id",popup_id:i}).rules("add", "required");
 			$(this).find("td:nth-child(2) select.item_box").select2().attr({name:"quotation_rows["+i+"][item_id]", id:"quotation_rows-"+i+"-item_id",popup_id:i}).rules('add', {
 						required: true
 					});
@@ -537,7 +537,9 @@ $(document).ready(function() {
 						number: true
 					});
 			
-			$(this).find("td:nth-child(5) input").attr({name:"quotation_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"});
+			$(this).find("td:nth-child(5) input.amt").attr({name:"quotation_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"});
+			$(this).find("td:nth-child(5) .qoid").attr({name:"quotation_rows["+i+"][id]", id:"quotation_rows-"+i+"-id"});
+
 		i++; });
 		
 		var i=0;
