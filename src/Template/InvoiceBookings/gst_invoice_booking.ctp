@@ -496,7 +496,7 @@ $(document).ready(function() {
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
 			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val());
 			$(this).find("td:nth-child(20) input").val(round((taxable_amount/qty),2));
-			total_rate_to_post = total_rate_to_post+parseFloat((round((taxable_amount/qty),2)));
+			total_rate_to_post = total_rate_to_post+parseFloat((round((taxable_amount/round(qty,2)),2)));
 			$(this).find("td:nth-child(19) input").val(round(row_total,2));
 			total_row_amount = total_row_amount+row_total;
 		});
@@ -619,7 +619,7 @@ $(document).ready(function() {
 			var qty=parseFloat($(this).find("td:nth-child(4) input").val());
 			var taxable_amount=parseFloat($(this).find("td:nth-child(11) input").val());
 			$(this).find("td:nth-child(20) input").val(round((taxable_amount/qty),2));
-			total_rate_to_post = total_rate_to_post+parseFloat((round((taxable_amount/qty),2)));
+			total_rate_to_post = total_rate_to_post+parseFloat((round((taxable_amount/round(qty,2)),2)));
 			$(this).find("td:nth-child(19) input").val(round(row_total,2));
 			total_row_amount = total_row_amount+row_total;
 		});
