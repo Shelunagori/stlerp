@@ -10,6 +10,9 @@
 
 
 </style>
+<?php if($job_card_status=='no'){
+
+}else{ ?>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -195,7 +198,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1) input.invoice_row_id").attr({name:"iv_rows["+q+"][invoice_row_id]", id:"iv_rows-"+q+"-invoice_row_id"});
 			$(this).find("td:nth-child(1) input.item_id").attr({name:"iv_rows["+q+"][item_id]", id:"iv_rows-"+q+"-item_id"});
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
-			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
+			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
 			$(this).find('table.subTable tbody.subTbody tr').each(function(){
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
@@ -248,3 +251,5 @@ $(document).ready(function() {
 	
 });
 </script>
+
+<?php } ?>

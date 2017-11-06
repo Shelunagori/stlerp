@@ -18,12 +18,46 @@ class IvsController extends AppController
      */
     public function index()
     {
+		$this->viewBuilder()->layout('index_layout');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$iv_no=$this->request->query('iv_no');
+		$invoice_no=$this->request->query('invoice_no');
+		$customer=$this->request->query('customer');
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('iv_no','customer','invoice_no','From','To'));
+		$where=[];
+		if(!empty($invoice_no)){
+			$where['Invoices.in2 LIKE']=$invoice_no;
+		}
+		if(!empty($iv_no)){
+			$where['Ivs.iv_number LIKE']=$iv_no;
+		}
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Ivs.transaction_date >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Ivs.transaction_date <=']=$To;
+		}
         $this->paginate = [
-            'contain' => ['Invoices', 'Companies']
+            'contain' => ['Invoices'=>['Customers'],'IvRows']
         ];
-        $ivs = $this->paginate($this->Ivs);
-
-        $this->set(compact('ivs'));
+		
+        $this->paginate = [
+            'contain' => ['Invoices'=>['Customers'],'IvRows', 'Companies']
+        ];
+		
+		$ivs = $this->paginate($this->Ivs->find()->contain(['Invoices'])->where($where)->where(['ivs.company_id'=>$st_company_id])->order(['ivs.id' => 'DESC']));
+        $this->set(compact('ivs','url'));
         $this->set('_serialize', ['ivs']);
     }
 
@@ -36,8 +70,12 @@ class IvsController extends AppController
      */
     public function view($id = null)
     {
-        $iv = $this->Ivs->get($id, [
-            'contain' => ['Invoices', 'Companies', 'IvRows']
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$iv = $this->Ivs->get($id, [
+            'contain' => ['Invoices'=>['InvoiceRows'=>['Items'],'Customers'],'IvRows'=>['Items'=>['SerialNumbers','ItemCompanies'],'IvRowItems'=>['Items'=>['SerialNumbers']]], 'Companies']
         ]);
 
         $this->set('iv', $iv);
@@ -63,19 +101,20 @@ class IvsController extends AppController
 		]);
 		
 		$item_display=[];
-		
+		$job_card_status='yes';
 		foreach($Invoice->invoice_rows as $invoice_row){
 			$so_row_id=$invoice_row->sales_order_row_id;
 			$salesorderrows=$this->Ivs->Invoices->InvoiceRows->SalesOrderRows->find()->where(['SalesOrderRows.id'=>$so_row_id])->first();
 			if($invoice_row->item->source=='Purchessed/Manufactured'){ 
-				if($salesorderrows->source_type=="Manufactured"){
+				if(@$salesorderrows->source_type=="Manufactured"){
 					$item_display[$invoice_row->id]=$invoice_row->item->name; 
+				}else if(@$salesorderrows->source_type==""){
+					$job_card_status='no'; 
 				}
 			}elseif($invoice_row->item->source=='Assembled' or $invoice_row->item->source=='Manufactured'){
 				$item_display[$invoice_row->id]=$invoice_row->item->name; 
 			}
 		}
-		
 		
         $iv = $this->Ivs->newEntity();
         if ($this->request->is('post')) {
@@ -91,12 +130,12 @@ class IvsController extends AppController
 			}else{
 				$iv->voucher_no=1;
 			}
-           // pr($iv); exit;
+          //pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
 				foreach($iv->iv_rows as $iv_row){   
 					/////For In
-					$serial_numbers_iv_row = $iv_row->serial_numbers;
-					if(!empty($serial_numbers_iv_row)){
+					$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
+					 if(!empty($serial_numbers_iv_row)){
 						foreach($serial_numbers_iv_row as $sr_nos){
 						 $query = $this->Ivs->IvRows->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
@@ -109,8 +148,8 @@ class IvsController extends AppController
 									]);
 								$query->execute(); 
 						}
-					}
-					foreach($iv_row->iv_row_items as $iv_row_item){
+					} 
+				 	foreach($iv_row->iv_row_items as $iv_row_item){
 						//// For Out
 						$serial_numbers_iv_row_item = $iv_row_item->serial_numbers;
 						if(!empty($serial_numbers_iv_row_item)){
@@ -127,9 +166,8 @@ class IvsController extends AppController
 									$query->execute(); 
 							}
 						}
-					}
+					} 
 				}
-				
                 $this->Flash->success(__('The iv has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -139,7 +177,7 @@ class IvsController extends AppController
         }
 		
 		$Items=$this->Ivs->IvRows->Items->find('list');
-        $this->set(compact('iv', 'Invoice', 'Items','item_display','invoice_id'));
+        $this->set(compact('iv', 'Invoice', 'Items','item_display','invoice_id','job_card_status'));
         $this->set('_serialize', ['iv']);
     }
 
@@ -152,12 +190,56 @@ class IvsController extends AppController
      */
     public function edit($id = null)
     {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
         $iv = $this->Ivs->get($id, [
-            'contain' => []
+            'contain' => ['IvRows'=>['Items'=>['ItemCompanies'],'IvRowItems'=>['Items'=>['ItemCompanies']]],'Invoices'=>['InvoiceRows']]
         ]);
+		//pr($iv);exit;
         if ($this->request->is(['patch', 'post', 'put'])) {
             $iv = $this->Ivs->patchEntity($iv, $this->request->data);
-            if ($this->Ivs->save($iv)) {
+            if ($this->Ivs->save($iv)) { 
+				foreach($iv->iv_rows as $iv_row){   
+					$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);
+					/////For In
+					$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
+					 if(!empty($serial_numbers_iv_row)){
+						foreach($serial_numbers_iv_row as $sr_nos){
+						 $query = $this->Ivs->IvRows->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
+									->values([
+									'name' => $sr_nos,
+									'item_id' => $iv_row->item_id,
+									'status' => 'In',
+									'iv_row_id' => $iv_row->id,
+									'company_id'=>$st_company_id
+									]);
+								$query->execute(); 
+						}
+					} 
+				 	foreach($iv_row->iv_row_items as $iv_row_item){ 
+						$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_items' => $iv_row_item['id'],'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);
+						//// For Out
+						$serial_numbers_iv_row_item = $iv_row_item['serial_numbers'];
+						if(!empty($serial_numbers_iv_row_item)){
+						foreach($serial_numbers_iv_row_item as $sr_nos_out){
+							 $query = $this->Ivs->IvRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id'])
+										->values([
+										'name' => $sr_nos_out,
+										'item_id' => $iv_row_item['item_id'],
+										'status' => 'Out',
+										'iv_row_items' => $iv_row_item['id'],
+										'company_id'=>$st_company_id
+										]);
+									$query->execute(); 
+							}
+						}
+					} 
+				}
+				
+				
                 $this->Flash->success(__('The iv has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -165,9 +247,8 @@ class IvsController extends AppController
                 $this->Flash->error(__('The iv could not be saved. Please, try again.'));
             }
         }
-        $invoices = $this->Ivs->Invoices->find('list', ['limit' => 200]);
-        $companies = $this->Ivs->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('iv', 'invoices', 'companies'));
+		$Items=$this->Ivs->IvRows->Items->find('list');
+        $this->set(compact('iv', 'invoices', 'Items'));
         $this->set('_serialize', ['iv']);
     }
 

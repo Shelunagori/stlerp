@@ -45,6 +45,9 @@ class IvRowItemsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		 $this->hasMany('SerialNumbers', [
+            'foreignKey' => 'iv_row_items'
+        ]);
     }
 
     /**

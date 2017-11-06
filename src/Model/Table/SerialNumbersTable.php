@@ -52,7 +52,7 @@ class SerialNumbersTable extends Table
         ]);
 
         $this->belongsTo('IvRowItems', [
-            'foreignKey' => 'iv_row_item_id',
+            'foreignKey' => 'iv_row_items',
             'joinType' => 'INNER'
         ]);
 		$this->belongsTo('Items', [

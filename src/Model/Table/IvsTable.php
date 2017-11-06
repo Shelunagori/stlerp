@@ -50,6 +50,11 @@ class IvsTable extends Table
         $this->hasMany('IvRows', [
             'foreignKey' => 'iv_id'
         ]);
+		
+		$this->belongsTo('Companies', [
+			'foreignKey' => 'company_id',
+			'joinType' => 'INNER'
+		]);
     }
 
 	public function beforeMarshal(Event $event, ArrayObject $data)
