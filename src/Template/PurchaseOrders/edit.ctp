@@ -487,13 +487,13 @@ $(document).ready(function() {
 		var i=0;
 		$("#main_tb tbody tr.tr1").each(function(){
 			$(this).find("td:nth-child(1)").html(++i); i--;
-			var len=$(this).find("td:nth-child(2) select").length;
+			var len=$(this).find("td:nth-child(2) select").length; 
 			if(len>0){
 				
 				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
 						required: true
 					});
-				$(this).find("td:nth-child(2) input[type='hidden'].p").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
+				//$(this).find("td:nth-child(2) input[type='hidden'].p").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
 				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 			}else{
 				$(this).find("td:nth-child(2) input:eq(0)").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
