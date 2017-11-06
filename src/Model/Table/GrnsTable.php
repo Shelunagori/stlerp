@@ -76,7 +76,7 @@ class GrnsTable extends Table
 			'foreignKey' => 'created_by',
 			'propertyName' => 'creator',
 		]);
-		 $this->hasMany('SerialNumbers', [
+		$this->hasMany('SerialNumbers', [
             'foreignKey' => 'grn_id',
 			'saveStrategy' => 'replace'
         ]);

@@ -51,6 +51,10 @@ class GrnRowsTable extends Table
             'joinType' => 'INNER'
         ]);
 		
+		$this->hasMany('SerialNumbers', [
+            'foreignKey' => 'grn_row_id'
+		]);
+		
     }
 
     /**

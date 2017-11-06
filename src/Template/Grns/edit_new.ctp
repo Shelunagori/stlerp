@@ -130,7 +130,7 @@ if($transaction_date <  $start_date ) {
 								//pr($total_items[$data3->item_id]);
 							}
 							
-							
+							//pr($current_row_items);
 							
 							
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
@@ -150,9 +150,11 @@ if($transaction_date <  $start_date ) {
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 								<td>
-									<?php echo $this->Form->input('q', ['type' => 'hidden','value'=>@$grn_rows->item_id]); 
+									<?php echo $this->Form->input('q', ['type' => 'hidden','value'=>@$grn_rows->item_id,'class'=>'item']); 
 									echo $this->Form->input('q', ['type' => 'hidden','value'=>@$grn_rows->item->item_companies[0]->serial_number_enable]);
 									echo $grn_rows->item->name;
+									
+									 echo $this->Form->input('q', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$grn_rows->id]);
 									?>								
 								</td>
 								<td>
@@ -174,7 +176,7 @@ if($transaction_date <  $start_date ) {
 								}
 								?>
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'min'=>$min]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'min'=>$min,'max'=>@$maxQty[$grn_rows->id]]); 
 								?>
 								<span>Max: <?php
 								if(!empty($maxQty[$grn_rows->id]))
@@ -232,7 +234,7 @@ if($transaction_date <  $start_date ) {
 										<div class="col-md-2"></div>
 										<?php  } else {?>
 										<div class="row">
-										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
+										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly','class'=>'renameSerial']); ?></div>
 										
 										<div class="col-md-2">
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
@@ -246,8 +248,8 @@ if($transaction_date <  $start_date ) {
 											
 										</div>
 										</div>
-									<?php  $i++; } }  }?>
-									
+									<?php  $i++; } }  }
+									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>
 							<?php  
@@ -402,6 +404,8 @@ $(document).ready(function() {
 			var row_no=$(this).closest('tr').attr('row_no');
 			var l=$('.tr2[row_no="'+row_no+'"]').find('input').length;
 			var item_id=$(this).closest('tr').find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val();
+			var val=$(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').val();
+			//alert(val);
 /* 			console.log(is_checked);
 			console.log(serial_number_enable);
 			console.log(old_qty);
@@ -414,10 +418,12 @@ $(document).ready(function() {
 			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html('');
 			for(i=0; i < (qty-old_qty); i++){ 
 			
-				 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no" name="serial_numbers['+item_id+'][new_'+i+']" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
+				 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
 				
-				$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true}); 
+				$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
+                rename_rows();				
 			}
+			
 		} 
     });
 	rename_rows();
@@ -429,7 +435,8 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
 			var qty=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').attr('max_qty');			
 			if(val){
-				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').attr({ name:"grn_rows["+val+"][item_id]"});
+				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1).item').attr({ name:"grn_rows["+val+"][item_id]"});
+				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
 				
 				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly').attr('max',qty);
 				$(this).css('background-color','#fffcda');
@@ -442,6 +449,12 @@ $(document).ready(function() {
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
 			}
+		});
+		$("#main_tb tbody tr.tr2").each(function(){
+			var val=$(this).find('td:nth-child(2) input.hid').val();
+			$(this).find('.renameSerial').each(function(){
+				$(this).attr({ name:"grn_rows["+val+"][serial_numbers][]"});
+			});
 		});
 	}
 });		
