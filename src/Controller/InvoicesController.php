@@ -606,16 +606,16 @@ class InvoicesController extends AppController
 				foreach($invoice->invoice_rows as $invoice_row){
 					$amt=$invoice_row->amount;
 					$total_amt=$total_amt+$amt;
-					$item_serial_no=$invoice_row->serial_numbers;
-					$serial_nos=implode(",", $item_serial_no); 
-					$query = $this->Invoices->InvoiceRows->query();
+					if(!empty($invoice_row->serial_numbers)){
+						$item_serial_no=$invoice_row->serial_numbers;
+						$serial_nos=implode(",", $item_serial_no); 
+						$query = $this->Invoices->InvoiceRows->query();
 									$query->update()
 										->set(['serial_number' => $serial_nos])
 										->where(['id' => $invoice_row->id])
 										->execute(); 
-				 foreach($item_serial_no as $serial){
-						 
-					 ////////
+						foreach($item_serial_no as $serial){
+						////////
 						 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
 									->values([
@@ -628,7 +628,8 @@ class InvoicesController extends AppController
 									]);
 								$query->execute();  
 						
-					}
+						}
+					}	
 				}
 			//////End serial Number database changes Oct17	
 				
