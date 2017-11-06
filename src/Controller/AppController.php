@@ -167,8 +167,6 @@ class AppController extends Controller
 				}
 			}
 			return $option;
-			
-		  
 		}
 
     /**

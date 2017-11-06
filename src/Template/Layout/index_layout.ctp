@@ -990,9 +990,7 @@ select
 jQuery(document).ready(function() {    
 	Metronic.init(); // init metronic core components
 	Layout.init(); // init current layout
-	
 	QuickSidebar.init(); // init quick sidebar
-	
 	Demo.init(); // init demo features
 	ComponentsFormTools.init();
 	ComponentsEditors.init();
@@ -1001,10 +999,8 @@ jQuery(document).ready(function() {
 	TableManaged.init();
 	ComponentsPickers.init();
 	UIGeneral.init();
-	
 	FormiCheck.init(); // init page demo
 	ComponentsDropdowns.init();
-	
 });
 </script>
 <style>
