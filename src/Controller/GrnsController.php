@@ -241,11 +241,8 @@ class GrnsController extends AppController
 						foreach($grn->check as $purchase_order_row_id){
 							$qty=$grn->grn_rows[$i]['quantity'];
 							$item_id=$grn->grn_rows[$i]['item_id'];
-							/* $PurchaseOrderRows = $this->Grns->PurchaseOrderRows->get($purchase_order_row_id);
-							$PurchaseOrderRows->processed_quantity=$PurchaseOrderRows->processed_quantity+$qty;
-							$this->Grns->PurchaseOrderRows->save($PurchaseOrderRows); */
 							$i++;
-							
+
 							//Insert in Item Ledger//
 							$itemLedger = $this->Grns->ItemLedgers->newEntity();
 							$itemLedger->item_id = $item_id;
