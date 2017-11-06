@@ -156,9 +156,25 @@ if($transaction_date <  $start_date ) {
 									?>								
 								</td>
 								<td>
+								<?php  $min=0;  
 								
+								foreach($grn->serial_numbers as $serial_number)
+								{  
+									if($serial_number->item_id == $grn_rows->item_id)
+									{
+										if($serial_number->status=='In')
+										{
+											  ++$min; 
+										}
+									}
+								} 
+								if($min==0)
+								{
+									$min=1;
+								}
+								?>
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id]]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'min'=>$min]); 
 								?>
 								<span>Max: <?php
 								if(!empty($maxQty[$grn_rows->id]))

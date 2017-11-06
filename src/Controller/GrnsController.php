@@ -485,7 +485,7 @@ class GrnsController extends AppController
 		$financial_month_first = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$this->viewBuilder()->layout('index_layout');
-		$grnDetail = $this->Grns->get($id, [
+		/* $grnDetail = $this->Grns->get($id, [
 			'contain' => [
 					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows']
 				]
@@ -516,7 +516,7 @@ class GrnsController extends AppController
 				foreach($grnDetail->grn_rows as $grn_row)
 				{ 
 					$maxQty[@$grn_row->purchase_order_row_id] =$POItemQty[@$grn_row->purchase_order_row_id]-@$Qty[$grn_row->purchase_order_row_id]+$grn_row->quantity;
-				}
+				} */
 				
 		$grn = $this->Grns->get($id, [
 				'contain' => [
@@ -562,11 +562,11 @@ class GrnsController extends AppController
 			}
 			$this->request->data['item_serial_numbers']=$item_serial_numbers;
 			}
-			
+			//pr($this->request->data()); exit;
             $grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->edited_on = date("Y-m-d"); 
 			$grn->edited_by=$this->viewVars['s_employee_id'];
-			//pr($grn->transaction_date); exit;
+			pr($grn); exit;
 			
 				if ($this->Grns->save($grn)) {
 					$this->Grns->ItemLedgers->deleteAll(['source_id' => $grn->id, 'source_model' => 'Grns']);
