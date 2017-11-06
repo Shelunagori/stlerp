@@ -393,7 +393,7 @@ class GrnsController extends AppController
 			
 			
 			 if ($this->Grns->save($grn)) {
-					//pr($grn); exit;
+					pr($grn); exit;
 					foreach($grn->grn_rows as $key => $grn_row){
 						if(isset($grn_row->serial_numbers))
 						{
