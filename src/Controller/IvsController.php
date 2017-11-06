@@ -92,6 +92,8 @@ class IvsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+
 		
 		$Invoice=$this->Ivs->Invoices->get($invoice_id, [
 			'contain' => ['InvoiceRows'=>['Items'=>function($p) use($st_company_id){
@@ -130,6 +132,9 @@ class IvsController extends AppController
 			}else{
 				$iv->voucher_no=1;
 			}
+			
+			$iv->created_by=$s_employee_id;
+			
           //pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
 				foreach($iv->iv_rows as $iv_row){   
@@ -193,12 +198,14 @@ class IvsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
         $iv = $this->Ivs->get($id, [
             'contain' => ['IvRows'=>['Items'=>['ItemCompanies'],'IvRowItems'=>['Items'=>['ItemCompanies']]],'Invoices'=>['InvoiceRows']]
         ]);
 		//pr($iv);exit;
         if ($this->request->is(['patch', 'post', 'put'])) {
             $iv = $this->Ivs->patchEntity($iv, $this->request->data);
+			$iv->created_by=$s_employee_id;
             if ($this->Ivs->save($iv)) { 
 				foreach($iv->iv_rows as $iv_row){   
 					$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);

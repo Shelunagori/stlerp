@@ -80,9 +80,6 @@ class QuotationsController extends AppController
 			$where['Quotations.status']='Closed';
 		}
 		
-		
-											
-		 							
 		$subquery=$this->Quotations->find();
 		$subquery->select(['max_id' => $subquery->func()->max('id')])->group('quotation_id');
 		$max_ids=[];
@@ -112,7 +109,7 @@ class QuotationsController extends AppController
 				);
 		}else{ 
 		
-			if(sizeof($max_ids)>0){ echo"ddfg";
+			if(sizeof($max_ids)>0){ 
 				$quotations = $this->paginate($this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']));
 					
 			}else{ 

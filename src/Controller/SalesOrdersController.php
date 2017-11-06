@@ -83,9 +83,6 @@ class SalesOrdersController extends AppController
 			$having=['total_sales =' => 0];
 		}
 		
-		
-		
-		
 		if(!empty($items)){
 			
 				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -114,6 +111,7 @@ class SalesOrdersController extends AppController
 				->where(['SalesOrders.company_id'=>$st_company_id])
 				->where($where);
 		}
+		
 		
 		//pr($salesOrders->toArray());exit;
 		$total_sales=[]; $total_qty=[];
