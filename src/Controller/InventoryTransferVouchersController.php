@@ -724,8 +724,9 @@ class InventoryTransferVouchersController extends AppController
 			if($ItemQuantity == 0){
 				$this->InventoryTransferVouchers->ItemLedgers->delete($ItemLedger);
 				$this->InventoryTransferVouchers->InventoryTransferVoucherRows->delete($InventoryTransferVoucherRows);
+				$this->InventoryTransferVouchers->SerialNumbers->delete($ItemSerialNumber);
 				$this->Flash->success(__('The Item has been deleted.'));
-				return $this->redirect(['action' => 'Opening-Balance']);
+				return $this->redirect(['action' => 'edit/'.$in_voucher_id]);
 				
 			}else{
 				
@@ -795,7 +796,7 @@ class InventoryTransferVouchersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->Items->ItemLedgers->find()->where(['source_id'=>$in_voucher_id,'item_id'=>$item_id,'in_out'=>'In','source_model'=>'Inventory Transfer Voucher'])->first();
 		
-		$ItemSerialNumbers = $this->InventoryTransferVouchers->SerialNumbers->find()->where(['SerialNumbers.name'=>$name,'SerialNumbers.item_id'=>$item_id]);
+		$ItemSerialNumbers = $this->InventoryTransferVouchers->SerialNumbers->find()->where(['SerialNumbers.name'=>$name,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.itv_row_id'=>$in_id]);
 		foreach($ItemSerialNumbers as $ItemSerialNumber1)
 		{
 			if($ItemSerialNumber1->status=='In')
@@ -829,7 +830,7 @@ class InventoryTransferVouchersController extends AppController
 				->where(['item_id'=>$item_id,'company_id'=>$st_company_id,'source_model'=>'Inventory Transfer Voucher','in_out'=>'In'])
 				->execute();
 			$ItemSerialNumber = $this->InventoryTransferVouchers->SerialNumbers->get($id);
-			$this->InventoryTransferVouchers->SerialNumbers->delete($ItemSerialNumber);
+			$this->InventoryTransferVouchers->SerialNumbers->delete($ItemSerialNumber); 
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 		}
 		//row delete code
@@ -838,6 +839,16 @@ class InventoryTransferVouchersController extends AppController
 		{
 			$InventoryTransferVoucherRowdetail = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->get($in_id);
 			$this->InventoryTransferVouchers->InventoryTransferVoucherRows->delete($InventoryTransferVoucherRowdetail);
+		}
+		
+		//item ledger entry delete when quantity 0.
+		$ItemLedgerExist = $this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Inventory Transfer Voucher','ItemLedgers.item_id'=>$item_id,'ItemLedgers.source_id'=>$in_voucher_id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.quantity'=>0])->first();
+
+		if(!empty($ItemLedgerExist))
+		{
+			$ItemLedgersId =$ItemLedgerExist->id;
+			$ItemLedgerDetail = $this->InventoryTransferVouchers->ItemLedgers->get($ItemLedgersId);
+			$this->InventoryTransferVouchers->ItemLedgers->delete($ItemLedgerDetail);
 		}
 		
 		return $this->redirect(['action' => 'editInventoryIn/'.$in_voucher_id]);

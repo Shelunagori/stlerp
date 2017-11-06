@@ -71,7 +71,9 @@ class SerialNumbersTable extends Table
             'foreignKey' => 'purchase_return_row_id',
             'joinType' => 'INNER'
         ]);
-
+		$this->belongsTo('GrnRows', [
+            'foreignKey' => 'grn_row_id'
+        ]);
     }
 
     /**
@@ -82,12 +84,12 @@ class SerialNumbersTable extends Table
      */
     public function validationDefault(Validator $validator)
     {
-        $validator
-            ->integer('id')
-            ->requirePresence('id', 'create')
+         $validator
+            ->integer('id');
+            /*->requirePresence('id', 'create')
             ->notEmpty('id');
-
-
+ */
+/* 
         $validator
             ->requirePresence('name', 'create')
             ->notEmpty('name');
@@ -99,7 +101,7 @@ class SerialNumbersTable extends Table
         $validator
             ->integer('iv_row_items')
             ->requirePresence('iv_row_items', 'create')
-            ->notEmpty('iv_row_items');
+            ->notEmpty('iv_row_items'); */
 
         return $validator;
     }

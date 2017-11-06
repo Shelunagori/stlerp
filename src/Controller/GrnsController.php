@@ -365,7 +365,9 @@ class GrnsController extends AppController
 			}
 			
 			$serial_numbers=@$this->request->data['serial_numbers']; 
-/* 			if(sizeof($serial_numbers)>0){
+            /*
+			if(sizeof($serial_numbers)>0)
+			{
 				$item_serial_numbers=[];
 				foreach($serial_numbers as $item_id=>$data){
 					foreach($data as $sr)
@@ -373,7 +375,8 @@ class GrnsController extends AppController
 				}
 				
 				$this->request->data['item_serial_numbers']=$item_serial_numbers;
-			} */
+			}
+			*/
 			
 			
 			
@@ -522,7 +525,7 @@ class GrnsController extends AppController
 				'contain' => [
 						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
-								}]],'Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
+								}]],'Grns'=>['GrnRows'=>['SerialNumbers']]],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
 					]
@@ -560,14 +563,14 @@ class GrnsController extends AppController
 				foreach($data as $sr)
 				$item_serial_numbers[]=['item_id'=>$item_id,'serial_no'=>$sr,'company_id'=>$st_company_id,'status'=>'In'];
 			}
-			$this->request->data['item_serial_numbers']=$item_serial_numbers;
+			$this->request->data['serial_numbers']=$item_serial_numbers;
 			}
 			
             $grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->edited_on = date("Y-m-d"); 
 			$grn->edited_by=$this->viewVars['s_employee_id'];
 			//pr($grn->transaction_date); exit;
-			
+			//pr($grn); exit;
 				if ($this->Grns->save($grn)) {
 					$this->Grns->ItemLedgers->deleteAll(['source_id' => $grn->id, 'source_model' => 'Grns']);
 						$grn->check=array_filter($grn->check);
@@ -589,13 +592,24 @@ class GrnsController extends AppController
 							$itemLedger->processed_on = $grn->transaction_date;
 							$this->Grns->ItemLedgers->save($itemLedger);
 						} 
-					/*$qq=0; foreach($grn->grn_rows as $grn_row){
-					 	//pr($grn->purchase_order_id); exit;
-						$purchaseorderrow=$this->Grns->PurchaseOrderRows->find()->where(['purchase_order_id'=>$grn->purchase_order_id,'item_id'=>$grn_row->item_id])->first();
-						$purchaseorderrow->processed_quantity=$purchaseorderrow->processed_quantity-@$grn->getOriginal('grn_rows')[$qq]->quantity+$grn_row->quantity;
-						$this->Grns->PurchaseOrderRows->save($purchaseorderrow);
-						$qq++;   
-					}*/
+					foreach($grn->grn_rows as $grn_row)
+					{
+						$this->Grns->SerialNumbers->deleteAll(['itv_row_id' => $grn_row->id, 'itv_id' => $grn->id]);
+						foreach($grn_row->serial_numbers as $serial_number)
+					    {
+						  $query = $this->Grns->SerialNumbers->query();
+								$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+								->values([
+								'name' => $serial_number,
+								'item_id' => $grn_row->item_id,
+								'status' => 'In',
+								'grn_id' => $grn->id,
+								'grn_row_id' => $grn_row->id,
+								'company_id'=>$st_company_id
+								]);
+								$query->execute();	
+						}
+					}
 					$this->Flash->success(__('The grn has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				} else {
