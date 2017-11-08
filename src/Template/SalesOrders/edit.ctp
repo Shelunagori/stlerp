@@ -142,22 +142,25 @@
 						}
 					}
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
-				
+			
 					if(@$quotation_qty[$sales_order_rows->quotation_row_id] > 0){
+						
+						$disable_class=" disabled='true'";
+						$disable_class_item="disabledbutton";
+					}
+					else if(@$sales_orders_qty[$sales_order_rows->id] > 0){
 						
 						$disable_class=" disabled='true'";
 						$disable_class_item="disabledbutton";
 					}else{
 						$disable_class=""; 
 						$disable_class_item=""; 
-						} 
+						}	
 					 ?>
 					
 					<tr class="tr1 main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
 						<td rowspan="2">
 							<?= h($q) ?>
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id,'class'=>'salesid']); ?>
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$invoice_row_id[@$sales_order_row->quotation_row_id],'readonly','class'=>'invoiceid']); ?>							
 						</td>
 						<td>						
 							<div class="row">
@@ -197,14 +200,11 @@
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.job_card_row_ids', ['type' => 'hidden','value'=>$job_card_row_ids]); ?>
 							
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id,'class'=>'SalesOrderRowId']); ?>
-							
-							
-							
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$quotation_row_id[@$sales_order_row->quotation_row_id],'readonly','class'=>'quotationId']); ?>
 						</td>
-						
 						<td>
 						
-						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$quotation_qty[$sales_order_rows->quotation_row_id],'max'=>@$quotation_qty[$sales_order_rows->quotation_row_id]-@$existing_quotation_rows[$sales_order_rows->quotation_row_id]+@$current_quotation_rows[$sales_order_rows->quotation_row_id]]); ?>
+						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id],'max'=>@$quotation_qty[$sales_order_rows->quotation_row_id]-@$existing_quotation_rows[$sales_order_rows->quotation_row_id]+@$current_so_rows[$sales_order_rows->id]]); ?>
 						<?php 
 						 echo $this->Form->input('sales_order_rows.'.$q.'.old_quantity', ['type' => 'hidden','value'=>$sales_order_rows->quantity]);
 						?>
@@ -223,7 +223,7 @@
 						echo $this->Form->input('sales_order_rows.'.$q.'.sale_tax_id', ['options'=>$options,'label' => false,'class' => 'form-control input-sm change_des','value'=>$sales_order_rows->sale_tax_id]);?>
 						</td>
 						<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-						<?php if(@$quotation_qty[$sales_order_rows->quotation_row_id] > 0){ ?>
+						<?php if((@$quotation_qty[$sales_order_rows->quotation_row_id] > 0) || (@$sales_orders_qty[@$sales_order_rows->id])){ ?>
 							
 						<?php }else{ ?> 
 						<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
@@ -738,6 +738,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) input[type=hidden]:eq(3)").attr({name:"sales_order_rows["+i+"][job_card_row_ids]", id:"sales_order_rows-"+i+"-job_card_row_ids"});
 			
 			$(this).find("td:nth-child(2) .SalesOrderRowId").attr({name:"sales_order_rows["+i+"][id]", id:"sales_order_rows-"+i+"-id"});
+			$(this).find("td:nth-child(2) .quotationId").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
 			
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);

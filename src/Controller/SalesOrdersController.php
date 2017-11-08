@@ -677,7 +677,51 @@ class SalesOrdersController extends AppController
 					}
 				}	
 
-			////end unique validation and procees qty		
+			////end unique validation and procees qty	
+			//start array declaration for unique validation and proceed quantity
+		$so_qty = $this->SalesOrders->get($id, [
+            'contain' => ['SalesOrderRows','Quotations' => ['SalesOrders'=>['SalesOrderRows'],'QuotationRows' => ['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}]]],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
+						return $q
+						->where(['CustomerAddress.default_address' => 1]);}],'Employees']
+        ]);
+		
+		
+		$quotation_id = $salesOrder->quotation_id;
+		 
+		$sales_qty = $this->SalesOrders->Quotations->get($quotation_id, [
+            'contain' => (['QuotationRows' => function ($q) {
+					$q->select(['QuotationRows.quotation_id','QuotationRows.id','total_qo_qty' => $q->func()->sum('QuotationRows.quantity')])->group(['QuotationRows.id']);
+					return $q;
+				}])
+        ]);
+		
+		//pr($sales_qty);exit;
+		$quotation_qty=[];$existing_quotation_rows=[]; $current_so_rows=[];$so_row_id=[];
+		
+		foreach($so_qty->quotation->sales_orders as $all_sales_orders){
+			foreach($all_sales_orders->sales_order_rows as $all_sales_order_row){
+				if($all_sales_order_row->quotation_row_id != 0){
+					@$existing_quotation_rows[$all_sales_order_row->quotation_row_id]+=@$all_sales_order_row->quantity;
+				}
+			}
+		}
+		
+		foreach($so_qty->sales_order_rows as $current_sales_order_rows){
+			@$current_so_rows[$current_sales_order_rows->id]+=@$current_sales_order_rows->quantity;
+			
+		}
+		/* pr($current_invoice_rows);
+		pr($invoice);
+		exit; */
+		foreach($sales_qty->quotation_rows as $quotation_row){ 
+			@$quotation_qty[@$quotation_row->id]+=@$quotation_row->total_qo_qty;
+			@$quotation_row_id[$quotation_row->id]=@$quotation_row->id;
+		}
+				
+		
+		//end array declaration for unique validation and proceed quantity			
 					
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -693,7 +737,7 @@ class SalesOrdersController extends AppController
 							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 						} 
 					);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id'));
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
