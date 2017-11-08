@@ -633,11 +633,7 @@ class GrnsController extends AppController
 								}]]
 					]
 			]);
-<<<<<<< HEAD
-		//pr($grn);exit;
-=======
-		
->>>>>>> origin/master
+
         $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
         $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
         $this->set(compact('grn','minQty', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
