@@ -136,7 +136,7 @@ if($transaction_date <  $start_date ) {
 							{
 								$grnRowIds[$grn_row->purchase_order_row_id] = $grn_row->id;
 							}
-							
+							//pr($grn->purchase_order);
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
 							<?php  
 							$min_val=0;
@@ -162,25 +162,10 @@ if($transaction_date <  $start_date ) {
 									?>								
 								</td>
 								<td>
-								<?php  $min=0;  
 								
-								foreach($grn->serial_numbers as $serial_number)
-								{  
-									if($serial_number->item_id == $grn_rows->item_id)
-									{
-										if($serial_number->status=='In')
-										{
-											  ++$min; 
-										}
-									}
-								} 
-								if($min==0)
-								{
-									$min=1;
-								}
-								?>
+								
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'min'=>$min,'max'=>@$maxQty[$grn_rows->id]]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id]]); 
 								?>
 								<span>Max: <?php
 								if(!empty($maxQty[$grn_rows->id]))
@@ -200,14 +185,18 @@ if($transaction_date <  $start_date ) {
 										}else{
 											$check=' ';
 										}
-									
-									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($grn->serial_numbers),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
+									$old_Quantity=[];
+									foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number)
+									{
+										$old_Quantity[] = $serial_number;
+									}
+									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($old_Quantity),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
 								</td>
 								
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$grn_rows->id; ?>'>
 
-								<?php  $i=1; foreach($grn->serial_numbers as $serial_number){
+								<?php  $i=1; foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){ ?>
 
 									<div style="margin-bottom:6px;">
@@ -220,7 +209,7 @@ if($transaction_date <  $start_date ) {
 								<td colspan="1" class="demo">
 
 								<?php  $i=1;  
-								foreach($grn->serial_numbers as $serial_number){
+								foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){
 									 
 									if($i==1)
@@ -402,6 +391,7 @@ $(document).ready(function() {
 			var count_serial_no = $('#count_serial_no').val();
 			var serial_number_enable=$(this).closest('tr').find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
 			var qty=parseInt($(this).closest('tr').find('td:nth-child(3) input[type="text"]').val());
+			var maxQty=parseInt($(this).closest('tr').find('td:nth-child(3) input[type="text"]').attr('max'));
 			var old_qty=parseInt($(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').attr('old_qty_size'));
 			if(!old_qty){ old_qty=0; }
 			
@@ -419,14 +409,20 @@ $(document).ready(function() {
 			for(i=0; i <= old_qty; i++){ 
 			$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
 			}
-			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html('');
-			for(i=0; i < (qty-old_qty); i++){ 
-			
-				 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
+			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
+			var quantity = qty-old_qty;
+			quantity = quantity+old_qty;
+			if(maxQty>quantity || maxQty==quantity)
+			{
+				for(i=0; i < (qty-old_qty); i++){ 
 				
-				$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
-                rename_rows();				
+					 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
+					
+					$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
+					rename_rows();				
+				}
 			}
+			
 			
 		} 
     });
