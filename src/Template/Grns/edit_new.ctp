@@ -131,7 +131,11 @@ if($transaction_date <  $start_date ) {
 							}
 							
 							//pr($current_row_items);
-							
+							$grnRowIds=[];
+							foreach ($grn->grn_rows as $grn_row)
+							{
+								$grnRowIds[$grn_row->purchase_order_row_id] = $grn_row->id;
+							}
 							
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
 							<?php  
@@ -153,8 +157,8 @@ if($transaction_date <  $start_date ) {
 									<?php echo $this->Form->input('q', ['type' => 'hidden','value'=>@$grn_rows->item_id,'class'=>'item']); 
 									echo $this->Form->input('q', ['type' => 'hidden','value'=>@$grn_rows->item->item_companies[0]->serial_number_enable]);
 									echo $grn_rows->item->name;
-									
-									 echo $this->Form->input('q', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$grn_rows->id]);
+									echo $this->Form->input('q', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$grn_rows->id]);
+									echo $this->Form->input('q', ['type' => 'hidden','class'=>'grn_row_id','value'=>@$grnRowIds[$grn_rows->id]]);
 									?>								
 								</td>
 								<td>
@@ -207,7 +211,7 @@ if($transaction_date <  $start_date ) {
 									if($serial_number->item_id == $grn_rows->item_id){ ?>
 
 									<div style="margin-bottom:6px;">
-									<?php echo $this->Form->input('serial_numbers['.$grn_rows->item_id.']['.$i.']', ['label' => false,'type'=>'hidden','class'=>'sr_no','ids'=>'sr_no['.$i.']','value' => $serial_number->name,'readonly']); ?>
+									
 									</div>
 									<?php  $i++;  }  }?><br/>
 								<td colspan="2" class="td_append">
@@ -429,7 +433,8 @@ $(document).ready(function() {
 	rename_rows();
 	
 	
-	function rename_rows(){
+	function rename_rows()
+	{
 		$("#main_tb tbody tr.tr1").each(function(){
 			var row_no=$(this).attr('row_no');
 			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
@@ -437,7 +442,7 @@ $(document).ready(function() {
 			if(val){
 				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1).item').attr({ name:"grn_rows["+val+"][item_id]"});
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
-				
+				$(this).find('td:nth-child(2) input.grn_row_id').attr({ name:"grn_rows["+val+"][id]"});
 				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly').attr('max',qty);
 				$(this).css('background-color','#fffcda');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
@@ -452,8 +457,10 @@ $(document).ready(function() {
 		});
 		$("#main_tb tbody tr.tr2").each(function(){
 			var val=$(this).find('td:nth-child(2) input.hid').val();
+			var no=0;
 			$(this).find('.renameSerial').each(function(){
 				$(this).attr({ name:"grn_rows["+val+"][serial_numbers][]"});
+				no++;
 			});
 		});
 	}
