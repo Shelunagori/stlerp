@@ -481,22 +481,14 @@ class GrnsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Grns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
-		 
-		
 		$financial_month_first = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$this->viewBuilder()->layout('index_layout');
-		
-				
 		$grn = $this->Grns->get($id, [
 				'contain' => ['GrnRows'
 					]
-			]);
-			 //pr($grn);exit;
-		
-        
+		]);
 			   $st_year_id = $session->read('st_year_id');
-
 			   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
 			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
@@ -518,15 +510,6 @@ class GrnsController extends AppController
 	
 		if ($this->request->is(['patch', 'post', 'put'])) {
 
-			/* $serial_numbers=@$this->request->data['serial_numbers']; 
-			$item_serial_numbers=[];
-			if(sizeof($serial_numbers)>0){
-			foreach($serial_numbers as $item_id=>$data){
-				foreach($data as $sr)
-				$item_serial_numbers[]=['item_id'=>$item_id,'serial_no'=>$sr,'company_id'=>$st_company_id,'status'=>'In'];
-			}
-			$this->request->data['serial_numbers']=$item_serial_numbers;
-			} */
 			
             $grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->edited_on = date("Y-m-d"); 
@@ -628,6 +611,7 @@ class GrnsController extends AppController
 								}]]
 					]
 			]);
+		
         $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
         $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
         $this->set(compact('grn', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
