@@ -125,7 +125,7 @@ margin-bottom: 0;
 			<td colspan="3" style="border-top:none !important;">
 			<table width="100%">
 			
-			<?php foreach($ref_bal[$journal_voucher_row->received_from_id] as $refbal): ?>
+			<?php foreach($journal_voucher_row->reference_details as $refbal): ?>
 			<tr>
 					<td style="width :180px !important;"> <?= h($refbal->reference_type). '-' .h($refbal->reference_no) ?></td>
 					

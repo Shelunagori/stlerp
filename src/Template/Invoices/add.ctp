@@ -207,7 +207,7 @@ $('.closetin').on("click",function() {
 					if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
 						$ed_des[]=$sales_order_rows->excise_duty;
-					/* if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ */	
+					 if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ 	
 					?>
 						<tr class="tr1  firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
 						
@@ -245,7 +245,7 @@ $('.closetin').on("click",function() {
 								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_rows->item_id); ?>
 							</td>
 						</tr>
-						<?php } $q++;  endforeach; }?>
+					 <?php } $q++; }  endforeach; }?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
