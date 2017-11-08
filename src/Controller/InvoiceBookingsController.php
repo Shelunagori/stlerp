@@ -1200,6 +1200,7 @@ class InvoiceBookingsController extends AppController
 			return $q->where(['AccountFirstSubgroups.id'=>$AccountReference->account_first_subgroup_id]);
 		}]])->order(['LedgerAccounts.name' => 'ASC'])->where(['LedgerAccounts.company_id'=>$st_company_id]);
 		
+		pr($AccountReference->toArray()); exit;
 		$AccountReference= $this->InvoiceBookings->AccountReferences->get(4);
 		$ledger_account_vat = $this->InvoiceBookings->LedgerAccounts->find('list'
 				,['keyField' => 		function ($row) {

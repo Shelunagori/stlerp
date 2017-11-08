@@ -309,7 +309,6 @@ $(document).ready(function() {
 		if(ref_type=="Against Reference"){
 			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
 			url=url+'/'+received_from_id,
-			
 			$.ajax({
 				url: url,
 				type: 'GET',

@@ -17,9 +17,7 @@ if($transaction_date <  $start_date ) {
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
 			<span class="caption-subject font-blue-steel uppercase">Edit Goods Receipt Note</span>
-		
 		</div>
-		
 	</div>
 	
 	<div class="portlet-body form">
