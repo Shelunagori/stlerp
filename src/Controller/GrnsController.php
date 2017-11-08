@@ -17,7 +17,7 @@ class GrnsController extends AppController
      * @return \Cake\Network\Response|null
      */
     public function index($status=null)
-    {
+    {   
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
@@ -143,7 +143,8 @@ class GrnsController extends AppController
     {
 		$grn = $this->Grns->find();
 		
-		foreach($grn as $grn){
+		foreach($grn as $grn)
+		{
 			$query = $this->Grns->query();
 			$query->update()
 				->set(['transaction_date' => $grn->date_created])
@@ -390,7 +391,7 @@ class GrnsController extends AppController
 			
 			
 			 if ($this->Grns->save($grn)) {
-					pr($grn); exit;
+					//pr($grn); exit;
 					foreach($grn->grn_rows as $key => $grn_row){
 						if(isset($grn_row->serial_numbers))
 						{
@@ -485,6 +486,107 @@ class GrnsController extends AppController
 		$financial_month_first = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$this->viewBuilder()->layout('index_layout');
+		
+				
+		$grn = $this->Grns->get($id, [
+				'contain' => ['GrnRows'
+					]
+			]);
+			 //pr($grn);exit;
+		
+        
+			   $st_year_id = $session->read('st_year_id');
+
+			   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+			   $tody1 = date("Y-m-d");
+
+			   $fromdate = strtotime($fromdate1);
+			   $todate = strtotime($todate1); 
+			   $tody = strtotime($tody1);
+
+			  if($fromdate > $tody || $todate < $tody || $SessionCheckDate['status'] == 'Closed')
+			   {
+				   $chkdate = 'Not Found';
+			   }
+			   else
+			   {
+				  $chkdate = 'Found';
+			   }			
+	
+	
+		if ($this->request->is(['patch', 'post', 'put'])) {
+
+			/* $serial_numbers=@$this->request->data['serial_numbers']; 
+			$item_serial_numbers=[];
+			if(sizeof($serial_numbers)>0){
+			foreach($serial_numbers as $item_id=>$data){
+				foreach($data as $sr)
+				$item_serial_numbers[]=['item_id'=>$item_id,'serial_no'=>$sr,'company_id'=>$st_company_id,'status'=>'In'];
+			}
+			$this->request->data['serial_numbers']=$item_serial_numbers;
+			} */
+			
+            $grn = $this->Grns->patchEntity($grn, $this->request->data);
+			$grn->edited_on = date("Y-m-d"); 
+			$grn->edited_by=$this->viewVars['s_employee_id'];
+			//pr($grn->transaction_date); exit;
+			unset($grn->count_serial_no);
+			unset($grn->q);
+			//pr($grn); exit;
+				if ($this->Grns->save($grn)) 
+				{
+					$this->Grns->ItemLedgers->deleteAll(['source_id' => $grn->id, 'source_model' => 'Grns','company_id' =>$st_company_id ]);
+						$grn->check=array_filter($grn->check);
+						$i=0; 
+						//pr($grn); exit;
+						foreach($grn->check as $purchase_order_row_id)
+						{
+							$qty=$grn->grn_rows[$i]['quantity'];
+							$item_id=$grn->grn_rows[$i]['item_id'];
+							$i++;
+							
+							//Insert in Item Ledger//
+							$itemLedger = $this->Grns->ItemLedgers->newEntity();
+							$itemLedger->item_id = $item_id;
+							$itemLedger->quantity = $qty;
+							$itemLedger->company_id = $grn->company_id;
+							$itemLedger->source_model = 'Grns';
+							$itemLedger->source_id = $grn->id;
+							$itemLedger->in_out = 'In';
+							$itemLedger->processed_on = $grn->transaction_date;
+							$this->Grns->ItemLedgers->save($itemLedger);
+						} 
+					foreach($grn->grn_rows as $grn_row)
+					{ 
+                        
+						if(!empty($grn_row->serial_numbers))
+						{
+							$this->Grns->SerialNumbers->deleteAll(['grn_id' => $grn->id,'company_id'=>$st_company_id]);
+							foreach($grn_row->serial_numbers as $serial_number)
+							{
+							  $query = $this->Grns->SerialNumbers->query();
+									$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+									->values([
+									'name' => $serial_number,
+									'item_id' => $grn_row->item_id,
+									'status' => 'In',
+									'grn_id' => $grn->id,
+									'grn_row_id' => $grn_row->id,
+									'company_id'=>$st_company_id
+									]);
+									$query->execute();	
+							}
+						}
+					}//exit;
+					$this->Flash->success(__('The grn has been saved.'));
+					return $this->redirect(['action' => 'index']);
+				} else {
+					$this->Flash->error(__('The grn could not be saved. Please, try again.'));
+				}
+			}
+			
 		$grnDetail = $this->Grns->get($id, [
 			'contain' => [
 					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows']
@@ -517,7 +619,6 @@ class GrnsController extends AppController
 				{ 
 					$maxQty[@$grn_row->purchase_order_row_id] =$POItemQty[@$grn_row->purchase_order_row_id]-@$Qty[$grn_row->purchase_order_row_id]+$grn_row->quantity;
 				}
-				
 		$grn = $this->Grns->get($id, [
 				'contain' => [
 						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
@@ -527,92 +628,6 @@ class GrnsController extends AppController
 								}]]
 					]
 			]);
-			 //pr($grn);exit;
-		
-        
-			   $st_year_id = $session->read('st_year_id');
-
-			   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
-			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
-			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
-			   $tody1 = date("Y-m-d");
-
-			   $fromdate = strtotime($fromdate1);
-			   $todate = strtotime($todate1); 
-			   $tody = strtotime($tody1);
-
-			  if($fromdate > $tody || $todate < $tody || $SessionCheckDate['status'] == 'Closed')
-			   {
-				   $chkdate = 'Not Found';
-			   }
-			   else
-			   {
-				  $chkdate = 'Found';
-			   }			
-	
-	
-		if ($this->request->is(['patch', 'post', 'put'])) {
-
-			$serial_numbers=@$this->request->data['serial_numbers']; 
-			$item_serial_numbers=[];
-			if(sizeof($serial_numbers)>0){
-			foreach($serial_numbers as $item_id=>$data){
-				foreach($data as $sr)
-				$item_serial_numbers[]=['item_id'=>$item_id,'serial_no'=>$sr,'company_id'=>$st_company_id,'status'=>'In'];
-			}
-			$this->request->data['serial_numbers']=$item_serial_numbers;
-			}
-			
-            $grn = $this->Grns->patchEntity($grn, $this->request->data);
-			$grn->edited_on = date("Y-m-d"); 
-			$grn->edited_by=$this->viewVars['s_employee_id'];
-			//pr($grn->transaction_date); exit;
-			//pr($grn); exit;
-				if ($this->Grns->save($grn)) {
-					$this->Grns->ItemLedgers->deleteAll(['source_id' => $grn->id, 'source_model' => 'Grns']);
-						$grn->check=array_filter($grn->check);
-						$i=0; 
-						//pr($grn); exit;
-						foreach($grn->check as $purchase_order_row_id){
-							$qty=$grn->grn_rows[$i]['quantity'];
-							$item_id=$grn->grn_rows[$i]['item_id'];
-							$i++;
-							
-							//Insert in Item Ledger//
-							$itemLedger = $this->Grns->ItemLedgers->newEntity();
-							$itemLedger->item_id = $item_id;
-							$itemLedger->quantity = $qty;
-							$itemLedger->company_id = $grn->company_id;
-							$itemLedger->source_model = 'Grns';
-							$itemLedger->source_id = $grn->id;
-							$itemLedger->in_out = 'In';
-							$itemLedger->processed_on = $grn->transaction_date;
-							$this->Grns->ItemLedgers->save($itemLedger);
-						} 
-					foreach($grn->grn_rows as $grn_row)
-					{
-						$this->Grns->SerialNumbers->deleteAll(['itv_row_id' => $grn_row->id, 'itv_id' => $grn->id]);
-						foreach($grn_row->serial_numbers as $serial_number)
-					    {
-						  $query = $this->Grns->SerialNumbers->query();
-								$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
-								->values([
-								'name' => $serial_number,
-								'item_id' => $grn_row->item_id,
-								'status' => 'In',
-								'grn_id' => $grn->id,
-								'grn_row_id' => $grn_row->id,
-								'company_id'=>$st_company_id
-								]);
-								$query->execute();	
-						}
-					}
-					$this->Flash->success(__('The grn has been saved.'));
-					return $this->redirect(['action' => 'index']);
-				} else {
-					$this->Flash->error(__('The grn could not be saved. Please, try again.'));
-				}
-			}
         $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
         $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
         $this->set(compact('grn', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
