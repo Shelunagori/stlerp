@@ -347,7 +347,8 @@ $(document).ready(function() {
 		var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
 		
 		if(serial_number_enable==1){
-			var qty=tr_obj.find('td:nth-child(2) input').val();
+			var OriginalQty=tr_obj.find('td:nth-child(2) input').val();
+			Quantity = OriginalQty.split('.'); qty=Quantity[0];
 			var row_no=tr_obj.attr('row_no'); 
 			tr_obj.find('td:nth-child(3) div.sr_container').html(''); 
 			for(var w=0; w < (qty-old_qty); w++){
