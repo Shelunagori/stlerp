@@ -128,7 +128,7 @@ class InventoryTransferVouchersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
-            'contain' => ['Creator','Companies', 'InventoryTransferVoucherRows'=>['Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Creator','Companies', 'InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]]
         ]);
