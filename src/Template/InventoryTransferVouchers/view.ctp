@@ -105,10 +105,10 @@ margin-bottom: 0;
 							<?php if($status==1) {  if(!empty($out_item->item->item_companies[0]->serial_number_enable)){
 							if($out_item->item->item_companies[0]->serial_number_enable == 1) { ?>
 							<td><table>
-							<?php foreach ($out_item->item->item_serial_numbers as  $item_serial_number){ 
-							if($item_serial_number->inventory_transfer_voucher_id == $out_item->inventory_transfer_voucher_id){ ?>
+							<?php foreach ($out_item->item->serial_numbers as  $item_serial_number){ 
+							if($item_serial_number->itv_id == $out_item->inventory_transfer_voucher_id){ ?>
 							<tr>
-								<td><?php echo $item_serial_number->serial_no ?></td>
+								<td><?php echo $item_serial_number->name; ?></td>
 							</tr>
 							<?php }} ?>
 							</table>
