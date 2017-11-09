@@ -113,7 +113,7 @@ margin-bottom: 0;
 		</td>
 				<?php }}else{  ?>
 							<td><table>
-							<?php foreach ($out_item->item->serial_numbers as  $item_serial_number){ 
+							<?php foreach ($out_item->serial_numbers as  $item_serial_number){ 
 							if($item_serial_number->itv_id == $out_item->inventory_transfer_voucher_id){ ?>
 							<tr>
 								<td><?php echo "-"; ?></td>

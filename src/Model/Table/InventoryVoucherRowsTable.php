@@ -52,6 +52,9 @@ class InventoryVoucherRowsTable extends Table
         ]);
 		$this->belongsTo('Invoices');
 		
+		$this->hasMany('SerialNumbers', [
+            'foreignKey' => 'itv_row_id'
+        ]);
 		
     }
 
