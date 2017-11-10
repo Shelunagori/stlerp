@@ -2536,7 +2536,7 @@ class InvoicesController extends AppController
 									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
 								}],'SaleTaxes']],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
 						return $q
-						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
+						->where(['CustomerAddress.default_address' => 1]);}]]
         ]);
 		
 		

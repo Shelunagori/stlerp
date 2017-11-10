@@ -224,9 +224,16 @@ class SerialNumbersController extends AppController
 		}
 		
 		foreach($SerialNumbers as $serialnumbers){
-			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_number[$in_row_id]))){
-				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-			}	
+			if(!empty($in_row_id)){
+				if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_number[$in_row_id]))){
+					$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
+				}
+			}else{
+				if(($serialnumbers->total_in > $serialnumbers->total_out)){
+					$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
+				}
+			}
+				
 			$values=$sr_number[$in_row_id];
 		}
 		//pr($values);exit;
