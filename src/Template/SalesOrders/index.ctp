@@ -147,13 +147,23 @@
 									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}else{
 									if(in_array(4,$allowed_pages)){
-									if($salesOrder->gst=="no")
-									{
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+										if($salesOrder->gst=="no")
+										{
+										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+										}
+										else{
+											echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+										}
 									}
-									else{
-										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}
+									
+									if(in_array(22,$allowed_pages)){
+										if($salesOrder->gst=="no")
+										{
+										echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
+										}
+										else{
+											echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstConfirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
+										}
 									}
 								} 
 								

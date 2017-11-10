@@ -74,20 +74,21 @@ class InvoicesController extends AppController
 			}	
 		}
 		
-		if(!empty($items)){ 
-		
-			$invoices=$this->paginate($this->Invoices->find()
-			->contain(['SalesOrders','InvoiceRows'=>['Items']])
-			->matching(
-					'InvoiceRows.Items', function ($q) use($items,$where) {
-						return $q->where(['Items.id' =>$items])->where($where);
-					}
-				)
-			->where(['Invoices.company_id'=>$st_company_id])	
-			);
-			
+		if(!empty($items))
+		{ 
+			$InvoiceRows = $this->Invoices->InvoiceRows->find();
+				$invoices = $this->Invoices->find();
+				$invoices->select(['id','total_sales'=>$InvoiceRows->func()->sum('InvoiceRows.quantity')])
+				->innerJoinWith('InvoiceRows')
+				->group(['Invoices.id'])
+				->matching('InvoiceRows.Items', function ($q) use($items,$st_company_id) {
+											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+							})
+				->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])
+				->autoFields(true)
+				->where(['Invoices.company_id'=>$st_company_id])
+				->where($where);
 		}
-		
 		else if($inventory_voucher=='true'){  
 			$invoices=[]; 
 			$invoices=$this->paginate($this->Invoices->find()->where($where)->contain(['SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
@@ -100,7 +101,7 @@ class InvoicesController extends AppController
 		} else{ 
 			$invoices = $this->paginate($this->Invoices->find()->contain(['SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']));
 		} 
-		//pr($invoices); exit;
+		
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url'));
 		
@@ -2528,12 +2529,16 @@ class InvoicesController extends AppController
 
 		$customers = $this->Invoices->Customers->find('all');
        $companies = $this->Invoices->Companies->find('all', ['limit' => 200]);
+	   
 	   //start array declaration for unique validation and proceed quantity
-	  
 		$invoice_qty = $this->Invoices->get($id, [
-            'contain' => ['SerialNumbers','InvoiceRows','SalesOrders' => ['Invoices'=>['InvoiceRows'],'SalesOrderRows']
-        ]]);
-		 //pr($invoice_qty);exit;
+            'contain' => ['SerialNumbers','InvoiceRows','SalesOrders' => ['Invoices'=>['InvoiceRows'],'SalesOrderRows' => ['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}],'SaleTaxes']],'Companies','Customers'=>['CustomerAddress'=> function ($q) {
+						return $q
+						->where(['CustomerAddress.default_address' => 1]);}],'Employees','SaleTaxes']
+        ]);
+		
 		
 		$sales_order_id = $invoice_old_data->sales_order_id;
 		 
@@ -2558,15 +2563,16 @@ class InvoicesController extends AppController
 			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
 			@$invoice_row_id[$current_invoice_row->sales_order_row_id]=@$current_invoice_row->id;
 		}
-		
+		/* pr($current_invoice_rows);
+		pr($invoice);
+		exit; */
 		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
 			@$sales_order_qty[@$sales_order_row->id]+=@$sales_order_row->total_sales_qty;
 		}
 				
 		
 		//end array declaration for unique validation and proceed quantity	
-	
-
+	   
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
 		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();

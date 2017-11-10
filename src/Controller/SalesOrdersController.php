@@ -81,7 +81,7 @@ class SalesOrdersController extends AppController
         $this->paginate = [
             'contain' => ['Customers']
         ];
-		
+		//pr($status); exit;
 		if($status==null or $status=='Pending'){ 
 			$having=['total_sales >' => 0];
 		}elseif($status=='Converted Into Invoice'){ 
@@ -106,8 +106,8 @@ class SalesOrdersController extends AppController
 				->where(['SalesOrders.company_id'=>$st_company_id])
 				->where($where);
 		
-		}else{ 
-				if($gst=="true" || $Actionstatus=="GstInvoice"){
+		}else{
+				if($gst=="true" || $Actionstatus=="GstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -119,7 +119,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'yes'])
 					->where($where);
 					$Actionstatus="GstInvoice";
-				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){
+				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -131,7 +131,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'no'])
 					->where($where);
 					$Actionstatus="NonGstInvoice";
-				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){
+				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -143,7 +143,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'no'])
 					->where($where);
 					$Actionstatus="NonGstCopy";
-				}else if($gst_copy_request=="copy" || $Actionstatus="GstCopy"){ //echo "ef"; exit;
+				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -155,7 +155,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'yes'])
 					->where($where);
 					$Actionstatus="GstCopy";
-				}else {
+				}else { 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -164,6 +164,7 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
+					->having($having)
 					->where($where);
 					$Actionstatus="IndexPage";
 				}
