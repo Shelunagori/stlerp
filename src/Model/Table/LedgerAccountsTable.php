@@ -59,7 +59,7 @@ class LedgerAccountsTable extends Table
 		$this->hasMany('NppaymentRows', [
             'foreignKey' => 'received_from_id'
         ]);
-		$this->hasMany('Payments', [
+		$this->hasMany('PaymentRows', [
             'foreignKey' => 'received_from_id'
         ]);
 		$this->belongsTo('AccountCategories');

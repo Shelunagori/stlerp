@@ -49,6 +49,10 @@ class PaymentRowsTable extends Table
 		$this->hasMany('ReferenceDetails', [
             'foreignKey' => 'payment_row_id'
         ]);
+		$this->belongsTo('LedgerAccounts', [
+            'foreignKey' => 'received_from_id',
+            'joinType' => 'INNER'
+		 ]);
     }
 
     /**
