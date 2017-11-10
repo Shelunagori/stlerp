@@ -128,7 +128,7 @@ class InventoryVouchersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 	   $inventoryVoucher = $this->InventoryVouchers->get($id, [
-            'contain' =>  ['Invoices'=>['InvoiceRows'=>['Items'],'Customers'],'InventoryVoucherRows'=>['Items'=>['ItemSerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' =>  ['Invoices'=>['InvoiceRows'=>['Items'],'Customers'],'InventoryVoucherRows'=>['Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]],'Creator', 'Companies']
         ]);
@@ -205,12 +205,12 @@ class InventoryVouchersController extends AppController
 			$SalesOrderRowID=$SalesOrderRow->id;
 			
 			$JobCardRows=$this->paginate(
-			$this->InventoryVouchers->JobCardRows->find()->contain(['Items'=>['ItemSerialNumbers'=>		function ($q) {  return $q
-			->where(['ItemSerialNumbers.status' => 'In' ]); }]])
+			$this->InventoryVouchers->JobCardRows->find()->contain(['Items'=>['SerialNumbers'=>		function ($q) {  return $q
+			->where(['SerialNumbers.status' => 'In' ]); }]])
 			->where(['sales_order_id'=>$sales_order_id,'sales_order_row_id'=>$SalesOrderRowID])
 			);	 
 		}else{ 
-			$InventoryVoucherRows=$this->InventoryVouchers->InventoryVoucherRows->find()->contain(['Items'=>['ItemSerialNumbers'=>		function ($q) {  return $q
+			$InventoryVoucherRows=$this->InventoryVouchers->InventoryVoucherRows->find()->contain(['Items'=>['SerialNumbers'=>		function ($q) {  return $q
 			->where(['ItemSerialNumbers.status' => 'In' ]); }]])
 			->where(['invoice_id'=>$invoice_id,'left_item_id'=>$item_id]);
 		}

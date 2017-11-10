@@ -329,8 +329,8 @@ $(document).ready(function() {
 	   var quantity=$('input[name="quantity"]').val();
 	  
 		if(itemserial_number_status=='1'){ 
-		var tq=parseInt($('input[name="new_quantity"]').val());
-		
+		var OriginalQty=$('input[name="new_quantity"]').val();
+		Quantity = OriginalQty.split('.'); tq=Quantity[0]; 
 			var p=1;  //alert(quantity);	
 			var r=0;
 			$('#itm_srl_num').find('input.sr_no').remove();

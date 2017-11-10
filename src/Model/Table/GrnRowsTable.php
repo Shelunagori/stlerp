@@ -54,7 +54,9 @@ class GrnRowsTable extends Table
 		$this->hasMany('SerialNumbers', [
             'foreignKey' => 'grn_row_id'
 		]);
-		
+		$this->hasMany('InvoiceBookingRows', [
+            'foreignKey' => 'grn_row_id'
+		]);
     }
 
     /**

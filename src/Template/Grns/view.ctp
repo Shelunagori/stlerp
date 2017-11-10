@@ -109,10 +109,10 @@ if($grn_row->item->item_companies[0]->serial_number_enable == 1) {
 		<td><?= $grn_row->item->name; ?></td>
 		<?php  if($grn_row->item->item_companies[0]->serial_number_enable == 1) { ?>
 		<td><table>
-		<?php foreach ($grn_row->item->item_serial_numbers as  $item_serial_number){ 
+		<?php foreach ($grn_row->serial_numbers as  $item_serial_number){ 
 			if($item_serial_number->grn_id == $grn->id){ ?>
 				<tr>
-						<td><?php echo $item_serial_number->serial_no ?></td>
+						<td><?php echo $item_serial_number->name; ?></td>
 				</tr>
 			<?php }} ?>
 			</table>

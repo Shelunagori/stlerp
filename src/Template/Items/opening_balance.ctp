@@ -205,9 +205,10 @@ $(document).ready(function() {
    function add_sr_textbox(){
 	    $('#itm_srl_num').show();
 	   var serial_number=$('input[name=serial_number_enable]').val(); 
-	   var quantity=$('input[name="quantity"]').val();
+	   var OriginalQty=$('input[name="quantity"]').val();
 	   
 		if(serial_number=='1'){ 
+		Quantity = OriginalQty.split('.'); quantity=Quantity[0];
 			var p=1;
 			var r=0;
 			$('#itm_srl_num').find('input.sr_no').remove();

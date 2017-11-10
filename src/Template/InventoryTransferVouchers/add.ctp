@@ -259,11 +259,12 @@ $(document).ready(function() {
 		}
     });
 	
-	function sr_nos(tr_obj){ 
+	function sr_nos(tr_obj){  
 		var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
 		//alert(serial_number_enable);
 		if(serial_number_enable==1){
-			var qty=tr_obj.find('td:nth-child(2) input').val();
+			var OriginalQty=tr_obj.find('td:nth-child(2) input').val(); 
+			Quantity = OriginalQty.split('.'); qty=Quantity[0];
 			var row_no=tr_obj.attr('row_no');
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');
 			for(var w=0; w<qty; w++){

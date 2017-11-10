@@ -129,7 +129,7 @@ class GrnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn = $this->Grns->get($id, [
-            'contain' => ['Companies','SerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['Items' => ['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Companies','SerialNumbers','Creator','Vendors','PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['SerialNumbers','Items' => ['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
         ]]);
@@ -485,7 +485,7 @@ class GrnsController extends AppController
 		$financial_month_last = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$this->viewBuilder()->layout('index_layout');
 		$grn = $this->Grns->get($id, [
-				'contain' => ['GrnRows'
+				'contain' => ['GrnRows'=>['SerialNumbers']
 					]
 		]);
 			   $st_year_id = $session->read('st_year_id');
@@ -546,9 +546,10 @@ class GrnsController extends AppController
                         
 						if(!empty($grn_row->serial_numbers))
 						{
-							$this->Grns->SerialNumbers->deleteAll(['grn_id' => $grn->id,'company_id'=>$st_company_id]);
+							$this->Grns->SerialNumbers->deleteAll(['grn_id' => $grn->id,'company_id'=>$st_company_id,'grn_row_id'=>$grn_row->id]);
 							foreach($grn_row->serial_numbers as $serial_number)
-							{
+							{ //pr($serial_number);
+						      
 							  $query = $this->Grns->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
 									->values([
@@ -572,9 +573,30 @@ class GrnsController extends AppController
 			
 		$grnDetail = $this->Grns->get($id, [
 			'contain' => [
-					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows']],'GrnRows'=>['PurchaseOrderRows']
+					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows'=>['InvoiceBookingRows']]],'GrnRows'=>['PurchaseOrderRows']
 				]
 		]);
+		//pr($grnDetail);exit;
+		$minQty=[];
+		if(!empty($grnDetail->purchase_order->grns))
+		{
+			foreach($grnDetail->purchase_order->grns as $grn)
+			{
+				if(!empty($grn->grn_rows))
+				{
+					foreach($grn->grn_rows as $grn_row)
+					{
+						if(!empty($grn_row->invoice_booking_rows))
+						{
+							foreach($grn_row->invoice_booking_rows as $invoice_booking_row)
+							{
+								@$minQty[@$grn_row->purchase_order_row_id] +=$invoice_booking_row->quantity;
+							}
+						}
+					}
+				}
+			}
+		}
 		$Qty=[];
 				$POItemQty=[];$maxQty=[];
 				if(!empty($grnDetail->purchase_order->purchase_order_rows))
@@ -604,17 +626,17 @@ class GrnsController extends AppController
 				}
 		$grn = $this->Grns->get($id, [
 				'contain' => [
-						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['Items' => ['ItemCompanies' =>function($q) use($st_company_id){
+						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['GrnRows'=>['SerialNumbers'],'Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]],'Grns'=>['GrnRows'=>['SerialNumbers']]],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
 					]
 			]);
-		
+
         $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
         $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('grn', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
+        $this->set(compact('grn','minQty', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
         $this->set('_serialize', ['grn']);
     }
     /**

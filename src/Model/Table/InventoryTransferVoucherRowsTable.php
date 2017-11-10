@@ -47,6 +47,9 @@ class InventoryTransferVoucherRowsTable extends Table
             'joinType' => 'INNER'
         ]);
 		$this->belongsTo('ItemLedgers');
+		$this->hasMany('SerialNumbers', [
+            'foreignKey' => 'itv_row_id'
+        ]);
     }
 
     /**

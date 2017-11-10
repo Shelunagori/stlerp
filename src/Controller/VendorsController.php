@@ -204,7 +204,7 @@ class VendorsController extends AppController
 		$EmployeeCompany->vendor_id=$vendor_id;
 		
 		$this->Vendors->VendorCompanies->save($EmployeeCompany);
-
+//pr($EmployeeCompany);  exit;
 		$vendor_details= $this->Vendors->get($vendor_id);
 		//pr($vendor_details); exit;
 		$ledgerAccount = $this->Vendors->LedgerAccounts->newEntity();

@@ -74,6 +74,9 @@ class SerialNumbersTable extends Table
 		$this->belongsTo('GrnRows', [
             'foreignKey' => 'grn_row_id'
         ]);
+		$this->hasMany('InventoryTransferVoucherRows', [
+            'foreignKey' => 'itv_row_id'
+        ]);
     }
 
     /**

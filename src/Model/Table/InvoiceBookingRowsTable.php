@@ -50,6 +50,9 @@ class InvoiceBookingRowsTable extends Table
             'foreignKey' => 'invoice_booking_row_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('GrnRows', [
+            'foreignKey' => 'grn_row_id'
+		]);
     }
 
     /**
