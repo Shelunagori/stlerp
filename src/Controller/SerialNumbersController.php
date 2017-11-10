@@ -181,6 +181,7 @@ class SerialNumbersController extends AppController
 	public function getSerialNumberEditList(){
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
+		$in_row_id=$this->request->query('in_row_id');
 		$sr_no=explode(',',$sr_nos);
 		
 		$session = $this->request->session();
@@ -214,11 +215,19 @@ class SerialNumbersController extends AppController
 		->autoFields(true);
 		$SerialNumbers =$query->toArray();
 		
+		$invoice_srnos = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out','sales_return_row_id'=>'0','sales_return_id'=>'0']);
+		$SerialNumbers_out = $invoice_srnos->toArray();
+		
+		$sr_number=[];
+		foreach($SerialNumbers_out as $sr_nos){
+			$sr_number[$sr_nos->invoice_row_id][]=$sr_nos->name;
+		}
+		
 		foreach($SerialNumbers as $serialnumbers){
-			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_no))){
+			if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_number[$in_row_id]))){
 				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
 			}	
-			$values=$sr_no;
+			$values=$sr_number[$in_row_id];
 		}
 		//pr($values);exit;
         $this->set(compact('options', 'values'));

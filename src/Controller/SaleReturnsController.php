@@ -423,20 +423,27 @@ class SaleReturnsController extends AppController
 		//pr($invoice); exit;
 		////
 		
-			$SaleReturns = $this->SaleReturns->Invoices->get($invoice_id, [
+			/* $SaleReturns = $this->SaleReturns->Invoices->get($invoice_id, [
             'contain' => (['SaleReturns'=>['SaleReturnRows' => function($q) {
 				return $q->select(['total_qty' => $q->func()->sum('SaleReturnRows.quantity')])->group('SaleReturnRows.invoice_row_id');
 			}]])
         ]);
-			
+		 */
+		 
+		$SaleReturns = $this->SaleReturns->Invoices->get($invoice_id, [
+            'contain' => (['SaleReturns'=>['SaleReturnRows' => function($q) {
+				return $q->select(['SaleReturnRows.sale_return_id','SaleReturnRows.invoice_row_id','SaleReturnRows.id','total_qty' => $q->func()->sum('SaleReturnRows.quantity')])->group('SaleReturnRows.invoice_row_id');
+			}]])
+        ]);
+		
 		$sales_return_qty=[];
-		if(!empty($SaleReturns->sale_return))
+		if(!empty($SaleReturns->sale_returns))
 		{
-			foreach($SaleReturns->sale_return as $sale_return){ 
+			foreach($SaleReturns->sale_returns as $sale_return){ 
 				if(!empty($sale_return->sale_return_rows))
 				{
 					foreach($sale_return->sale_return_rows as $sale_return_row){ 
-						$sales_return_qty[@$sale_return_row->invoice_row_id]=@$sales_return_qty[$sale_return_row->invoice_row_id]+$sale_return_row->total_qty;
+						@$sales_return_qty[@$sale_return_row->invoice_row_id]+=@$sale_return_row->total_qty;
 					}
 				}	
 			}	
@@ -623,7 +630,7 @@ class SaleReturnsController extends AppController
 					$item_serial_no=$sale_return_row->serial_numbers;
 					$serial_nos=implode(",", $item_serial_no); 
 				/////for delete serial number in table					
-					$this->SaleReturns->SaleReturnRows->SerialNumbers->deleteAll(['SerialNumbers.sales_return_id'=>$saleReturn->id,'SerialNumbers.sales_return_row_id' => $sale_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);					
+					$this->SaleReturns->SaleReturnRows->SerialNumbers->deleteAll(['SerialNumbers.sales_return_id'=>$saleReturn->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);					
 				 foreach($item_serial_no as $serial){
 
 				 $query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();

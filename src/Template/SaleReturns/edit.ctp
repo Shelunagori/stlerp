@@ -104,7 +104,9 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 				<tbody id='main_tbody'>
 					<?php 
 					$q=0; $p=1; 
-					foreach ($invoice->invoice_rows as $invoice_row){  ?>
+					foreach ($invoice->invoice_rows as $invoice_row){  
+						if(@$current_salesreturn_rows[@$invoice_row->id] != @$sales_return_qty[$invoice_row->id]){
+					?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td >
 								<?php echo $p++; ?>
@@ -160,7 +162,7 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 						</tr>
 					<?php  } 
 					$q++; 
-					}?>
+					} } ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">

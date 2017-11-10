@@ -58,7 +58,6 @@
 						<th><?= $this->Paginator->sort('date_to') ?></th>
 						<th><?= $this->Paginator->sort('status') ?></th>
 						<th class="actions"><?= __('Actions') ?></th>
-						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -73,19 +72,6 @@
 						<td><?= h($financialYear->status) ?></td>
 						<td class="actions">
 							<?= $this->Html->link(__('Edit'), ['action' => 'edit', $financialYear->id]) ?>
-						</td>
-						<td>
-							<?php if($financialYear->status=='Open'){
-									echo $this->Form->postLink('<i class="fa fa-minus-circle"> Closed</i> ',['action' =>'closed', $financialYear->id],['escape' => false,'class' => 'btn btn-xs red tooltips','data-original-title'=>'Closed','confirm' => __('Are you sure, you want to Closed ?', $financialYear->id)]
-									);
-								}
-							
-							 ?>
-							<?php if($financialYear->status=='Closed'){
-									echo $this->Form->postLink('<i class="fa fa-plus-circle"> Open</i> ',['action' =>'open', $financialYear->id],['escape' => false,'class' => 'btn btn-xs green tooltips','data-original-title'=>'Opened','confirm' => __('Are you sure, you want to Open ?', $financialYear->id)]
-									);
-							}
-							?>
 						</td>
 					</tr>
             <?php endforeach; ?>

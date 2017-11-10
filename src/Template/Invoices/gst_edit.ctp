@@ -328,7 +328,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&sr_nos='.$sr_nos); ?>
+							<?php echo 
+							$this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&in_row_id='. @$invoice_row_id[@$sales_order_row->id]); ?>
 							</td>
 						</tr><?php } ?>
 						<?php  $q++;  } ?>

@@ -99,10 +99,10 @@
 					<div class="col-md-12">
 						
 						<div class="col-md-2">
-							<div class="form-group">
+							<!--<div class="form-group">
 								<label class="control-label col-md-4"> <span class="required" aria-required="true"></span></label>
 								<?php echo $this->Form->input('freeze'); ?>
-							</div>
+							</div>-->
 						</div>
 						<div class="col-md-2">
 							<div class="form-group">

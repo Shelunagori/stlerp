@@ -169,7 +169,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					<?php 
 					$q=0; 
 					foreach (@$invoice->invoice_rows as $invoice_row){ 
-					if($invoice_row->quantity > @$sales_return_qty[@$invoice_row->id] ){
+					if(@$sales_return_qty[@$invoice_row->id] < $invoice_row->quantity ){
 					?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td >
@@ -184,7 +184,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('sale_return_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','max'=>$invoice_row->quantity-@$sales_orders_qty[$invoice_row->id],'value'=>0,'required']); 
+								echo $this->Form->input('sale_return_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','max'=>$invoice_row->quantity-@$sales_return_qty[$invoice_row->id],'value'=>0,'required']); 
 								?>
 							</td>
 							<td>
