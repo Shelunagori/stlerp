@@ -298,7 +298,7 @@
 					<td width="20%"><?php echo $this->Form->input('total_discount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Total Discount','value' =>$salesOrder->total_discount,'step'=>0.01,'readonly']); ?></td>
 				</tr>
 				<tr>
-					<td  align="right"><b>Total after P&F </b></td>
+					<td  align="right"><b>Total P&F </b></td>
 					<td><?php echo $this->Form->input('total_after_pnf', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Total after P&F','readonly','step'=>0.01,'value' =>$salesOrder->total_after_pnf]); ?></td>
 				</tr>
 				<tr>

@@ -30,7 +30,7 @@
 			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
 			if($status=='Converted Into Invoice'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
 			?>
-			<?php if($pull_request!="true" and $gst!="true" and $copy_request!="copy" and $job_card!="true"){ ?>
+			<?php if($Actionstatus=="IndexPage"){ ?>
 				<?= $this->Html->link(
 					'Pending',
 					'/Sales-Orders/index/Pending',
@@ -52,6 +52,7 @@
 				<input type="hidden" name="pull-request" value="<?php echo @$pull_request; ?>">
 				<input type="hidden" name="gst" value="<?php echo @$gst; ?>">
 				<input type="hidden" name="job-card" value="<?php echo @$job_card; ?>">
+				<input type="hidden" name="Actionstatus" value="<?php echo @$Actionstatus; ?>">
 				<table class="table table-condensed">
 					<tbody>
 						<tr>
@@ -106,19 +107,12 @@
 					<tbody>
 						<?php 
 						//pr($salesOrders);exit;
-						foreach ($salesOrders as $salesOrder):
-							$TotalSalesOrderQuantity=0;
-							$item_ids=[];
-							foreach($salesOrder->sales_order_rows as $sales_order_row){ 
-								$TotalSalesOrderQuantity+=$sales_order_row->quantity;
-								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
-							}
+						foreach ($salesOrders as $salesOrder){
+							
 							
 						?>
 						
-						<tr <?php if($status=='Converted Into Invoice'){ echo 'style="background-color:#f4f4f4"';  
-							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){
-						?> >
+						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
 							<?php if($salesOrder->quotation_id != 0){ ?>
@@ -143,174 +137,41 @@
 							
 							<td class="actions">
 							<?php if(in_array(22,$allowed_pages)){ ?>
-								<?php 
-								if($salesOrder->gst=="no")
-								{
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); }else{
-									
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstConfirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF'));
-									?>
-								<?php } } ?>
-								<?php if($copy_request=="copy"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/Add?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if($gst_copy_request=="copy"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if($job_card=="true"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Add?Sales-Order='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if(in_array(4,$allowed_pages)){ 
-								
-								 if(!in_array(date("m-Y",strtotime($salesOrder->created_on)),$closed_month))
-								 { 
-								?> 
-									<?php 
-									if($salesOrder->gst=="no")
-									{
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}
-									else{
-										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}?>
-								<?php } } ?>
-								
-							</td>
-						</tr>
-							<?php  }}else if($status==null  || $status=='Pending'){ ?>
-								<tr>    
-							<?php if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ ?> 
-							<td><?= h(++$page_no) ?></td>
-							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
-							<?php if($salesOrder->quotation_id != 0){ ?>
-							<td>
-							<?php echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
-							'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank')); ?>
-							</td><?php }else{ ?><td>-</td><?php } ?>
-							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
-							<td><?= h($salesOrder->customer_po_no); ?></td>
-							<td>
-								<div class="btn-group">
-									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
-										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
-										<?php  foreach($salesOrder->sales_order_rows as $sales_order_rows){ 
-											if($sales_order_rows->sales_order_id == $salesOrder->id){?>
-											<li><p><?= h($sales_order_rows->item->name) ?></p></li>
-											<?php }}?>
-										</ul>
-								</div>
-							</td>
-							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
-							
-							<td class="actions">
-							<?php if(in_array(22,$allowed_pages)){ ?>
-								<?php 
-								if($salesOrder->gst=="no")
-								{
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); }else{
-									
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstConfirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF'));
-									?>
-								<?php } } ?>
-								
-								<?php if(in_array(4,$allowed_pages)){ 
-								
-								 if(!in_array(date("m-Y",strtotime($salesOrder->created_on)),$closed_month))
-								 { 
-								?> 
-									<?php 
-									if($salesOrder->gst=="no")
-									{
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}
-									else{
-										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}?>
-								<?php } } ?>
-								
-							</td>
-						</tr>
-							<?php }}else if(($pull_request=="true") && ($gst=="true")){ pr($gst);
-	pr($pull_request); exit;?>
-								<tr>    
-							<?php if(@$total_sales[@$salesOrder->id] < @$total_qty[@$salesOrder->id]){  ?>
-								<td><?= h(++$page_no) ?></td>
-							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
-							<?php if($salesOrder->quotation_id != 0){ ?>
-							<td>
-							<?php echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
-							'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank')); ?>
-							</td><?php }else{ ?><td>-</td><?php } ?>
-							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
-							<td><?= h($salesOrder->customer_po_no); ?></td>
-							<td>
-								<div class="btn-group">
-									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
-										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
-										<?php  foreach($salesOrder->sales_order_rows as $sales_order_rows){ 
-											if($sales_order_rows->sales_order_id == $salesOrder->id){?>
-											<li><p><?= h($sales_order_rows->item->name) ?></p></li>
-											<?php }}?>
-										</ul>
-								</div>
-							</td>
-							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
-							
-							<td class="actions">
-							<?php if(in_array(22,$allowed_pages)){ ?>
-								<?php 
-								if($salesOrder->gst=="no")
-								{
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); }else{
-									
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstConfirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF'));
-									?>
-								<?php } } ?>
-								<?php if($copy_request=="copy"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/Add?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if($gst_copy_request=="copy"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if($job_card=="true"){
-									echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Add?Sales-Order='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<?php if($status!='Converted Into Invoice' and in_array(4,$allowed_pages) and $pull_request!="true" && $copy_request!="copy" && $job_card!="true" && $gst!="true"){ 
-								
-								 if(!in_array(date("m-Y",strtotime($salesOrder->created_on)),$closed_month))
-								 { 
-								?> 
-									<?php 
-									if($salesOrder->gst=="no")
-									{
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}
-									else{
-										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-									}?>
-								<?php } } ?>
-								
-								<?php if($pull_request=="true"){ 
-									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Invoice','/Invoices/Add?sales-order='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} else if($gst=="true") {
+								<?php if($Actionstatus=='GstInvoice' ){ 
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Invoice','/Invoices/gstAdd?sales-order='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
-								<!--<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
-									['action' => 'delete', $salesOrder->id], 
-									[
-										'escape' => false,
-										'class' => 'btn btn-xs red',
-										'confirm' => __('Are you sure, you want to delete {0}?', $salesOrder->id)
-									]
-								) ?>-->
+								}elseif($Actionstatus=='NonGstInvoice'){ 
+									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Invoice','/Invoices/Add?sales-order='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}elseif($Actionstatus=='NonGstCopy'){ 
+									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/Add?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}elseif($Actionstatus=='GstCopy'){ 
+									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}else{
+									if(in_array(4,$allowed_pages)){
+									if($salesOrder->gst=="no")
+									{
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+									}
+									else{
+										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesOrderEdit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+									}
+									}
+								} 
+								
+								?>
+								
+							<?php	} ?>
+								
+								
+								
 							</td>
 						</tr>
+						
 							
 							
-							<?php } ?> 
+							
 								
 						<?php }
-						endforeach; ?>
+						?>
 					</tbody>
 				</table>
 				</div>

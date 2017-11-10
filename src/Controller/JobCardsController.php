@@ -412,7 +412,7 @@ class JobCardsController extends AppController
 					->order(['SalesOrders.id' => 'DESC'])
 			);
 			
-		
+		//pr($SalesOrders); exit;
 	
 		$this->set(compact('SalesOrders'));
         $this->set('_serialize', ['jobCard']);
