@@ -506,7 +506,7 @@ class PaymentsController extends AppController
 
 		
         $payment = $this->Payments->get($id, [
-            'contain' => ['PaymentRows'=>['ReferenceDetails']]
+            'contain' => ['PaymentRows'=>['LedgerAccounts','ReferenceDetails']]
         ]);
 		$old_ref_rows=[];
 		$old_received_from_ids=[];

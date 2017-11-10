@@ -56,7 +56,12 @@ class LedgerAccountsTable extends Table
             'foreignKey' => 'customer_id',
             'joinType' => 'INNER'
         ]);
-		
+		$this->hasMany('NppaymentRows', [
+            'foreignKey' => 'received_from_id'
+        ]);
+		$this->hasMany('Payments', [
+            'foreignKey' => 'received_from_id'
+        ]);
 		$this->belongsTo('AccountCategories');
 		$this->belongsTo('Grns');
 		$this->belongsTo('Invoices');
