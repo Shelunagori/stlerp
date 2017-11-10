@@ -80,7 +80,7 @@
 					<div class="col-md-3">
 						<div class="form-group">
 							<br/>
-							<?php echo $this->Form->input('freeze'); ?>
+							<?php //echo $this->Form->input('freeze'); ?>
 						</div>
 					</div>
 					

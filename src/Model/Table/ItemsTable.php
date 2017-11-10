@@ -114,10 +114,7 @@ class ItemsTable extends Table
             ->requirePresence('name', 'create')
             ->notEmpty('name');
 
-        $validator
-            ->integer('freeze')
-            ->requirePresence('freeze', 'create')
-            ->notEmpty('freeze');
+       
 
         
 

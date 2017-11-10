@@ -95,6 +95,7 @@ class ItemsController extends AppController
         $item = $this->Items->newEntity();
         if ($this->request->is('post')) {
             $item = $this->Items->patchEntity($item, $this->request->data);
+			//pr($item);exit;
 			if ($this->Items->save($item)) {
 				
 				 $this->Flash->success(__('The item has been saved.'));
@@ -126,10 +127,7 @@ class ItemsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $item = $this->Items->get($id, [
-            'contain' => ['Companies','ItemSerialNumbers'=> function ($q) use($id) {
-						   return $q
-								->where(['master_item_id'=> $id]);
-						}]
+            'contain' => ['Companies']
         ]);
 	
         if ($this->request->is(['patch', 'post', 'put'])) {
