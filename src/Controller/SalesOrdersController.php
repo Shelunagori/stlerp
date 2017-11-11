@@ -466,7 +466,7 @@ class SalesOrdersController extends AppController
 			
 			
 			
-			
+			//pr($salesOrder);exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
 				

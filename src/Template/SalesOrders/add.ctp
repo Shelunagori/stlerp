@@ -843,8 +843,7 @@ $(document).ready(function() {
 					});
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
-						digits: true,
-						min: 1,
+						min: 0.01,
 						messages: {
 							min: "Quantity can't be zero."
 						}

@@ -801,7 +801,7 @@ $(document).ready(function() {
 		});
 		
 		last_three_rates(popup_id,item_id);
-	})
+	});
 	
 	function last_three_rates_onload(popup_id,item_id){
 			var customer_id=$('select[name="customer_id"]').val();
