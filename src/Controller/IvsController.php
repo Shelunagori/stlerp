@@ -135,7 +135,7 @@ class IvsController extends AppController
 			
 			$iv->created_by=$s_employee_id;
 			
-          //pr($iv); exit;
+          pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
 				foreach($iv->iv_rows as $iv_row){   
 					/////For In

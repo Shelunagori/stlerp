@@ -1885,5 +1885,50 @@ class ItemLedgersController extends AppController
 		<?php }
 			} exit;
 	}
+	
+	public function weightedAvgCostIvs($item_id=null){
+			$this->viewBuilder()->layout('');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			
+			$Items = $this->ItemLedgers->Items->get($item_id, [
+				'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
+					return $q->where(['company_id'=>$st_company_id]);
+				}]
+			]);
+			
+			if($Items->item_companies[0]->serial_number_enable == '0'){  
+				$stock=[];  $sumValue=[];
+				foreach($Items as $Item){
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+					foreach($StockLedgers as $StockLedger){ 
+						if($StockLedger->in_out=='In'){
+							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+									$stock[$Item->id][]=$StockLedger->rate;
+								}
+							}
+						}
+					}
+					foreach($StockLedgers as $StockLedger){
+						if($StockLedger->in_out=='Out'){
+							if(sizeof(@$stock[$Item->id])>0){
+								$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+							}
+						}
+					}
+					//echo "hello"; exit;
+					if(sizeof(@$stock[$Item->id]) > 0){ 
+						foreach(@$stock[$Item->id] as $stockRate){
+							@$sumValue[$Item->id]+=@$stockRate;
+						}
+					}
+				}
+			
+			}else{
+				
+			}
+		exit;	
+	}
 }
 
