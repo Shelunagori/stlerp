@@ -1348,7 +1348,7 @@ class InvoicesController extends AppController
 						@$itemSerialQuantity=@$itemSerialQuantity+1;
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
 					}
-					else if(@$ItemSerialNumber->master_item_id > 0){
+					else if(@$ItemSerialNumber->is_opening_balance == 'Yes'){
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
 						@$itemSerialQuantity=@$itemSerialQuantity+1;
@@ -1463,7 +1463,7 @@ class InvoicesController extends AppController
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
 						
 					}
-					else if(@$ItemSerialNumber->master_item_id > 0){
+					else if(@$ItemSerialNumber->is_opening_balance == 'Yes'){
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
 						@$itemSerialQuantity=@$itemSerialQuantity+1;

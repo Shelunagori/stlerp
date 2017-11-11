@@ -549,9 +549,8 @@ $(document).ready(function() {
 			if(r==2){ w++; r=0; }
 		});
 		rename_rows();
-		
-		
 	}
+	
 	rename_rows();
 	function rename_rows(){
 		var i=0;
@@ -592,13 +591,7 @@ $(document).ready(function() {
 			$(this).find('td.main:nth-child(1)').append('<textarea name="quotation_rows['+i+'][description]" style="display:none;"></textarea>');
 		i++; });
 		
-		$("select.item_box").each(function(){
-			var popup_id=$(this).attr('popup_id');
-			var item_id=$(this).val();
-			if(popup_id){
-				last_three_rates_onload(popup_id,item_id);
-			}
-		});
+		
 		
 		calculate_total();
 	}
@@ -815,12 +808,13 @@ $(document).ready(function() {
 			//$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
 			if(customer_id){
-				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
+				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,
 				$.ajax({
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
+					
 					var values = parseFloat(response);
 					$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
 						min: values,
@@ -855,6 +849,7 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
+					
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				});
 			}else{

@@ -501,14 +501,14 @@ class QuotationsController extends AppController
 				$quotation->finalisation_date=date("Y-m-d",strtotime($quotation->finalisation_date));
 				$quotation->company_id=$st_company_id;
 				//$quotation->company_id=$st_company_id;
-				//pr($quotation);exit;
+				
 				if ($this->Quotations->save($quotation)) {
 					
 					
 					$this->Flash->success(__('The quotation has been saved.'));
 
 					return $this->redirect(['action' => 'confirm/'.$quotation->id]);
-				} else {
+				} else { pr($quotation);exit;
 					$this->Flash->error(__('The quotation could not be saved. Please, try again.'));
 				}
 			}
