@@ -856,8 +856,8 @@ $(document).ready(function() {
 				
 	
 		}
-	$('select[name="purchase_ledger_account"]').on("change",function() { alert();
-		ar gst_type=$('select[name="purchase_ledger_account"] option:selected').attr('gst_type'); 
+	$('select[name="purchase_ledger_account"]').on("change",function() { 
+		var gst_type=$('select[name="purchase_ledger_account"] option:selected').attr('gst_type'); 
 		if(gst_type=='GST')
 		{			
 				$('.igst_display').css("display", "none");
