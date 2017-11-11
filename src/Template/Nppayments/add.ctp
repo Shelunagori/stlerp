@@ -365,7 +365,19 @@ $(document).ready(function() {
             rename_ref_rows(sel2,received_from_id);
         });
 		
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkExpenseTrackingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) { 
+			$(sel).closest('tr.main_tr').find('.show_result').html(response);
+			//$(sel).closest('tr.main_tr').find('select.grns').select2();
+			rename_rows();
+		});
+		
+		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
 		
 		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
@@ -401,7 +413,7 @@ $(document).ready(function() {
 		else
 		{
 			$(sel).closest('tr.main_tr').find('.show_result').html('');
-		}
+		} */
     }
     
     

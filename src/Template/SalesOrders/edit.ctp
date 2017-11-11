@@ -230,7 +230,7 @@
 						<?php } ?>
 						</td>
 					</tr>
-					<tr class="tr2 <?php echo $disable_class_item; ?> main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
+					<tr class="tr2  main_tr" row_no='<?php echo @$sales_order_rows->id; ?>'>
 						<td colspan="6" class="main">
 							<div class="note-editable"><?php echo $sales_order_rows->description; ?></div>
 						</td>

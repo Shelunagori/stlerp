@@ -495,9 +495,9 @@ class NppaymentsController extends AppController
 
         
         $nppayment = $this->Nppayments->get($id, [
-            'contain' => ['NppaymentRows'=>['ReferenceDetails','ReceivedFroms']]
+            'contain' => ['NppaymentRows'=>['LedgerAccounts','ReferenceDetails','ReceivedFroms']]
         ]);
-   // pr( $nppayment); exit;
+        //pr( $nppayment); exit;
         if ($this->request->is(['patch', 'post', 'put'])) {
 			$grnIds=[];$invoiceIds=[];
 			foreach( $this->request->data['nppayment_rows'] as $key =>  $pr)

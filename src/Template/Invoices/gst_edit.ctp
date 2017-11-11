@@ -268,6 +268,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						$current_igst[$current_invoice_row->item_id]=$current_invoice_row->igst_percentage;
 						$sr_nos=$current_invoice_row->serial_number;
 					}
+					
 					$q=0; 
 					
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ ?>

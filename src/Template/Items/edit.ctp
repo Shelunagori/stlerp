@@ -1,12 +1,12 @@
 <?php 
-$total_qty=0;
+/* $total_qty=0;
 $total_qty=sizeof($item->item_serial_numbers);
 $min_qty=0; foreach($item->item_serial_numbers as $item_serial_number){
 		if($item_serial_number->status=='Out')
 		{
 			$min_qty++;
 		}
-	}
+	} */
 ?>
 <div class="portlet light bordered">
 	<div class="portlet-title">

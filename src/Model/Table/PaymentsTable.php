@@ -78,6 +78,7 @@ class PaymentsTable extends Table
             'foreignKey' => 'payment_id',
             'joinType' => 'INNER'
 		 ]);
+		 
     }
 
     /**

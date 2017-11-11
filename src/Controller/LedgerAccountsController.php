@@ -889,6 +889,28 @@ public function firstSubGroupsPnl($group_id,$from_date,$to_date)
 		exit;
 	}
 	
+	function checkExpenseTrackingStatus($received_from_id)
+	{
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$Ledger=$this->LedgerAccounts->get($received_from_id);
+		
+		if($Ledger->expense_tracking=='yes')
+		{
+			if($Ledger->grn_invoice=='GRN')
+			{
+				$grn_invoice=$this->LedgerAccounts->Grns->find()->where(['company_id' => $st_company_id,'purchase_thela_bhada_status'=>'no']);
+				$status ="GRN";
+			}
+			if($Ledger->grn_invoice=='INVOICE')
+			{
+				$grn_invoice=$this->LedgerAccounts->Invoices->find()->where(['company_id' => $st_company_id,'sales_thela_bhada_status'=>'no']);
+			 	$status ="INVOICE"; 
+			}
+			$this->set(compact('grn_invoice','status'));
+		}
+	}
+	
 	function loadGrns($received_from_id){
 	    $session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');

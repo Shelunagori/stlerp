@@ -325,11 +325,7 @@ var form3 = $('#form_sample_3');
 				$(this).find('td:nth-child(2) input[type="hidden"]').attr({name:"job_card_rows["+i+"][sales_order_row_id]", id:"job_card_rows-"+i+"-sales_order_row_id"}).val(sales_order_row_id);
 				
 				$(this).find("td:nth-child(2) select").select2().attr({name:"job_card_rows["+i+"][item_id]", id:"job_card_rows-"+i+"-item_id"}).addClass("item_name-"+sales_order_row_id).rules('add', {
-						required: true,
-						notEqualToGroup: ['.item_name-'+sales_order_row_id],
-						messages: {
-							notEqualToGroup: "Do not select same Item again."
-						}
+						required: true
 					});
 				$(this).find("td:nth-child(3) input").attr({name:"job_card_rows["+i+"][quantity]", id:"job_card_rows-"+i+"-quantity"});
 
