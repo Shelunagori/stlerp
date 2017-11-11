@@ -102,7 +102,7 @@
 							$total_qo_qty=@$qo_qty[$data['item_id']]; 
 							$open_qo_qty=$total_qo_qty-$total_so_qty;
 							
-							$total_indent=$Current_Stock-@$open_so_qty+$po_qty-$qo_qty+$mi_qty;
+							$total_indent=abs($Current_Stock-@$open_so_qty+$open_po_qty-$open_qo_qty);
 							//pr($open_qo_qty);
 							
 						?>
@@ -128,17 +128,12 @@
 						 
 						 <td align="center">
 							<label class="hello">
-							<?php 
-							/*if(@$total_indent[$item_id] < 0){ */
-							if(sizeof($company_name)==1){
-							foreach($company_name as $names){			
-										if(@$names == @$st_company_id){ ?>
-											<button type="button" id="item<?php echo $item_id;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $item_id; ?>" suggestindent="<?php echo @$total_indent[$item_id];
+							
+											<button type="button" id="item<?php echo $item_id;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $item_id; ?>" suggestindent="<?php echo @$total_indent;
 							 ?>"><i class="fa fa-plus"></i></button>
-										<?php 		}						
-							else{ ?>
+										
 								
-							<?php }} } ?>	
+							
 							</label>
 						</td>
 						
@@ -196,6 +191,7 @@ $(document).ready(function() {
 		var suggestindent=$(this).attr('suggestindent');
 		var url="<?php echo $this->Url->build(['controller'=>'ItemLedgers','action'=>'addToBucket']); ?>";
 		url=url+'/'+item_id+'/'+suggestindent,
+		alert(url);
 		$.ajax({
 			url: url,
 			type: 'GET',
