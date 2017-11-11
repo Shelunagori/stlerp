@@ -49,6 +49,10 @@ class PettyCashVoucherRowsTable extends Table
 		$this->hasMany('ReferenceDetails', [
             'foreignKey' => 'petty_cash_voucher_row_id'
         ]);
+		 $this->belongsTo('LedgerAccounts', [
+            'foreignKey' => 'received_from_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

@@ -425,7 +425,7 @@ class PettyCashVouchersController extends AppController
 		$financial_month_last = $this->PettyCashVouchers->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
         
         $pettycashvoucher = $this->PettyCashVouchers->get($id, [
-            'contain' => ['PettyCashVoucherRows'=>['ReferenceDetails']]
+            'contain' => ['PettyCashVoucherRows'=>['LedgerAccounts','ReferenceDetails']]
         ]);
 
         $old_ref_rows=[];

@@ -105,7 +105,7 @@ if($transaction_date <  $start_date ) {
 					
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm  received_from','value'=>$nppayment_row->received_from_id,'style'=>'width: 266px; display: block;']); ?>
 					<div class="show_result">
-					<?php if($nppayment_row->received_from_id=='101' || $nppayment_row->received_from_id=="165" || $nppayment_row->received_from_id=='313'){
+					<?php if($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='GRN'){
 							 $option=[];
 							foreach($grn as $grn1)
 								{ 
@@ -125,9 +125,9 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control select2me grns','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns','style'=>'width:100%']);
 					}
-					elseif($nppayment_row->received_from_id=='105' || $nppayment_row->received_from_id=="168" || $nppayment_row->received_from_id=='316'){
+					elseif($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='INVOICE'){
 							 $option=[];
 							foreach($invoice as $invoice1)
 								{ 
@@ -478,7 +478,18 @@ $(document).ready(function() {
             rename_ref_rows(sel2,received_from_id);
         });
 		
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkExpenseTrackingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) { 
+			$(sel).closest('tr.main_tr').find('.show_result').html(response);
+			//$(sel).closest('tr.main_tr').find('select.grns').select2();
+			rename_rows();
+		});
+		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
 		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
 		{ 
@@ -512,7 +523,7 @@ $(document).ready(function() {
 		else
 		{
 			$(sel).closest('tr.main_tr').find('.show_result').html('');
-		}
+		} */
     }
     
     

@@ -72,7 +72,7 @@ if($transaction_date <  $start_date ) {
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					
 					<div class="show_grns">
-										<?php if($journal_voucher_rows->received_from_id=='101' || $journal_voucher_rows->received_from_id=="165" || $journal_voucher_rows->received_from_id=='313'){
+										<?php if($journal_voucher_rows->ledger_account->expense_tracking=='yes' && $journal_voucher_rows->ledger_account->grn_invoice=='GRN'){
 											$option=[];
 											foreach($grn as $grn1)
 											{ 
@@ -94,7 +94,7 @@ if($transaction_date <  $start_date ) {
 											}
 											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns','style'=>'width:266px']);
 											}
-											elseif($journal_voucher_rows->received_from_id=='105' || $journal_voucher_rows->received_from_id=="168" || $journal_voucher_rows->received_from_id=='316')
+											elseif($journal_voucher_rows->ledger_account->expense_tracking=='yes' && $journal_voucher_rows->ledger_account->grn_invoice=='INVOICE')
 											{
 											    $option=[];
 												foreach($invoice as $invoice1)
@@ -486,7 +486,18 @@ $(document).ready(function() {
 			rename_ref_rows(sel2,received_from_id);
 		});
 		
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkExpenseTrackingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) { 
+			$(sel).closest('tr.main_tr').find('.show_grns').html(response);
+			rename_rows();
+		});
+		
+		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
 		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
 		{ 
@@ -523,7 +534,7 @@ $(document).ready(function() {
 		else
 		{
 			$(sel).closest('tr.main_tr').find('.show_grns').html('');
-		}
+		} */
 	}
 	
 	$('.ref_type').live("change",function() {

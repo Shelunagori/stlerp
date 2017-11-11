@@ -53,6 +53,11 @@ class JournalVoucherRowsTable extends Table
 		$this->hasMany('ReferenceDetails', [
             'foreignKey' => 'journal_voucher_row_id'
         ]);
+		
+		$this->belongsTo('LedgerAccounts', [
+            'foreignKey' => 'received_from_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
