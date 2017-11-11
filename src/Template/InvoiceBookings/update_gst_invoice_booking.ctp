@@ -111,19 +111,10 @@
 							<?php $option =[];
 							foreach($ledger_account_details as $key => $ledger_account_detail)
 							{ 
-								if(($key!= 35 && $key!= 538 && $st_company_id==25))
+								if($ledger_account_detail->purchase_account=='yes')
 								{
-									$option[$key] = $ledger_account_detail;
+									$option[]=['value'=>$ledger_account_detail->id,'text'=>$ledger_account_detail->name,'gst_type'=>$ledger_account_detail->gst_type];
 								}
-								elseif(($key!= 161 && $key!= 160 && $st_company_id==26))
-								{
-									$option[$key] = $ledger_account_detail;
-								}
-								elseif(($key!= 309 && $key!= 308 && $st_company_id==27))
-								{
-									$option[$key] = $ledger_account_detail;
-								}
-								
 							}
 							echo $this->Form->input('purchase_ledger_account', ['options' => $option,'label' => false,'class' => 'form-control input-sm']); ?>
 							<?php echo $this->Form->input('cst_vat', ['label' => false,'type' => 'hidden']); ?>
@@ -866,9 +857,9 @@ $(document).ready(function() {
 	
 		}
 	$('select[name="purchase_ledger_account"]').on("change",function() { alert();
-		var gst_ledger_id=$('select[name="purchase_ledger_account"] option:selected').val();
-		if(gst_ledger_id=="799" || gst_ledger_id=="800" )
-		{  
+		ar gst_type=$('select[name="purchase_ledger_account"] option:selected').attr('gst_type'); 
+		if(gst_type=='GST')
+		{			
 				$('.igst_display').css("display", "none");
 				$('.cgst_display').css("display", "");
 				$('.sgst_display').css("display", "");

@@ -1196,11 +1196,11 @@ class InvoiceBookingsController extends AppController
 		
 		
 		$AccountReference= $this->InvoiceBookings->AccountReferences->get(2);
-		$ledger_account_details = $this->InvoiceBookings->LedgerAccounts->find('list')->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
+		$ledger_account_details = $this->InvoiceBookings->LedgerAccounts->find()->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
 			return $q->where(['AccountFirstSubgroups.id'=>$AccountReference->account_first_subgroup_id]);
 		}]])->order(['LedgerAccounts.name' => 'ASC'])->where(['LedgerAccounts.company_id'=>$st_company_id]);
 		
-		//pr($AccountReference->toArray()); exit;
+		//pr($ledger_account_details->toArray()); exit;
 		$AccountReference= $this->InvoiceBookings->AccountReferences->get(4);
 		$ledger_account_vat = $this->InvoiceBookings->LedgerAccounts->find('list'
 				,['keyField' => 		function ($row) {
@@ -1462,7 +1462,7 @@ class InvoiceBookingsController extends AppController
         $grns = $this->InvoiceBookings->Grns->find('list');
 		
 		$AccountReference= $this->InvoiceBookings->AccountReferences->get(2);
-		$ledger_account_details = $this->InvoiceBookings->LedgerAccounts->find('list')->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
+		$ledger_account_details = $this->InvoiceBookings->LedgerAccounts->find()->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
 			return $q->where(['AccountFirstSubgroups.id'=>$AccountReference->account_first_subgroup_id]);
 		}]])->order(['LedgerAccounts.name' => 'ASC'])->where(['LedgerAccounts.company_id'=>$st_company_id]);
 		
