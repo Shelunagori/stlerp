@@ -155,7 +155,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'yes'])
 					->where($where);
 					$Actionstatus="GstCopy";
-				}else { 
+				}else {  
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -164,9 +164,9 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->having($having)
 					->where($where);
 					$Actionstatus="IndexPage";
+					//pr($salesOrders->toArray()); exit;
 				}
 				//	exit;
 		}

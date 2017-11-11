@@ -12,7 +12,7 @@
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
 			<span class="caption-subject font-blue-steel uppercase">Goods Receipt Note</span>
-			<?php if($pull_request=="true"){ ?>
+			<?php if($pull_request=="true" || $grn_pull_request=="true"){ ?>
 			: Select a GRN to Book Invoice
 			<?php } ?>
 		</div>
@@ -22,7 +22,7 @@
 			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
 			if($status=='Invoice-Booked'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
 			?>
-			<?php if($pull_request!="true"){ ?>
+			<?php if($pull_request!="true" && $grn_pull_request!="true"){ ?>
 				<?= $this->Html->link(
 					'Pending',
 					'/Grns/index/Pending',

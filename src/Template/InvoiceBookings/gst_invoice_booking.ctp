@@ -872,7 +872,7 @@ $(document).ready(function() {
 	}
 	
 	
-	$('select[name="purchase_ledger_account"]').on("change",function() { alert();
+	$('select[name="purchase_ledger_account"]').on("change",function() { 
 		var gst_ledger_id=$('select[name="purchase_ledger_account"] option:selected').val();
 		if(gst_ledger_id=="799" || gst_ledger_id=="800" )
 		{  
