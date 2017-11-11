@@ -310,7 +310,8 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
-	function load_ref_section(sel){ 
+	function load_ref_section(sel)
+	{ 
 		$(sel).closest("tr.main_tr").find("td:nth-child(3)").html("Loading...");
 		var sel2=$(sel).closest('tr.main_tr');
 		var received_from_id=$(sel).closest("tr.main_tr").find("td:nth-child(1) select").find('option:selected').val();
@@ -330,7 +331,18 @@ $(document).ready(function() {
 			rename_ref_rows(sel2,received_from_id);
 		});
 		
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkExpenseTrackingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) { 
+			$(sel).closest('tr.main_tr').find('.show_grns').html(response);
+			rename_rows();
+		});
+		
+		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
 		url=url+'/'+received_from_id;
 		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
 		{ 
@@ -367,7 +379,7 @@ $(document).ready(function() {
 		else
 		{
 			$(sel).closest('tr.main_tr').find('.show_grns').html('');
-		}
+		} */
 	}
 	
 	

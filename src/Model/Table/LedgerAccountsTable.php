@@ -62,6 +62,12 @@ class LedgerAccountsTable extends Table
 		$this->hasMany('PaymentRows', [
             'foreignKey' => 'received_from_id'
         ]);
+		$this->hasMany('PettyCashVoucherRows', [
+            'foreignKey' => 'received_from_id'
+        ]);
+		$this->hasMany('JournalVouchers', [
+            'foreignKey' => 'received_from_id'
+        ]);
 		$this->belongsTo('AccountCategories');
 		$this->belongsTo('Grns');
 		$this->belongsTo('Invoices');
