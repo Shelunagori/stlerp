@@ -773,7 +773,7 @@ class LedgersController extends AppController
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));
 			$company = $this->Companies->get($st_company_id);
 			//pr($company);exit;
-			if($from == $company->accounting_book_date){
+			if($from == date("d-m-Y",strtotime($company->accounting_book_date))){
 				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
 				$opening_balance_ar=[];
 			foreach($OB as $Ledger)
