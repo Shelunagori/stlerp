@@ -104,8 +104,51 @@
 					</thead>
 
 					<tbody>
+						<?php  foreach ($purchaseOrders as $purchaseOrder): ?>
+						<tr <?php if($status=='Pending'){ echo 'style="background-color:#f4f4f4"';   
+							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){
+						?>>
+							<td><?= h(++$page_no) ?></td>
+							
+							<td><?= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4)) ?></td>
+							
+							<td><?= h($purchaseOrder->vendor->company_name) ?></td>
+							<td>
+								<div class="btn-group">
+									<button id="btnGroupVerticalDrop5" type="button" class="btn default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
+										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
+										<?php  foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){ 
+											if($purchase_order_row->purchase_order_id == $purchaseOrder->id){?>
+											<li><p><?= h($purchase_order_row->item->name) ?></p></li>
+											<?php }}?>
+										</ul>
+								</div>
+							</td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+						
+							<td class="actions">
+							<?php if(in_array(31,$allowed_pages)){ ?>
+								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+							<?php } ?>
+								<?php if($pull_request=="true"){ 
+									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								} ?>
+								
+								
+								<?php
+								if($status != 'Converted-Into-GRN') {
+								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } ?>
+
+							</td>
+						</tr>
+						<?php }} endforeach; ?>
+						
 						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
-						<tr>
+						<tr <?php if($status=='Converted-Into-GRN'){ echo 'style="background-color:#f4f4f4"';   
+							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){
+						?>>
 							<td><?= h(++$page_no) ?></td>
 							
 							<td><?= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4)) ?></td>
@@ -141,20 +184,53 @@
 
 							</td>
 						</tr>
-						<?php endforeach; ?>
+						<?php }} endforeach; ?>
+						
+						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
+						<tr <?php if($status=='true' || $status==null){ echo 'style="background-color:#f4f4f4"';  
+							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ //exit;
+						?>>
+							<td><?= h(++$page_no) ?></td>
+							
+							<td><?= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4)) ?></td>
+							
+							<td><?= h($purchaseOrder->vendor->company_name) ?></td>
+							<td>
+								<div class="btn-group">
+									<button id="btnGroupVerticalDrop5" type="button" class="btn default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
+										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
+										<?php  foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){ 
+											if($purchase_order_row->purchase_order_id == $purchaseOrder->id){?>
+											<li><p><?= h($purchase_order_row->item->name) ?></p></li>
+											<?php }}?>
+										</ul>
+								</div>
+							</td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+						
+							<td class="actions">
+							<?php if(in_array(31,$allowed_pages)){ ?>
+								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+							<?php } ?>
+								<?php if($pull_request=="true"){ 
+									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								} ?>
+								
+								
+								<?php
+								if($status != 'Converted-Into-GRN') {
+								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } ?>
+
+							</td>
+						</tr>
+						<?php }} endforeach; ?>
 					</tbody>
 				</table>
 				</div>
 			</div>
 		</div>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				
-	</div>
+			
 </div>
 </div>

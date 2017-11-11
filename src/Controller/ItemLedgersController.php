@@ -999,254 +999,86 @@ class ItemLedgersController extends AppController
 					$where7['ItemCompanies.company_id IN'][]=$names;
 			}
 		}
-		if(!empty($company_name)){  
-			$salesOrders=$this->ItemLedgers->SalesOrders->find()
-			->select(['total_rows'=>$this->ItemLedgers->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-			->leftJoinWith('SalesOrderRows', function ($q) use($where){
-				return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-			})
-			->where($where1)
-			->group(['SalesOrders.id'])
-			->autoFields(true)
-			->having(['total_rows >' => 0])
-			->contain(['SalesOrderRows.Items'=>function($q) use($where){
-				return $q->where($where);
-			} ])
-			->toArray();
-			
-		}else{
-			$salesOrders=$this->ItemLedgers->SalesOrders->find()
-			->select(['total_rows'=>$this->ItemLedgers->SalesOrders->find()->func()->count('SalesOrderRows.id')])
-			->leftJoinWith('SalesOrderRows', function ($q) use($where){
-				return $q->where(['SalesOrderRows.processed_quantity < SalesOrderRows.quantity']);
-			})
-			->where(['company_id'=>$st_company_id])
-			->group(['SalesOrders.id'])
-			->autoFields(true)
-			->having(['total_rows >' => 0])
-			->contain(['SalesOrderRows.Items'=>function($q) use($where){
-				return $q->where($where);
-			} ])
-			->toArray();
-			//pr($salesOrders); exit; 
-			
-		}
-		
-		$sales=[];$sales_id=[];
-			foreach($salesOrders as $data){
-				foreach($data->sales_order_rows as $row){ 
-				//pr($row->quantity);
-				$item_id=$row->item_id;
-				$quantity=$row->quantity;
-				$processed_quantity=$row->processed_quantity;
-				$Sales_Order_stock=$quantity-$processed_quantity;
-				$sales[$row->item_id]=@$sales[$row->item_id]+$Sales_Order_stock;
-				
-					if(array_search(@$item_id, @$sales_id)==false){
-						if($row->quantity > $row->processed_quantity){
-							@$sales_id[$row->item_id].=@$row->sales_order_id.',';
-						}
-					}	
-				}
-				//$sales[$item_id]=@$sales[$item_id]+$Sales_Order_stock;
-			}
-			//pr($sales_id);exit;
-			
-		if(!empty($company_name)){  	
-			//$JobCards=$this->ItemLedgers->JobCards->find()->where($where2)
-			//->where(['status'=>'Pending'])->contain(['JobCardRows']);
-			
-			$SalesOrders=$this->ItemLedgers->JobCards->SalesOrders->find()->contain(['SalesOrderRows'=>function ($q){ return $q->where(['source_type'=>'Manufactured']);
-			}]);
-			
-			$JobCards = $this->ItemLedgers->JobCards->find()->where($where2)->contain(['SalesOrders'=>['SalesOrderRows'=>['JobCardRows']]]);
-			//
-		}else{
-			$JobCards=$this->ItemLedgers->JobCards->find()->where(['company_id'=>$st_company_id,'status'=>'Pending'])->contain(['JobCardRows.Items'=>function ($q) use($where){
-				return $q->where($where);
-			}]);
-			
-			$SalesOrders=$this->ItemLedgers->JobCards->SalesOrders->find()->contain(['SalesOrderRows'=>function ($q){ return $q->where(['source_type'=>'Manufactured']);
-			}]);
-		} 
 
 		
-		$salesOrderQty=[]; $invoiceQty=[]; $jobcard_id=[];
-
-
-
-		foreach($SalesOrders as $SalesOrder){ 
-			if(!empty($SalesOrder->sales_order_rows)){
-				foreach($SalesOrder->sales_order_rows as $SalesOrderRow){ 
-					@$salesOrderQty[@$SalesOrderRow->sales_order_id][@$SalesOrderRow->item_id]+=@$SalesOrderRow->quantity;
+	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows','Invoices'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+	}]]);
+		
+	$sales_order_qty=[];
+	$invoice_qty=[];
+	$sales_id=[];
+		foreach($SalesOrders as $SalesOrder){ $sales_qty=[];
+			foreach($SalesOrder->invoices as $invoice){
+				foreach($invoice->invoice_rows as $invoice_row){
+					@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
 				}
-				$Invoices=$this->ItemLedgers->JobCards->SalesOrders->Invoices->find()->contain(['InvoiceRows'=>function ($q) use($where){
-							return $q->where(['inventory_voucher_status'=>'Done']);
-					}])->where(['sales_order_id'=>$SalesOrder->id]);
-				
-				foreach($Invoices as $Invoice){ 
-					foreach($Invoice->invoice_rows as $invoice_row){ 
-						@$invoiceQty[@$Invoice->sales_order_id][@$invoice_row->item_id]+=@$invoice_row->quantity;
-						
+			}
+			foreach($SalesOrder->sales_order_rows as $sales_order_row){  
+				@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+				@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+			}
+			foreach(@$sales_qty as $key=>$sales_order_qt){
+					if(@$sales_order_qt > @$invoice_qty[$key] ){ 
+						@$sales_id[$key].=@$SalesOrder->id.',';
 					}
-				}
+				
 			}
 		}
 		
-		$jobCardQty=[];
-		foreach($JobCards as $JobCard){ 
-			//pr($JobCard['sales_order']); exit;
-			foreach($JobCard['sales_order']->sales_order_rows as $sales_order_row){ 
-				$sq=@$salesOrderQty[@$sales_order_row->sales_order_id][@$sales_order_row->item_id];
-				$iq=@$invoiceQty[@$sales_order_row->sales_order_id][@$sales_order_row->item_id]; 
-					if(empty(@$invoiceQty[@$sales_order_row->sales_order_id][@$sales_order_row->item_id])){
-						foreach($sales_order_row->job_card_rows as $job_card_row){
-							@$jobCardQty[$job_card_row->item_id]+=@$job_card_row->quantity;
-							if(array_search(@$job_card_row->item_id, @$jobcard_id)==false){
-									
-								@$jobcard_id[$job_card_row->item_id].=@$job_card_row->job_card_id.',';
-							}
-						}
-					}else{
-						$due=$sq-$iq;
-						foreach($sales_order_row->job_card_rows as $job_card_row){
-							@$jobCardQty[$job_card_row->item_id]+=($due*@$job_card_row->quantity)/$sq;
-							if(array_search(@$invoice_row->item_id, @$jobcard_id)==false){
-								@$jobcard_id[$invoice_row->item_id].=@$job_card_row->job_card_id.',';
-							}
-						}
-					}
-						
-						
+	$PurchaseOrders = $this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows','Grns'=>['GrnRows' => function($q) {
+				return $q->select(['grn_id','purchase_order_row_id','item_id','total_qty' => $q->func()->sum('GrnRows.quantity')])->group('GrnRows.purchase_order_row_id');
+	}]]);
+		//pr($PurchaseOrders->toArray()); exit;
+	$purchase_order_qty=[];
+	$grn_qty=[];
+	$purchase_id=[];
+		foreach($PurchaseOrders as $PurchaseOrder){ $sales_qty=[];
+			foreach($PurchaseOrder->grns as $grn){
+				foreach($grn->grn_rows as $grn_row){
+					@$grn_qty[$grn_row['item_id']]+=$grn_row['total_qty'];
 				}
 			}
-		/* 
-		$job_card_items=[];
-		foreach($JobCards as $JobCard){
-			$Invoices=$this->ItemLedgers->JobCards->SalesOrders->Invoices->find()->contain(['InvoiceRows'])->where(['sales_order_id'=>$JobCard->sales_order_id]);
-			
-			pr($Invoices->toArray()); exit;
-			foreach($JobCard->job_card_rows as $job_card_row){
-				$job_card_items[$job_card_row->item_id]=@$job_card_items[$job_card_row->item_id]+$job_card_row->quantity;
+			foreach($PurchaseOrder->purchase_order_rows as $purchase_order_row){  
+				@$purchase_order_qty[$purchase_order_row['item_id']]+=$purchase_order_row['quantity'];
+				@$sales_qty[$purchase_order_row['item_id']]+=$purchase_order_row['quantity'];
 			}
-		} exit;	 */	
-		
-		//$PurchaseOrders=$this->ItemLedgers->PurchaseOrders->find()
-			//->contain(['PurchaseOrderRows']);			
-		if(!empty($company_name)){ 		
-			$PurchaseOrders=$this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['Items'=>function($q) use($where){
-				return $q->where($where);
-			}]])->select(['total_rows' => 
-				$this->ItemLedgers->PurchaseOrders->find()->func()->count('PurchaseOrderRows.id')])
-				->leftJoinWith('PurchaseOrderRows', function ($q) {
-					return $q->where(['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity']);
-				})
-				->where($where3)
-				->group(['PurchaseOrders.id'])
-				->autoFields(true)
-				->order(['PurchaseOrders.id' => 'DESC']);			
-			//pr($PurchaseOrders->toArray());exit;
-		}else{
-			$PurchaseOrders=$this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['Items'=>function($q) use($where){
-				return $q->where($where);
-			}]])->select(['total_rows' => 
-				$this->ItemLedgers->PurchaseOrders->find()->func()->count('PurchaseOrderRows.id')])
-				->leftJoinWith('PurchaseOrderRows', function ($q) {
-					return $q->where(['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity']);
-				})
-				->where(['company_id'=>$st_company_id])
-				->group(['PurchaseOrders.id'])
-				->autoFields(true)
-				->where($where1)
+			foreach(@$sales_qty as $key=>$sales_order_qt){
+					if(@$sales_order_qt > @$grn_qty[$key] ){ 
+						@$purchase_id[$key].=@$PurchaseOrder->id.',';
+					}
 				
-				->order(['PurchaseOrders.id' => 'DESC']);			
-			//pr($PurchaseOrders->toArray());exit;
-		}
-		$purchase_order_items=[]; $po_id=[];
-		foreach($PurchaseOrders as $PurchaseOrder){
-			foreach($PurchaseOrder->purchase_order_rows as $purchase_order_rows){
-				$item_id=$purchase_order_rows->item_id;
-				$quantity=$purchase_order_rows->quantity;
-				$processed_quantity=$purchase_order_rows->processed_quantity;
-				$Sales_Order_stock=$quantity-$processed_quantity;
-				$purchase_order_items[$purchase_order_rows->item_id]=@$purchase_order_items[$purchase_order_rows->item_id]+$Sales_Order_stock;
-				if(array_search(@$purchase_order_rows->item_id, @$po_id)==false){
-					if($purchase_order_rows->quantity > $purchase_order_rows->processed_quantity){
-						@$po_id[$purchase_order_rows->item_id].=@$purchase_order_rows->purchase_order_id.',';
-					}
-					
-				}
 			}
-		}	
-		/// Start Material Indent Report Cost
-		if(!empty($company_name)){
-				$MaterialIndents=$this->ItemLedgers->MaterialIndents->find()->contain(['MaterialIndentRows'=>['Items'=>function($q) use($where){
-				return $q->where($where);
-			}]])->select(['total_rows' => 
-				$this->ItemLedgers->MaterialIndents->find()->func()->count('MaterialIndentRows.id')])
-				->leftJoinWith('MaterialIndentRows', function ($q) {
-					return $q->where(['MaterialIndentRows.processed_quantity < MaterialIndentRows.required_quantity']);
-				})
-				->where($where4)
-				->group(['MaterialIndents.id'])
-				->autoFields(true)
-				->order(['MaterialIndents.id' => 'DESC']);	
-				//pr($MaterialIndents->toArray());exit;
-		}else{
-			$MaterialIndents=$this->ItemLedgers->MaterialIndents->find()->contain(['MaterialIndentRows'=>['Items'=>function($q) use($where){
-				return $q->where($where);
-			}]])->select(['total_rows' => 
-				$this->ItemLedgers->MaterialIndents->find()->func()->count('MaterialIndentRows.id')])
-				->leftJoinWith('MaterialIndentRows', function ($q) {
-					return $q->where(['MaterialIndentRows.processed_quantity < MaterialIndentRows.required_quantity']);
-				})
-				->where(['company_id'=>$st_company_id])
-				->group(['MaterialIndents.id'])
-				->autoFields(true)
-				->where($where1)
-				->order(['MaterialIndents.id' => 'DESC']);	
-		}		
-						
-			
+		}
 		
-		$material_indent_order_items=[];$mi_id=[];
-		foreach($MaterialIndents as $MaterialIndent){ 
-			foreach($MaterialIndent->material_indent_rows as $material_indent_rows){
-				$item_id=$material_indent_rows->item_id;
-				$quantity=$material_indent_rows->required_quantity;
-				$processed_quantity=$material_indent_rows->processed_quantity;
-				$Sales_Order_stock=$quantity-$processed_quantity;
-				$material_indent_order_items[$material_indent_rows->item_id]=@$material_indent_order_items[$material_indent_rows->item_id]+$Sales_Order_stock;
-				if(array_search(@$material_indent_rows->item_id, @$mi_id)==false){
-					if($material_indent_rows->required_quantity > $material_indent_rows->processed_quantity){
-						@$mi_id[$material_indent_rows->item_id].=@$material_indent_rows->material_indent_id.',';
-					}
-				}	
-			}
-		}
-		/// End Material Indent Report Cost
-		if(!empty($company_name)){
-			$Quotations=$this->ItemLedgers->Quotations->find()->where(['status'=>'Pending'])->where($where5)->contain(['QuotationRows']);
-				
-		}else{
-			$Quotations=$this->ItemLedgers->Quotations->find()->where(['status'=>'Pending','company_id'=>$st_company_id])->contain(['QuotationRows']);
-		}
-		$quotation_items=[]; $quotation_id=[];
-		foreach($Quotations as $Quotation){
-			foreach($Quotation->quotation_rows as $quotation_row){
-				$item_id=$quotation_row->item_id;
-				$quantity=$quotation_row->quantity;
-				$processed_quantity=$quotation_row->proceed_qty;
-				$Sales_Order_stock=$quantity-$processed_quantity;
-				$quotation_items[$quotation_row->item_id]=@$quotation_items[$quotation_row->item_id]+$Sales_Order_stock;
-				if(array_search(@$quotation_row->item_id, @$quotation_id)==false){
-					if($quotation_row->quantity > $quotation_row->proceed_qty){
-						@$quotation_id[$quotation_row->item_id].=@$quotation_row->quotation_id.',';
-					}
-				}	
-			}
-		}	
+	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows','SalesOrders'=>['SalesOrderRows' => function($q) {
+				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
+	}]]);
 		//pr($Quotations->toArray()); exit;
+	$qo_qty=[];
+	$so_qty=[];
+	$qotation_id=[];
+		foreach($Quotations as $Quotation){ $sales_qty=[];
+			foreach($Quotation->sales_orders as $sales_order){
+				foreach($sales_order->sales_order_rows as $sales_order_row){
+					@$so_qty[$sales_order_row['item_id']]+=$sales_order_row['total_qty'];
+				}
+			}
+			foreach($Quotation->quotation_rows as $quotation_row){  
+				@$qo_qty[$quotation_row['item_id']]+=$quotation_row['quantity'];
+				@$sales_qty[$quotation_row['item_id']]+=$quotation_row['quantity'];
+			}
+			foreach(@$sales_qty as $key=>$sales_order_qt){
+					if(@$sales_order_qt > @$so_qty[$key] ){  
+						@$qotation_id[$key].=@$Quotation->id.',';
+					}
+				
+			}
+		}
+
+	//pr($qo_qty)	;	pr($so_qty)	; 
+//	exit;
+		
 		if(!empty($company_name)){
 		$ItemLedgers = $this->ItemLedgers->find();
 				$totalInCase = $ItemLedgers->newExpr()
@@ -1308,7 +1140,6 @@ class ItemLedgersController extends AppController
 		$ItemMiniStock=[];
 		$Items =$this->ItemLedgers->Items->ItemCompanies->find()->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 			foreach($Items as $Item){ 
-				
 					$ItemMiniStock[$Item->item_id]=$Item->minimum_stock;
 				
 			}
@@ -1319,115 +1150,11 @@ class ItemLedgersController extends AppController
 			$item_name=$itemLedger->item->name;
 			$item_id=$itemLedger->item->id;
 			$Current_Stock=$itemLedger->total_in-$itemLedger->total_out;
-			
-			
-			$material_report[]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'sales_order'=>@$sales[$item_id],'sales_order_id'=>@$sales_id[$item_id],'job_card_qty'=>@$jobCardQty[$item_id],'job_card_id'=>@$jobcard_id[$item_id],'po_qty'=>@$purchase_order_items[$item_id],'po_id'=>@$po_id[$item_id],'qo_qty'=>@$quotation_items[$item_id],'qo_id'=>@$quotation_id[$item_id],'mi_qty'=>@$material_indent_order_items[$item_id],'mi_id'=>@$mi_id[$item_id],'min_stock'=>@$ItemMiniStock[$item_id]);
+			$material_report[]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock);
 			
 		} 
 		
-		$ItemDatas=[];
-		
-		
-		
-		
-		$total_indent=[];
-		if($stock == "Positive"){
-			
-			
-			foreach($material_report as $result){ 
-				$Current_Stock=$result['Current_Stock'];
-				$sales_order=$result['sales_order'];
-				$sales_order_id=$result['sales_order_id'];
-				$job_card_id=$result['job_card_id'];
-				$po_id=$result['po_id'];
-				$qo_id=$result['qo_id'];
-				$mi_id=$result['mi_id'];
-				$job_card_qty=$result['job_card_qty'];
-				$po_qty=$result['po_qty'];
-				$qo_qty=$result['qo_qty'];
-				$mi_qty=$result['mi_qty'];
-				$item_id=$result['item_id'];
-				$min_stock=$result['min_stock'];
-				$total = $Current_Stock-@$sales_order-$job_card_qty+$po_qty-$qo_qty+$mi_qty;
-				if($total < 0){
-					$total_indent[$item_id]=$total;
-				}
-			}
-		}elseif($stock == "All"){
-			
-			$Items =$this->ItemLedgers->Items->find()->contain(['ItemCompanies'=>function($p) use($st_company_id,$where){
-						return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
-				}])->where($whereItem);
-			foreach($Items as $Item){ 
-				$ItemLedgersexists = $this->ItemLedgers->exists(['item_id' => $Item->id,'company_id'=>$st_company_id]);
-				if(empty($ItemLedgersexists)){
-					$ItemDatas[$Item->id]=$Item->name;
-				}
-			}
-		
-			//pr($ItemDatas);exit;
-			
-			foreach($material_report as $result){ 
-				$Current_Stock=$result['Current_Stock'];
-				$sales_order=$result['sales_order'];
-				$sales_order_id=$result['sales_order_id'];
-				$job_card_qty=$result['job_card_qty'];
-				$po_id=$result['po_id'];
-				$qo_id=$result['qo_id'];
-				$mi_id=$result['mi_id'];
-				$job_card_id=$result['job_card_id'];
-				$po_qty=$result['po_qty'];
-				$qo_qty=$result['qo_qty'];
-				$mi_qty=$result['mi_qty'];
-				$item_id=$result['item_id'];
-				$min_stock=$result['min_stock'];
-				$total = $Current_Stock-@$sales_order-$job_card_qty+$po_qty-$qo_qty+$mi_qty;
-				
-				if($total){
-					$total_indent[$item_id] = $total;
-				}
-			}
-		}elseif($stockstatus == "Positive"){ 
-			foreach($material_report as $result){ 
-					$Current_Stock=$result['Current_Stock'];
-					$sales_order=$result['sales_order'];
-					$job_card_qty=$result['job_card_qty'];
-					$po_id=$result['po_id'];
-					$qo_id=$result['qo_id'];
-					$mi_id=$result['mi_id'];
-					$sales_order_id=$result['sales_order_id'];
-					$job_card_id=$result['job_card_id'];
-					$po_qty=$result['po_qty'];
-					$qo_qty=$result['qo_qty'];
-					$mi_qty=$result['mi_qty'];
-					$item_id=$result['item_id'];
-					$min_stock=$result['min_stock'];
-					$total = $Current_Stock-@$sales_order-$job_card_qty+$po_qty-$qo_qty+$mi_qty;
-						if($total < 0 ){
-							$total_indent[$item_id] = $total;
-						}
-				} //pr($total_indent);
-		}else{
-			foreach($material_report as $result){ 
-				$Current_Stock=$result['Current_Stock'];
-				$sales_order=$result['sales_order'];
-				$job_card_qty=$result['job_card_qty'];
-				$sales_order_id=$result['sales_order_id'];
-				$job_card_id=$result['job_card_id'];
-				$po_id=$result['po_id'];
-				$qo_id=$result['qo_id'];
-				$mi_id=$result['mi_id'];
-				$po_qty=$result['po_qty'];
-				$qo_qty=$result['qo_qty'];
-				$mi_qty=$result['mi_qty'];
-				$item_id=$result['item_id'];
-				$min_stock=$result['min_stock'];
-				$total = $Current_Stock-@$sales_order-$job_card_qty+$po_qty-$qo_qty+$mi_qty;
-				if($total < 0){
-					$total_indent[$item_id]=$total;
-				}
-			}
-		} //exit;
+//pr($material_report); exit;
 		
 		//exit;
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
@@ -1436,7 +1163,7 @@ class ItemLedgersController extends AppController
 		$Items = $this->ItemLedgers->Items->find('list')->order(['Items.name' => 'ASC']);
 		$Companies = $this->ItemLedgers->Companies->find('list')->order(['Companies.name' => 'ASC']);
 			
-		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock'));
+		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock','invoice_qty','sales_order_qty','sales_id','purchase_order_qty','grn_qty','purchase_id','qotation_id','qo_qty','so_qty'));
 			
 	 }
 	
