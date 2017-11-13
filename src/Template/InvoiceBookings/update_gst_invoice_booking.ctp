@@ -874,6 +874,23 @@ $(document).ready(function() {
 		}
 		calculate_total();
 	});
+	
+	var gst_type=$('select[name="purchase_ledger_account"] option:selected').attr('gst_type'); 
+		if(gst_type=='GST')
+		{			
+				$('.igst_display').css("display", "none");
+				$('.cgst_display').css("display", "");
+				$('.sgst_display').css("display", "");
+				$('.igst_percent option:selected').prop('selected', false);
+		}else{
+			
+				$('.igst_display').css("display", "");
+				$('.cgst_display').css("display", "none");
+				$('.sgst_display').css("display", "none");
+				$('.cgst_percent option:selected').prop('selected', false);
+				$('.sgst_percent option:selected').prop('selected', false);
+		}
+	
 	$('.cr_dr_amount').live("change",function() {
 			do_ref_total();
 	});
