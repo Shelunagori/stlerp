@@ -1711,76 +1711,80 @@ class ItemLedgersController extends AppController
 						->where(['ItemLedgers.company_id' => $st_company_id]); 
 		
 		$itemDatas=[];
+		$qty=[];
 		foreach($itemLedgers as $itemLedger){
-			$itemDatas[$itemLedger['source_model'].$itemLedger['source_id'].','.$itemLedger['processed_on'].','.$itemLedger['source_id'].','.$itemLedger['in_out'].','.$itemLedger['quantity']][]=$itemLedger;
+			$itemDatas[$itemLedger['source_model'].$itemLedger['source_id']][]=$itemLedger;
 			
 		}
-		//pr($itemLedgers->toArray());exit;
+		//pr($itemDatas);exit;
 		$serial_nos=[];
 		$voucher_no=[];
 		$sourceData=[];
 		$link=[];
+		$extra = [];
 		foreach($itemDatas as $key=>$itemData){
-			foreach($itemData as $itemDetail){
-				$keyVal = explode(',',$key);
+			foreach($itemData as $itemDetail)
+			{
 				if($itemDetail['source_model']=='Invoices'){
 					$invoice=$this->ItemLedgers->Invoices->find()->where(['Invoices.id'=>$itemDetail['source_id']])->contain(['InvoiceRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $invoice->invoice_rows;
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity']; 
 					$invoice=$this->ItemLedgers->Invoices->find()->where(['Invoices.id'=>$itemDetail['source_id']])->first();
 					@$invoice1=($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4);
 					
-					$voucher_no[$keyVal[0]][]=$invoice1;
+					$voucher_no[$key][]=$invoice1;
 					
 					if($invoice['invoice_type']=="GST"){
 						$link1 = ['controller'=>'Invoices','action' => 'gst-confirm'];
 					}else{ 
 						$link1 = ['controller'=>'Invoices','action' => 'confirm'];
 					}
-					$link[$keyVal[0]]=$link1;
+					$link[$key]=$link1;
 				}
 				if($itemDetail['source_model']=='Grns')
 				{
 					$grnDetail=$this->ItemLedgers->Grns->find()->where(['Grns.id'=>$itemDetail['source_id']])->contain(['GrnRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $grnDetail->grn_rows;
-					
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity'];
 					$grn=$this->ItemLedgers->Grns->find()->where(['Grns.id'=>$itemDetail['source_id']])->first();
-					$voucher_no[$keyVal[0]][]=($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4);
+					$voucher_no[$key][]=($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4);
 					
 					$link1 = ['controller'=>'Grns','action' => 'View'];
-					$link[$keyVal[0]]=$link1;
+					$link[$key]=$link1;
 				}
 				if($itemDetail['source_model']=='Inventory Vouchers')
 				{
 					$InventoryVoucherDetail=$this->ItemLedgers->InventoryVouchers->find()->where(['InventoryVouchers.id'=>$itemDetail['source_id']])->contain(['InventoryVoucherRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $InventoryVoucherDetail->inventory_voucher_rows;
-					
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity'];
 					$InventoryVoucher=$this->ItemLedgers->InventoryVouchers->find()->where(['InventoryVouchers.id'=>$itemDetail['source_id']])->first();
-					$voucher_no[$keyVal[0]][]=('#'.str_pad($InventoryVoucher->iv_number, 4, '0', STR_PAD_LEFT));
+					$voucher_no[$key][]=('#'.str_pad($InventoryVoucher->iv_number, 4, '0', STR_PAD_LEFT));
 					$link1 = ['controller'=>'InventoryVouchers','action' => 'View'];
 					
-					$link[$keyVal[0]]=$link1;
+					$link[$key]=$link1;
 				}
 				if($itemDetail['source_model']=='Inventory Transfer Voucher')
 				{
 					$InventoryTransferVoucherDetail=$this->ItemLedgers->InventoryTransferVouchers->find()->where(['InventoryTransferVouchers.id'=>$itemDetail['source_id']])->contain(['InventoryTransferVoucherRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $InventoryTransferVoucherDetail->inventory_transfer_voucher_rows;
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity'];
 					$InventoryTransferVoucher=$this->ItemLedgers->InventoryTransferVouchers->find()->where(['InventoryTransferVouchers.id'=>$itemDetail['source_id']])->first();
 					
 					 if($InventoryTransferVoucher->in_out=='in_out')
 					    { 
-							$voucher_no[$keyVal[0]][]=('ITV-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
+							$voucher_no[$key][]=('ITV-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
 							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'View'];
-							$link[$keyVal[0]]=$link1;
+							$link[$key]=$link1;
 						}
 						else if($InventoryTransferVoucher->in_out=='in') 
 						{ 
-							$voucher_no[$keyVal[0]][]=('ITVI-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
+							$voucher_no[$key][]=('ITVI-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
 							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'inView'];
-							$link[$keyVal[0]]=$link1;
+							$link[$key]=$link1;
 						}else {
-							$voucher_no[$keyVal[0]][]=('ITVO-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT)) ;
+							$voucher_no[$key][]=('ITVO-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT)) ;
 							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'outView'];
-							$link[$keyVal[0]]=$link1;
+							$link[$key]=$link1;
 						} 
 					
 				}
@@ -1788,29 +1792,29 @@ class ItemLedgersController extends AppController
 				{
 					$PurchaseReturnDetail=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $PurchaseReturnDetail->purchase_return_rows;
-					
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity'];
 					$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->first();
-					$voucher_no[$keyVal[0]][]=('#'.str_pad($PurchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT));
+					$voucher_no[$key][]=('#'.str_pad($PurchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT));
 					
 					$link1 = ['controller'=>'PurchaseReturns','action' => 'View'];
-					$link[$keyVal[0]]=$link1;
+					$link[$key]=$link1;
 				}
 				if($itemDetail['source_model']=='Sale Return')
 				{
 					$SaleReturnDetail=$this->ItemLedgers->SaleReturns->find()->where(['SaleReturns.id'=>$itemDetail['source_id']])->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->first();
 					$sourceData[$key] = $SaleReturnDetail->sale_return_rows;
-
+					$extra[$key] =$itemDetail['processed_on'].','.$itemDetail['source_id'].','.$itemDetail['in_out'].','.$itemDetail['quantity'];
 					$SaleReturn=$this->ItemLedgers->SaleReturns->find()->where(['SaleReturns.id'=>$itemDetail['source_id']])->first();
 					
-					@$voucher_no[$keyVal[0]][]=($SaleReturn->sr1.'/SR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4);
+					@$voucher_no[$key][]=($SaleReturn->sr1.'/SR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4);
 					$link1 = ['controller'=>'SaleReturns','action' => 'View'];
-					$link[$keyVal[0]]=$link1;
+					$link[$key]=$link1;
 				}
 			}
 			
 		}
-		/* pr($sourceData);
-	exit; */
+		 pr($extra);
+	exit; 
 		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
 	}
 }
