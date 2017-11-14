@@ -1768,6 +1768,8 @@ class ItemLedgersController extends AppController
 				}
 				if($itemDetail['source_model']=='Inventory Transfer Voucher')
 				{
+					$InventoryTransferVoucherDetail=$this->ItemLedgers->InventoryTransferVouchers->find()->where(['InventoryTransferVouchers.id'=>$itemDetail['source_id']])->contain(['InventoryTransferVoucherRows'=>['Items','SerialNumbers']])->first();
+					$sourceData[$key] = $InventoryTransferVoucherDetail->inventory_transfer_voucher_rows;
 					$InventoryTransferVoucher=$this->ItemLedgers->InventoryTransferVouchers->find()->where(['InventoryTransferVouchers.id'=>$itemDetail['source_id']])->first();
 					
 					 if($InventoryTransferVoucher->in_out=='in_out')
@@ -1790,24 +1792,25 @@ class ItemLedgersController extends AppController
 				}
 				if($itemDetail['source_model']=='Purchase Return')
 				{
-					$serialnoarray=$this->ItemLedgers->Items->SerialNumbers->find()->where(['purchse_return_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->first();
+					$PurchaseReturnDetail=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->first();
+					$sourceData[$key] = $PurchaseReturnDetail->purchase_return_rows;
 					
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					$voucher_no[$key][]=('#'.str_pad($PurchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT));
+					$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->first();
+					$voucher_no[$keyVal[0]][]=('#'.str_pad($PurchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT));
 					
 					$link1 = ['controller'=>'PurchaseReturns','action' => 'View'];
-					$link[$key]=$link1;
+					$link[$keyVal[0]]=$link1;
 				}
 				if($itemDetail['source_model']=='Sale Return')
 				{
-					$serialnoarray=$this->ItemLedgers->Items->SerialNumbers->find()->where(['sales_return_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
+					$SaleReturnDetail=$this->ItemLedgers->SaleReturns->find()->where(['SaleReturns.id'=>$itemDetail['source_id']])->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->first();
+					$sourceData[$key] = $SaleReturnDetail->sale_return_rows;
+
 					$SaleReturn=$this->ItemLedgers->SaleReturns->find()->where(['SaleReturns.id'=>$itemDetail['source_id']])->first();
 					
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					@$voucher_no[@$key][]=($SaleReturn->sr1.'/SR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4);
+					@$voucher_no[$keyVal[0]][]=($SaleReturn->sr1.'/SR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4);
 					$link1 = ['controller'=>'SaleReturns','action' => 'View'];
-					$link[$key]=$link1;
+					$link[$keyVal[0]]=$link1;
 				}
 			}
 			
