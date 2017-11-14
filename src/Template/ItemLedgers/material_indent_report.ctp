@@ -87,7 +87,7 @@
 						</tr>
 					</thead>
 					<tbody  >
-						<?php  $i=0; foreach($material_report as $data){
+						<?php echo $stock;  $i=1; foreach($material_report as $data){
 							$item_id=$data['item_id'];
 							$Current_Stock=$data['Current_Stock'];
 							$total_invoice_qty=@$invoice_qty[$data['item_id']]; 
@@ -102,43 +102,126 @@
 							$total_qo_qty=@$qo_qty[$data['item_id']]; 
 							$open_qo_qty=$total_qo_qty-$total_so_qty;
 							
-							$total_indent=abs($Current_Stock-@$open_so_qty+$open_po_qty-$open_qo_qty);
-							//pr($open_qo_qty);
+							$total_po_qty=@$po_qty[$data['item_id']]; 
+							$total_mi_qty=@$mi_qty[$data['item_id']]; 
+							$open_mi_qty=$total_mi_qty-$total_po_qty;
+							
+							$total_indent=$Current_Stock-@$open_so_qty+$open_po_qty-$open_qo_qty+$open_mi_qty;
+							$qty="";
+							if($stock=="Positive" && $total_indent < 0){ //exit; ?>
+								<tr class="tr1" row_no='<?php echo @$i; ?>'>
+									<td ><?php echo $i; ?> </td>
+									<td><?php /* echo $data['item_name']; */ echo $data['item_name']; ?></td>
+									<td><?php echo $data['Current_Stock']; ?></td>
+									
+									<td style="text-align:center"><?php if($open_so_qty > 0){ 
+										echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
+									 }else{ echo "-"; } ?></td>
+									<td style="text-align:center"><?php echo "-"; ?></td>
+									<td style="text-align:center"><?php if($open_po_qty > 0){ 
+										echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 
+									 }else{ echo "-"; } ?></td>
+									 
+									 <td style="text-align:center"><?php if($open_qo_qty > 0){ 
+										echo $this->Html->link(@$open_qo_qty ,'/ItemLedgers/material_indent?status=quotation&id='.@$qotation_id[$item_id],['target' => '_blank']); 
+									 }else{ echo "-"; } ?></td>
+									 
+									 <td style="text-align:center"><?php if($open_mi_qty > 0){ 
+										echo $this->Html->link(@$open_mi_qty ,'/ItemLedgers/material_indent?status=mi&id='.@$mi_id[$item_id],['target' => '_blank']); 
+									 }else{ echo "-"; } ?></td>
+									 <td style="text-align:center">
+									<?php if(@$total_indent < 0){
+											 echo abs(@$total_indent);
+									}else{ echo "-";} ?>
+									</td> 
+									
+									<td style="text-align:center">
+									<?php if(@$data['minimum_stock'] > 0){
+											 echo abs(@$data['minimum_stock']);
+									}else{ echo "-";} ?>
+									</td>
+									
+									<td style="text-align:center">
+										<?php if(@$total_indent || @$data['minimum_stock'] ){
+											if(@$total_indent > 0){
+												echo abs(@$data['minimum_stock']); 
+											}else{
+												echo abs(@$data['minimum_stock']+abs(@$total_indent)); 
+											}
+										}
+												?>
+									
+									</td>
+									 
+									 <td align="center">
+										<label class="hello">
+										
+														<button type="button" id="item<?php echo $item_id;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $item_id; ?>" suggestindent="<?php echo @$total_indent;
+										 ?>"><i class="fa fa-plus"></i></button>
+										</label>
+									</td>
+								</tr>
+							<?php }else{ ?>
+									<tr class="tr1" row_no='<?php echo @$i; ?>'>
+										<td ><?php echo $i; ?> </td>
+										<td><?php /* echo $data['item_name']; */ echo $data['item_name']; ?></td>
+										<td><?php echo $data['Current_Stock']; ?></td>
+										
+										<td style="text-align:center"><?php if($open_so_qty > 0){ 
+											echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
+										 }else{ echo "-"; } ?></td>
+										<td style="text-align:center"><?php echo "-"; ?></td>
+										<td style="text-align:center"><?php if($open_po_qty > 0){ 
+											echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 
+										 }else{ echo "-"; } ?></td>
+										 
+										 <td style="text-align:center"><?php if($open_qo_qty > 0){ 
+											echo $this->Html->link(@$open_qo_qty ,'/ItemLedgers/material_indent?status=quotation&id='.@$qotation_id[$item_id],['target' => '_blank']); 
+										 }else{ echo "-"; } ?></td>
+										 
+										 <td style="text-align:center"><?php if($open_mi_qty > 0){ 
+											echo $this->Html->link(@$open_mi_qty ,'/ItemLedgers/material_indent?status=mi&id='.@$mi_id[$item_id],['target' => '_blank']); 
+										 }else{ echo "-"; } ?></td>
+										 <td style="text-align:center">
+										<?php if(@$total_indent < 0){
+												 echo abs(@$total_indent);
+										}else{ echo "-";} ?>
+										</td> 
+										
+										<td style="text-align:center">
+										<?php if(@$data['minimum_stock'] > 0){
+												 echo abs(@$data['minimum_stock']);
+										}else{ echo "-";} ?>
+										</td>
+										
+										<td style="text-align:center">
+											<?php if(@$total_indent || @$data['minimum_stock'] ){
+												if(@$total_indent > 0){
+													echo abs(@$data['minimum_stock']); 
+												}else{
+													echo abs(@$data['minimum_stock']+abs(@$total_indent)); 
+												}
+											}
+													?>
+										
+										</td>
+										 
+										 <td align="center">
+											<label class="hello">
+											
+															<button type="button" id="item<?php echo $item_id;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $item_id; ?>" suggestindent="<?php echo @$total_indent;
+											 ?>"><i class="fa fa-plus"></i></button>
+											</label>
+										</td>
+									
+									
+									</tr>
+							<?php }
 							
 						?>
 						<?php $i++ ;?>
-						<tr class="tr1" row_no='<?php echo @$i; ?>'>
-						<td ><?php echo $i; ?> </td>
-						<td><?php /* echo $data['item_name']; */ echo $data['item_name']; ?></td>
-						<td><?php echo $data['Current_Stock']; ?></td>
-						
-						<td style="text-align:center"><?php if($open_so_qty > 0){ 
-							echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
-						 }else{ echo "-"; } ?></td>
-						<td style="text-align:center"><?php echo "-"; ?></td>
-						<td style="text-align:center"><?php if($open_po_qty > 0){ 
-							echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 
-						 }else{ echo "-"; } ?></td>
-						 
-						 <td style="text-align:center"><?php if($open_qo_qty > 0){ 
-							echo $this->Html->link(@$open_qo_qty ,'/ItemLedgers/material_indent?status=quotation&id='.@$qotation_id[$item_id],['target' => '_blank']); 
-						 }else{ echo "-"; } ?></td>
-						 
-						 
-						 
-						 <td align="center">
-							<label class="hello">
-							
-											<button type="button" id="item<?php echo $item_id;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $item_id; ?>" suggestindent="<?php echo @$total_indent;
-							 ?>"><i class="fa fa-plus"></i></button>
-										
-								
-							
-							</label>
-						</td>
-						
-						
-						</tr>
+						<?php //echo $qty; exit;?>
+
 						<?php }  ?>
 					</tbody>
 				</table>
@@ -191,7 +274,6 @@ $(document).ready(function() {
 		var suggestindent=$(this).attr('suggestindent');
 		var url="<?php echo $this->Url->build(['controller'=>'ItemLedgers','action'=>'addToBucket']); ?>";
 		url=url+'/'+item_id+'/'+suggestindent,
-		alert(url);
 		$.ajax({
 			url: url,
 			type: 'GET',

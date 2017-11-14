@@ -58,14 +58,8 @@ class MaterialIndentsController extends AppController
 	
 	
 	$materialIndents=$this->paginate(
-			$this->MaterialIndents->find()->select(['total_open_rows' => 
-				$this->MaterialIndents->find()->func()->count('MaterialIndentRows.id')])
-					->leftJoinWith('MaterialIndentRows', function ($q) {
-						return $q->where(['MaterialIndentRows.required_quantity >MaterialIndentRows.processed_quantity']);
-					})	
-					->group(['MaterialIndents.id'])
+			$this->MaterialIndents->find()
 					->autoFields(true)
-					->having($having)
 					->where($where)
 					->where(['company_id'=>$st_company_id])
 					->order(['MaterialIndents.id' => 'DESC'])

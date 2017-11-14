@@ -42,6 +42,7 @@ class MaterialIndentsTable extends Table
 		$this->belongsTo('ItemLedgers');
 	   $this->belongsTo('Employees');
 	   $this->belongsTo('ItemBuckets');
+	   //$this->belongsTo('PurchaseOrders');
 	   
         $this->belongsTo('Companies', [
             'foreignKey' => 'company_id',
@@ -56,6 +57,11 @@ class MaterialIndentsTable extends Table
 			'foreignKey' => 'created_by',
 			'propertyName' => 'creator',
 		]);
+		
+		$this->hasMany('PurchaseOrders', [
+            'foreignKey' => 'material_indent_id',
+        ]);
+		
     }
 
     /**
