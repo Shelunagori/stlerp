@@ -51,6 +51,13 @@ class ItemLedgersTable extends Table
 		$this->belongsTo('Grns', [
             'joinType' => 'LEFT'
         ]);
+		
+		$this->belongsTo('Grns', [
+			'className' => 'Grns',
+			'foreignKey' => 'source_id',
+			'propertyName' => 'grn',
+		]);
+		
 		$this->belongsTo('InventoryVouchers');
 		$this->belongsTo('Vendors');
 		$this->belongsTo('Customers');

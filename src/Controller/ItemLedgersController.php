@@ -1692,5 +1692,64 @@ class ItemLedgersController extends AppController
 			}
 		exit;	
 	}
+	
+	public function inventoryDailyReports(){ 
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		$from_date=$this->request->query('From');
+		$to_date=$this->request->query('To');
+		$where =[];
+		if(!empty($from_date)){
+			$From=date("Y-m-d",strtotime($from_date));
+			$where['processed_on >=']=$From;
+		}
+		if(!empty($to_date)){
+			$To=date("Y-m-d",strtotime($to_date));
+			$where['processed_on <=']=$To;
+		}
+		$itemLedgers = $this->ItemLedgers->find()
+						->where($where)
+						->order(['processed_on'=>'DESC'])
+						->contain(['Items'])
+						->where(['ItemLedgers.company_id' => $st_company_id]); 
+		
+		$itemDatas=[];
+		foreach($itemLedgers as $itemLedger){
+			$itemDatas[$itemLedger['source_model'].$itemLedger['source_id'].','.$itemLedger['processed_on'].','.$itemLedger['source_id']][]=$itemLedger;
+			
+		}
+		//pr($itemLedgers->toArray());exit;
+		$serial_nos=[];
+		$voucher_no=[];
+		$sourceData=[];
+		$link=[];
+		foreach($itemDatas as $key=>$itemData){
+			foreach($itemData as $itemDetail){
+				
+				if($itemDetail['source_model']=='Grns')
+				{
+					$grnDetail=$this->ItemLedgers->Grns->find()->where(['Grns.id'=>$itemDetail['source_id']])->contain(['GrnRows'=>['Items','SerialNumbers']])->first();
+					//pr($grnDetail->toArray());
+					$sourceData[$key][] = $grnDetail->grn_rows;
+					/* $serialnoarray=$this->ItemLedgers->Items->SerialNumbers->find()->where(['grn_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
+					// pr($serialnoarray->toArray()); */
+					$grn=$this->ItemLedgers->Grns->find()->where(['Grns.id'=>$itemDetail['source_id']])->first();
+					$voucher_no[$key][]=($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4);
+					//$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
+					
+					$link1 = ['controller'=>'Grns','action' => 'View'];
+					
+					$link[$key]=$link1;
+				}
+			}
+			
+		}
+		/* pr($sourceData);
+	exit; */
+		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
+	}
 }
 
