@@ -1,4 +1,4 @@
-<?php $url_excel="/?".$url;?>
+<?php //$url_excel="/?".$url;?>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -6,7 +6,7 @@
 			<span class="caption-subject font-blue-steel uppercase">Account Statement For Reference Balance</span>
 		</div>
 		<div class="actions">
-			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/Excel-Export-Account-Ref/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+			<?php /* echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/Excel-Export-Account-Ref/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); */ ?>
 		</div>
 <div class="portlet-body form">
 	<form method="GET" >
@@ -56,18 +56,20 @@
 					</tr>
 				</thead>
 				<tbody>
-				<?php $total_debit=0; $total_credit=0; foreach($ReferenceBalances as $ReferenceBalance){  
-					if($ReferenceBalance->credit != $ReferenceBalance->debit){
+				<?php $total_debit=0; $total_credit=0; foreach($ReferenceBalances as $ReferenceBalance){ 
+					if($ReferenceBalance['reference_type']!="On_account"){
+					$payment_terms=$customer_data->payment_terms;
+					$due_date=date('Y-m-d', strtotime($ReferenceBalance['transaction_date']. ' +'. $payment_terms .'days'));
 				?>
 				
 				<tr>
-						<td><?php echo $ReferenceBalance->reference_no; ?></td>
-						<td><?php echo (date('d-m-Y',strtotime($ReferenceBalance->transaction_date))); ?></td>
-						<td><?php echo (date('d-m-Y',strtotime($ReferenceBalance->due_date))); ?></td>
-						<td align="right"><?= $this->Number->format($ReferenceBalance->debit,[ 'places' => 2]); ?></td>
-						<td align="right"><?= $this->Number->format($ReferenceBalance->credit,[ 'places' => 2]);  ?></td>
-						<?php $total_debit+=$ReferenceBalance->debit;
-							  $total_credit+=$ReferenceBalance->credit  ?>
+						<td><?php echo $ReferenceBalance['reference_no']; ?></td>
+						<td><?php echo (date('d-m-Y',strtotime($ReferenceBalance['transaction_date']))); ?></td>
+						<td><?php echo (date('d-m-Y',strtotime($due_date))); ?></td>
+						<td align="right"><?= $this->Number->format($ReferenceBalance['debit'],[ 'places' => 2]); ?></td>
+						<td align="right"><?= $this->Number->format($ReferenceBalance['credit'],[ 'places' => 2]);  ?></td>
+						<?php $total_debit+=$ReferenceBalance['debit'];
+							  $total_credit+=$ReferenceBalance['credit']  ?>
 
 				</tr>
 				<?php } } ?>
@@ -80,9 +82,9 @@
 					<td  align="right" colspan="3">On Account</td>	
 					<?php 
 						$on_acc=0;
-						$closing_balance=0;
+						/* $closing_balance=0;
 						$on_dr=@$ledger_amt['Debit']-@$ref_amt['debit'];
-						$on_cr=@$ledger_amt['Credit']-@$ref_amt['credit'];
+						$on_cr=@$ledger_amt['Credit']-@$ref_amt['credit']; */
 						
 						$on_acc=$on_dr-$on_cr;
 						

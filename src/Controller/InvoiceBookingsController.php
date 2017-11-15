@@ -1163,7 +1163,7 @@ class InvoiceBookingsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-							$ReferenceDetail->transaction_date = date("d-m-Y");
+							$ReferenceDetail->transaction_date =$invoiceBooking->supplier_date;
 							
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 							
@@ -1180,7 +1180,7 @@ class InvoiceBookingsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-						$ReferenceDetail->transaction_date = date("d-m-Y");
+						$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 						if($invoiceBooking->on_account > 0){
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 						}

@@ -589,16 +589,13 @@ class LedgersController extends AppController
 		return $this->response;
 	}
 	public function AccountStatementRefrence (){
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
-		
-		$status=$this->request->query('status');
-		$ledger_account_id=$this->request->query('ledgerid');
-		
 		 
 		$this->viewBuilder()->layout('index_layout');
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
+		$url=$this->request->here(); //pr($url); exit;
+		//$url=parse_url($url,PHP_URL_QUERY);
+		//pr($url); exit;
+		$status=$this->request->query('status');
+		$ledger_account_id=$this->request->query('ledgerid');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $st_year_id = $session->read('st_year_id');
@@ -607,7 +604,7 @@ class LedgersController extends AppController
 		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
 		$from = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		$To = date("Y-m-d"); 
-		$this->set(compact('ledger_account_id'));
+		//$this->set(compact('ledger_account_id'));
 		$status=$this->request->query('status');
 		//pr($ledger_account_id); exit;
 		
@@ -620,7 +617,40 @@ class LedgersController extends AppController
 		$Ledger_Account_data = $this->Ledgers->LedgerAccounts->get($ledger_account_id, [
         'contain' => ['AccountSecondSubgroups'=>['AccountFirstSubgroups'=>['AccountGroups'=>['AccountCategories']]]] ]);
 		
+		if($Ledger_Account_data->source_model=='Customers'){
+			$customer_data = $this->Ledgers->LedgerAccounts->Customers->get($Ledger_Account_data->source_id);
+			//pr($customer_data); exit;
+		}
+		if($Ledger_Account_data->source_model=='Vendors'){
+			$customer_data = $this->Ledgers->Vendors->get($Ledger_Account_data->source_id);
+			//pr($customer_data); exit;
+		}
 		
+		$query = $this->Ledgers->ReferenceDetails->find();
+		$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
+		->where(['ReferenceDetails.ledger_account_id'=>$ledger_account_id])
+		->group(['ReferenceDetails.reference_no'])
+		->autoFields(true);
+		$referenceDetails=$query;
+		$ReferenceBalances=[];
+		$on_dr=0;
+		$on_cr=0;
+		foreach($referenceDetails as $referenceDetail){
+			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
+				$ReferenceBalances[]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type];
+			}
+			
+			if($referenceDetail->reference_type=="On_account"){
+				if($referenceDetail->credit==0){
+					$on_dr+=$referenceDetail->debit;
+				}else{
+					$on_cr+=$referenceDetail->credit;
+				}
+				
+			}
+		}
+		
+		// exit;
 		
 		$ledger=$this->Ledgers->LedgerAccounts->find('list',
 			['keyField' => function ($row) {
@@ -634,9 +664,24 @@ class LedgersController extends AppController
 				}
 				
 			}])->where(['company_id'=>$st_company_id]);
+			//pr($ledger); exit;
 			
-			$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url'));
+		}else{
+			$ledger=$this->Ledgers->LedgerAccounts->find('list',
+			['keyField' => function ($row) {
+				return $row['id'];
+			},
+			'valueField' => function ($row) {
+				if(!empty($row['alias'])){
+					return  $row['name'] . ' (' . $row['alias'] . ')';
+				}else{
+					return $row['name'];
+				}
+				
+			}])->where(['company_id'=>$st_company_id]);
 		}
+		
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr'));
 	}
 	
 	public function excelExportAccountRef(){
@@ -717,6 +762,7 @@ class LedgersController extends AppController
 			$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt'));
 		}
 	}
+	
 	public function AccountStatement (){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
@@ -741,7 +787,7 @@ class LedgersController extends AppController
 			$transaction_to_date= date('Y-m-d', strtotime($To));
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));
 			$company = $this->Companies->get($st_company_id);
-			//pr($company);exit;
+		//	pr($Ledger_Account_data);exit;
 			if($from == date("d-m-Y",strtotime($company->accounting_book_date))){
 				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
 				$opening_balance_ar=[];
@@ -769,7 +815,7 @@ class LedgersController extends AppController
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
 				})->order(['transaction_date' => 'DESC']);
-				//pr($Ledgers->toArray()); exit;
+				//pr($opening_balance_ar); exit;
 		
 			$url_link=[];
 			foreach($Ledgers as $ledger){
@@ -784,7 +830,7 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Receipt Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
-				}else if($ledger->voucher_source=="Invoice"){ 
+				}else if($ledger->voucher_source=="Invoice"){  //pr($ledger->voucher_source); exit;
 					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
 					if($inq->sale_tax_id==0){
 						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id, [
@@ -795,8 +841,6 @@ class LedgersController extends AppController
 							'contain' => ['Customers','SaleTaxes']
 						]);
 					}
-					
-					
 				}else if($ledger->voucher_source=="Invoice Booking"){
 					$ib=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
 					if($ib->cst_vat=='vat'){

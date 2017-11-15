@@ -506,10 +506,10 @@ if(!empty($copy))
 						<label class="control-label">Address  <span class="required" aria-required="true">*</span></label>
 						<?php 
 						if($sales_id){
-							echo $this->Form->input('customer_address', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Address','value'=>$salesOrder->customer_address]); 
+							echo $this->Form->input('dispatch_address', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Address','value'=>$salesOrder->dispatch_address]); 
 							
 						}else{
-							echo $this->Form->input('customer_address', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Address']); 
+							echo $this->Form->input('dispatch_address', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Address']); 
 						}
 						
 					?>
