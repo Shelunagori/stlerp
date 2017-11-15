@@ -53,7 +53,7 @@
 					$row_count=count($itemData);
 					?>
 					
-						<?php $flag=0; foreach($itemData as $itemData) {  ?>
+						<?php $i=0;$flag=0; foreach($itemData as $itemData) {  ?>
 						<tr>
 						<?php if($flag==0){?>
 						<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>"><?php echo ++$srn; ?> </td>
@@ -89,7 +89,7 @@
 						} //echo $srn; ?>
 						</td>
 						</tr>
-						<?php } ?>
+						<?php $i++;} ?>
 						
 					
 					<?php } ?>

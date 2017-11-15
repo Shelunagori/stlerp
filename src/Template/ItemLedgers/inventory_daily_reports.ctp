@@ -50,47 +50,58 @@
 				<tbody>
 					<?php $srn=0; 
 					
-					foreach ($sourceData as $key=>$itemData){ 
-					$key = explode(',',$key);
+					foreach ($sourceData as $key=>$itemData)
+					{ 
+					//$key = explode(',',$key);
 					$row_count=count($itemData);
 					?>
 					
-						<?php $flag=0; foreach($itemData as $itemData) {  ?>
-						<tr>
-						<?php if($flag==0){?>
-						<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>"><?php echo ++$srn; ?> </td>
-						<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>"><?php echo date("d-m-Y",strtotime($key[1])); ?></td>
+						<?php $flag=0;$item_condition=0;
+						foreach($itemData as $itemData) 
+						{  
 						
-						<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>">
-							<?php 
-							$location='/'.$link[$key[0]]['controller'].'/'.$link[$key[0]]['action'].'/'.$key[2];
+						?>
+							<tr>
+							<?php if($flag==0){?>
+							<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>"><?php echo ++$srn; ?> </td>
+							<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>"><?php if(!empty($itemData->processed_on)){echo date("d-m-Y",strtotime($itemData->processed_on));} ?></td>
 							
-							echo $this->Html->link($voucher_no[$key[0]][0],$location,array('target'=>'_blank'));?>
-						</td>
-						
-						
-						
-						<?php $flag=1; }?>
-						<td style="vertical-align: top !important;"><?php echo $itemData->item->name; ?></td>
-						<?php if($key[3]=="In"){ ?>
-						<td style="vertical-align: top !important;"><?php echo $key[4]; ?></td>
-						<?php }else{ ?>
-						<td style="vertical-align: top !important;"><?php echo "-"; ?></td>
-						<?php } ?>
-						<?php if($key[3]=="Out"){ ?>
-						<td><?php echo $key[4]; ?></td>
-						<?php }else{ ?>
-						<td><?php echo "-"; ?></td>
-						<?php } ?>
-						
-						<td width="30px">
-						<?php foreach($itemData->serial_numbers as $sr){ 
-							echo $no=$sr->name; echo "</br>";
-							//$srn=implode(',', $no);
-						} //echo $srn; ?>
-						</td>
-						</tr>
-						<?php } ?>
+							<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>">
+								<?php 
+								$location='/'.$link[$key]['controller'].'/'.$link[$key]['action'].'/'.$key;
+								
+								echo $this->Html->link($voucher_no[$key][0],$location,array('target'=>'_blank'));?>
+							</td>
+							
+							
+							
+							<?php $flag=1; } 
+							if($item_condition>0){
+							?>
+							<td style="vertical-align: top !important;" ><?php 
+							
+							echo $itemData->item->name; ?></td>
+							<?php  if($itemData->in_out=="In"){ ?>
+							<td style="vertical-align: top !important;"><?php echo @$itemData->quantity; ?></td>
+							<?php }else{ ?>
+							<td style="vertical-align: top !important;"><?php echo "-"; ?></td>
+							<?php } ?>
+							<?php if($itemData->in_out=="Out"){ ?>
+							<td><?php echo @$itemData->quantity; ?></td>
+							<?php }else{ ?>
+							<td><?php echo "-"; ?></td>
+							<?php } ?>
+							
+							<td width="30px">
+							<?php 
+							if(!empty($itemData->serial_numbers)){
+							foreach($itemData->serial_numbers as $sr){ 
+								echo $no=$sr->name; echo "</br>";
+								
+							}} ?>
+							</td><?php } ?>
+							</tr>
+						<?php $item_condition++;} ?>
 						
 					
 					<?php } ?>
