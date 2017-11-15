@@ -68,7 +68,7 @@
 							
 							<td style="vertical-align: top !important;" rowspan="<?php echo $row_count; ?>">
 								<?php 
-								$location='/'.$link[$key]['controller'].'/'.$link[$key]['action'].'/'.$key;
+								$location='/'.$link[$key]['controller'].'/'.$link[$key]['action'].'/'.$itemData->source_id;
 								
 								echo $this->Html->link($voucher_no[$key][0],$location,array('target'=>'_blank'));?>
 							</td>
@@ -76,12 +76,12 @@
 							
 							
 							<?php $flag=1; } 
-							if($item_condition>0){
+							if($item_condition<1){
 							?>
 							<td style="vertical-align: top !important;" ><?php 
 							
 							echo $itemData->item->name; ?></td>
-							<?php  if($itemData->in_out=="In"){ ?>
+							<?php } if($itemData->in_out=="In"){ ?>
 							<td style="vertical-align: top !important;"><?php echo @$itemData->quantity; ?></td>
 							<?php }else{ ?>
 							<td style="vertical-align: top !important;"><?php echo "-"; ?></td>
@@ -90,7 +90,7 @@
 							<td><?php echo @$itemData->quantity; ?></td>
 							<?php }else{ ?>
 							<td><?php echo "-"; ?></td>
-							<?php } ?>
+							<?php }?>
 							
 							<td width="30px">
 							<?php 
@@ -99,7 +99,7 @@
 								echo $no=$sr->name; echo "</br>";
 								
 							}} ?>
-							</td><?php } ?>
+							</td><?php  ?>
 							</tr>
 						<?php $item_condition++;} ?>
 						

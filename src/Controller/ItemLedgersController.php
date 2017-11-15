@@ -1746,8 +1746,8 @@ class ItemLedgersController extends AppController
 			}
 			
 		}
-		pr($sourceData);
-		exit;
+		//pr($sourceData);
+		//exit;
 	
 		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
 	}
