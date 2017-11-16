@@ -76,8 +76,7 @@ class SerialNumbersController extends AppController
 	
 	public function getSerialNumberListIV(){
 		$iv_row_id=$this->request->query('iv_row_id');
-		$sr_nos=$this->request->query('sr_nos');
-		$sr_no=explode(',',$sr_nos);
+		$item_id=$this->request->query('item_id');
 		
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -85,7 +84,7 @@ class SerialNumbersController extends AppController
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
+        /* $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
 		
 		$totalInCase = $query->newExpr()
 			->addCase(
@@ -105,18 +104,26 @@ class SerialNumbersController extends AppController
 			'total_in' => $query->func()->count($totalInCase),
 			'total_out' => $query->func()->count($totalOutCase),'id','item_id'
 		])
-		->where(['company_id'=>$st_company_id,'SerialNumbers.iv_row_id'=>$iv_row_id])
+		->where(['company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id])
 		->group('SerialNumbers.name')
 		->autoFields(true);
-		$SerialNumbers =$query->toArray();
+		$SerialNumbers =$query->toArray(); */
 		
+		$query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
+		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'iv_row_id'=>$iv_row_id,'status'=>'In']);
+		$SerialNumbers_in = $query->toArray();
+		
+		foreach($SerialNumbers_in as $sr_in) {
+			$options[]=$sr_in;
+		}
+		/* 
 		foreach($SerialNumbers as $serialnumbers){
-			if($serialnumbers->total_in > $serialnumbers->total_out){
+			if($serialnumbers->total_in > $serialnumbers->total_out || ){
 				$options[]=$serialnumbers->name;
 				//$values=$sr_nos;
 			}
-		}
-		//pr($values);exit;
+		} */
+		
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
 		
@@ -162,10 +169,10 @@ class SerialNumbersController extends AppController
 		$SerialNumbers_out = $query->toArray();
 		
 		foreach($SerialNumbers_out as $sr_out) {
-			$values=$sr_out;
+			$values[]=$sr_out;
 			$options[]=['text' =>$sr_out, 'value' => $sr_out];
 		}
-		
+		//pr($options);exit;
 		
 		foreach($SerialNumbers as $serialnumbers){
 			if(($serialnumbers->total_in > $serialnumbers->total_out)){

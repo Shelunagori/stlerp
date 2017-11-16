@@ -489,10 +489,7 @@ class QuotationsController extends AppController
 			   else
 				{
 					$chkdate = 'Not Found';	
-				}
-
-
-			
+				}			
 			if ($this->request->is(['patch', 'post', 'put'])) {
 				$this->request->data["finalisation_date"]=date("Y-m-d",strtotime($this->request->data["finalisation_date"]));
 				$quotation = $this->Quotations->patchEntity($quotation, $this->request->data);
@@ -503,12 +500,11 @@ class QuotationsController extends AppController
 				//$quotation->company_id=$st_company_id;
 				
 				if ($this->Quotations->save($quotation)) {
-					
-					
-					$this->Flash->success(__('The quotation has been saved.'));
+				     
+					 $this->Flash->success(__('The quotation has been saved.'));
 
 					return $this->redirect(['action' => 'confirm/'.$quotation->id]);
-				} else { pr($quotation);exit;
+				} else { 
 					$this->Flash->error(__('The quotation could not be saved. Please, try again.'));
 				}
 			}

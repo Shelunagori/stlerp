@@ -43,13 +43,22 @@ class IvsTable extends Table
             'foreignKey' => 'invoice_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('ItemLedgers');
+		$this->belongsTo('JobCards');
         $this->belongsTo('Companies', [
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'
         ]);
         $this->hasMany('IvRows', [
-            'foreignKey' => 'iv_id'
+            'foreignKey' => 'iv_id',
+			'saveStrategy' => 'replace'
         ]);
+		
+		$this->belongsTo('Creator', [
+			'className' => 'Employees',
+			'foreignKey' => 'created_by',
+			'propertyName' => 'creator',
+		]);
 		
 		$this->belongsTo('Companies', [
 			'foreignKey' => 'company_id',

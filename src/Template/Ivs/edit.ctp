@@ -57,7 +57,9 @@
 								</td>
 								<td><?= h($iv_row->quantity); ?></td>
 								<td>
-									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberListIV?iv_row_id='.$iv_row->id); ?>
+								<?php if($iv_row->item->item_companies[0]->serial_number_enable == '1'){ ?>
+									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberListIV?iv_row_id='.$iv_row->id.'&item_id='.$iv_row->item_id); ?>
+								<?php } ?>
 								</td>
 								<td colspan="3">
 									<table class="table subTable">
@@ -68,18 +70,20 @@
 											<th></th>
 										</thead>
 										<tbody class="subTbody">
-											<?php foreach($iv_row->iv_row_items as $iv_row_items){  ?>
-												<tr>
+											<?php  foreach($iv_row->iv_row_items as $iv_row_items){  ?>
+												<tr class='tr1 SampleTable'>
 													<td>
 														<?php echo $this->Form->input('id',['type'=>'hidden','label'=>false,'class'=>'form-control ivrowitemsId','value'=>$iv_row_items->id])?>
 														
-														<?php echo $this->Form->input('item_id', ['options' => $Items,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$iv_row_items->item_id]); ?>
+														<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$iv_row_items->item_id]); ?>
 													</td>
 													<td>
 														<?php echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx','value'=>$iv_row_items->quantity]); ?>
 													</td>
 													<td>
-														<?php echo $this->requestAction('/SerialNumbers/getSerialNumberListIVItemsEdit?iv_row_items='.$iv_row_items->id.'&item_id='.$iv_row_items->item_id); ?>
+													<?php if($iv_row_items->item->item_companies[0]->serial_number_enable == '1'){ ?>
+															<?php echo $this->requestAction('/SerialNumbers/getSerialNumberListIVItemsEdit?iv_row_items='.$iv_row_items->id.'&item_id='.$iv_row_items->item_id); ?>
+													<?php } ?>		
 													</td>
 													<td>
 														<a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
@@ -113,7 +117,8 @@
 	<tbody>
 		<tr class="tr1 SampleTable" >
 			<td>
-			<?php echo $this->Form->input('item_id', ['options' => $Items,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item']); ?>
+			
+			<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item']); ?>
 			</td>
 			<td>
 			<?php echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx']); ?>
@@ -178,19 +183,28 @@ $(document).ready(function() {
 		});
 	} */
 	
+	
+	
 	$('.select_item ').die().live("change",function() {
 		var t=$(this);
 		var row_no=t.closest('.MainTable tbody.MainTbody tr.MainTr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val(); 
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
 		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
 		url1=url1+'?item_id='+select_item_id,
 		$.ajax({
 			url: url1
 		}).done(function(response) { 
-		$(t).closest('tr').find('td:nth-child(3)').html(response);
-		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
-		rename_rows_name();
+		if(serial_number_enable == 1){
+			$(t).closest('tr').find('td:nth-child(3)').html(response);
+			$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+			rename_rows_name();
 			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+		 }else{
+			 
+			 $(t).closest('tr').find('td:nth-child(3)').html('');
+			 $(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+		 }
   			
 		});
 	});
@@ -216,6 +230,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
 			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
 			$(this).find('table.subTable tbody.subTbody tr').each(function(){ 
+				
 				$(this).find("td:nth-child(1) input.ivrowitemsId").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-id"});
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
@@ -232,16 +247,18 @@ $(document).ready(function() {
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {
+		rename_rows_name();
 		validate_serial();
     });
 	
 	function validate_serial(){
-		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){ 
-			var OriginalQty=$(this).find('table.subTable tbody.subTbody tr td:nth-child(2) input').val();
+		$(".MainTable tbody.MainTbody tr.MainTr table.subTable tbody.subTbody tr").each(function(){ 
+			var OriginalQty=$(this).find('td:nth-child(2) input').val();
 				Quantities = OriginalQty.split('.'); 
 				qty=Quantities[0];
-			if($(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').length>0){
-				$(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').attr('test',qty).rules('add', {
+				
+			if($(this).find('td:nth-child(3) select').length>0){
+				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,
 							minlength: qty,
 							maxlength: qty,

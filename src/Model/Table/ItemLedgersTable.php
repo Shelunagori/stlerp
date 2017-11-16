@@ -86,7 +86,7 @@ class ItemLedgersTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->integer('quantity')
+            ->decimal('quantity')
             ->requirePresence('quantity', 'create')
             ->notEmpty('quantity');
 

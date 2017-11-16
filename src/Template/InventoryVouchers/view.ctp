@@ -20,18 +20,18 @@ margin-bottom: 0;
     margin: 0 5px 0 20px;  /* this affects the margin in the printer settings */
 }
 </style>
-<?php //pr($inventoryVoucher->inventory_voucher_rows); exit;?>
+<?php pr($iv); exit;?>
 <a class="btn  blue hidden-print margin-bottom-5 pull-right" onclick="javascript:window.print();">Print <i class="fa fa-print"></i></a>
 <div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 70%;font-size: 12px;" class="maindiv">
 <table width="100%" class="divHeader" border="0">
 <tr>
-    <td><?php echo $this->Html->image('/logos/'.$inventoryVoucher->company->logo, ['width' => '48%']); ?></td>
+    <td><?php echo $this->Html->image('/logos/'.$iv->company->logo, ['width' => '48%']); ?></td>
     <td align="center" width="30%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">INVENTORY VOUCHER</div></td>
 	<td align="right" width="40%" style="font-size: 12px;">
-			<span style="font-size: 14px;"><?= h($inventoryVoucher->company->name) ?></span>
-			<span><?= $this->Text->autoParagraph(h($inventoryVoucher->company->address)) ?></span>
-			<span> <i class="fa fa-phone" aria-hidden="true"></i> <?= h($inventoryVoucher->company->landline_no) ?></span> |
-			<?= h($inventoryVoucher->company->mobile_no) ?>
+			<span style="font-size: 14px;"><?= h($iv->company->name) ?></span>
+			<span><?= $this->Text->autoParagraph(h($iv->company->address)) ?></span>
+			<span> <i class="fa fa-phone" aria-hidden="true"></i> <?= h($iv->company->landline_no) ?></span> |
+			<?= h($iv->company->mobile_no) ?>
 			</td>
 	
 </tr>
@@ -46,13 +46,13 @@ margin-bottom: 0;
 					<td><b>Inventory Voucher No</b></td>
 					<td width="20%" align="center">:</td>
 					<td>
-					<?= h('IV/'.str_pad($inventoryVoucher->iv_number, 4, '0', STR_PAD_LEFT)) ?>
+					<?= h('IV/'.str_pad($iv->voucher_no, 4, '0', STR_PAD_LEFT)) ?>
 					</td>
 				</tr>
 				<tr>
 					<td><b>Invoice No</b></td>
 						<td width="20%" align="center">:</td>
-						<td><?= h($inventoryVoucher->invoice->in1.'/IN'.str_pad($inventoryVoucher->invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$inventoryVoucher->invoice->in3.'/'.$inventoryVoucher->invoice->in4) ?>
+						<td><?= h($iv->invoice->in1.'/IN'.str_pad($iv->invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$iv->invoice->in3.'/'.$iv->invoice->in4) ?>
 					</td>
 				</tr>
 			</table>
@@ -63,12 +63,12 @@ margin-bottom: 0;
 					<tr>
 						<td><b>Transaction Date</b></td>
 						<td width="20%" align="center">:</td>
-						<td><?php  if(!empty($inventoryVoucher->transaction_date)){ echo date("d-m-Y",strtotime($inventoryVoucher->transaction_date));}else{echo '-';} ?></td>
+						<td><?php  if(!empty($iv->transaction_date)){ echo date("d-m-Y",strtotime($iv->transaction_date));}else{echo '-';} ?></td>
 					</tr>
 					<tr>
 						<td><b>Created On</b></td>
 						<td width="20%" align="center">:</td>
-						<td><?php  if(!empty($inventoryVoucher->created_on)){ echo date("d-m-Y",strtotime($inventoryVoucher->created_on));}else{echo '-';} ?></td>
+						<td><?php  if(!empty($iv->created_on)){ echo date("d-m-Y",strtotime($iv->created_on));}else{echo '-';} ?></td>
 					</tr>
 				</table>
 			</td>
@@ -82,21 +82,21 @@ margin-bottom: 0;
 				<tr>
 					<td width="20%"><b>Customer Name</b></td>
 					<td width="5%">:</td>
-					<td width="72%"><?php echo $inventoryVoucher->invoice->customer->customer_name ."(". $inventoryVoucher->invoice->customer->alias.")"; ?></td>
+					<td width="72%"><?php echo $iv->invoice->customer->customer_name ."(". $iv->invoice->customer->alias.")"; ?></td>
 				</tr>
 			</table>
 	   </td>
 	</tr>
 </table>	
 </br>
-<?php if(!empty($inventoryVoucher)){ ?>
+<?php if(!empty($iv)){ ?>
 <div class="portlet-body form">
 <table class="table table-bordered table-condensed">
 	<thead> 
 		<th width="30%"></th>
 		<th>
 		<?php $status=0;
-					foreach($inventoryVoucher->inventory_voucher_rows as $inventory_voucher_row ){
+					foreach($iv->inventory_voucher_rows as $inventory_voucher_row ){
 						if( $inventory_voucher_row->item->item_companies[0]->serial_number_enable == 1) {
 						$status=1;
 						}
@@ -176,7 +176,7 @@ margin-bottom: 0;
 					<td valign="top" align="left" width="10%"><b>Narration</b></td>
 					<td  width="2%" align="center">:</td>
 					<td>
-					<?= h($inventoryVoucher->narration) ?>
+					<?= h($iv->narration) ?>
 					</td>
 				</tr>
 			</table></br></br></br>
@@ -185,13 +185,13 @@ margin-bottom: 0;
 		<table >
 			<tr>
 			    <td align="center">
-				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($inventoryVoucher->company->name)?><br/></span>
+				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($iv->company->name)?><br/></span>
 				<?php 
-				 echo $this->Html->Image('/signatures/'.$inventoryVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
+				 echo $this->Html->Image('/signatures/'.$iv->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 				 ?></br>
 				<span style="font-size: 14px;font-weight: bold;">Authorised Signatory</span>
 				</br>
-				<span style="font-size:14px;"><?= h($inventoryVoucher->creator->name) ?></span><br/>
+				<span style="font-size:14px;"><?= h($iv->creator->name) ?></span><br/>
 				</td>
 			</tr>
 		</table>

@@ -1340,6 +1340,7 @@ class InvoicesController extends AppController
 				
 				
 			}else{ 
+			
 				$ItemSerialNumbers =$this->Invoices->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
 				
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;

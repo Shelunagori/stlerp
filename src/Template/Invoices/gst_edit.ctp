@@ -1046,6 +1046,7 @@ $(document).ready(function() {
 		$("table.main_ref_table tbody").append(tr);
 		rename_ref_rows();
 	}
+	
 	$('.ref_type').live("change",function() {
 		var current_obj=$(this);
 		

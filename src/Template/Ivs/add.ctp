@@ -71,7 +71,20 @@
 											<th></th>
 										</thead>
 										<tbody class="subTbody">
-										
+											<?php foreach($jobcardrows as $jobcardrow){ ?> 
+											 <tr class="tr1 SampleTable">
+												<td>
+													<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$jobcardrow->item_id]); ?>
+												</td>
+												<td>
+													<?php echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx','value'=>$jobcardrow->quantity]); ?>
+												</td>	
+												<td></td>
+												<td>
+													<a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
+												</td>
+											 </tr>
+											<?php } ?>
 										</tbody>
 									</table>
 								</td>
@@ -98,7 +111,7 @@
 	<tbody>
 		<tr class="tr1 SampleTable" >
 			<td>
-			<?php echo $this->Form->input('item_id', ['options' => $Items,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item']); ?>
+			<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item']); ?>
 			</td>
 			<td>
 			<?php echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx']); ?>
@@ -121,11 +134,7 @@ $(document).ready(function() {
 		errorElement: 'span', //default input error message container
 		errorClass: 'help-block help-block-error', // default input error message class
 		focusInvalid: true, // do not focus the last invalid input
-		rules: {
-			item_serial_numbers:{
-				required: true,
-			}
-		},
+		
 	});
 	
 	$('.addrow').die().live("click",function() {
@@ -149,7 +158,7 @@ $(document).ready(function() {
 			var OriginalQtyy=$(this).find('.quantity').val();
 				Quantitiess = OriginalQtyy.split('.'); 
 				Qty=Quantitiess[0];
-			if(serial_number_enable){
+			if(serial_number_enable == 1){
 				var p=1;
 				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
 				for (i = 0; i < Qty; i++) {
@@ -163,20 +172,51 @@ $(document).ready(function() {
 		});
 	}
 	
-	$('.select_item ').die().live("change",function() {
+	
+	$('.select_item').each(function() {
 		var t=$(this);
 		var row_no=t.closest('.MainTable tbody.MainTbody tr.MainTr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val(); 
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
 		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
 		url1=url1+'?item_id='+select_item_id,
 		$.ajax({
 			url: url1
 		}).done(function(response) { 
-		$(t).closest('tr').find('td:nth-child(3)').html(response);
-		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
-		rename_rows_name();
+		if(serial_number_enable == 1){
+			$(t).closest('tr').find('td:nth-child(3)').html(response);
+			$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+			rename_rows_name();
 			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
-  			
+		 }else{
+			 
+			 $(t).closest('tr').find('td:nth-child(3)').html('');
+			 $(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+		 }
+		});
+	});
+	
+	
+	$('.select_item').die().live("change",function() {
+		var t=$(this);
+		var row_no=t.closest('.MainTable tbody.MainTbody tr.MainTr').attr('row_no');
+		var select_item_id=$(this).find('option:selected').val(); 
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
+		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
+		url1=url1+'?item_id='+select_item_id,
+		$.ajax({
+			url: url1
+		}).done(function(response) { 
+		if(serial_number_enable == 1){
+			$(t).closest('tr').find('td:nth-child(3)').html(response);
+			$(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+			rename_rows_name();
+			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+		 }else{
+			 
+			 $(t).closest('tr').find('td:nth-child(3)').html('');
+			 $(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
+		 }
 		});
 	});
 	
@@ -215,16 +255,18 @@ $(document).ready(function() {
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {
+		rename_rows_name();
 		validate_serial();
     });
 	
 	function validate_serial(){
-		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){ 
-			var OriginalQty=$(this).find('table.subTable tbody.subTbody tr td:nth-child(2) input').val();
+		$(".MainTable tbody.MainTbody tr.MainTr table.subTable tbody.subTbody tr").each(function(){ 
+			var OriginalQty=$(this).find('td:nth-child(2) input').val();
 				Quantities = OriginalQty.split('.'); 
 				qty=Quantities[0];
-			if($(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').length>0){
-				$(this).find('table.subTable tbody.subTbody tr td:nth-child(3) select').attr('test',qty).rules('add', {
+				
+			if($(this).find('td:nth-child(3) select').length>0){
+				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,
 							minlength: qty,
 							maxlength: qty,

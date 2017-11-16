@@ -20,7 +20,6 @@ margin-bottom: 0;
     margin: 0 5px 0 20px;  /* this affects the margin in the printer settings */
 }
 </style>
-<?php //pr($inventoryVoucher->inventory_voucher_rows); exit;?>
 <a class="btn  blue hidden-print margin-bottom-5 pull-right" onclick="javascript:window.print();">Print <i class="fa fa-print"></i></a>
 <div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 70%;font-size: 12px;" class="maindiv">
 <table width="100%" class="divHeader" border="0">
@@ -65,6 +64,11 @@ margin-bottom: 0;
 						<td width="20%" align="center">:</td>
 						<td><?php  if(!empty($iv->transaction_date)){ echo date("d-m-Y",strtotime($iv->transaction_date));}else{echo '-';} ?></td>
 					</tr>
+					<!--<tr>
+						<td><b>Created On</b></td>
+						<td width="20%" align="center">:</td>
+						<td><?php  if(!empty($iv->created_on)){ echo date("d-m-Y",strtotime($iv->created_on));}else{echo '-';} ?></td>
+					</tr>-->
 				</table>
 			</td>
 	</tr>
@@ -88,14 +92,16 @@ margin-bottom: 0;
 <div class="portlet-body form">
 <table class="table table-bordered table-condensed">
 	<thead> 
-		<th width="30%"></th>
+		<th width="30%" colspan='2'><b>Production</b></th>
+		
 		<th>
-		<?php $status=0;
+		<?php $status=0;$status1=0;
 					foreach($iv->iv_rows as $iv_row ){
 						if( $iv_row->item->item_companies[0]->serial_number_enable == 1) {
 						$status=1;
 						}
 					}
+					
 					?>
 			<table width="97%" align="center">
 				<tr>
@@ -110,49 +116,61 @@ margin-bottom: 0;
 	</thead>
 	
 	<tbody>
-		<?php foreach ($iv->invoice->invoice_rows as $invoice_row): 
-       if($invoice_row->inventory_voucher_applicable=="Yes"){
+		<?php foreach ($iv->iv_rows as $iv_row): 
        ?>
 		<tr>
 			<td valign="top">
-			<b><?= $invoice_row->item->name ?> ( <?= h($invoice_row->quantity) ?> )</b>
+			<b><?= $iv_row->item->name ?> ( <?= h($iv_row->quantity) ?> )</b>
+			
+			
+				<?php if($status==1) {  if(!empty($iv_row->item->item_companies[0]->serial_number_enable)){
+							if($iv_row->item->item_companies[0]->serial_number_enable == 1) { ?>
+							<td width="10%"><table>
+							<?php foreach ($iv_row->item->serial_numbers as  $serial_number){ 
+							if($serial_number->iv_row_id == $iv_row->id){ ?>
+							<tr>
+								<td ><?php echo $serial_number->name ?></td>
+							</tr>
+							<?php }} ?>
+							</table>
+							</td>
+				<?php }}} ?>
+			
+			
 			</td>
 			<td>
 				<table width="100%">
-					<?php foreach($iv->iv_rows as $iv_rows): ?> 
-					<?php if($iv_rows->left_item_id == $invoice_row->item->id){ ?>
+					<?php foreach($iv_row->iv_row_items as $iv_row_item): ?> 
 					<tr>
-						<td width="30%"><?= $iv_rows->item->name?></td>
-						<?php if($status==1) {  if(!empty($iv_rows->item->item_companies[0]->serial_number_enable)){
-							if($iv_rows->item->item_companies[0]->serial_number_enable == 1) { ?>
-							<td width="50%"><table>
-							<?php foreach ($iv_rows->item->item_serial_numbers as  $item_serial_number){ 
-							if($item_serial_number->iv_invoice_id == $iv_rows->invoice_id){ ?>
-							<tr>
-								<td ><?php echo $item_serial_number->serial_no ?></td>
-							</tr>
-							<?php }} ?>
-							</table>
-							</td>
-							<?php }}else{  ?>
-							<td><table>
-							<?php foreach ($iv_rows->item->item_serial_numbers as  $item_serial_number){ 
-							if($item_serial_number->in_inventory_voucher_id == $iv_rows->inventory_voucher_id){ ?>
-							<tr>
+						<td width="30%">
+							<?= $iv_row_item->item->name?>
+						</td>
+						<?php if(!empty($iv_row_item->item->item_companies[0]->serial_number_enable)){
+							if($iv_row_item->item->item_companies[0]->serial_number_enable == 1) { ?>
+								<td width="50%">
+									<table>
+										<?php foreach ($iv_row_item->item->serial_numbers as  $serial_number){ 
+											if($serial_number->iv_row_items == $iv_row_item->id){ ?>
+												<tr>
+													<td ><?php echo $serial_number->name ?></td>
+												</tr>
+											<?php }else{ ?>
+												<tr><td></td></tr>
+											<?php }} ?>
+									</table>
+								</td>
+								<?php }else{ ?>
+								<td >-</td>
+								<?php }}  else{ ?> 
 								<td>-</td>
-							</tr>
-							<?php }} ?>
-							</table>
-							</td>
-							<?php }} ?>
-
-						<td width="8%" ><?= $iv_rows->quantity?></td>
+								<?php } ?>
+						<td width="8%" ><?= $iv_row_item->quantity?></td>
 					</tr>
-					<?php } endforeach; ?>
+					<?php  endforeach; ?>
 				</table>
 			</td>
 		</tr>
-		<?php } endforeach; ?>
+		<?php  endforeach; ?>
 	</tbody>
 	
 </table>
