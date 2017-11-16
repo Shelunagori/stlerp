@@ -35,7 +35,7 @@ class IvsController extends AppController
 			$where['Invoices.in2 LIKE']=$invoice_no;
 		}
 		if(!empty($iv_no)){
-			$where['Ivs.iv_number LIKE']=$iv_no;
+			$where['Ivs.voucher_no LIKE']=$iv_no;
 		}
 		if(!empty($customer)){
 			$where['Customers.customer_name LIKE']='%'.$customer.'%';
