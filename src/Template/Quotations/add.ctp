@@ -321,7 +321,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 						<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
 							<div class="modal-dialog">
 								<div class="modal-content">
-									<div class="modal-body" >
+									<div class="modal-body">
 										
 									</div>
 									<div class="modal-footer">

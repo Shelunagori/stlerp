@@ -49,16 +49,14 @@
 							<?php foreach($Invoice->invoice_rows as $invoice_row){ ?>
 							<tr class="MainTr" row_no='<?php echo @$invoice_row->id; ?>'>
 								<td>
-									<input type="hidden" value="<?php echo $invoice_id; ?>" class="invoice_row_id"/>
+									
 									<input type="hidden" value="<?php echo $invoice_row->id; ?>" class="invoice_row_id"/>
 									<input type="hidden" value="<?php echo $invoice_row->item_id; ?>" class="item_id"/>
 									<input type="hidden" value="<?php echo $invoice_row->quantity; ?>" class="quantity"/>
 									<input type="hidden" value="<?php echo $invoice_row->item->item_companies[0]->serial_number_enable; ?>" class="serial_number"/>
 
-									<?php foreach($item_display as $item_name){ ?>
-										<?= h($item_name); 
-										}
-									?>
+										<?= h($item_display[$invoice_row->id]); ?>
+										
 								</td>
 								<td><?= h($invoice_row->quantity); ?></td>
 								<td></td>
@@ -163,7 +161,7 @@ $(document).ready(function() {
 				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
 				for (i = 0; i < Qty; i++) {
 					
-					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers][]" placeholder="serial number '+p+' " id="sr_no'+r+'" />');
+					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers][]" placeholder="serial number '+p+' " required id="sr_no'+r+'" />');
 					p++;
 					r++;
 					rename_rows_name();
@@ -193,6 +191,10 @@ $(document).ready(function() {
 			 $(t).closest('tr').find('td:nth-child(3)').html('');
 			 $(t).closest('tr').find('td:nth-child(3) select').attr({name:"iv_rows["+row_no+"][iv_row_items]["+row_no+"][serial_numbers][]", id:"iv_rows-"+row_no+"-iv_row_items"+row_no+"-serial_numbers"});
 		 }
+		 
+		 	rename_rows_name();
+			validate_serial(); 
+		 
 		});
 	});
 	
@@ -238,8 +240,12 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1) input.invoice_row_id").attr({name:"iv_rows["+q+"][invoice_row_id]", id:"iv_rows-"+q+"-invoice_row_id"});
 			$(this).find("td:nth-child(1) input.item_id").attr({name:"iv_rows["+q+"][item_id]", id:"iv_rows-"+q+"-item_id"});
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
-			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
-			$(this).find('table.subTable tbody.subTbody tr').each(function(){
+			
+			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {
+							required: true
+					});
+			
+			$(this).find('table.subTable tbody.subTbody tr').each(function(){ 
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
 				$(this).find("td:nth-child(2) input").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][quantity]", id:"iv_rows-"+q+"-iv_row_items"+i+"-quantity"}).rules('add', {
@@ -259,13 +265,16 @@ $(document).ready(function() {
 		validate_serial();
     });
 	
-	function validate_serial(){
+	
+
+
+	function validate_serial(){ 
 		$(".MainTable tbody.MainTbody tr.MainTr table.subTable tbody.subTbody tr").each(function(){ 
 			var OriginalQty=$(this).find('td:nth-child(2) input').val();
 				Quantities = OriginalQty.split('.'); 
-				qty=Quantities[0];
-				
-			if($(this).find('td:nth-child(3) select').length>0){
+				qty=Quantities[0]; 
+				//var a =$(this).find('td:nth-child(3) select').length; alert(a);
+			if($(this).find('td:nth-child(3) select').length > 0){ 
 				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,
 							minlength: qty,

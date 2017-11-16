@@ -213,7 +213,7 @@
 								 
 							</td>
 							<td width="100">
-								<?php echo $this->Form->input('quotation_rows['.$q.'][quantity]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => $quotation_row->quantity,'required','min'=>1]); ?>
+								<?php echo $this->Form->input('quotation_rows['.$q.'][quantity]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => $quotation_row->quantity,'required','min'=>0.01]); ?>
 								
 							</td>
 							<td width="130">
@@ -224,11 +224,7 @@
 							
 							</td>
 							<td  width="70"><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-							<?php if(@$quotation_qty[$quotation_row->id] > 0){ ?>
-							
-							<?php }else{ ?> 
 							<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
-							<?php } ?>
 							</td>
 						</tr>
 						<tr class="tr2 preimp" row_no='<?php echo @$quotation_row->id; ?>'>
