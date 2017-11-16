@@ -896,6 +896,7 @@ class CustomersController extends AppController
 		
 		$Customer = $this->Customers->get($customer_id);
 		echo $Customer->credit_limit;
+		//pr($Customer);
     }
 	
 	public function AgstRefForPayment($customer_id=null){

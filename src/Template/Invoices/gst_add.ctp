@@ -402,6 +402,58 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					</div>
 				</div>
 			</div><br/>
+		<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-6 control-label">Credit Limits</label>
+						<div class="col-md-6" id="due">
+							<?php echo $this->Form->input('credit_limit', ['label' => false,'class' => 'form-control input-md','placeholder'=>'','readonly','value' => @$sales_order->customer->credit_limit]); ?><br/>
+							<a href="#" role="button" id="update_credit_limit">Update Credit Limit</a>
+							<span id="update_credit_limit_wait"></span>
+						</div>
+					</div>
+				</div>
+		
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-6 control-label">Due Payment</label>
+						<div class="col-md-6" id="due">
+							<?php echo $this->Form->input('old_due_payment', ['label' => false,'class' => 'form-control input-md','placeholder'=>'','readonly','value'=>$old_due_payment]); ?>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-6 control-label">New Due Payment</label>
+						<div class="col-md-6" id="due">
+							<?php echo $this->Form->input('new_due_payment', ['label' => false,'class' => 'form-control input-md','placeholder'=>'','readonly','max'=>@$sales_order->customer->credit_limit]); ?>
+						</div>
+					</div>
+				</div>
+			
+				
+				
+			</div><br/>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-6 control-label">Temporary Limit</label>
+						<div class="col-md-6" id="due">
+							<?php echo $this->Form->input('temp_limit', ['label' => false,'class' => 'form-control input-md','placeholder'=>'']); ?>
+						</div>
+					</div>
+				</div>
+				
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="col-md-6 control-label">Customer TIN</label>
+						<div class="col-md-6" id="due">
+							<?php echo $this->Form->input('customer_tin', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'','readonly','value' => @$sales_order->customer->tin_no,'required']); ?><br/>
+							
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		
 					<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
@@ -770,7 +822,40 @@ $(document).ready(function() {
 			//$('.fright_sgst_percent').rules("add", "required");
 			
 	<?php } ?>
-		
+	
+	$('#update_credit_limit').on("click",function() {
+		var customer_id=$('input[name="customer_id"]').val();
+		$("#update_credit_limit_wait").html('Loading...');
+		var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'CreditLimit']); ?>";
+		url=url+'/'+customer_id,
+		$.ajax({
+			url: url,
+		}).done(function(response) {
+			$('input[name="credit_limit"]').val(response);
+			$("#update_credit_limit_wait").html('');
+			$('input[name="new_due_payment"]').attr('max',response).rules('add', {
+						required: true,
+						max: response,
+						messages: {
+							max: "Credit Limit Exieded ."
+						}
+					});
+		});
+    });
+	
+	$('input[name="temp_limit"]').die().live("keyup",function(){
+	var credit_limit=$('input[name="credit_limit"]').val();
+	var temp_limit=$('input[name="temp_limit"]').val();
+    var sum= parseFloat(temp_limit) + parseFloat(credit_limit);
+	$('input[name="new_due_payment"]').attr('max',sum).rules('add', {
+						required: true,
+						max: sum,
+						messages: {
+							max: "Credit Limit Exieded ."
+						}
+					});
+	});	
+	
 	function put_code_description(){ 
 		var i=0;
 			$("#main_tb tbody tr.tr1").each(function(){ 
@@ -944,6 +1029,9 @@ $(document).ready(function() {
 			$('input[name="total_igst_amount"]').val(round(total_igst_amt,2));
 			$('input[name="total_sgst_amount"]').val(round(total_sgst_amt,2));
 			$('input[name="grand_total"]').val(round(grand_total,2));
+			var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());
+			var	new_due_payment=grand_total+old_due_payment1;
+		    $('input[name="new_due_payment"]').val(round(new_due_payment,2));
 		});
 	}
 	

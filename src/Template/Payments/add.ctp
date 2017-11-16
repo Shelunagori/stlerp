@@ -231,33 +231,36 @@ $(document).ready(function() {
 	function rename_rows(){
 		var i=0; 
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"payment_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"payment_rows["+i+"][received_from_id]", id:"payment_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true
 					});
 					$(this).find("td:eq(0) .row_id").val(i);
 			
-				var thela_type = $(this).find("td:eq(0) select.received_from").val();
-                if(thela_type=='101' || thela_type=='165' || thela_type=='313')
-		        {				
-					$(this).find("td:eq(0) select.grns").select2().attr({name:"payment_rows["+i+"][grn_ids][]", id:"quotation_rows-"+i+"-grn_ids"}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.grns'],
-						messages: {
-							notEqualToGroup: "Do not select same grn again."
-						}
-					});
+				//var thela_type = $(this).find("td:eq(0) select.received_from").val();
+				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				if(thela_type)
+				{
+					if(thela_type=='grn')
+					{				
+						$(this).find("td:eq(0) select.grns").select2().attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
+							required: true,
+							notEqualToGroup: ['.grns'],
+							messages: {
+								notEqualToGroup: "Do not select same grn again."
+							}
+						});
+					}
+					if(thela_type=='invoice')
+					{				
+						$(this).find("td:eq(0) select.invoices").select2().attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
+							required: true,
+							notEqualToGroup: ['.invoices'],
+							messages: {
+								notEqualToGroup: "Do not select same invoice again."
+							}
+						});
+					}
 				}
-				if(thela_type=='105' || thela_type=='168' || thela_type=='316')
-		        {				
-					$(this).find("td:eq(0) select.invoices").select2().attr({name:"payment_rows["+i+"][invoice_ids][]", id:"quotation_rows-"+i+"-invoice_ids"}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.invoices'],
-						messages: {
-							notEqualToGroup: "Do not select same invoice again."
-						}
-					});
-				}
-		
 			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,

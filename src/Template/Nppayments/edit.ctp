@@ -339,27 +339,30 @@ $(document).ready(function() {
 						required: true
 					});
 
-				var thela_type = $(this).find("td:eq(0) select.received_from").val();
-                if(thela_type=='101' || thela_type=='165' || thela_type=='313')
-		        {				
-					$(this).find("td:eq(0) select.grns").select2().attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.grns'],
-						messages: {
-							notEqualToGroup: "Do not select same grn again."
-						}
-					});
-				}
-				if(thela_type=='105' || thela_type=='168' || thela_type=='316')
-		        {				
-					$(this).find("td:eq(0) select.invoices").select2().attr({name:"nppayment_rows["+i+"][invoice_ids][]", id:"nppayment_rows-"+i+"-invoice_ids"}).rules('add', {
-						required: true,
-						notEqualToGroup: ['.invoices'],
-						messages: {
-							notEqualToGroup: "Do not select same invoice again."
-						}
-					});
-				}					
+				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				if(thela_type)
+				{
+					if(thela_type=='grn')
+					{				
+						$(this).find("td:eq(0) select.grns").select2().attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {
+							required: true,
+							notEqualToGroup: ['.grns'],
+							messages: {
+								notEqualToGroup: "Do not select same grn again."
+							}
+						});
+					}
+					if(thela_type=='invoice')
+					{				
+						$(this).find("td:eq(0) select.invoices").select2().attr({name:"nppayment_rows["+i+"][invoice_ids][]", id:"nppayment_rows-"+i+"-invoice_ids"}).rules('add', {
+							required: true,
+							notEqualToGroup: ['.invoices'],
+							messages: {
+								notEqualToGroup: "Do not select same invoice again."
+							}
+						});
+					}
+				}				
 
 
     		$(this).find("td:eq(0) .row_id").val(i);

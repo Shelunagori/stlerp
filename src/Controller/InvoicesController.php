@@ -730,7 +730,17 @@ class InvoicesController extends AppController
 			
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$sales_order->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
-		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
+		
+		$query = $this->Invoices->Ledgers->find();
+		$query->select([
+				'debit_total'  => $query->func()->sum('debit'),
+				'credit_total' => $query->func()->sum('credit')
+			])
+			->where(['Ledgers.ledger_account_id'=>$customer_ledger[0]->id]);
+		$ledgers = $query->toArray();
+		$old_due_payment=$ledgers[0]->debit_total-$ledgers[0]->credit_total;
+        
+		/* $customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
 		$total_credit=0;
 		$total_debit=0;
 		$old_due_payment=0;
@@ -742,7 +752,7 @@ class InvoicesController extends AppController
 				$total_debit=$total_debit+$customer_reference_detail->debit;
 			}
 		}
-				$old_due_payment=$total_credit-$total_debit;
+				$old_due_payment=$total_credit-$total_debit; */
 
 		}
 		//pr($old_due_payment); exit;	
@@ -784,7 +794,8 @@ class InvoicesController extends AppController
     }
 	
 	public function pullFromSalesOrder(){
-		if ($this->request->is('post')) {
+		if ($this->request->is('post')) 
+		{
 			$sales_order_id=$this->request->data["sales_order_id"];
             return $this->redirect(['action' => 'add?sales-order='.$sales_order_id]);
         }
@@ -881,7 +892,7 @@ class InvoicesController extends AppController
 										->set(['serial_number' => $serial_nos])
 										->where(['id' => $invoice_row->id])
 										->execute(); 
-				/////for delete serial number in table					
+				//for delete serial number in table					
 					$this->Invoices->InvoiceRows->SerialNumbers->deleteAll(['SerialNumbers.invoice_id'=>$invoice->id,'SerialNumbers.invoice_row_id' => $invoice_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
 					 foreach($item_serial_no as $serial){
 
@@ -1194,19 +1205,30 @@ class InvoicesController extends AppController
 		//end array declaration for unique validation and proceed quantity		
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
-		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
+		/* $customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
 		//pr()
 		$total_credit=0;
 		$total_debit=0;
 		$old_due_payment=0;
-		foreach($customer_reference_details as $customer_reference_detail){
-			if($customer_reference_detail->debit==0){
+		foreach($customer_reference_details as $customer_reference_detail)
+		{
+			if($customer_reference_detail->debit==0)
+			{
 				$total_credit=$total_credit+$customer_reference_detail->credit;
 			}
-			else{
+			else
+			{
 				$total_debit=$total_debit+$customer_reference_detail->debit;
 			}
-		}
+		} */
+		$query = $this->Invoices->Ledgers->find();
+		$query->select([
+				'debit_total'  => $query->func()->sum('debit'),
+				'credit_total' => $query->func()->sum('credit')
+			])
+			->where(['Ledgers.ledger_account_id'=>$customer_ledger[0]->id]);
+		$ledgers = $query->toArray();
+		$temp_due_payment=$ledgers[0]->debit_total-$ledgers[0]->credit_total;
 
 				//$session = $this->request->session();
 				$st_year_id = $session->read('st_year_id');
@@ -1235,7 +1257,7 @@ class InvoicesController extends AppController
 
 
 		
-		$temp_due_payment=$total_credit-$total_debit;
+		//$temp_due_payment=$total_credit-$total_debit;
 		$old_due_payment=$temp_due_payment-$invoice->grand_total;
 		
 
@@ -1826,7 +1848,7 @@ class InvoicesController extends AppController
 					} 
 					if(!empty($item_serial_no)){
 						foreach($item_serial_no as $serial){
-							 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
+							 $query  = $this->Invoices->InvoiceRows->SerialNumbers->query();
 										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
 										->values([
 										'name' => $serial,
@@ -2064,24 +2086,18 @@ class InvoicesController extends AppController
 		$termsConditions = $this->Invoices->TermsConditions->find('all',['limit' => 200]);
 		//$SaleTaxes = $this->Invoices->SaleTaxes->find('all')->where(['freeze'=>0]);
 		
-		if(!empty($sales_order->customer_id)){
+		if(!empty($sales_order->customer_id))
+		{
+			$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$sales_order->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 			
-		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$sales_order->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
-		
-		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
-		$total_credit=0;
-		$total_debit=0;
-		$old_due_payment=0;
-		foreach($customer_reference_details as $customer_reference_detail){
-			if($customer_reference_detail->debit==0){
-				$total_credit=$total_credit+$customer_reference_detail->credit;
-			}
-			else{
-				$total_debit=$total_debit+$customer_reference_detail->debit;
-			}
-		}
-				$old_due_payment=$total_credit-$total_debit;
-
+			$query = $this->Invoices->Ledgers->find();
+			$query->select([
+					'debit_total'  => $query->func()->sum('debit'),
+					'credit_total' => $query->func()->sum('credit')
+				])
+				->where(['Ledgers.ledger_account_id'=>$customer_ledger[0]->id]);
+			$ledgers = $query->toArray();
+			$old_due_payment=$ledgers[0]->debit_total-$ledgers[0]->credit_total;
 		}
 		//pr($old_due_payment); exit;	
 		$AccountReference_for_sale= $this->Invoices->AccountReferences->get(1);
@@ -2222,30 +2238,32 @@ class InvoicesController extends AppController
 				
 				//////start serial Number database changes Oct17	  
 				foreach($invoice->invoice_rows as $invoice_row){
-					
-					$item_serial_no=$invoice_row->serial_numbers;
-					$serial_nos=implode(",", $item_serial_no); 
-					$query = $this->Invoices->InvoiceRows->query();
-									$query->update()
-										->set(['serial_number' => $serial_nos])
-										->where(['id' => $invoice_row->id])
-										->execute(); 
-				/////for delete serial number in table					
-					$this->Invoices->InvoiceRows->SerialNumbers->deleteAll(['SerialNumbers.invoice_id'=>$invoice->id,'SerialNumbers.invoice_row_id' => $invoice_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
-				 foreach($item_serial_no as $serial){
+					if(!empty($invoice_row->serial_numbers))
+					{
+						$item_serial_no=$invoice_row->serial_numbers;
+						$serial_nos=implode(",", $item_serial_no); 
+						$query = $this->Invoices->InvoiceRows->query();
+										$query->update()
+											->set(['serial_number' => $serial_nos])
+											->where(['id' => $invoice_row->id])
+											->execute(); 
+					/////for delete serial number in table					
+						$this->Invoices->InvoiceRows->SerialNumbers->deleteAll(['SerialNumbers.invoice_id'=>$invoice->id,'SerialNumbers.invoice_row_id' => $invoice_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
+					 foreach($item_serial_no as $serial){
 
-				 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
-									->values([
-									'name' => $serial,
-									'item_id' => $invoice_row->item_id,
-									'status' => 'Out',
-									'invoice_id' => $invoice->id,
-									'invoice_row_id' => $invoice_row->id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute();  
-						
+					 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
+										->values([
+										'name' => $serial,
+										'item_id' => $invoice_row->item_id,
+										'status' => 'Out',
+										'invoice_id' => $invoice->id,
+										'invoice_row_id' => $invoice_row->id,
+										'company_id'=>$st_company_id
+										]);
+									$query->execute();  
+							
+						}
 					}
 				}
 			//////End serial Number database changes Oct17
@@ -2576,7 +2594,7 @@ class InvoicesController extends AppController
 	   
 		$customer_ledger = $this->Invoices->LedgerAccounts->find()->where(['LedgerAccounts.source_id'=>$invoice->customer_id,'LedgerAccounts.source_model'=>'Customers'])->toArray();
 		
-		$customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
+		/* $customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
 		//pr()
 		$total_credit=0;
 		$total_debit=0;
@@ -2589,7 +2607,16 @@ class InvoicesController extends AppController
 				$total_debit=$total_debit+$customer_reference_detail->debit;
 			}
 		}
-
+ */
+		$query = $this->Invoices->Ledgers->find();
+			$query->select([
+					'debit_total'  => $query->func()->sum('debit'),
+					'credit_total' => $query->func()->sum('credit')
+				])
+				->where(['Ledgers.ledger_account_id'=>$customer_ledger[0]->id]);
+			$ledgers = $query->toArray();
+			$temp_due_payment=$ledgers[0]->debit_total-$ledgers[0]->credit_total;
+			//pr($temp_due_payment);exit;
 				//$session = $this->request->session();
 				$st_year_id = $session->read('st_year_id');
 		
@@ -2617,8 +2644,8 @@ class InvoicesController extends AppController
 
 
 		
-		$temp_due_payment=$total_credit-$total_debit;
-		$old_due_payment=$temp_due_payment-$invoice->grand_total;
+		//$temp_due_payment=$total_credit-$total_debit;
+		 $old_due_payment=$temp_due_payment-$invoice->grand_total;
 		
 
 		$AccountReference_for_sale= $this->Invoices->AccountReferences->get(1);
