@@ -159,30 +159,22 @@ $(document).ready(function() {
 		rename_rows_name();
 	}
 	
-	/* addSrTextbox();
-	
-	function addSrTextbox(){
-		var r=0;
+	rename_input();
+	function rename_input()
+	{
+		var q=0;
 		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){
 			var row_no=$(this).attr('row_no');
-			var serial_number_enable=$(this).find('.serial_number').val();
-			var OriginalQtyy=$(this).find('.quantity').val();
-				Quantitiess = OriginalQtyy.split('.'); 
-				Qty=Quantitiess[0];
-			if(serial_number_enable){
-				var p=1;
-				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
-				for (i = 0; i < Qty; i++) {
+			var i=1;
+				$(this).find("td:nth-child(3) .sr_no").each(function()
+				{
 					
-					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers][]" placeholder="serial number '+p+' " id="sr_no'+r+'" />');
-					p++;
-					r++;
-					rename_rows_name();
-				}
-			}
-		});
-	} */
-	
+					$(this).attr({name:"iv_rows["+q+"][serial_numbers]["+i+"]"}).rules("add", "required");
+					i++;
+				});
+				
+			});
+	}
 	
 	
 	$('.select_item ').die().live("change",function() {
@@ -222,13 +214,13 @@ $(document).ready(function() {
 	function rename_rows_name(){
 		var q=0;
 		$('.MainTable tbody.MainTbody tr.MainTr').each(function(){ 
-			var i=0;
+			var i=0; 
 			$(this).find("td:nth-child(1) input.ivs_id").attr({name:"iv_rows["+q+"][id]", id:"iv_rows-"+q+"-id"});
 
 			$(this).find("td:nth-child(1) input.invoice_row_id").attr({name:"iv_rows["+q+"][invoice_row_id]", id:"iv_rows-"+q+"-invoice_row_id"});
 			$(this).find("td:nth-child(1) input.item_id").attr({name:"iv_rows["+q+"][item_id]", id:"iv_rows-"+q+"-item_id"});
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
-			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {required: true});
+			
 			$(this).find('table.subTable tbody.subTbody tr').each(function(){ 
 				
 				$(this).find("td:nth-child(1) input.ivrowitemsId").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-id"});

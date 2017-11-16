@@ -271,8 +271,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					$q=0; 
 					
-					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ ?>
-						
+					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
+						if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; --$q; ?>
@@ -333,7 +333,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							$this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&in_row_id='. @$invoice_row_id[@$sales_order_row->id]); ?>
 							</td>
 						</tr><?php } ?>
-						<?php  $q++;  } ?>
+						<?php  $q++; }  } ?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();

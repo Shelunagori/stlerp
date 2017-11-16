@@ -39,8 +39,7 @@ class IvRowItemsTable extends Table
 
         $this->belongsTo('IvRows', [
             'foreignKey' => 'iv_row_id',
-            'joinType' => 'INNER',
-			'saveStrategy' => 'replace'
+            'joinType' => 'INNER'
         ]);
         $this->belongsTo('Items', [
             'foreignKey' => 'item_id',

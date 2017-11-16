@@ -2582,9 +2582,9 @@ class InvoicesController extends AppController
 			@$current_invoice_rows[$current_invoice_row->sales_order_row_id]+=@$current_invoice_row->quantity;
 			@$invoice_row_id[$current_invoice_row->sales_order_row_id]=@$current_invoice_row->id;
 		}
-		/* pr($current_invoice_rows);
-		pr($invoice);
-		exit; */
+		// pr($current_invoice_rows);
+		//pr($invoice);
+		//exit; 
 		foreach($sales_qty->sales_order_rows as $sales_order_row){ 
 			@$sales_order_qty[@$sales_order_row->id]+=@$sales_order_row->total_sales_qty;
 		}

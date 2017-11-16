@@ -161,11 +161,12 @@ $(document).ready(function() {
 				$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').find('input.sr_no').remove();
 				for (i = 0; i < Qty; i++) {
 					
-					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers][]" placeholder="serial number '+p+' " required id="sr_no'+r+'" />');
+					$('.MainTable tbody.MainTbody tr.MainTr[row_no="'+row_no+'"] td:nth-child(3)').append('<input type="text" class="sr_no" name="iv_rows['+r+'][serial_numbers]['+p+']" placeholder="serial number '+p+' " required id="sr_no'+r+'" />');
 					p++;
-					r++;
+					
 					rename_rows_name();
 				}
+				r++;
 			}
 		});
 	}
@@ -241,9 +242,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1) input.item_id").attr({name:"iv_rows["+q+"][item_id]", id:"iv_rows-"+q+"-item_id"});
 			$(this).find("td:nth-child(1) input.quantity").attr({name:"iv_rows["+q+"][quantity]", id:"iv_rows-"+q+"-quantity"});
 			
-			$(this).find("td:nth-child(3) input").attr({name:"iv_rows["+q+"][serial_numbers][]", id:"iv_rows-"+q+"-serial_numbers"}).rules('add', {
-							required: true
-					});
+			
 			
 			$(this).find('table.subTable tbody.subTbody tr').each(function(){ 
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});

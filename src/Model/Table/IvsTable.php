@@ -50,8 +50,7 @@ class IvsTable extends Table
             'joinType' => 'INNER'
         ]);
         $this->hasMany('IvRows', [
-            'foreignKey' => 'iv_id',
-			'saveStrategy' => 'replace'
+            'foreignKey' => 'iv_id'
         ]);
 		
 		$this->belongsTo('Creator', [

@@ -241,7 +241,7 @@ class SerialNumbersController extends AppController
 				}
 			}
 				
-			$values=$sr_number[$in_row_id];
+			@$values=$sr_number[$in_row_id];
 		}
 		//pr($values);exit;
         $this->set(compact('options', 'values'));

@@ -193,7 +193,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						
 			
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
-						//if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
+						if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
 
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
@@ -255,7 +255,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 					</tr><?php } ?>
 					
-					<?php $q++;  }  ?>
+						<?php $q++; } }  ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">

@@ -252,8 +252,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					}
 				if(!empty($sales_order->sales_order_rows)){
 					$q=0; foreach ($sales_order->sales_order_rows as $sales_order_rows): 
-					/*
-					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ */
+					
+					if($sales_order_rows->quantity != @$sales_orders_qty[@$sales_order_rows->id]){ 
 					?>
 					
 						<tr class="tr1 firsttr " row_no='<?php echo @$sales_order_rows->id; ?>'>
@@ -304,7 +304,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_rows->item_id); ?>
 							<td></td>
 						</tr><?php }  ?>
-					<?php $q++;  endforeach; }?>
+					<?php $q++; }  endforeach; }?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();

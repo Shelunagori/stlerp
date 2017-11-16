@@ -335,9 +335,13 @@ class IvsController extends AppController
 			'associated' => ['IvRows', 'IvRows.IvRowItems']
 			]);
 			$iv->created_by=$s_employee_id;
-			
+			foreach($this->request->data['iv_rows'] as $iv_row){
+				$this->Ivs->IvRows->IvRowItems->deleteAll(['iv_row_id'=>$iv_row['id']], false);
+			}
+			 
             if ($this->Ivs->save($iv)) {  
-				$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers']);
+//pr($iv);exit;
+			$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers']);
 
 				foreach($iv->iv_rows as $iv_row){   
 					$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);

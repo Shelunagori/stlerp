@@ -143,11 +143,7 @@
 					}
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
 			
-					if(@$quotation_qty[$sales_order_rows->quotation_row_id] > 0){
-						
-						$disable_class=" disabled='true'";
-						$disable_class_item="disabledbutton";
-					}
+					
 					else if(@$sales_orders_qty[$sales_order_rows->id] > 0){
 						
 						$disable_class=" disabled='true'";
@@ -204,7 +200,7 @@
 						</td>
 						<td>
 						
-						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id],'max'=>@$quotation_qty[$sales_order_rows->quotation_row_id]-@$existing_quotation_rows[$sales_order_rows->quotation_row_id]+@$current_so_rows[$sales_order_rows->id]]); ?>
+						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
 						<?php 
 						 echo $this->Form->input('sales_order_rows.'.$q.'.old_quantity', ['type' => 'hidden','value'=>$sales_order_rows->quantity]);
 						?>
@@ -223,7 +219,7 @@
 						echo $this->Form->input('sales_order_rows.'.$q.'.sale_tax_id', ['options'=>$options,'label' => false,'class' => 'form-control input-sm change_des','value'=>$sales_order_rows->sale_tax_id]);?>
 						</td>
 						<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
-						<?php if((@$quotation_qty[$sales_order_rows->quotation_row_id] > 0) || (@$sales_orders_qty[@$sales_order_rows->id])){ ?>
+						<?php if(@$sales_orders_qty[@$sales_order_rows->id]){ ?>
 							
 						<?php }else{ ?> 
 						<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
