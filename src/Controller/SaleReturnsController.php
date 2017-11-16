@@ -1063,6 +1063,7 @@ class SaleReturnsController extends AppController
 		//pr($invoices->toArray()); exit;
 		$this->set(compact('SaleReturns','url'));
 	}
+	
 	public function GstSalesAdd(){
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
@@ -1088,27 +1089,27 @@ class SaleReturnsController extends AppController
 			$c_LedgerAccount=$this->SaleReturns->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Customers','source_id'=>$invoice->customer->id])->first();
 		}
 			$st_year_id = $session->read('st_year_id');
-			   $SessionCheckDate = $this->SaleReturns->FinancialYears->get($st_year_id);
-			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
-			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
-			   $tody1 = date("Y-m-d");
+			$SessionCheckDate = $this->SaleReturns->FinancialYears->get($st_year_id);
+			$fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+			$todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+			$tody1 = date("Y-m-d");
 
-			   $fromdate = strtotime($fromdate1);
-			   $todate = strtotime($todate1); 
-			   $tody = strtotime($tody1);
+			$fromdate = strtotime($fromdate1);
+			$todate = strtotime($todate1); 
+			$tody = strtotime($tody1);
 
-			  if($fromdate < $tody || $todate > $tody)
-			   {
-				 if($SessionCheckDate['status'] == 'Open')
-				 { $chkdate = 'Found'; }
-				 else
-				 { $chkdate = 'Not Found'; }
+			if($fromdate < $tody || $todate > $tody)
+			{
+				if($SessionCheckDate['status'] == 'Open')
+				{ $chkdate = 'Found'; }
+				else
+				{ $chkdate = 'Not Found'; }
 
-			   }
-			   else
-				{
-					$chkdate = 'Not Found';	
-				}
+			}
+			else
+			{
+				$chkdate = 'Not Found';	
+			}
 			
 			$saleReturn = $this->SaleReturns->newEntity();
 		  if ($this->request->is('post')) {
@@ -1140,7 +1141,7 @@ class SaleReturnsController extends AppController
 			$saleReturn->sale_return_status="Yes";
 			$saleReturn->transaction_date=date("Y-m-d",strtotime($saleReturn->transaction_date)); 
 			
-		
+		//pr($saleReturn); exit;
 
 			$ref_rows=@$saleReturn->ref_rows;
 			if ($this->SaleReturns->save($saleReturn)) {
@@ -1216,21 +1217,25 @@ class SaleReturnsController extends AppController
 				////start updated serial number code Oct17 changes
 				foreach($saleReturn->sale_return_rows as $sale_return_row)
 				{
-					foreach($sale_return_row->serial_numbers as $serial_nos){
-						$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','invoice_row_id'])
-									->values([
-									'name' => $serial_nos,
-									'item_id' => $sale_return_row->item_id,
-									'status' => 'In',
-									'sales_return_id' => $saleReturn->id,
-									'sales_return_row_id' => $sale_return_row->id,
-									'invoice_row_id' => $sale_return_row->invoice_row_id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute();  	
-					}	
+					if(!empty($sale_return_row->serial_numbers)){
+						foreach($sale_return_row->serial_numbers as $serial_nos){
+							$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','invoice_row_id'])
+										->values([
+										'name' => $serial_nos,
+										'item_id' => $sale_return_row->item_id,
+										'status' => 'In',
+										'sales_return_id' => $saleReturn->id,
+										'sales_return_row_id' => $sale_return_row->id,
+										'invoice_row_id' => $sale_return_row->invoice_row_id,
+										'company_id'=>$st_company_id
+										]);
+									$query->execute();  	
+						}	
+					}
 				} 
+				
+				// pr($sale_return_row->serial_numbers); exit;
 				//end updated serial number code Oct17 changes
 			$Invoice_data = $this->SaleReturns->Invoices->get($invoice->id);
 			$Invoice_data->sale_return_id=$saleReturn->id;
@@ -1577,6 +1582,7 @@ class SaleReturnsController extends AppController
 				//////start serial Number database changes Oct17	  
 				foreach($saleReturn->sale_return_rows as $sale_return_row){ 
 					
+					if(!empty($sale_return_row->serial_numbers)){
 					$item_serial_no=$sale_return_row->serial_numbers;
 					$serial_nos=implode(",", $item_serial_no); 
 				/////for delete serial number in table					
@@ -1596,6 +1602,7 @@ class SaleReturnsController extends AppController
 									]);
 								$query->execute();  
 						
+					}
 					}
 				}
 			//////End serial Number database changes Oct17		

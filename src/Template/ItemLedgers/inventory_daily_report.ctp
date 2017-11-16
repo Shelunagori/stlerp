@@ -48,6 +48,7 @@
 		</thead>
 		<tbody>
 		<?php $srn=0; 
+			
 			foreach($AllDatas as $key=>$AllData1){ 
 				foreach($AllData1  as $key1=>$AllData){ 
 					
@@ -57,6 +58,7 @@
 					$voucher="";
 					$location="";
 					$in_out="";
+					$srn=0;
 					foreach($AllData as $key2=>$itemData) {
 					$row_count=count($itemData->invoice_rows);
 					if($key1=='Invoice'){
@@ -69,6 +71,19 @@
 						}
 						$in_out="Out";
 						$voucher_rows=$itemData->invoice_rows;
+						
+					}
+					
+					if($key1=='SaleReturns'){
+						$date=$itemData['date_created'];
+						@$voucher=($itemData->sr1.'/IN-'.str_pad($itemData->sr2, 3, '0', STR_PAD_LEFT).'/'.$itemData->sr3.'/'.$itemData->sr4);
+						if($itemData['sale_return_type']=="GST"){
+							$location='/sale-returns/gst-sales-edit/'.$itemData->id;
+						}else{
+							$location='/sale-returns/edit/'.$itemData->id;
+						}
+						$in_out="In";
+						$voucher_rows=$itemData->sale_return_rows;
 						
 					}
 					if($key1=='Grns'){
@@ -100,7 +115,34 @@
 						$voucher_rows=$itemData->inventory_transfer_voucher_rows;
 						//pr($i_rows); exit;
 					}
+					//$IVs=[];
+					$IVRs=[];
+					$IVRs=[];
+					$IVSr=[];
 					
+					if($key1=='InventoryVouchers')
+					{ 
+						$date=$itemData['transaction_date'];
+						@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
+						$location='/InventoryVouchers/View/'.$itemData->id;
+						foreach($itemData->iv_rows as $iv_row)
+						{ 
+							$IVRs[$iv_row->id][$iv_row->id]=['item_name'=>$iv_row->item->name,'item_qty'=>$iv_row->quantity,'status'=>'In'];
+							foreach($iv_row->iv_row_items as $iv_row_item){ 
+								$IVRs[$iv_row->id][$iv_row_item->id]=['item_name'=>$iv_row_item->item->name,'item_qty'=>$iv_row_item->quantity,'status'=>'Out'];;
+								//$IVRs[]['Out']=$iv_row_item->item->name;
+								foreach($iv_row_item->serial_numbers as $serial_number){ 
+								$IVSr[$iv_row->id][$iv_row_item->id][]=$serial_number;
+								}
+							}
+													
+						}
+						$voucher_rows=$itemData->iv_rows;
+						
+					}
+				//	pr($IVRs);
+					//pr($IVSr);
+						
 					?>
 					<?php if($flag==0){ ?>
 						<tr>
@@ -115,13 +157,48 @@
 									<thead>
 										<tr>		
 											<th width="10%">Item</th>
-											<?php if($key1=="InventoryTransferVouchers"){?>
+											<?php if($key1=="InventoryTransferVouchers" || $key1=="InventoryVouchers"){?>
 											<th width="2%">In/Out</th>
 											<?php } ?>
 											<th width="5%">Quantity</th>
 											<th width="12%">Serial No</th>
 										</tr>
 									</thead>
+								<?php if($key1=="InventoryVouchers"){ ?>
+									<tbody>
+										<?php foreach($IVRs as $key=>$IVR){ 
+										 foreach($IVR as $key1=>$IVRData){
+										$sr_size=0;
+										if(!empty($IVSr[@$key][@$key1])){
+												$sr_size=sizeof($IVSr[@$key][@$key1]);
+												
+										}
+										
+										 ?>
+										<tr>
+											<td rowspan=""><?php echo $IVRData['item_name']?></td>
+											<td rowspan=""><?php echo $IVRData['status']?></td>
+											<td rowspan=""><?php echo $IVRData['item_qty']?></td>
+											
+											<td rowspan="">
+												<?php if($sr_size > 0){ ?>
+												<?php foreach($IVSr[@$key][@$key1] as $serial_number){ 
+													echo $serial_number->name; echo "</br>";
+												}?>
+												<?php }else{ 
+													echo "-";
+												?>
+												
+												<?php } ?>
+												
+											</td>
+											
+											
+										</tr>
+										<?php } }?>
+									</tbody>
+									
+								<?php }else{ ?>
 									<tbody>
 										<?php foreach($voucher_rows as $voucher_row){ 
 										$sr_size=count($voucher_row->serial_numbers); //pr($sr_size);?>
@@ -147,7 +224,7 @@
 										</tr>
 										<?php }?>
 									</tbody>
-									
+								<?php } ?>
 								</table>
 							</td>
 							

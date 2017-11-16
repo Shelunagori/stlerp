@@ -72,7 +72,6 @@
 					</tbody>
 				</table>
 				</form>
-				<?php $page_no=$this->Paginator->current('Invoices'); $page_no=($page_no-1)*20; ?>
 				<table class="table table-bordered table-striped table-hover">
 					<thead>
 						<tr>
@@ -87,12 +86,13 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($invoices as $invoice): //pr($invoice);exit;
+						<?php $i=0; foreach ($invoices as $invoice): //pr($invoice);exit;
 						if($invoice->status=='Pending'){ $tr_color='#FFF'; }
 						if($invoice->status=='Cancel'){ $tr_color='#FFF'; }
 						?>
+						<?php if(sizeof($invoice->invoice_rows) > 0){ ?>
 						<tr>
-							<td><?= h(++$page_no) ?></td>
+							<td><?php echo ++$i; ?></td>
 							<td><?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>
 							<?php if($invoice->sales_order_id != 0){ ?>
 							<td>
@@ -142,7 +142,7 @@
 								
 								}?>
 								<?php
-								if($inventory_voucher=="true"){
+								if($inventory_voucher=="true" ){
 								echo $this->Html->link('<i class="fa fa-repeat"></i>  Create Inventory Voucher','/Ivs/add/'.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								
 								} ?><?php 
@@ -152,20 +152,13 @@
 								
 							</td>
 						</tr>
-						<?php endforeach; ?>
+						<?php } endforeach; ?>
 					</tbody>
 				</table>
 				</div>
 			</div>
 		</div>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				</div>
+				
 			</div>
 		</div>
 

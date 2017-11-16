@@ -8,7 +8,7 @@ use Cake\Datasource\ConnectionManager;
  *
  * @property \App\Model\Table\SalesOrdersTable $SalesOrders
  */
-class SalesOrdersController extends AppController
+class SalesOrdersController extends AppController 
 {
 
     /**

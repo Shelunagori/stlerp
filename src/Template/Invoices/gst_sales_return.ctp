@@ -57,7 +57,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($invoices as $invoice):  ?>
+						<?php foreach ($invoices as $invoice):   ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>
@@ -92,8 +92,11 @@
 							<td align="right"><?= h($this->Number->format($invoice->total_after_pnf,[ 'places' => 2])) ?></td>
 							<td class="actions">
 								<?php 
-								
-								echo $this->Html->link('<i class="fa fa-repeat"></i> Gst Sale Return','/SaleReturns/GstSalesAdd?invoice='.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								if($InvoiceExist=="Yes"){
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['controller'=>'SaleReturns','action' => 'gstSalesEdit/'.$SalesReturnId,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+								}else{
+									echo $this->Html->link('<i class="fa fa-repeat"></i> Gst Sale Return','/SaleReturns/GstSalesAdd?invoice='.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}
 								 ?>
 								
 							</td>
