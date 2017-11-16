@@ -143,7 +143,7 @@
 								}?>
 								<?php
 								if($inventory_voucher=="true"){
-								echo $this->Html->link('<i class="fa fa-repeat"></i>  Create Inventory Voucher','/Inventory-Vouchers/edit?invoice='.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								echo $this->Html->link('<i class="fa fa-repeat"></i>  Create Inventory Voucher','/Ivs/add/'.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								
 								} ?><?php 
 								if($sales_return=="true" && $invoice->sale_return_status=='No'){
