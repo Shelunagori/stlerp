@@ -117,7 +117,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'yes'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();

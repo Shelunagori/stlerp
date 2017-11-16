@@ -51,6 +51,8 @@
 				<form method="GET" >
 				<input type="hidden" name="pull-request" value="<?php echo @$pull_request; ?>">
 				<input type="hidden" name="gst" value="<?php echo @$gst; ?>">
+				<input type="hidden" name="gst-copy-request" value="<?php echo @$gst_copy_request; ?>">
+				<input type="hidden" name="copy-request" value="<?php echo @$copy_request; ?>">
 				<input type="hidden" name="job-card" value="<?php echo @$job_card; ?>">
 				<table class="table table-condensed">
 					<tbody>
