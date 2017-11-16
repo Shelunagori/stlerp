@@ -589,18 +589,13 @@ class LedgersController extends AppController
 		return $this->response;
 	}
 	public function AccountStatementRefrence (){
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
-		
+		 
+		$this->viewBuilder()->layout('index_layout');
+		$url=$this->request->here(); //pr($url); exit;
+		//$url=parse_url($url,PHP_URL_QUERY);
+		//pr($url); exit;
 		$status=$this->request->query('status');
 		$ledger_account_id=$this->request->query('ledgerid');
-		
-		if($ledger_account_id > 0 && $status=='Pending'){  
-		$this->redirect(['controller'=>'Ledgers','action' => 'findDate/'.$ledger_account_id]);
-		}else{ 
-		$this->viewBuilder()->layout('index_layout');
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $st_year_id = $session->read('st_year_id');
@@ -609,7 +604,7 @@ class LedgersController extends AppController
 		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
 		$from = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		$To = date("Y-m-d"); 
-		$this->set(compact('ledger_account_id'));
+		//$this->set(compact('ledger_account_id'));
 		$status=$this->request->query('status');
 		//pr($ledger_account_id); exit;
 		
@@ -624,34 +619,38 @@ class LedgersController extends AppController
 		
 		if($Ledger_Account_data->source_model=='Customers'){
 			$customer_data = $this->Ledgers->LedgerAccounts->Customers->get($Ledger_Account_data->source_id);
-			$customer_ledger_data = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$ledger_account_id]);
-			//pr($customer_ledger_data->toArray()); exit;
+			//pr($customer_data); exit;
+		}
+		if($Ledger_Account_data->source_model=='Vendors'){
+			$customer_data = $this->Ledgers->Vendors->get($Ledger_Account_data->source_id);
+			//pr($customer_data); exit;
 		}
 		
-		$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$ledger_account_id]);
-		
-		$ledger_amt = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$ledger_account_id]);
-		$ledger_amt->select([
-			'Debit' => $ledger_amt->func()->sum('Debit'),
-			'Credit' => $ledger_amt->func()->sum('Credit')
-		]);
-		
-		$ledger_amt=@$ledger_amt->first();
-		//$ledger_amt=@$ledger_amt->first();
-		
-		
-		$ReferenceBalances = $this->Ledgers->ReferenceBalances->find()->where(['ReferenceBalances.ledger_account_id'=>$ledger_account_id]);
-		//pr($ReferenceBalances->toArray()); exit;
-		
-		$ref_amt = $this->Ledgers->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$ledger_account_id]);
-		$ref_amt->select([
-			'debit' => $ref_amt->func()->sum('debit'),
-			'credit' => $ref_amt->func()->sum('credit')
-		]);
-		
-		$ref_amt=$ref_amt->first(); 
-		
+		$query = $this->Ledgers->ReferenceDetails->find();
+		$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
+		->where(['ReferenceDetails.ledger_account_id'=>$ledger_account_id])
+		->group(['ReferenceDetails.reference_no'])
+		->autoFields(true);
+		$referenceDetails=$query;
+		$ReferenceBalances=[];
+		$on_dr=0;
+		$on_cr=0;
+		foreach($referenceDetails as $referenceDetail){
+			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
+				$ReferenceBalances[]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type];
+			}
+			
+			if($referenceDetail->reference_type=="On_account"){
+				if($referenceDetail->credit==0){
+					$on_dr+=$referenceDetail->debit;
+				}else{
+					$on_cr+=$referenceDetail->credit;
+				}
+				
+			}
 		}
+		
+		// exit;
 		
 		$ledger=$this->Ledgers->LedgerAccounts->find('list',
 			['keyField' => function ($row) {
@@ -665,9 +664,24 @@ class LedgersController extends AppController
 				}
 				
 			}])->where(['company_id'=>$st_company_id]);
+			//pr($ledger); exit;
 			
-			$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url'));
+		}else{
+			$ledger=$this->Ledgers->LedgerAccounts->find('list',
+			['keyField' => function ($row) {
+				return $row['id'];
+			},
+			'valueField' => function ($row) {
+				if(!empty($row['alias'])){
+					return  $row['name'] . ' (' . $row['alias'] . ')';
+				}else{
+					return $row['name'];
+				}
+				
+			}])->where(['company_id'=>$st_company_id]);
 		}
+		
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr'));
 	}
 	
 	public function excelExportAccountRef(){
@@ -748,6 +762,7 @@ class LedgersController extends AppController
 			$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt'));
 		}
 	}
+	
 	public function AccountStatement (){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
@@ -772,7 +787,7 @@ class LedgersController extends AppController
 			$transaction_to_date= date('Y-m-d', strtotime($To));
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));
 			$company = $this->Companies->get($st_company_id);
-			//pr($company);exit;
+		//	pr($Ledger_Account_data);exit;
 			if($from == date("d-m-Y",strtotime($company->accounting_book_date))){
 				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
 				$opening_balance_ar=[];
@@ -800,7 +815,7 @@ class LedgersController extends AppController
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
 				})->order(['transaction_date' => 'DESC']);
-				//pr($Ledgers->toArray()); exit;
+				//pr($opening_balance_ar); exit;
 		
 			$url_link=[];
 			foreach($Ledgers as $ledger){
@@ -815,7 +830,7 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Receipt Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
-				}else if($ledger->voucher_source=="Invoice"){ 
+				}else if($ledger->voucher_source=="Invoice"){  //pr($ledger->voucher_source); exit;
 					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
 					if($inq->sale_tax_id==0){
 						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id, [
@@ -826,8 +841,6 @@ class LedgersController extends AppController
 							'contain' => ['Customers','SaleTaxes']
 						]);
 					}
-					
-					
 				}else if($ledger->voucher_source=="Invoice Booking"){
 					$ib=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
 					if($ib->cst_vat=='vat'){
@@ -1091,23 +1104,23 @@ class LedgersController extends AppController
 	public function findDate($ledger_account_id=null){ 
 	
 		$ReferenceDetails =$this->Ledgers->ReferenceDetails->find()->where(['ledger_account_id'=>$ledger_account_id]);
-		//pr($ReferenceDetails->toArray()); exit;
+		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Ledgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
-		foreach($ReferenceDetails as $ReferenceDetail){
-			 if($ReferenceDetail->invoice_id !=0){  
+		foreach($ReferenceDetails as $ReferenceDetail){ 
+			 if($ReferenceDetail->invoice_id !=0){  //pr($ReferenceDetails->toArray()); exit;
 				$Receipt =$this->Ledgers->Invoices->get($ReferenceDetail->invoice_id);
 				$Customer =$this->Ledgers->Customers->get($Receipt->customer_id);
 				$date = date("Y-m-d", strtotime($Receipt->date_created));
 				$due_date= date("Y-m-d",strtotime("+".$Customer->payment_terms."  day", strtotime($date)));
-				$query = $this->Ledgers->ReferenceBalances->query();
+				$query = $this->Ledgers->ReferenceDetails->query();
 				$query->update()
-						->set(['transaction_date' =>$date,'due_date'=>$due_date])
+						->set(['due_date'=>$due_date])
 						->where(['ledger_account_id' => $ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])
 						->execute();
-			}else if($ReferenceDetail->receipt_id !=0){ 
+			}else if($ReferenceDetail->receipt_id !=0){  
 				$Receipt =$this->Ledgers->Receipts->get($ReferenceDetail->receipt_id);
 				
 				$LedgerAccount =$this->Ledgers->LedgerAccounts->get($ReferenceDetail->ledger_account_id);
@@ -1115,9 +1128,9 @@ class LedgersController extends AppController
 				$Customer =$this->Ledgers->Customers->get($LedgerAccount->source_id);
 				$date = date("Y-m-d", strtotime($Receipt->created_on));
 				$due_date= date("Y-m-d",strtotime("+".$Customer->payment_terms."  day", strtotime($date)));
-				$query = $this->Ledgers->ReferenceBalances->query();
+				$query = $this->Ledgers->ReferenceDetails->query();
 				$query->update()
-						->set(['transaction_date' =>$date,'due_date'=>$due_date])
+						->set(['due_date'=>$due_date])
 						->where(['ledger_account_id' => $ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])
 						->execute();
 				}
@@ -1128,9 +1141,9 @@ class LedgersController extends AppController
 				$Customer =$this->Ledgers->Customers->get($LedgerAccount->source_id);
 				$date = date("Y-m-d", strtotime($Receipt->created_on));
 				$due_date= date("Y-m-d",strtotime("+".$Customer->payment_terms."  day", strtotime($date)));
-				$query = $this->Ledgers->ReferenceBalances->query();
+				$query = $this->Ledgers->ReferenceDetails->query();
 				$query->update()
-						->set(['transaction_date' =>$date,'due_date'=>$due_date])
+						->set(['due_date'=>$due_date])
 						->where(['ledger_account_id' => $ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])
 						->execute();
 				}
@@ -1142,9 +1155,9 @@ class LedgersController extends AppController
 					$Customer =$this->Ledgers->Customers->get($LedgerAccount->source_id);
 					$date = date("Y-m-d", strtotime($Receipt->created_on));
 					$due_date= date("Y-m-d",strtotime("+".$Customer->payment_terms."  day", strtotime($date)));
-					$query = $this->Ledgers->ReferenceBalances->query();
+					$query = $this->Ledgers->ReferenceDetails->query();
 					$query->update()
-							->set(['transaction_date' =>$date,'due_date'=>$due_date])
+							->set(['due_date'=>$due_date])
 							->where(['ledger_account_id' => $ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])
 							->execute();
 				}
@@ -1156,9 +1169,9 @@ class LedgersController extends AppController
 					$Customer =$this->Ledgers->Customers->get($LedgerAccount->source_id);
 					$date = date("Y-m-d", strtotime($Receipt->date_created));
 					$due_date= date("Y-m-d",strtotime("+".$Customer->payment_terms."  day", strtotime($date)));
-					$query = $this->Ledgers->ReferenceBalances->query();
+					$query = $this->Ledgers->ReferenceDetails->query();
 					$query->update()
-							->set(['transaction_date' =>$date,'due_date'=>$due_date])
+							->set(['due_date'=>$due_date])
 							->where(['ledger_account_id' => $ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])
 							->execute();
 				}

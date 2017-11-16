@@ -112,19 +112,11 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 							<label class="control-label">Purchase Account <span class="required" aria-required="true">*</span></label>
 							<?php  //pr($ledger_account_details->toArray()); 
 							$option =[];
-							foreach($ledger_account_details as $key => $ledger_account_detail)
+							foreach($ledger_account_details as  $ledger_account_detail)
 							{ 
-								if(($key!= 35 && $key!= 538 && $st_company_id==25))
+								if($ledger_account_detail->purchase_account=='yes')
 								{
-									$option[$key] = $ledger_account_detail;
-								}
-								elseif(($key!= 161 && $key!= 160 && $st_company_id==26))
-								{
-									$option[$key] = $ledger_account_detail;
-								}
-								elseif(($key!= 309 && $key!= 308 && $st_company_id==27))
-								{
-									$option[$key] = $ledger_account_detail;
+									$option[]=['value'=>$ledger_account_detail->id,'text'=>$ledger_account_detail->name,'gst_type'=>$ledger_account_detail->gst_type];
 								}
 							}
 							echo $this->Form->input('purchase_ledger_account', ['options' => $option,'label' => false,'empty'=>'Select','class' => 'form-control input-sm gst_type']); ?>
@@ -873,8 +865,8 @@ $(document).ready(function() {
 	
 	
 	$('select[name="purchase_ledger_account"]').on("change",function() { 
-		var gst_ledger_id=$('select[name="purchase_ledger_account"] option:selected').val();
-		if(gst_ledger_id=="799" || gst_ledger_id=="800" )
+		var gst_type=$('select[name="purchase_ledger_account"] option:selected').attr('gst_type'); 
+		if(gst_type=='GST')
 		{  
 				$('.igst_display').css("display", "none");
 				$('.cgst_display').css("display", "");

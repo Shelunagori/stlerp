@@ -31,6 +31,7 @@
 				 <form method="GET" >
 				<input type="hidden" name="pull-request" value="<?php echo @$pull_request; ?>">
 				<input type="hidden" name="gst" value="<?php echo @$gst; ?>">
+				<input type="hidden" name="status" value="<?php echo @$status; ?>">
 				<input type="hidden" name="job-card" value="<?php echo @$job_card; ?>">
 				<table class="table table-condensed">
 					<tbody>
@@ -54,7 +55,7 @@
 					</tbody>
 				</table>
 				</form>
-<?php $page_no=$this->Paginator->current('MaterialIndentS'); $page_no=($page_no-1)*20; ?>
+
 	<table class="table table-bordered table-striped table-hover">
 		<thead>
 				<tr>
@@ -65,11 +66,11 @@
 				</tr>
 		</thead>
         <tbody>
-            <?php  foreach($materialIndents as $materialIndent): 
-			//pr($materialIndent->material_indent_rows);
+            <?php $i=1;  foreach($mi_id as $materialIndent): 
+			//pr($materialIndent);
 			?>
             <tr>
-			   <td><?= h(++$page_no) ?></td>
+			   <td><?php echo $i++; ?></td>
 			   <td>
 				<?= h('#'.str_pad($materialIndent->mi_number, 4, '0', STR_PAD_LEFT)) ?>
 			    </td>
@@ -86,12 +87,5 @@
             <?php endforeach; ?>
         </tbody>
     </table>
-    <div class="paginator">
-        <ul class="pagination">
-            <?= $this->Paginator->prev('< ' . __('previous')) ?>
-            <?= $this->Paginator->numbers() ?>
-            <?= $this->Paginator->next(__('next') . ' >') ?>
-        </ul>
-        <p><?= $this->Paginator->counter() ?></p>
-    </div>
+
 </div>

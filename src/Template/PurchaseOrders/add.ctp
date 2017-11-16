@@ -92,14 +92,18 @@ With reference to your price list we are pleased to place an order for the follo
 						</thead>
 						<tbody id="main_tbody">
 						<?php if(sizeof(@$to_be_send2)>0){
-							$q=0; foreach ($to_be_send2 as $item_id=>$data): ?>
+							$q=0; foreach ($to_be_send2 as $key=>$data): ?>
 								<tr class="tr1" row_no='<?php echo @$item_id; ?>'>
 									<td rowspan="2"><?php echo ++$q; $q--; ?></td>
 									<td>
 										
 										<?php 
-										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$item_id,'class'=>'item_id']);  ?>
+										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$data['item_id'],'class'=>'item_id']);  ?>
+										
+										
 										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'type'=>'hidden','value'=>'PULLED_FROM_MI']);  ?>
+										<?php 
+										echo $this->Form->input('purchase_order_rows.'.$q.'.material_indent_row_id', ['label' => false,'type'=>'hidden','value'=>$key,'class'=>'material_indent_row_id']);  ?> 
 										<?php echo $data['item_name']; ?><br/>
 										<span class="label label-sm label-warning ">Pulled from MI</span>
 									</td>
@@ -470,6 +474,8 @@ $(document).ready(function() {
 					$(this).find("td:nth-child(2) input").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
 					
 					$(this).find("td:nth-child(2) input:eq(1)").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
+					
+					$(this).find("td:nth-child(2) .material_indent_row_id").attr({name:"purchase_order_rows["+i+"][material_indent_row_id]", id:"purchase_order_rows-"+i+"-material_indent_row_id"}).rules("add", "required");
 					
 				}
 				

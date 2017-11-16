@@ -383,12 +383,12 @@ select
 					</a>
 					<ul class="sub-menu">
 						<?php if(in_array(137,$allowed_pages)){ ?>
-						<?php echo '<li>'.$this->Html->link( 'Create', '/InventoryTransferVouchers/add' ).'</li>';
+						<?php echo '<li>'.$this->Html->link( 'Create', '/Ivs/add' ).'</li>';
 						 ?>
 						 <?php } ?>
 						 <?php if(in_array(140,$allowed_pages)){ ?>
 						<?php
-						echo '<li>'.$this->Html->link('View', '/InventoryTransferVouchers' ).'</li>';
+						echo '<li>'.$this->Html->link('View', '/Ivs' ).'</li>';
 						 ?>
 						 <?php } ?>
 					</ul>

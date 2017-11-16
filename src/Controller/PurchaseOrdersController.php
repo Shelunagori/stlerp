@@ -251,12 +251,14 @@ class PurchaseOrdersController extends AppController
 		if($to_be_send){
 			$to_be_send=json_decode($to_be_send);
 			$to_be_send2=[];
-			foreach($to_be_send as $item_id=>$qty){
-				$Item=$this->PurchaseOrders->Items->get($item_id);
-				$to_be_send2[$item_id]=['qty'=>$qty,'item_name'=>$Item->name];
+			foreach($to_be_send as $id=>$qty){
+				$PurchaseOrderRow=$this->PurchaseOrders->MaterialIndentRows->get($id, [
+					'contain' => ['Items']
+				]);
+				$to_be_send2[$id]=['qty'=>$qty,'item_name'=>$PurchaseOrderRow->item->name,'item_id'=>$PurchaseOrderRow->item_id,'row_id'=>$PurchaseOrderRow->id];
 			}
 		}
-		
+		// pr($to_be_send2); exit;
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();

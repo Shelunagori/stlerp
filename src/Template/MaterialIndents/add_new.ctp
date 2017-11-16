@@ -20,13 +20,13 @@
 						<th>Action</th>
 					</thead>
 					<tbody >
-					<?php foreach($MaterialIndentRows as $MaterialIndentRow){ ?>
+					<?php foreach($MaterialIndentRows as $MaterialIndentRow){ //pr($MaterialIndentRow);?>
 						<tr class="main_tr">
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h($MaterialIndentRow->item->name) ?></td>
-							<td><?= h($MaterialIndentRow->r_quantity-$MaterialIndentRow->p_quantity) ?></td>
+							<td><?= h($MaterialIndentRow->required_quantity) ?></td>
 							<td>
-								<?php echo $this->Form->input('to_be_send['.$MaterialIndentRow->item_id.']', ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => (@$MaterialIndentRow->r_quantity-$MaterialIndentRow->p_quantity),'hiddenField'=>false]);  ?>
+								<?php echo $this->Form->input('to_be_send['.$MaterialIndentRow->id.']', ['label' => false,'type'=>'checkbox','class'=>'rename_check qty','value' => @$MaterialIndentRow->required_quantity,'hiddenField'=>false]);  ?>
 							</td>
 						</tr>
 					<?php } ?>
@@ -49,20 +49,21 @@
 <script>
 
 $(document).ready(function() {
-	$('.rename_check').die().live("click",function() { 
+	$('.rename_check').die().live("click",function() {  
  		rename_rows();
     })
 	var p=0;
-	function rename_rows(){ 
+	function rename_rows(){  //alert();
 		var i=0;
-		$("#main_tb tbody tr.tr1").each(function(){
-			var val=$(this).find('td:nth-child(3) input[type="checkbox"]:checked').val();
+		$("#main_tb tbody tr.main_tr").each(function(){
+			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
 			var mi=$(this).find('td:nth-child(1) input[type="hidden"]').val();
+			//alert(val);
 			if(val){
 				$(this).css('background-color','#fffcda');
 				
-				$(this).find('td:nth-child(1) input').attr("name","prepo["+mi+"]["+val+"][item_id]").attr("id","prepo-"+val+"-item_id");
-				$(this).find('td:nth-child(2) input').attr("name","prepo["+mi+"]["+val+"][quantity]").attr("id","prepo-"+val+"-quantity");
+				//$(this).find('td:nth-child(1) input').attr("name","prepo["+mi+"]["+val+"][item_id]").attr("id","prepo-"+val+"-item_id");
+				//$(this).find('td:nth-child(2) input').attr("name","prepo["+mi+"]["+val+"][quantity]").attr("id","prepo-"+val+"-quantity");
 				
 				
  			}else{

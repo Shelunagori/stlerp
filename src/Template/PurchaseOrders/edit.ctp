@@ -112,12 +112,12 @@
 									<td>
 									
 									<?php 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id,$disable]);
-									if($disable!="")
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
+									/* if($disable!="")
 									{
 										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['class' => 'itemId','value'=>$purchase_order_rows->item_id,'type'=>'hidden']);
-									}
-									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','class'=>'p','value'=>@$purchase_order_rows->processed_quantity]);
+									} */
+									
 									?>
 									 <?php
 									   echo $this->Form->input('purchase_order_rows.'.$q.'.id', ['value'=>$purchase_order_rows->id,'type'=>'hidden','class'=>'idd']);
@@ -129,9 +129,12 @@
 									<?php } else { ?>
 									<td>
 									<?php 
+									
+									echo $this->Form->input('purchase_order_rows.'.$q.'.id', ['value'=>$purchase_order_rows->id,'type'=>'hidden','class'=>'idd']);
+									
 									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item_id','type'=>'hidden','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
-									echo $this->Form->input('purchase_order_rows.'.$q.'.processed_quantity', ['label' => false,'type' => 'hidden','value'=>@$purchase_order_rows->processed_quantity]);
-									echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'type'=>'hidden','value'=>'PULLED_FROM_MI']); 
+									echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'class'=>'pull_status','type'=>'hidden','value'=>'PULLED_FROM_MI']); 
+									echo $this->Form->input('purchase_order_rows.'.$q.'.material_indent_row_id', ['label' => false,'type'=>'hidden','value'=>@$purchase_order_rows->material_indent_row_id,'class'=>'material_indent_row_id']); 
 									
 									echo $purchase_order_rows->item->name; ?><br/>
 									<span class="label label-sm label-warning ">Pulled from MI</span>
@@ -490,17 +493,18 @@ $(document).ready(function() {
 			var len=$(this).find("td:nth-child(2) select").length; 
 			if(len>0){
 				
-				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
+				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules('add', {
 						required: true
 					});
-				//$(this).find("td:nth-child(2) input[type='hidden'].p").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
 				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 			}else{
-				$(this).find("td:nth-child(2) input:eq(0)").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 				
-				$(this).find("td:nth-child(2) input:eq(1)").attr({name:"purchase_order_rows["+i+"][processed_quantity]", id:"purchase_order_rows-"+i+"-processed_quantity"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input.item_id").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
 				
-				$(this).find("td:nth-child(2) input:eq(2)").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input.pull_status").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
+				
+				$(this).find("td:nth-child(2) .material_indent_row_id").attr({name:"purchase_order_rows["+i+"][material_indent_row_id]", id:"purchase_order_rows-"+i+"-material_indent_row_id"}).rules("add", "required");
 				
 				
 			}
