@@ -2238,30 +2238,32 @@ class InvoicesController extends AppController
 				
 				//////start serial Number database changes Oct17	  
 				foreach($invoice->invoice_rows as $invoice_row){
-					
-					$item_serial_no=$invoice_row->serial_numbers;
-					$serial_nos=implode(",", $item_serial_no); 
-					$query = $this->Invoices->InvoiceRows->query();
-									$query->update()
-										->set(['serial_number' => $serial_nos])
-										->where(['id' => $invoice_row->id])
-										->execute(); 
-				/////for delete serial number in table					
-					$this->Invoices->InvoiceRows->SerialNumbers->deleteAll(['SerialNumbers.invoice_id'=>$invoice->id,'SerialNumbers.invoice_row_id' => $invoice_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
-				 foreach($item_serial_no as $serial){
+					if(!empty($invoice_row->serial_numbers))
+					{
+						$item_serial_no=$invoice_row->serial_numbers;
+						$serial_nos=implode(",", $item_serial_no); 
+						$query = $this->Invoices->InvoiceRows->query();
+										$query->update()
+											->set(['serial_number' => $serial_nos])
+											->where(['id' => $invoice_row->id])
+											->execute(); 
+					/////for delete serial number in table					
+						$this->Invoices->InvoiceRows->SerialNumbers->deleteAll(['SerialNumbers.invoice_id'=>$invoice->id,'SerialNumbers.invoice_row_id' => $invoice_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
+					 foreach($item_serial_no as $serial){
 
-				 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
-									->values([
-									'name' => $serial,
-									'item_id' => $invoice_row->item_id,
-									'status' => 'Out',
-									'invoice_id' => $invoice->id,
-									'invoice_row_id' => $invoice_row->id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute();  
-						
+					 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
+										->values([
+										'name' => $serial,
+										'item_id' => $invoice_row->item_id,
+										'status' => 'Out',
+										'invoice_id' => $invoice->id,
+										'invoice_row_id' => $invoice_row->id,
+										'company_id'=>$st_company_id
+										]);
+									$query->execute();  
+							
+						}
 					}
 				}
 			//////End serial Number database changes Oct17
