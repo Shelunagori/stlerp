@@ -1571,9 +1571,7 @@ class ItemLedgersController extends AppController
 			} exit;
 	}
 	
-<<<<<<< HEAD
-	
-=======
+
 	public function weightedAvgCostIvs($item_id=null){
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();
@@ -1683,6 +1681,5 @@ class ItemLedgersController extends AppController
 	
 		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
 	}
->>>>>>> 7e038cbfddf9faae4bf825c2ab79d0b5cd031af2
 }
 
