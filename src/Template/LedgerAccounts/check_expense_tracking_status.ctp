@@ -11,7 +11,7 @@ if(!empty($grn_invoice))
 				$option[]=['text' =>$grn_no, 'value' => $grn1->id];
 			}
 		echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control select2me grns','style'=>'width:100%']);   
-		 
+		echo $this->Form->input('q', ['class'=>'check','type'=>'hidden','value'=>'grn']); 
 	}
 	if(@$status=="INVOICE")
 	{
@@ -22,6 +22,7 @@ if(!empty($grn_invoice))
 			$option[]=['text' =>$invoice_no, 'value' => $invoice1->id];
 		}
 		echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control select2me invoices','style'=>'width:100%']);
+		echo $this->Form->input('q', ['class'=>'check','type'=>'hidden','value'=>'invoice']);
 	}
 }
 ?>
