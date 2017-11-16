@@ -58,6 +58,11 @@ class InvoiceRowsTable extends Table
 		$this->hasOne('IvRows', [
             'foreignKey' => 'invoice_row_id'
         ]);
+		
+		$this->hasOne('Ivs', [
+            'foreignKey' => 'invoice_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

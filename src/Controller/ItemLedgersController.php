@@ -1382,7 +1382,17 @@ class ItemLedgersController extends AppController
 						return $exp->between('transaction_date',$From ,$To, 'date');
 					});
 			$AllDatas[$To]['InventoryTransferVouchers']=$InventoryTransferVouchers;
-			//pr($InventoryTransferVouchers);exit;
+			
+			$Ivs=$this->ItemLedgers->Ivs->find()->contain(['IvRows'=>['Items','SerialNumbers','IvRowItems'=>['Items','SerialNumbers']]])->where(function($exp) use($From ,$To) {
+						return $exp->between('transaction_date',$From ,$To, 'date');
+					});
+			$AllDatas[$To]['InventoryVouchers']=$Ivs;
+			
+			$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+						return $exp->between('date_created',$From ,$To, 'date');
+					});
+			$AllDatas[$To]['SaleReturns']=$SaleReturns;
+			//pr($SaleReturns->toArray());exit;
 	
 		$this->set(compact('AllDatas','serial_nos','voucher_no','From','To','link','url'));
 	}

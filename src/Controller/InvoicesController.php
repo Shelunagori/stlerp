@@ -62,7 +62,7 @@ class InvoicesController extends AppController
             'contain' => ['Customers', 'Companies']
         ];
 		
-		if($inventory_voucher=='true'){
+		/* if($inventory_voucher=='true'){
 			$where['Invoices.inventory_voucher_status']='Pending';
 			
 		}else{
@@ -73,7 +73,7 @@ class InvoicesController extends AppController
 				$where['status']='Cancel';
 			}	
 		}
-		
+		 */
 		if(!empty($items))
 		{ 
 			$InvoiceRows = $this->Invoices->InvoiceRows->find();
@@ -91,15 +91,21 @@ class InvoicesController extends AppController
 		}
 		else if($inventory_voucher=='true'){  
 			$invoices=[]; 
-			$invoices=$this->paginate($this->Invoices->find()->where($where)->contain(['SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+			$invoices=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
 				return $q->where(['source !='=>'Purchessed']);
-				}]])->where(['Invoices.company_id'=>$st_company_id,'Invoices.inventory_voucher_status'=>'Pending','Invoices.inventory_voucher_create'=>'Yes'])->order(['Invoices.id' => 'DESC']));
+				},'SalesOrderRows'=>function ($q) {
+				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
+				}
+				]])
+				
+				->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
+				
 				//pr($invoices); exit;
 		}else if($sales_return=='true'){
 			
-			$invoices = $this->paginate($this->Invoices->find()->contain(['SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']));
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices = $this->paginate($this->Invoices->find()->contain(['SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']));
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
 		} 
 		
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
@@ -156,12 +162,21 @@ class InvoicesController extends AppController
 			if(!empty($invoice_no)){
 				$where['Invoices.in2 LIKE']=$invoice_no;
 			}
-		
-			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST']);
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST'])->toArray();
 			$status=1;
-			
 		}
-		$this->set(compact('invoices','status','sales_return','InvoiceRows','invoice_no'));
+		$InvoiceExist="No";
+		if(!empty($invoices)){
+			$SalesReturnexists = $this->Invoices->SaleReturns->exists(['SaleReturns.invoice_id' => $invoices[0]->id]);
+			if($SalesReturnexists==1){
+				$SalesReturn=$this->Invoices->SaleReturns->find()->where(['SaleReturns.invoice_id' => $invoices[0]->id,'SaleReturns.company_id'=>$st_company_id])->first();
+				$SalesReturnId=$SalesReturn->id;
+				$InvoiceExist="Yes";
+			}
+		}
+		 //pr($InvoiceExist); exit;
+		
+		$this->set(compact('invoices','status','sales_return','InvoiceRows','invoice_no','InvoiceExist','SalesReturnId'));
         $this->set('_serialize', ['invoices']);
 		$this->set(compact('url'));
 	}
