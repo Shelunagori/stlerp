@@ -8,7 +8,7 @@ use Cake\Datasource\ConnectionManager;
  *
  * @property \App\Model\Table\SalesOrdersTable $SalesOrders
  */
-class SalesOrdersController extends AppController 
+class SalesOrdersController extends AppController
 {
 
     /**
@@ -128,6 +128,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="NonGstInvoice";
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -139,7 +140,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'no'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="NonGstCopy";
 				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -151,7 +152,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'yes'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstCopy";
 				}else {   
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -162,7 +163,7 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
 				}
@@ -238,18 +239,14 @@ class SalesOrdersController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['SalesOrders.created_on <=']=$To;
 		}
-        $this->paginate = [
+        /* $this->paginate = [
             'contain' => ['Customers','Employees','Categories', 'Companies']
-        ];
+        ]; */
 		
        
 		
-		if($status=='Pending'){
-			$having=['total_rows >' => 0];
-		}else if($status=='Converted Into Invoice'){
-			$having=['total_rows =' => 0];
-		}
-		$salesOrders=
+		
+		/* $salesOrders=
 			$this->SalesOrders->find()->select(['total_rows' => 
 				$this->SalesOrders->find()->func()->count('SalesOrderRows.id')])
 				->leftJoinWith('SalesOrderRows', function ($q) {
@@ -262,9 +259,33 @@ class SalesOrdersController extends AppController
 				->where(['SalesOrders.company_id'=>$st_company_id])
 				->order(['SalesOrders.id' => 'DESC'])
 				->contain(['Quotations','Customers'])
-			;
+			; */
 		
-        $this->set(compact('salesOrders','status','From','To'));
+		$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Quotations','Customers','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'],'Employees','Companies'])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where($where);
+					
+		$total_sales=[]; $total_qty=[];
+		foreach($salesOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->sales_order_rows as $sales_order_row){
+				foreach($sales_order_row->invoice_rows as $invoice_row){
+						if(sizeof($invoice_row) > 0)
+						{
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
+		//pr($total_sales);
+		//pr($total_qty);exit;
+        $this->set(compact('salesOrders','status','From','To','total_sales','total_qty'));
         $this->set('_serialize', ['salesOrders']);
     }
 	
@@ -467,10 +488,6 @@ class SalesOrdersController extends AppController
 			//pr($salesOrder);exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
-				
-			  	
-				
-			
 				if(!empty($status_close)){
 				$query = $this->SalesOrders->Quotations->query();
 					$query->update()
@@ -657,7 +674,7 @@ class SalesOrdersController extends AppController
 				$salesOrder->edited_by=$s_employee_id;
 				$salesOrder->edited_on=date("Y-m-d");
 				$salesOrder->edited_on_time= date("Y-m-d h:i:sA");
-				
+				//pr($salesOrder);exit;
 				if ($this->SalesOrders->save($salesOrder)) {
 					
 					foreach($salesOrder->sales_order_rows as $sales_order_row){

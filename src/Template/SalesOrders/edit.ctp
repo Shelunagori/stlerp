@@ -144,7 +144,7 @@
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
 			
 					
-					else if(@$sales_orders_qty[$sales_order_rows->id] > 0){
+					if(@$sales_orders_qty[$sales_order_rows->id] > 0){
 						
 						$disable_class=" disabled='true'";
 						$disable_class_item="disabledbutton";

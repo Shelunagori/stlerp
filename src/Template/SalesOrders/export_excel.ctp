@@ -25,8 +25,8 @@
 						<tr>
 							<th>S. No.</th>
 							<th>Sales Order No</th>
-							<th>Quotation No</th>
 							<th>Customer</th>
+							<th>Quotation No</th>
 							<th>Date</th>
 							<th>PO No.</th>
 							<th>Status</th>
@@ -47,7 +47,7 @@
 							
 							
 							<td>
-								<?php if($salesOrder->total_rows > 0 ){ 
+								<?php if($total_sales[$salesOrder->id] != @$total_qty[@$salesOrder->id]){ 
 									echo "Pending";
 								}else{
 									echo "Converted Into Invoice";

@@ -778,20 +778,6 @@ class InvoicesController extends AppController
 			->where(['Ledgers.ledger_account_id'=>$customer_ledger[0]->id]);
 		$ledgers = $query->toArray();
 		$old_due_payment=$ledgers[0]->debit_total-$ledgers[0]->credit_total;
-        
-		/* $customer_reference_details = $this->Invoices->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$customer_ledger[0]->id])->toArray();
-		$total_credit=0;
-		$total_debit=0;
-		$old_due_payment=0;
-		foreach($customer_reference_details as $customer_reference_detail){
-			if($customer_reference_detail->debit==0){
-				$total_credit=$total_credit+$customer_reference_detail->credit;
-			}
-			else{
-				$total_debit=$total_debit+$customer_reference_detail->debit;
-			}
-		}
-				$old_due_payment=$total_credit-$total_debit; */
 
 		}
 		//pr($old_due_payment); exit;	

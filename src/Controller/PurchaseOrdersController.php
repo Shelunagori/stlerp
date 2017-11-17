@@ -194,16 +194,10 @@ class PurchaseOrdersController extends AppController
 		}
 		$where1=[];
 		$having=[];
-		if($status=='Pending'){
-			$having=['total_rows >' => 0];
-			
-		}elseif($status=='Converted-Into-GRN'){
-			$having=['total_rows =' => 0];
-			
-		}
+		
 		
 				
-			$purchaseOrders=
+			/* $purchaseOrders=
 			$this->PurchaseOrders->find()->select(['total_rows' => 
 				$this->PurchaseOrders->find()->func()->count('PurchaseOrderRows.id')])
 				->leftJoinWith('PurchaseOrderRows', function ($q) {
@@ -216,9 +210,30 @@ class PurchaseOrdersController extends AppController
 				->where(['company_id'=>$st_company_id])
 				->order(['PurchaseOrders.id' => 'DESC'])
 				->contain(['PurchaseOrderRows'=>['Items'],'Companies', 'Vendors'])
-			;
-
-		$this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last'));
+			; */
+		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where);
+			
+		
+		$total_sales=[]; $total_qty=[];
+		foreach($purchaseOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->purchase_order_rows as $sales_order_row){
+				foreach($sales_order_row->grn_rows as $invoice_row){
+						if(sizeof($invoice_row) > 0){
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
+		$this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_sales','total_qty'));
         $this->set('_serialize', ['purchaseOrders']);
 		$this->set(compact('url','purchaseOrders'));
 	}
