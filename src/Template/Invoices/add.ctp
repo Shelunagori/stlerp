@@ -500,6 +500,7 @@ $('.closetin').on("click",function() {
 
 
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<<<<<<< HEAD
 <script>
 $(document).ready(function() {
 	jQuery.validator.addMethod("noSpace", function(value, element) { 
@@ -1170,6 +1171,10 @@ $(document).ready(function() {
 	}
 });
 </script> 
+=======
+
+	 
+>>>>>>> 327f39686953d528fc5062cfffae9a5921e2c3c9
 <div id="myModal12" class="modal fade in" tabindex="-1"  style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
 	<div class="modal-dialog">
 		<div class="modal-content">

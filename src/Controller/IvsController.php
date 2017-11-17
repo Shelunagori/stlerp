@@ -105,6 +105,7 @@ class IvsController extends AppController
 		]);
 		
 		$item_display=[];
+		$jobcardrows=[];
 		$job_card_status='yes';
 		foreach($Invoice->invoice_rows as $invoice_row){
 			$so_row_id=$invoice_row->sales_order_row_id;
@@ -118,8 +119,9 @@ class IvsController extends AppController
 			}elseif($invoice_row->item->source=='Assembled' or $invoice_row->item->source=='Manufactured'){
 				$item_display[$invoice_row->id]=$invoice_row->item->name; 
 			}
-			$jobcardrows=$this->Ivs->JobCards->JobCardRows->find()
+			$jobcardrows[$invoice_row->id]=$this->Ivs->JobCards->JobCardRows->find()
 							->where(['JobCardRows.sales_order_row_id'=>$so_row_id]);
+							
 		}
 		
         $iv = $this->Ivs->newEntity();
