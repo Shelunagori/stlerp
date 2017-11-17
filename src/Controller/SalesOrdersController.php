@@ -129,7 +129,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'no'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="NonGstInvoice";
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -141,7 +141,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'no'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="NonGstCopy";
 				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -153,7 +153,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'yes'])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstCopy";
 				}else {  
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -164,7 +164,7 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where($where);
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
 				}
@@ -469,10 +469,6 @@ class SalesOrdersController extends AppController
 			//pr($salesOrder);exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
-				
-			  	
-				
-			
 				if(!empty($status_close)){
 				$query = $this->SalesOrders->Quotations->query();
 					$query->update()
@@ -659,7 +655,7 @@ class SalesOrdersController extends AppController
 				$salesOrder->edited_by=$s_employee_id;
 				$salesOrder->edited_on=date("Y-m-d");
 				$salesOrder->edited_on_time= date("Y-m-d h:i:sA");
-				
+				//pr($salesOrder);exit;
 				if ($this->SalesOrders->save($salesOrder)) {
 					
 					foreach($salesOrder->sales_order_rows as $sales_order_row){

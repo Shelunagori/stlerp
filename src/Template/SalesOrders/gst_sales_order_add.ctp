@@ -307,7 +307,7 @@ if(!empty($copy))
 							<td width="200px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.total', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Total']); ?></td>
 							<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
 						</tr>
-						<tr class="tr2 <?php echo $disable_class; ?> maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
+						<tr class="tr2 maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
 							<td colspan="16" class="main">
 							<div class="note-editable" id="summer<?php echo $q; ?>" ><?php echo $quotation_rows->description; ?></div>
 							</td>

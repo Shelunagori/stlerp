@@ -500,7 +500,6 @@ $('.closetin').on("click",function() {
 
 
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
-
 <script>
 $(document).ready(function() {
 	jQuery.validator.addMethod("noSpace", function(value, element) { 
@@ -646,8 +645,6 @@ $(document).ready(function() {
 
 	});
 	
-	//--	 END OF VALIDATION
-	
 	if($("#discount_per").is(':checked')){
 			$("#discount_text").show();
 			$('input[name="discount"]').attr('readonly','readonly');
@@ -658,7 +655,7 @@ $(document).ready(function() {
 			$('input[name="discount_per"]').val(0);
 			$('input[name="discount"]').val(0);
 		}
-	
+		
 	$('#update_credit_limit').on("click",function() {
 		var customer_id=$('input[name="customer_id"]').val();
 		$("#update_credit_limit_wait").html('Loading...');
@@ -677,8 +674,8 @@ $(document).ready(function() {
 						}
 					});
 		});
-    });
-	
+    });	
+		
 	$('input[name="temp_limit"]').die().live("keyup",function(){
 	var credit_limit=$('input[name="credit_limit"]').val();
 	var temp_limit=$('input[name="temp_limit"]').val();
@@ -691,7 +688,7 @@ $(document).ready(function() {
 						}
 					});
 	});
-	
+
 	$('input[name="discount"],input[name="discount_per"],input[name="pnf"],input[name="fright_amount"],input[name="pnf_per"]').die().live("keyup",function() {
 			var asc=$(this).val();
 			var numbers =  /^[0-9]*\.?[0-9]*$/;
@@ -703,16 +700,14 @@ $(document).ready(function() {
 				$(this).val('');
 				return false;  
 			}
-	});
-	
-	
+	});	
 	
 	$('select[name="company_id"]').on("change",function() {
 		var alias=$('select[name="company_id"] option:selected').attr("alias");
 		$('input[name="in1"]').val(alias);
     });
 	
-		$("#pnfper").on('click',function(){
+	$("#pnfper").on('click',function(){
 		if($(this).is(':checked')){
 			$("#pnf_text").show();
 			$('input[name="pnf"]').attr('readonly','readonly');
@@ -726,7 +721,7 @@ $(document).ready(function() {
 			
 		}
 		calculate_total();
-	})
+	});
 	
 	$("#discount_per").on('click',function(){  
 		if($(this).is(':checked')){
@@ -741,7 +736,7 @@ $(document).ready(function() {
 			
 		}
 		calculate_total();
-	})
+	});
 	
 	$('#main_tb input,#tbl1 input').die().live("keyup","blur",function() { 
 		calculate_total();
@@ -768,9 +763,7 @@ $(document).ready(function() {
 	$('#main_tb input,#tbl2 select').die().live("change",function() { 
 		calculate_total();
     });
-	
-	$('.rename_check').die().live("click",function() {
-	
+	$('.rename_check').die().live("click",function() {  
 		rename_rows(); calculate_total();
     });
 	
@@ -780,16 +773,16 @@ $(document).ready(function() {
     });
 	
 	<?php if($process_status!="New"){ ?>
-	function rename_rows(){
+	function rename_rows(){ 
 		var list = new Array();
-		
-		$("#main_tb tbody tr.tr1").each(function(){  
+		$("#main_tb tbody tr.tr1").each(function(){ 
 			var row_no=$(this).attr('row_no');
 			
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
-				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
-				$(th is).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(1) input').attr(
+				"name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
+				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");
@@ -805,7 +798,8 @@ $(document).ready(function() {
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
 				var OriginalQty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				Quantity = OriginalQty.split('.'); qty=Quantity[0];
+				Quantity = OriginalQty.split('.'); 
+				qty=Quantity[0];
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
@@ -845,10 +839,10 @@ $(document).ready(function() {
 			});
 
 			$("#checked_row_length").val(unique.length);
-			
+		
 		});
+				
 	}
-	
 	
 	
 	function put_code_description(){
@@ -865,7 +859,6 @@ $(document).ready(function() {
 		});
 		
 	}
-	
 	
 	function calculate_total(){
 		var total=0; var grand_total=0;
@@ -938,6 +931,7 @@ $(document).ready(function() {
 		$('input[name="new_due_payment"]').val(round(new_due_payment,2));
 		do_ref_total();
 	}
+	//alert();
 	<?php } ?>
 	
 	$('.select_address').on("click",function() {
@@ -947,8 +941,6 @@ $(document).ready(function() {
 	$('.closebtn').on("click",function() { 
 		$("#myModal12").hide();
     });
-	
-	
 	
 	$('select[name="customer_id"]').on("change",function() {
 		var customer_id=$('select[name="customer_id"] option:selected').val();
@@ -1026,11 +1018,11 @@ $(document).ready(function() {
 	
 	});
 	
-	 
 	calculation_for_total();
 	$('input').live("keyup",function() {
 		calculation_for_total();
 	});
+	
 	function calculation_for_total(){
 		var total_left=0; var total_right=0; var sum=0;
 		$("#due_receipt tbody tr.tr1").each(function(){ 
@@ -1044,8 +1036,6 @@ $(document).ready(function() {
 		});
 	}
 	
-	
-	
 	$('.addrefrow').live("click",function() {
 		add_ref_row();
 	});
@@ -1055,6 +1045,7 @@ $(document).ready(function() {
 		$("table.main_ref_table tbody").append(tr);
 		rename_ref_rows();
 	}
+	
 	rename_ref_rows();
 	function rename_ref_rows(){
 		var i=0;
@@ -1118,9 +1109,11 @@ $(document).ready(function() {
 		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
 		do_ref_total();
 	});
+	
 	$('.cr_dr_amount').live("change",function() {
 		do_ref_total();
 	});
+	
 	$('.ref_amount_textbox').live("keyup",function() {
 		do_ref_total();
 	});
@@ -1175,10 +1168,8 @@ $(document).ready(function() {
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}
-	
 });
-</script>
-	 
+</script> 
 <div id="myModal12" class="modal fade in" tabindex="-1"  style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
 	<div class="modal-dialog">
 		<div class="modal-content">

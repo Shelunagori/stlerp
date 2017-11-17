@@ -184,7 +184,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
 						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
-						$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
+						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
 						$sr_nos=$current_invoice_row->serial_number;
 					}
 					//$sr_nos=explode(',',$current_item_serial_number);
@@ -193,7 +193,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						
 			
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
-						if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
+						?>
 
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
@@ -241,8 +241,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</tr>
 						<tr class="tr2" row_no="<?= h($q) ?>">
 							<td colspan="7">
-							<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>" ><?php echo @$descriptions[$sales_order_row->item_id]; ?></div>
-							<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm ','placeholder'=>'Description','style'=>['display:none'],'value' => @$descriptions[$sales_order_row->item_id],'readonly','required']); ?>
+							<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>" ><?php echo @$descriptions[$sales_order_row->id]; ?></div>
+							<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm ','placeholder'=>'Description','style'=>['display:none'],'value' => @$descriptions[$sales_order_row->id],'readonly','required']); ?>
 							
 							
 							</td>
@@ -255,7 +255,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 					</tr><?php } ?>
 					
-						<?php $q++; } }  ?>
+						<?php $q++;  }  ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">

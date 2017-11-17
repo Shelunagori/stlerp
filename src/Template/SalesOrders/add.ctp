@@ -274,7 +274,7 @@ if(!empty($copy))
 						</tr>
 						<tr class="tr2 maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
 							<td colspan="6">
-							<div class="note-editable" id="summer<?php echo $q; ?>" ><?php echo $quotation_rows->description; ?></div>
+							<div  class="note-editable" id="summer<?php echo $q; ?>" ><?php echo $quotation_rows->description; ?></div>
 							</td>
 							<td></td>
 						</tr>
@@ -324,7 +324,9 @@ if(!empty($copy))
 						</tr>
 						<tr class="tr2 maintr" row_no='<?php echo @$sales_order_rows->id; ?>'>
 							<td colspan="6" class="main">
-								<div class="note-editable" id="summer<?php echo $q; ?>" ><?php echo $sales_order_rows->description; ?></div>
+								<div class="note-editable" id="summer<?php echo $q; ?>" ><?php echo $sales_order_rows->description; ?>
+								
+								</div>
 							</td>
 							<td></td>
 						</tr>
@@ -853,13 +855,13 @@ $(document).ready(function() {
 		
 		var i=0;
 		$("#main_tb tbody tr.tr2").each(function(){
+			var row_no=$(this).attr('row_no');
 			var htm=$(this).find('td:nth-child(1)').find('div.note-editable').html();
-			
 			if(!htm){ htm=""; }
 			$(this).find('td:nth-child(1)').html('');
 			$(this).find('td:nth-child(1)').append('<div id=summer'+i+'>'+htm+'</div>');
 			$(this).find('td:nth-child(1)').find('div#summer'+i).summernote();
-			$(this).find('td.main:nth-child(1)').append('<textarea name="sales_order_rows['+i+'][description]"style="display:none;"></textarea>');
+			$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<textarea name="sales_order_rows['+i+'][description]" style="display:none;"></textarea>');
 		i++; });
 		
 		
