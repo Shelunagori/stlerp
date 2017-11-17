@@ -46,7 +46,7 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 						<td>
-							<?php if($purchaseOrder->total_rows > 0 ){ 
+							<?php if($total_sales[$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id] ){ 
 									echo "Pending";
 								}else{
 									echo "Converted-Into-GRN";

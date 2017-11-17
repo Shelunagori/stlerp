@@ -277,7 +277,8 @@ class SalesOrdersController extends AppController
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->sales_order_rows as $sales_order_row){
 				foreach($sales_order_row->invoice_rows as $invoice_row){
-						if(sizeof($invoice_row) > 0){
+						if(sizeof($invoice_row) > 0)
+						{
 							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
 						}
 				}
