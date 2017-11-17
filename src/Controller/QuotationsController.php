@@ -190,7 +190,7 @@ class QuotationsController extends AppController
 		}else{ 
 			$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items'],'Customers','Employees','ItemGroups'])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 		}
-	
+		//pr($subquery->count());exit;
         //$quotations = $this->paginate($this->Quotations->find()->where($where)->order(['Quotations.id' => 'DESC']));
         $this->set(compact('quotations','status','From','To'));
         $this->set('_serialize', ['quotations']);
