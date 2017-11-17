@@ -53,7 +53,8 @@ class IvRowsTable extends Table
             'joinType' => 'INNER'
         ]);
         $this->hasMany('IvRowItems', [
-            'foreignKey' => 'iv_row_id'
+            'foreignKey' => 'iv_row_id',
+			'saveStrategy'=>'replace'
         ]);
         $this->hasMany('SerialNumbers', [
             'foreignKey' => 'iv_row_id'

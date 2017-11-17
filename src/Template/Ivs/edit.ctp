@@ -165,14 +165,14 @@ $(document).ready(function() {
 		var q=0;
 		$(".MainTable tbody.MainTbody tr.MainTr").each(function(){
 			var row_no=$(this).attr('row_no');
-			var i=1;
+			var i=0;
 				$(this).find("td:nth-child(3) .sr_no").each(function()
 				{
 					
 					$(this).attr({name:"iv_rows["+q+"][serial_numbers]["+i+"]"}).rules("add", "required");
 					i++;
 				});
-				
+				q++;
 			});
 	}
 	
