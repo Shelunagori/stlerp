@@ -48,7 +48,7 @@ class SalesOrdersController extends AppController
 		/* if(!empty($company_alise)){
 			$where['SalesOrders.so1 LIKE']='%'.$company_alise.'%';
 		} */
-		//pr($Actionstatus); exit;
+		
 		if(!empty($salesman_name)){
 			$where['SalesOrders.employee_id']=$salesman_name;
 		}
@@ -90,7 +90,7 @@ class SalesOrdersController extends AppController
 		
 		
 		
-		if(!empty($items) && empty($Actionstatus)){
+		if(!empty($items) && empty($Actionstatus)){ 
 			
 				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 				$salesOrders = $this->SalesOrders->find();
@@ -116,7 +116,6 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where(['gst'=>'yes'])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
@@ -128,7 +127,6 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where(['gst'=>'no'])
 					->where($where);
 					$Actionstatus="NonGstInvoice";
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
@@ -155,7 +153,7 @@ class SalesOrdersController extends AppController
 					->where(['gst'=>'yes'])
 					->where($where);
 					$Actionstatus="GstCopy";
-				}else {  
+				}else {   
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -171,7 +169,7 @@ class SalesOrdersController extends AppController
 				//	exit;
 		}
 		
-		
+		//pr($Actionstatus); exit;
 		
 		$total_sales=[]; $total_qty=[];
 		foreach($salesOrders as $salesorder){

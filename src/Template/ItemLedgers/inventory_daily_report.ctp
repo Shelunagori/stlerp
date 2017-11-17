@@ -50,7 +50,7 @@
 		<?php $srn=0; 
 			
 			foreach($AllDatas as $key=>$AllData1){ 
-				foreach($AllData1  as $key1=>$AllData){ 
+				foreach($AllData1  as $key1=>$AllData){ //pr($key1);
 					
 					$i=0;
 					$flag=0; 
@@ -59,8 +59,8 @@
 					$location="";
 					$in_out="";
 					$srn=0;
-					foreach($AllData as $key2=>$itemData) {
-					$row_count=count($itemData->invoice_rows);
+					foreach($AllData as $key2=>$itemData) { 
+					$row_count=count($itemData->invoice_rows); 
 					if($key1=='Invoice'){
 						$date=$itemData['date_created'];
 						@$voucher=($itemData->in1.'/IN-'.str_pad($itemData->in2, 3, '0', STR_PAD_LEFT).'/'.$itemData->in3.'/'.$itemData->in4);
@@ -115,33 +115,29 @@
 						$voucher_rows=$itemData->inventory_transfer_voucher_rows;
 						//pr($i_rows); exit;
 					}
-					//$IVs=[];
 					$IVRs=[];
-					$IVRs=[];
+					$IVRI=[];
 					$IVSr=[];
 					
 					if($key1=='InventoryVouchers')
-					{ 
+					{  
 						$date=$itemData['transaction_date'];
 						@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
-						$location='/InventoryVouchers/View/'.$itemData->id;
+						$location='/InventoryVouchers/View/'.$itemData->id; //pr($itemData);
 						foreach($itemData->iv_rows as $iv_row)
 						{ 
-							$IVRs[$iv_row->id][$iv_row->id]=['item_name'=>$iv_row->item->name,'item_qty'=>$iv_row->quantity,'status'=>'In'];
-							foreach($iv_row->iv_row_items as $iv_row_item){ 
-								$IVRs[$iv_row->id][$iv_row_item->id]=['item_name'=>$iv_row_item->item->name,'item_qty'=>$iv_row_item->quantity,'status'=>'Out'];;
-								//$IVRs[]['Out']=$iv_row_item->item->name;
+							$IVRs[$iv_row->id]=['item_name'=>$iv_row->item->name,'item_qty'=>$iv_row->quantity,'status'=>'In'];
+							$iv_id=$iv_row->id;
+							foreach($iv_row->iv_row_items as $iv_row_item){ //pr($itemData); 
+								$IVRI[$iv_row->id][$iv_row_item->id]=['item_name'=>$iv_row_item->item->name,'item_qty'=>$iv_row_item->quantity,'status'=>'Out'];
 								foreach($iv_row_item->serial_numbers as $serial_number){ 
-								$IVSr[$iv_row->id][$iv_row_item->id][]=$serial_number;
+								$IVSr[$iv_row_item->id][$serial_number->id]=$serial_number;
 								}
 							}
-													
+								$voucher_rows=$itemData->iv_rows;
 						}
-						$voucher_rows=$itemData->iv_rows;
-						
 					}
-				//	pr($IVRs);
-					//pr($IVSr);
+					
 						
 					?>
 					<?php if($flag==0){ ?>
@@ -166,23 +162,33 @@
 									</thead>
 								<?php if($key1=="InventoryVouchers"){ ?>
 									<tbody>
-										<?php foreach($IVRs as $key=>$IVR){ 
-										 foreach($IVR as $key1=>$IVRData){
-										$sr_size=0;
-										if(!empty($IVSr[@$key][@$key1])){
-												$sr_size=sizeof($IVSr[@$key][@$key1]);
-												
-										}
+										<?php foreach($IVRs as $key=>$IVR){ ?>
+										<tr>
+											<td rowspan=""><?php echo $IVR['item_name']?></td>
+											<td rowspan=""><?php echo $IVR['status']?></td>
+											<td rowspan=""><?php echo $IVR['item_qty']?></td>
+											<td rowspan="">
+											</td>
+										</tr>
+										<?php } ?>
 										
-										 ?>
+										<?php foreach($IVRI as $key=>$IVRDatas){ ?>
+										<?php foreach($IVRDatas as $key22=>$IVRData){ 
+														
+										$sr_size=0;
+										if(!empty($IVSr[@$key22])){
+												$sr_size=sizeof($IVSr[@$key22]);
+												//pr($sr_size);
+										}
+
+										?>
 										<tr>
 											<td rowspan=""><?php echo $IVRData['item_name']?></td>
 											<td rowspan=""><?php echo $IVRData['status']?></td>
 											<td rowspan=""><?php echo $IVRData['item_qty']?></td>
-											
 											<td rowspan="">
-												<?php if($sr_size > 0){ ?>
-												<?php foreach($IVSr[@$key][@$key1] as $serial_number){ 
+											<?php if($sr_size > 0){ ?>
+												<?php foreach($IVSr[@$key22] as $serial_number){ 
 													echo $serial_number->name; echo "</br>";
 												}?>
 												<?php }else{ 
@@ -190,12 +196,9 @@
 												?>
 												
 												<?php } ?>
-												
 											</td>
-											
-											
 										</tr>
-										<?php } }?>
+										<?php } } ?>
 									</tbody>
 									
 								<?php }else{ ?>

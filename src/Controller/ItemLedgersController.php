@@ -1370,29 +1370,40 @@ class ItemLedgersController extends AppController
 	
 			$invoice=$this->ItemLedgers->Invoices->find()->contain(['InvoiceRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					});
-			$AllDatas[$To]['Invoice']=$invoice;
+					})->toArray();
+					//pr($invoice->toArray()); exit;
+			if(!empty($invoice)){
+				$AllDatas[$To]['Invoice']=$invoice;
+			}
 			
 			$Grns=$this->ItemLedgers->Grns->find()->contain(['GrnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					});
-			$AllDatas[$To]['Grns']=$Grns;
+					})->toArray();
+			if(!empty($Grns)){
+				$AllDatas[$To]['Grns']=$Grns;
+			}
 			
 			$InventoryTransferVouchers=$this->ItemLedgers->InventoryTransferVouchers->find()->contain(['InventoryTransferVoucherRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('transaction_date',$From ,$To, 'date');
-					});
-			$AllDatas[$To]['InventoryTransferVouchers']=$InventoryTransferVouchers;
+					})->toArray();
+			if(!empty($InventoryTransferVouchers)){
+				$AllDatas[$To]['InventoryTransferVouchers']=$InventoryTransferVouchers;
+			}
 			
 			$Ivs=$this->ItemLedgers->Ivs->find()->contain(['IvRows'=>['Items','SerialNumbers','IvRowItems'=>['Items','SerialNumbers']]])->where(function($exp) use($From ,$To) {
 						return $exp->between('transaction_date',$From ,$To, 'date');
-					});
-			$AllDatas[$To]['InventoryVouchers']=$Ivs;
+					})->toArray();
+			if(!empty($Ivs)){
+				$AllDatas[$To]['InventoryVouchers']=$Ivs;
+			}
 			
 			$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					});
-			$AllDatas[$To]['SaleReturns']=$SaleReturns;
-			//pr($SaleReturns->toArray());exit;
+					})->toArray();
+			if(!empty($SaleReturns)){
+				$AllDatas[$To]['SaleReturns']=$SaleReturns;
+			}
+			//pr($AllDatas);exit;
 	
 		$this->set(compact('AllDatas','serial_nos','voucher_no','From','To','link','url'));
 	}

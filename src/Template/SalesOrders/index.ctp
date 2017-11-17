@@ -54,6 +54,7 @@
 				<input type="hidden" name="gst-copy-request" value="<?php echo @$gst_copy_request; ?>">
 				<input type="hidden" name="copy-request" value="<?php echo @$copy_request; ?>">
 				<input type="hidden" name="job-card" value="<?php echo @$job_card; ?>">
+				<input type="hidden" name="Actionstatus" value="<?php echo @$Actionstatus; ?>">
 				<table class="table table-condensed">
 					<tbody>
 						<tr>
@@ -118,7 +119,7 @@
 							
 						?>
 						
-						<tr <?php if($status=='Converted Into Invoice'){ echo 'style="background-color:#f4f4f4"';  
+						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';  
 							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){
 						?> >
 							<td><?= h(++$page_no) ?></td>
@@ -156,7 +157,7 @@
 								
 							</td>
 						</tr>
-							<?php  }}else if($status==null  || $status=='Pending'){ ?>
+							<?php  }}else if($status=='Pending'){  ?>
 								<tr>    
 							<?php if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ ?> 
 							<td><?= h(++$page_no) ?></td>
@@ -221,9 +222,12 @@
 								
 							</td>
 						</tr>
-							<?php }}else if(($pull_request=="true") && ($gst=="true")){ ?>
+							<?php }}else if(($pull_request=="true") || ($gst=="true")){   ?>
 								<tr>    
-							<?php if(@$total_sales[@$salesOrder->id] < @$total_qty[@$salesOrder->id]){  ?>
+							<?php 
+						//	pr(@$total_sales[@$salesOrder->id]);
+						//	pr(@$total_qty[@$salesOrder->id]); exit;
+							if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){?>
 								<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
 							<?php if($salesOrder->quotation_id != 0){ ?>
