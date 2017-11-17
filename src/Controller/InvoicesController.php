@@ -424,7 +424,7 @@ class InvoicesController extends AppController
 		$sales_order_id=@(int)$this->request->query('sales-order'); 
 		$sales_order=array(); $process_status='New';
 		if(!empty($sales_order_id)){
-			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
+			/* $sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) 
 						{
 						   return $q
@@ -437,6 +437,30 @@ class InvoicesController extends AppController
 						},'SalesOrderRows.SaleTaxes','Companies','Customers','Employees'
 					]
 			]);
+			 */
+			
+			//$SalesOrderRows = $this->Invoices->SalesOrders->SalesOrderRows->find();
+				$sales_order = $this->Invoices->SalesOrders->get($sales_order_id,[
+				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) 
+						{
+						   return $q
+								->contain(['SerialNumbers'=>function($q) use($st_company_id){
+									return $q->where(['SerialNumbers.status' => 'In','SerialNumbers.company_id' => $st_company_id]); 
+								},
+								'ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}]);
+						},'SalesOrderRows.SaleTaxes','Companies','Customers','Employees','SalesOrderRows'=>['InvoiceRows' => function($q) {
+						return $q->select(['id','sales_order_row_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}]]
+				]);
+				 /* $sales_order->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				->innerJoinWith('SalesOrderRows')
+				->group(['SalesOrders.id'])
+				->where(['SalesOrders.company_id'=>$st_company_id]); */
+			
+			
+			
 			//pr($sales_order); exit;
 			$c_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Customers','source_id'=>$sales_order->customer->id])->first();
 			//pr($sales_order); exit;
