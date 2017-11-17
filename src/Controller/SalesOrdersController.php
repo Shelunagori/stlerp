@@ -8,7 +8,7 @@ use Cake\Datasource\ConnectionManager;
  *
  * @property \App\Model\Table\SalesOrdersTable $SalesOrders
  */
-class SalesOrdersController extends AppController 
+class SalesOrdersController extends AppController
 {
 
     /**
@@ -240,18 +240,14 @@ class SalesOrdersController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['SalesOrders.created_on <=']=$To;
 		}
-        $this->paginate = [
+        /* $this->paginate = [
             'contain' => ['Customers','Employees','Categories', 'Companies']
-        ];
+        ]; */
 		
        
 		
-		if($status=='Pending'){
-			$having=['total_rows >' => 0];
-		}else if($status=='Converted Into Invoice'){
-			$having=['total_rows =' => 0];
-		}
-		$salesOrders=
+		
+		/* $salesOrders=
 			$this->SalesOrders->find()->select(['total_rows' => 
 				$this->SalesOrders->find()->func()->count('SalesOrderRows.id')])
 				->leftJoinWith('SalesOrderRows', function ($q) {
@@ -264,9 +260,32 @@ class SalesOrdersController extends AppController
 				->where(['SalesOrders.company_id'=>$st_company_id])
 				->order(['SalesOrders.id' => 'DESC'])
 				->contain(['Quotations','Customers'])
-			;
+			; */
 		
-        $this->set(compact('salesOrders','status','From','To'));
+		$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Quotations','Customers','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'],'Employees','Companies'])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where($where);
+					
+		$total_sales=[]; $total_qty=[];
+		foreach($salesOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->sales_order_rows as $sales_order_row){
+				foreach($sales_order_row->invoice_rows as $invoice_row){
+						if(sizeof($invoice_row) > 0){
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
+		//pr($total_sales);
+		//pr($total_qty);exit;
+        $this->set(compact('salesOrders','status','From','To','total_sales','total_qty'));
         $this->set('_serialize', ['salesOrders']);
     }
 	
