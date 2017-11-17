@@ -69,7 +69,7 @@
 											<th></th>
 										</thead>
 										<tbody class="subTbody">
-											<?php foreach($jobcardrows as $jobcardrow){ ?> 
+											<?php foreach($jobcardrows[$invoice_row->id] as $jobcardrow){ ?> 
 											 <tr class="tr1 SampleTable">
 												<td>
 													<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$jobcardrow->item_id]); ?>
