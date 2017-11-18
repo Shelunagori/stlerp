@@ -1,4 +1,3 @@
-
 <?php $this->Form->templates([
      'inputContainer' => '{{content}}'
                                                ]); 
@@ -97,7 +96,6 @@ if($transaction_date <  $start_date ) {
 							<th width="70%">Items</th>
 							<th width="15%">Quantity</th>
 							<th width="5%"></th>
-							
 						</tr>
 					</thead>
 					<tbody>
@@ -123,10 +121,10 @@ if($transaction_date <  $start_date ) {
 							}
 								//pr($current_rows); 	 exit;
 							
-							foreach($grn->purchase_order->purchase_order_rows as $data3){
+							/* foreach($grn->purchase_order->purchase_order_rows as $data3){
 								$total_items[$data3->item_id]=@$total_items[$data3->item_id]+$data3->quantity;
 								//pr($total_items[$data3->item_id]);
-							}
+							} */
 							
 							//pr($current_row_items);
 							$grnRowIds=[];
@@ -141,7 +139,7 @@ if($transaction_date <  $start_date ) {
 							}
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
 							<?php  
-							$min_val=0;
+							/* $min_val=0;
 							$min_val1=0;
 							foreach($grn->serial_numbers as $item_serial_number){
 									if($item_serial_number->item_id == $grn_rows->item_id){ 
@@ -151,7 +149,7 @@ if($transaction_date <  $start_date ) {
 										}
 										$min_val1++;
 									}
-							} 
+							}  */
 							?>
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
@@ -174,7 +172,8 @@ if($transaction_date <  $start_date ) {
 								{
 									echo @$maxQty[$grn_rows->id];
 								}
-								else{
+								else
+								{
 									echo $grn_rows->quantity;
 								}
 								?></span>
@@ -403,19 +402,20 @@ $(document).ready(function() {
 			var l=$('.tr2[row_no="'+row_no+'"]').find('input').length;
 			var item_id=$(this).closest('tr').find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val();
 			var val=$(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').val();
-			//alert(val);
-/* 			console.log(is_checked);
+			/*//alert(val);
+ 			console.log(is_checked);
 			console.log(serial_number_enable);
 			console.log(old_qty);
 			console.log(row_no); */
 			if(is_checked && serial_number_enable=='1'){
 			
-			for(i=0; i <= old_qty; i++){ 
-			$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
+			for(i=0; i <= old_qty; i++)
+			{ 
+				$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
 			}
 			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
 			var quantity = qty-old_qty;
-			quantity = quantity+old_qty;
+			quantity = quantity+old_qty; //alert();
 			if(maxQty>quantity || maxQty==quantity)
 			{
 				for(i=0; i < (qty-old_qty); i++){ 
@@ -443,7 +443,7 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1).item').attr({ name:"grn_rows["+val+"][item_id]"});
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
 				$(this).find('td:nth-child(2) input.grn_row_id').attr({ name:"grn_rows["+val+"][id]"});
-				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly').attr('max',qty);
+				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly');
 				$(this).css('background-color','#fffcda');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}

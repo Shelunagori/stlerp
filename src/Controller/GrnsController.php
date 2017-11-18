@@ -178,7 +178,8 @@ class GrnsController extends AppController
 				->set(['transaction_date' => $grn->date_created])
 				->where(['id' => $grn->id])
 				->execute();
-		} exit;
+		} 
+		exit;
 	}	
 	
 	
@@ -194,7 +195,8 @@ class GrnsController extends AppController
 		
 		$purchase_order=array();
 		
-		if(!empty($purchase_order_id)){
+		if(!empty($purchase_order_id))
+		{
 			$purchase_order = $this->Grns->PurchaseOrders->get($purchase_order_id, [
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) {
@@ -604,7 +606,7 @@ class GrnsController extends AppController
 					'PurchaseOrders'=>['PurchaseOrderRows','Grns'=>['GrnRows'=>['InvoiceBookingRows']]],'GrnRows'=>['PurchaseOrderRows']
 				]
 		]);
-		//pr($grnDetail);exit;
+		
 		$minQty=[];
 		if(!empty($grnDetail->purchase_order->grns))
 		{
@@ -625,6 +627,7 @@ class GrnsController extends AppController
 				}
 			}
 		}
+		
 		$Qty=[];
 				$POItemQty=[];$maxQty=[];
 				if(!empty($grnDetail->purchase_order->purchase_order_rows))
@@ -652,6 +655,10 @@ class GrnsController extends AppController
 				{ 
 					$maxQty[@$grn_row->purchase_order_row_id] =$POItemQty[@$grn_row->purchase_order_row_id]-@$Qty[$grn_row->purchase_order_row_id]+$grn_row->quantity;
 				}
+			/* pr($Qty);
+			pr($POItemQty);
+			pr($maxQty);
+			exit; */
 		$grn = $this->Grns->get($id, [
 				'contain' => [
 						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['GrnRows'=>['SerialNumbers'],'Items' => ['ItemCompanies' =>function($q) use($st_company_id){
@@ -662,8 +669,8 @@ class GrnsController extends AppController
 					]
 			]);
 
-        $purchaseOrders = $this->Grns->PurchaseOrders->find('list', ['limit' => 200]);
-        $companies = $this->Grns->Companies->find('list', ['limit' => 200]);
+        $purchaseOrders = $this->Grns->PurchaseOrders->find('list');
+        $companies = $this->Grns->Companies->find('list');
         $this->set(compact('grn','minQty', 'purchaseOrders', 'companies','chkdate','financial_year','financial_month_first','financial_month_last','maxQty'));
         $this->set('_serialize', ['grn']);
     }
