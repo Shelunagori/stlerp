@@ -518,6 +518,7 @@ $(document).ready(function() {
 		rename_rows();
 		calculate_total();
 	}
+	
 	rename_rows();
 	function rename_rows(){ 
 		var i=0;
@@ -779,7 +780,9 @@ $(document).ready(function() {
 					row_no.find('.rate').attr({ min:values}).rules('add', {
 							required:true,
 							min: values,
-							
+							messages: {
+							min: "Minimum selling price : "+values
+						}
 						});
 			});
 		}else{

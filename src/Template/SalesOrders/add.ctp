@@ -539,7 +539,21 @@ if(!empty($copy))
 					<div class="col-md-10 padding-right-decrease">
 						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
-					
+					<div class="col-md-1 padding-left-decrease">
+						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
+						<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-body" >
+										
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn default closebtn">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</td>
 			<td width="100"><?php echo $this->Form->input('unit[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity']); ?></td>
@@ -1043,11 +1057,12 @@ $(document).ready(function() {
 		$("#myModal2").hide();
     });
 	
-		$("select.item_box").die().live("change",function(){
+	$("select.item_box").die().live("change",function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
-		//last_three_rates(popup_id,item_id);
-	})
+		last_three_rates(popup_id,item_id);
+	});
+	
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
@@ -1056,17 +1071,12 @@ $(document).ready(function() {
 			last_three_rates_onload(popup_id,item_id);
 		}
 	});
-	$("select.item_box").die().live("change",function(){ 
+	
+	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		var obj = $(this);
 		var row_no = $(this).closest('tr.tr1');
-		var values= row_no.find('.rate').val();
-		if(values){
-			row_no.find('.rate').val('');
-		}else{
-			row_no.find('.rate').val('');
-		}
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
 		if(item_id){
@@ -1074,39 +1084,62 @@ $(document).ready(function() {
 			$.ajax({
 				url: url
 			}).done(function(response) {
+				
 				var values = parseFloat(response);
 					row_no.find('.rate').attr({ min:values}).rules('add', {
 							required:true,
 							min: values,
-							messages: {
-							min: "Minimum selling price : "+values
-						}
+							
 						});
 			});
 		}else{
 			$(this).val();
 		}
-		//last_three_rates(popup_id,item_id);
+		
+		 if(popup_id){ 
+			last_three_rates_onload(popup_id,item_id);
+		}
+	});
+	
+	
+	$("select.item_box").die().live("change",function(){ 
+		var popup_id=$(this).attr('popup_id');
+		var item_id=$(this).val();
+		var obj = $(this);
+		var row_no = $(this).closest('tr.tr1');
+		//var values= row_no.find('.rate').val();
+		
+		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
+		if(item_id){
+			url=url+'/'+item_id,
+			$.ajax({
+				url: url
+			}).done(function(response) {
+				
+				var values = parseFloat(response);
+					row_no.find('.rate').attr({ min:values}).rules('add', {
+							required:true,
+							min: values,
+							
+						});
+			});
+		}else{
+			$(this).val();
+		}
+		last_three_rates(popup_id,item_id);
 	});
 	
 	function last_three_rates_onload(popup_id,item_id){
-			var customer_id=$('select[name="customer_id"]').val();
+			var customer_id=$('select[name="customer_id"]').val(); 
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
-			if(customer_id){
-				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
+			if(customer_id){ 
+				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,
 				$.ajax({
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					var values = parseFloat(response);
-					$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price "+values
-						}
-					});
-					$('div[popup_ajax_id='+popup_id+']').html(values.html);
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -1120,21 +1153,21 @@ $(document).ready(function() {
 			}
 	}
 	
-	function last_three_rates(popup_id,item_id){
+	function last_three_rates(popup_id,item_id){ 
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
-			if(customer_id){
+			if(customer_id){ 
 				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,
 				$.ajax({
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					
+					//var values = parseFloat(response);
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				});
-			}else{
+			}else{ 
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
 				$(".item_box[popup_id="+popup_id+"]").val('').select2();
 			}

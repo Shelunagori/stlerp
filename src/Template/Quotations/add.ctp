@@ -590,7 +590,13 @@ $(document).ready(function() {
 			$(this).find('td:nth-child(1)').find('div#summer'+i).summernote();
 			$(this).find('td.main:nth-child(1)').append('<textarea name="quotation_rows['+i+'][description]" style="display:none;"></textarea>');
 		i++; });
-		
+		$("select.item_box").each(function(){
+			var popup_id=$(this).attr('popup_id');
+			var item_id=$(this).val();
+			if(popup_id){
+				last_three_rates_onload(popup_id,item_id);
+			}
+		});
 		
 		
 		calculate_total();
@@ -763,17 +769,38 @@ $(document).ready(function() {
 		$('textarea[name="terms_conditions"]').val(code);
 	}
 	
-	
-
-	$("select.item_box").die().live("change",function(){
+	$('.popup_btn').live("click",function() {
 		var popup_id=$(this).attr('popup_id');
-		var item_id=$(this).val();
-		last_three_rates(popup_id,item_id);
-	})
+		$("div[popup_div_id="+popup_id+"]").show();
+		
+		
+    });
+	
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
-		if(popup_id){
+		var obj = $(this);
+		var row_no = $(this).closest('tr.tr1');
+		
+		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
+		if(item_id){
+			url=url+'/'+item_id,
+			$.ajax({
+				url: url
+			}).done(function(response) {
+				
+				var values = parseFloat(response);
+					row_no.find('.rate').attr({ min:values}).rules('add', {
+							required:true,
+							min: values,
+							
+						});
+			});
+		}else{
+			$(this).val();
+		}
+		
+		 if(popup_id){ 
 			last_three_rates_onload(popup_id,item_id);
 		}
 	});
@@ -790,7 +817,7 @@ $(document).ready(function() {
 		url=url+'/'+item_id,
 		$.ajax({
 			url: url
-		}).done(function(response) {
+		}).done(function(response) { 
 			var values = parseFloat(response);
 				row_no.find('.rate').attr({ min:values}).rules('add', {
 						min: values,
@@ -814,15 +841,7 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					
-					var values = parseFloat(response);
-					$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price "+values
-						}
-					});
-					$('div[popup_ajax_id='+popup_id+']').html(values.html);
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
