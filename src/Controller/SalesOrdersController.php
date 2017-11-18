@@ -116,7 +116,9 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					->where($where)
+					->where(['gst'=>'yes'])
+					->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
@@ -127,8 +129,9 @@ class SalesOrdersController extends AppController
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
-					->where($where);
-					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					->where($where)
+					->where(['gst'=>'no'])
+					->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="NonGstInvoice";
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
