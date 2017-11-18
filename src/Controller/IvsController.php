@@ -146,21 +146,23 @@ class IvsController extends AppController
 				
 				foreach($iv->iv_rows as $iv_row){   
 					/////For In
-					$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
-					 if(!empty($serial_numbers_iv_row)){
-						 foreach($serial_numbers_iv_row as $sr_nos){
-						 $query = $this->Ivs->IvRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
-									->values([
-									'name' => $sr_nos,
-									'item_id' => $iv_row->item_id,
-									'status' => 'In',
-									'iv_row_id' => $iv_row->id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute(); 
+					if(!empty($iv_row->serial_numbers)){
+						$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
+						 if(!empty($serial_numbers_iv_row)){
+							 foreach($serial_numbers_iv_row as $sr_nos){
+							 $query = $this->Ivs->IvRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
+										->values([
+										'name' => $sr_nos,
+										'item_id' => $iv_row->item_id,
+										'status' => 'In',
+										'iv_row_id' => $iv_row->id,
+										'company_id'=>$st_company_id
+										]);
+									$query->execute(); 
+							} 
 						} 
-					} 
+					}
 					$unit_rate_In=0;$unit_rate=0;
 				 	foreach($iv_row->iv_row_items as $iv_row_item){
 						//// For Out
