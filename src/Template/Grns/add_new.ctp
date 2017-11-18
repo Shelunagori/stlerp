@@ -98,13 +98,14 @@
 							<th width="10%">Quantity</th>
 							<th width="10%"></th>
 							<th width="10%"></th>
-							
 						</tr>
 					</thead>
 					<tbody>
 						<?php 
 						if(!empty($purchase_order->purchase_order_rows)){
-							$q=0; foreach ($purchase_order->purchase_order_rows as $purchase_order_rows): ?>
+							$q=0; foreach ($purchase_order->purchase_order_rows as $purchase_order_rows): 
+							if(@$actuleQty[$purchase_order_rows->id]>0){
+							?>
 							<tr class="tr1" row_no='<?php echo @$purchase_order_rows->id; ?>'>
 								
 								<td rowspan="2"><?php echo ++$q; --$q; 
@@ -128,8 +129,8 @@
 								</td>
 								<td>
 									<label><?php
-									if(@$actuleQty[$purchase_order_rows->id]>0){
-									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$purchase_order_rows->id]); }?></label>
+									
+									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$purchase_order_rows->id]); ?></label>
 								</td>
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$purchase_order_rows->id; ?>'>
@@ -139,7 +140,7 @@
 								
 							</tr>
 							
-						<?php $q++; endforeach; }?>
+						<?php  $q++; }endforeach; }?>
 					</tbody>
 				</table>
 			</div>
