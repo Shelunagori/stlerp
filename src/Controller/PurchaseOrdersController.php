@@ -460,6 +460,14 @@ class PurchaseOrdersController extends AppController
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
 		
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();

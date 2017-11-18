@@ -134,7 +134,11 @@ if($transaction_date <  $start_date ) {
 							{
 								$grnRowIds[$grn_row->purchase_order_row_id] = $grn_row->id;
 							}
-							//pr($grn->purchase_order);
+							$serial_no =[];
+							foreach ($grn->grn_rows as $grn_row)
+							{
+								$serial_no[$grn_row->purchase_order_row_id] = $grn_row->serial_numbers;
+							}
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
 							<?php  
 							$min_val=0;
@@ -206,8 +210,10 @@ if($transaction_date <  $start_date ) {
 								</td>
 								<td colspan="1" class="demo">
 
-								<?php  $i=1;  
-								foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number){
+								<?php   
+								if(!empty($serial_no[$grn_rows->id]))
+								{$i=1;
+								foreach($serial_no[$grn_rows->id] as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){
 									 
 									if($i==1)
@@ -239,7 +245,7 @@ if($transaction_date <  $start_date ) {
 											
 										</div>
 										</div>
-									<?php  $i++; } }  }
+								<?php  $i++; } }  }}
 									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>

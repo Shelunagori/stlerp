@@ -259,8 +259,8 @@ class GrnsController extends AppController
 			$grn->company_id=$st_company_id ;
 			$grn->created_by=$this->viewVars['s_employee_id'];
 			//
-			 if ($this->Grns->save($grn)) {
-				
+			 if ($this->Grns->save($grn)) 
+			 {
 					if(!empty($purchase_order_id)){
 						$grn->check=array_filter($grn->check);
 						$i=0; 
@@ -654,7 +654,7 @@ class GrnsController extends AppController
 				'contain' => [
 						'Companies','SerialNumbers','Vendors','PurchaseOrders'=>['PurchaseOrderRows'=>['GrnRows'=>['SerialNumbers'],'Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
-								}]],'Grns'=>['GrnRows'=>['SerialNumbers']]],'GrnRows'=>['PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
+								}]],'Grns'=>['GrnRows'=>['SerialNumbers']]],'GrnRows'=>['SerialNumbers','PurchaseOrderRows','Items' => ['ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]
 					]
