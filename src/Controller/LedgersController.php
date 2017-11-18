@@ -636,8 +636,8 @@ class LedgersController extends AppController
 		$on_dr=0;
 		$on_cr=0;
 		foreach($referenceDetails as $referenceDetail){
-			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
-				$ReferenceBalances[]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type];
+			if($referenceDetail->total_debit!=$referenceDetail->total_credit){ //pr($referenceDetail);
+				$ReferenceBalances[]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->total_debit,'credit' =>$referenceDetail->total_credit,'reference_type'=>$referenceDetail->reference_type];
 			}
 			
 			if($referenceDetail->reference_type=="On_account"){
@@ -650,7 +650,7 @@ class LedgersController extends AppController
 			}
 		}
 		
-		// exit;
+		// pr($ReferenceBalances);exit;
 		
 		$ledger=$this->Ledgers->LedgerAccounts->find('list',
 			['keyField' => function ($row) {
