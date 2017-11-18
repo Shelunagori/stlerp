@@ -41,7 +41,9 @@ class GrnsController extends AppController
 			$where1['grn2 LIKE']=$grn_no;
 		}
 		if(!empty($po_no)){
-			$where1['PurchaseOrders.po2 LIKE']='%'.$po_no.'%';
+			$findpo = $this->Grns->PurchaseOrders->find()->where(['PurchaseOrders.po2'=>$po_no])->first();
+			//pr($findpo->id); exit;
+			$where1['Grns.purchase_order_id']=@$findpo->id;
 		}
 		
 		if(!empty($vendor)){

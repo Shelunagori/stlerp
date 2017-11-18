@@ -84,10 +84,11 @@ class PurchaseOrdersController extends AppController
 				->matching('PurchaseOrderRows.Items', function ($q) use($items,$st_company_id) {
 											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
 							})
-				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items']])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
 			if($pull_request=="true"){
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
@@ -98,7 +99,8 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			if($status==null || $status=="Converted-Into-GRN" ){
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
@@ -109,7 +111,8 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			if($status==null || $status=="Pending" ){ 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
@@ -120,7 +123,8 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			
 		} 
@@ -131,7 +135,7 @@ class PurchaseOrdersController extends AppController
 		foreach($purchaseOrders as $salesorder){
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->purchase_order_rows as $sales_order_row){
-				foreach($sales_order_row->grn_rows as $invoice_row){
+				foreach($sales_order_row->grn_rows as $invoice_row){ 
 						if(sizeof($invoice_row) > 0){
 							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
 						}
@@ -338,11 +342,11 @@ class PurchaseOrdersController extends AppController
 
 			if ($this->PurchaseOrders->save($purchaseOrder)) {
 				
-			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){
+/* 			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){
 
 				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
 					$query = $this->PurchaseOrders->MaterialIndentRows->find()
-					->where(['MaterialIndentRows.status'=>'Open','MaterialIndentRows.item_id'=>$purchase_order_row->item_id]);
+					->where(['MaterialIndentRows.id'=>$purchase_order_row->material_indent_row_id]);
 					
 					$MaterialIndentRows=$query->matching('MaterialIndents', function ($q) use($st_company_id){
 						return $q->where(['MaterialIndents.company_id' => $st_company_id]);
@@ -355,9 +359,9 @@ class PurchaseOrdersController extends AppController
 					}
 					//pr($material_rows); exit;
 				}
-			}
+			} */
 			
-			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){ 
+/* 			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){ 
 			
 				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
 					$mi_rows=$material_rows[$purchase_order_row->item_id];
@@ -394,7 +398,7 @@ class PurchaseOrdersController extends AppController
 					}
 					send:
 				}
-			}
+			} */
                 $this->Flash->success(__('The purchase order has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
