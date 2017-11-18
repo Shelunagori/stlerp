@@ -36,7 +36,8 @@ class InvoiceBookingsController extends AppController
 		
 		$this->set(compact('book_no','grn_no','From','To','in_no','file_grn_no','file','vendor_name'));
 		
-		if(!empty($book_no)){
+		if(!empty($book_no))
+		{
 			$where['InvoiceBookings.ib2 LIKE']=$book_no;
 		}
 		

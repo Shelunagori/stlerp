@@ -1,7 +1,7 @@
 <?php  
 $item_po_info=[];
 foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
-	$item_po_info[$purchase_order_row->item_id]=$purchase_order_row;
+	$item_po_info[$purchase_order_row->id]=$purchase_order_row;
 } 
 ?>
 <style>
@@ -196,7 +196,7 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 							}
 							
 					$total=0; $sum=0;
-					$q=0; foreach ($grn->grn_rows as $grn_rows): ?>
+					$q=0; foreach ($grn->grn_rows as $grn_rows):?>
 						<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 							<?php
@@ -220,7 +220,7 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'.grn_row_id', ['label' => false,'class' => 'invoice','type'=>'hidden','value' => @$grn_rows->id]); ?>
 							</td>
 							
-							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.unit_rate_from_po',['value'=>$item_po_info[$grn_rows->item->id]->rate,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
+							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.unit_rate_from_po',['value'=>$item_po_info[$grn_rows->purchase_order_row_id]->rate,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
 							
 							<td><?php echo $this->Form->input('invoice_booking_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>$grn_rows->quantity,'readonly','type'=>'text','style'=>'width:50px;']); ?></td>
 							
