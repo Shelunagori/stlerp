@@ -156,19 +156,20 @@ class SalesOrdersController extends AppController
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'yes'])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					//pr($salesOrders->toArray()); exit;
 					$Actionstatus="GstCopy";
-				}else { exit;   
+				}else { //exit;   
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-					$salesOrders = $this->SalesOrders->find()->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']]);
-				//	pr($salesOrders->toArray()); exit;
+					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
-					pr($salesOrders->toArray()); exit;
+					//pr($salesOrders->toArray()); exit;
 				}
 				//	exit;
 		}

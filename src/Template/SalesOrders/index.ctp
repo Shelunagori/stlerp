@@ -119,9 +119,9 @@
 							
 						?>
 						
-						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';  
-							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){
-						?> >
+						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
+							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){ 
+						?> > 
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
 							<?php if($salesOrder->quotation_id != 0){ ?>
@@ -157,7 +157,7 @@
 								
 							</td>
 						</tr>
-							<?php  }}else if($status=='Pending'){  ?>
+							<?php  }}else if($status==null || $status=='Pending'){ //pr($salesOrders->toArray());  ?>
 								<tr>    
 							<?php if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ ?> 
 							<td><?= h(++$page_no) ?></td>
