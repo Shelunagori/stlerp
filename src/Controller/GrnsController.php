@@ -630,14 +630,6 @@ class GrnsController extends AppController
 		
 		$Qty=[];
 				$POItemQty=[];$maxQty=[];
-				if(!empty($grnDetail->purchase_order->purchase_order_rows))
-				{
-					foreach($grnDetail->purchase_order->purchase_order_rows as $purchase_order_row)
-					{
-						$POItemQty[@$purchase_order_row->id] =$purchase_order_row->quantity;
-					}
-				}	
-
 				if(!empty($grnDetail->purchase_order->grns))
 				{
 					foreach($grnDetail->purchase_order->grns as $grn)
@@ -651,9 +643,28 @@ class GrnsController extends AppController
 						}
 					}
 				}	
+				
+				if(!empty($grnDetail->purchase_order->purchase_order_rows))
+				{
+					foreach($grnDetail->purchase_order->purchase_order_rows as $purchase_order_row)
+					{
+						$POItemQty[@$purchase_order_row->id] =$purchase_order_row->quantity;
+					}
+				}
+				
 				foreach($grnDetail->grn_rows as $grn_row)
 				{ 
 					$maxQty[@$grn_row->purchase_order_row_id] =$POItemQty[@$grn_row->purchase_order_row_id]-@$Qty[$grn_row->purchase_order_row_id]+$grn_row->quantity;
+				}
+				if(!empty($grnDetail->purchase_order->purchase_order_rows))
+				{
+					foreach($grnDetail->purchase_order->purchase_order_rows as $purchase_order_row)
+					{
+						if(empty($maxQty[@$purchase_order_row->id]))
+						{
+							$maxQty[@$purchase_order_row->id] =$POItemQty[@$purchase_order_row->id]-@$Qty[$purchase_order_row->id];
+						}
+					}
 				}
 			/* pr($Qty);
 			pr($POItemQty);

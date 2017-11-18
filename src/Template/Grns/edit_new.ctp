@@ -109,7 +109,7 @@ if($transaction_date <  $start_date ) {
 									$existing_rows[$data2->item_id]=@$existing_rows[$data2->item_id]+$data2->quantity;
 								}
 							}
-							
+							//pr($existing_rows);
 							foreach($grn->grn_rows as $current_invoice_row){ 
 							
 							//pr($current_invoice_row); 
