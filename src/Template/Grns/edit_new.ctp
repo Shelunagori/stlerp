@@ -162,10 +162,17 @@ if($transaction_date <  $start_date ) {
 									?>								
 								</td>
 								<td>
-								
-								
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id]]); 
+								
+								if(!empty($serial_no[$grn_rows->id]))
+									{   $old_Quantity=[];
+										foreach($serial_no[$grn_rows->id] as $old_quantity)
+										{
+											$old_Quantity[] =$old_quantity; //$serial_no[$grn_rows->id];
+										}
+									}
+									
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id],'min'=>sizeof(@$old_Quantity)]); 
 								?>
 								<span>Max: <?php
 								if(!empty($maxQty[$grn_rows->id]))
