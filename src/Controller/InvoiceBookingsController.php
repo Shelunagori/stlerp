@@ -182,7 +182,7 @@ class InvoiceBookingsController extends AppController
 			if(!empty($book_no)){
 				$where['InvoiceBookings.ib2 LIKE']=$book_no;
 			}
-			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']);
+			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'no'])->order(['InvoiceBookings.id' => 'DESC']);
 			$status=1;
 		}	
 		//pr($invoiceBookings->toArray());exit;
@@ -207,7 +207,7 @@ class InvoiceBookingsController extends AppController
 			if(!empty($book_no)){
 				$where['InvoiceBookings.ib2 LIKE']=$book_no;
 			}
-			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'gst'=>'yes'])->order(['InvoiceBookings.id' => 'DESC']);
+			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'yes'])->order(['InvoiceBookings.id' => 'DESC']);
 			$status=1;
 		}	
 		//pr($invoiceBookings->toArray());exit;

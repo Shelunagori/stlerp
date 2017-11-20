@@ -58,7 +58,7 @@
 					$voucher="";
 					$location="";
 					$in_out="";
-					$srn=0;
+					
 					foreach($AllData as $key2=>$itemData) { 
 					$row_count=count($itemData->invoice_rows); 
 					if($key1=='Invoice'){
@@ -137,6 +137,20 @@
 								$voucher_rows=$itemData->iv_rows;
 						}
 					}
+					if($key1=='PurchaseReturns'){
+						$date=$itemData['created_on'];
+						@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
+						
+						if($itemData['gst_type']=="Gst"){
+							$location='/PurchaseReturns/gst-view/'.$itemData->id;
+						}else{
+							$location='/PurchaseReturns/View/'.$itemData->id;
+						}
+						
+						$in_out="Out";
+						$voucher_rows=$itemData->purchase_return_rows;
+						//pr($itemData); exit;
+					}
 					
 						
 					?>
@@ -178,7 +192,6 @@
 										$sr_size=0;
 										if(!empty($IVSr[@$key22])){
 												$sr_size=sizeof($IVSr[@$key22]);
-												//pr($sr_size);
 										}
 
 										?>
