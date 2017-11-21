@@ -344,13 +344,13 @@ class SalesOrdersController extends AppController
 		$sgst_per=[];
 		$igst_per=[];
 		foreach($salesOrder->sales_order_rows as $sales_order_row){
-			if($sales_order_row->cgst_per > 0){
+			if($sales_order_row->cgst_per){
 				$cgst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->cgst_per);
 			}
-			if($sales_order_row->sgst_per > 0){
+			if($sales_order_row->sgst_per){
 				$sgst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->sgst_per);
 			}
-			if($sales_order_row->igst_per > 0){
+			if($sales_order_row->igst_per){
 				$igst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->igst_per);
 			}
 		}
@@ -492,38 +492,19 @@ class SalesOrdersController extends AppController
 			//pr($salesOrder);exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
-				if(!empty($status_close)){
-				$query = $this->SalesOrders->Quotations->query();
+				if($status_close=="open"){
+					$query_pending = $this->SalesOrders->Quotations->query();
+					$query_pending->update()
+					->set(['Quotations.status' => 'Pending'])
+					->where(['id' => $salesOrder->quotation_id])
+					->execute();
+				} else if($status_close=="close"){
+					$query = $this->SalesOrders->Quotations->query();
 					$query->update()
-						->set(['status' => 'Converted Into Sales Order'])
-						->where(['id' => $quotation_id])
-						->execute();
-				} else{
-						$falg=0;
-					if($salesOrder->quotation_id > 0){ 
-					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
-						foreach($quotation_rows_datas as $quotation_rows_data){
-							$salesorders_rows_datas = $this->SalesOrders->SalesOrderRows->find()->where(['quotation_row_id'=>$quotation_rows_data->id])->toArray();
-							foreach($salesorders_rows_datas as $salesorders_rows_data){
-								if($quotation_rows_data->quantity != $salesorders_rows_data->quantity){ 
-								$falg=1;	
-								}
-							}
-						} 
-					} 
-					if($falg==1){
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['Quotations.status' => 'Pending'])
-						->where(['id' => $salesOrder->quotation_id])
-						->execute();
-					}else{
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['Quotations.status' => 'Converted Into Sales Order'])
-						->where(['id' => $salesOrder->quotation_id])
-						->execute();
-					}
+					->set(['status' => 'Converted Into Sales Order'])
+					->where(['id' => $quotation_id])
+					->execute();
+					
 				}
 				
 				$this->Flash->success(__('The sales order has been saved.'));
@@ -919,39 +900,18 @@ class SalesOrdersController extends AppController
 				$status_close=$this->request->query('status');
 			
 			
-				if(!empty($status_close)){
+				if($status_close=='close'){
 				$query = $this->SalesOrders->Quotations->query();
 					$query->update()
 						->set(['status' => 'Converted Into Sales Order'])
 						->where(['id' => $quotation_id])
 						->execute();
-				} else{
-						$falg=0;
-					if($salesOrder->quotation_id > 0){ 
-					$quotation_rows_datas = $this->SalesOrders->Quotations->QuotationRows->find()->where(['quotation_id'=>$salesOrder->quotation_id])->toArray();
-						foreach($quotation_rows_datas as $quotation_rows_data){
-							$salesorders_rows_datas = $this->SalesOrders->SalesOrderRows->find()->where(['quotation_row_id'=>$quotation_rows_data->id])->toArray();
-							foreach($salesorders_rows_datas as $salesorders_rows_data){
-								if($quotation_rows_data->quantity != $salesorders_rows_data->quantity){ 
-								$falg=1;	
-								}
-							}
-						} 
-					} 
-					if($falg==1){
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['Quotations.status' => 'Pending'])
-						->where(['id' => $salesOrder->quotation_id])
+				} else if($status_close=='open'){
+						$query = $this->SalesOrders->Quotations->query();
+					$query->update()
+						->set(['status' => 'Pending'])
+						->where(['id' => $quotation_id])
 						->execute();
-					}
-					else{
-						$query_pending = $this->SalesOrders->Quotations->query();
-						$query_pending->update()
-						->set(['Quotations.status' => 'Converted Into Sales Order'])
-						->where(['id' => $salesOrder->quotation_id])
-						->execute();
-					}
 				}
 				
 				$this->Flash->success(__('The sales order has been saved.'));
@@ -982,23 +942,7 @@ class SalesOrdersController extends AppController
 		}else{
 			$Filenames = $this->SalesOrders->Filenames->find();
 		}
-		////
-		if(!empty(@$quotation_id)){
-			 $SalesOrders = $this->SalesOrders->Quotations->get($quotation_id, [
-            'contain' => (['SalesOrders'=>['SalesOrderRows' => function($q) {
-				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
-			}]])
-        ]);
 			
-		$sales_orders_qty=[];
-			foreach($SalesOrders->sales_orders as $sales_orders){ 
-				foreach($sales_orders->sales_order_rows as $sales_order_row){ 
-					$sales_orders_qty[@$sales_order_row->quotation_row_id]=@$sales_orders_qty[$sales_order_row->quotation_row_id]+$sales_order_row->total_qty;
-					
-				}
-			}	
-		}
-		//////	
         $companies = $this->SalesOrders->Companies->find('all');
 		$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
 		$items = $this->SalesOrders->Items->find('list')->matching(

@@ -164,9 +164,9 @@ $html.='
 </table>';
  foreach ($salesOrder->sales_order_rows as $salesOrderRows)
  {
-	 if($salesOrderRows->cgst_amount!=0){ $cgst=1;}
-	 if($salesOrderRows->sgst_amount!=0){ $sgst=1;}
-	 if($salesOrderRows->igst_amount!=0){ $igst=1;}
+	 if($salesOrderRows->cgst_per > 0){ $cgst=1;}
+	 if($salesOrderRows->sgst_per > 0){ $sgst=1;}
+	 if($salesOrderRows->igst_per > 0){ $igst=1;}
 }
 $html.='
 <table width="100%" class="table_rows">
@@ -252,27 +252,27 @@ $html.='
 		}
 		
 		$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->taxable_value) .'</td>';
-		if($salesOrderRows->cgst_amount!=0){ 
+		if($salesOrderRows->cgst_per > 0){ 
 		$html.='<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">';
-            if(!empty($cgst_per[$salesOrderRows->id]['tax_figure']))
+            if($cgst_per[$salesOrderRows->id]['tax_figure'] >= 0)
 			{
 				$html.=$cgst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
 			$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->cgst_amount,['places'=>2]) .'</td>';
 		}
 		
-		if($salesOrderRows->sgst_amount!=0){ 
+		if($salesOrderRows->sgst_per > 0){ 
 		$html.='<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">';
-			if(!empty($sgst_per[$salesOrderRows->id]['tax_figure']))
+			if($sgst_per[$salesOrderRows->id]['tax_figure'] >= 0)
 			{
 				$html.=$sgst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
 		$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->sgst_amount,['places'=>2]) .'</td>';
 		}
 		
-		if($salesOrderRows->igst_amount!=0){ 
+		if($salesOrderRows->igst_per > 0){ 
 		$html.='<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">';
-			if(!empty($igst_per[$salesOrderRows->id]['tax_figure']))
+			if($igst_per[$salesOrderRows->id]['tax_figure'] >= 0)
 			{
 				$html.=$igst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
