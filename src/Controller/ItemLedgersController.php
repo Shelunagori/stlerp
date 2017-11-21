@@ -55,7 +55,7 @@ class ItemLedgersController extends AppController
 		}
 		
 		if($source_model=="Inventory Vouchers"){ //echo "IV"; exit;
-			$InventoryVoucher=$this->ItemLedgers->InventoryVouchers->get($source_id);
+			$InventoryVoucher=$this->ItemLedgers->Ivs->get($source_id);
 			//pr($InventoryVoucher); exit;
 			return ['voucher_info'=>$InventoryVoucher,'party_type'=>'-','party_info'=>''];
 		}
@@ -642,16 +642,19 @@ class ItemLedgersController extends AppController
 		}
 		/////fdgdfgdrc disavble
 		
-	$ItemSerialNumbers =$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['ItemSerialNumbers.company_id' => $st_company_id,'ItemSerialNumbers.status'=>"In"]);
+	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
+	
+	pr($ItemSerialNumbers->toArray()); exit;
 	
 	$itemSerialRate=[]; $itemSerialQuantity=[]; $i=1;
 	foreach($ItemSerialNumbers as $ItemSerialNumber){
 		if(@$ItemSerialNumber->grn_id > 0){
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
+			//pr($ItemLedgerData); 
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 		}
-		else if(@$ItemSerialNumber->master_item_id > 0){
+		else if(@$ItemSerialNumber->is_opening_balance =="Yes"){
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -663,10 +666,16 @@ class ItemLedgersController extends AppController
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+		}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
+			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
+			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 		}
 	}
 	
-	//pr($itemSerialRate); exit;
+	pr($itemSerialRate); 
+	pr($itemSerialQuantity); 
+	exit;
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
 			$r=@$itemSerialRate[$key];
