@@ -17,11 +17,11 @@
 	<table border="1">
 		<thead>
 			<tr>
-			<td colspan="7" align="center">
-				 Inventory Daily Report
-				<?php if(!empty($from_date) || !empty($to_date)){ echo date('d-m-Y',strtotime($from_date)); ?> TO <?php echo date('d-m-Y',strtotime($to_date));} ?>
-			</td>
-		</tr>
+				<td colspan="7" align="center">
+					 Inventory Daily Report
+					<?php if(!empty($from_date) || !empty($to_date)){ echo date('d-m-Y',strtotime($from_date)); ?> TO <?php echo date('d-m-Y',strtotime($to_date));} ?>
+				</td>
+		    </tr>
 			<tr>
 				<th width="2%">SR</th>
 				<th width="5%">Transaction Date</th>
