@@ -17,7 +17,7 @@
 	<table border="1">
 		<thead>
 			<tr>
-				<td colspan="7" align="center">
+				<td colspan="5" align="center">
 					 Inventory Daily Report
 					<?php if(!empty($from_date) || !empty($to_date)){ echo date('d-m-Y',strtotime($from_date)); ?> TO <?php echo date('d-m-Y',strtotime($to_date));} ?>
 				</td>
@@ -147,7 +147,7 @@
 							</td>
 							<td style="vertical-align: top !important;" rowspan=""><?php echo $in_out; ?> </td>
 							<td>
-								<table border="1" ">
+								<table border="1" width="100%">
 									<thead>
 										<tr>		
 											<th width="10%">Item</th>
