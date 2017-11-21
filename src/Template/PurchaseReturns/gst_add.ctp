@@ -275,7 +275,7 @@
 						<tr class="tr3" row_no="<?php echo @$q; ?>">
 							<td></td>
 							<td colspan="18">
-								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?item_id='.$invoice_booking_row->item_id); ?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id); ?>
 							</td>
 						</tr>
 					<?php } ?>
@@ -842,7 +842,7 @@ $(document).ready(function() {
 
 	
 	//ref no //
-	add_ref_row();
+	//add_ref_row();
 	$('.addrefrow').live("click",function() {
 		add_ref_row();
 	});

@@ -379,6 +379,36 @@ class SalesOrdersController extends AppController
 		$this->set(compact('salesorder','id'));
     }
 	
+	
+	public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Quotations=$this->SalesOrders->Quotations->QuotationRows->find();
+		//pr($Quotation->toArray()); exit;
+		foreach($Quotations as $Quotation){
+			$salesOrders=$this->SalesOrders->find()->contain(['SalesOrderRows'])->where(['SalesOrders.quotation_id'=>$Quotation->quotation_id])->toArray();
+		//	pr($salesOrders);
+			if(sizeof($salesOrders) > 0){
+				foreach($salesOrders as $salesOrder){
+					foreach($salesOrder->sales_order_rows as $sales_order_row){ //pr($Quotation->item_id); exit;
+						$query = $this->SalesOrders->SalesOrderRows->query();
+						$query->update()
+							->set(['quotation_row_id' => $Quotation->id])
+							->where(['item_id' => $Quotation->item_id,'sales_order_id'=>$salesOrder->id])
+							->execute();
+						}
+				}
+			}
+		}
+		exit;
+	}
+	
+	
+	
+	
     /**
      * Add method
      *

@@ -1403,6 +1403,15 @@ class ItemLedgersController extends AppController
 			if(!empty($SaleReturns)){
 				$AllDatas[$To]['SaleReturns']=$SaleReturns;
 			}
+			
+			$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+						return $exp->between('created_on',$From ,$To, 'date');
+					})->toArray();
+					//pr($PurchaseReturns);exit;
+			if(!empty($PurchaseReturns)){
+				$AllDatas[$To]['PurchaseReturns']=$PurchaseReturns;
+				//pr($AllDatas);exit;
+			}
 			//pr($AllDatas);exit;
 	
 		$this->set(compact('AllDatas','serial_nos','voucher_no','From','To','link','url'));

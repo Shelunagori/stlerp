@@ -109,7 +109,7 @@ if($transaction_date <  $start_date ) {
 									$existing_rows[$data2->item_id]=@$existing_rows[$data2->item_id]+$data2->quantity;
 								}
 							}
-							
+							//pr($existing_rows);
 							foreach($grn->grn_rows as $current_invoice_row){ 
 							
 							//pr($current_invoice_row); 
@@ -162,10 +162,17 @@ if($transaction_date <  $start_date ) {
 									?>								
 								</td>
 								<td>
-								
-								
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id]]); 
+								
+								if(!empty($serial_no[$grn_rows->id]))
+									{   $old_Quantity=[];
+										foreach($serial_no[$grn_rows->id] as $old_quantity)
+										{
+											$old_Quantity[] =$old_quantity; //$serial_no[$grn_rows->id];
+										}
+									}
+									
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id],'min'=>sizeof(@$old_Quantity)]); 
 								?>
 								<span>Max: <?php
 								if(!empty($maxQty[$grn_rows->id]))
@@ -187,10 +194,18 @@ if($transaction_date <  $start_date ) {
 											$check=' ';
 										}
 									$old_Quantity=[];
+									/* pr($grn_rows);
 									foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number)
+									{ */
+									if(!empty($serial_no[$grn_rows->id]))
 									{
-										$old_Quantity[] = $serial_number;
+										foreach($serial_no[$grn_rows->id] as $old_quantity)
+										{
+											$old_Quantity[] =$old_quantity; //$serial_no[$grn_rows->id];
+										}
 									}
+										//$serial_number;
+									//}
 									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($old_Quantity),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
 								</td>
 								
@@ -415,9 +430,9 @@ $(document).ready(function() {
 			}
 			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
 			var quantity = qty-old_qty;
-			quantity = quantity+old_qty; //alert();
+			quantity = quantity+old_qty; 
 			if(maxQty>quantity || maxQty==quantity)
-			{
+			{  
 				for(i=0; i < (qty-old_qty); i++){ 
 				
 					 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');

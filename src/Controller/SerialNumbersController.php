@@ -313,7 +313,7 @@ class SerialNumbersController extends AppController
 	}
 	
 	public function getSerialNumberPurchaseReturnList(){
-		$item_id=$this->request->query('item_id'); 
+		$grn_row_id=$this->request->query('grn_row_id'); 
 		$in_row_id=$this->request->query('in_row_id'); 
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -321,11 +321,11 @@ class SerialNumbersController extends AppController
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find('list')->contain(['Grns'=>['GrnRows']]);
-		$query->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'SerialNumbers.status'=>'In']);
+        $query = $this->SerialNumbers->find('list');
+		$query->where(['SerialNumbers.company_id'=>$st_company_id,'grn_row_id'=>$grn_row_id,'SerialNumbers.status'=>'In']);
 		$SerialNumbers_in = $query->toArray();
-		
-		$serialnumbers_out = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.item_id'=>$item_id,'SerialNumbers.status'=>'Out','purchase_return_row_id >'=>0])->toArray();
+	//	pr($SerialNumbers_in); exit;
+		$serialnumbers_out = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.status'=>'Out','purchase_return_row_id >'=>0])->toArray();
 
 		
 		$out_dropdown = array_diff($SerialNumbers_in,$serialnumbers_out);
