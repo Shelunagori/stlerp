@@ -5,6 +5,9 @@
 	}else{
 		$url_excel="/?".$url;
 	}
+	
+	$jobCardStatus=$status;
+	
 ?>
 <div class="portlet light bordered">
 <div class="portlet-title">
@@ -13,10 +16,10 @@
 		<span class="caption-subject font-blue-steel uppercase">Job Cards</span>
 	</div>
 	<div class="actions">
-		<?php
+		<?php 
 			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
 			if($status=='Closed'){ $class3='btn btn-primary'; }else{ $class3='btn btn-default'; }
-			?>
+			 ?>
 		<?= $this->Html->link(
 			'Pending',
 			'/JobCards/index/Pending',
@@ -80,7 +83,7 @@
 				</table>
 			</form>
 		
-			<?php $page_no=$this->Paginator->current('JobCards'); $page_no=($page_no-1)*20; ?>	 
+			<?php  $page_no=$this->Paginator->current('JobCards'); $page_no=($page_no-1)*20; ?>	 
 			<table class="table table-bordered table-striped table-hover ">
 				<thead>
 				<tr>
@@ -94,7 +97,13 @@
 				</tr>
 				</thead>
 				<tbody>
-		    <?php foreach ($jobCards as $jobCard): ?>
+		    <?php    foreach ($jobCards as $jobCard): 
+			$so=$SalesOrderQty[$jobCard->sales_order_id];
+			$in=$InvoiceQty[$jobCard->sales_order_id];
+			$iv=$InventoryVoucherQty[$jobCard->sales_order_id];
+			
+			if((($jobCardStatus==null) || ($jobCardStatus=='Pending') && (($so != $in) || ($so != $iv) || ($in != $iv )))){  
+			?>
 				<tr>
 					<td><?= h(++$page_no) ?></td>
 					<td><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
@@ -137,7 +146,51 @@
 					<?php } } ?>
 					</td>
 				</tr>
-		    <?php endforeach; ?>
+		    <?php }  else if($jobCardStatus=='Closed' && (($so == $in) && ($so == $iv) && ($so == $iv) )){   ?>
+			<tr>
+					<td><?= h(++$page_no) ?></td>
+					<td><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
+					<td><?= h(($jobCard->sales_order->so1.'/SO-'.str_pad($jobCard->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->sales_order->so3.'/'.$jobCard->sales_order->so4))?></td> 
+					<td>
+								<div class="btn-group">
+									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
+										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
+										<?php  foreach($jobCard->job_card_rows as $job_card_rows){ ?>
+											<li><p><?= h($job_card_rows->item->name) ?></p></li>
+											<?php }?>
+										</ul>
+								</div>
+							</td>
+ 					<td><?= date("d-m-Y",strtotime($jobCard->required_date));?></td>
+					<td><?= date("d-m-Y",strtotime($jobCard->created_on));?></td>
+					<td class="actions">
+					<?php if(in_array(24,$allowed_pages)){ ?>
+					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); ?>
+					<?php } ?>
+					<?php if(in_array(6,$allowed_pages)){  ?>
+					<?php
+					if(!in_array(date("m-Y",strtotime($jobCard->created_on)),$closed_month))
+					{ 
+					echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
+					<?php } } ?>
+
+				
+					<?php if(in_array(34,$allowed_pages)) {?>
+
+					<?php if($status==null or $status=='Pending'){ ?>
+					<?= $this->Form->postLink('Close',
+						['action' => 'close', $jobCard->id], 
+						[
+							'escape' => false,
+							'class'=>'btn btn-xs red tooltips','data-original-title'=>'Close',
+							'confirm' => __('Are you sure ?')
+						]
+					) ?>
+					<?php } } ?>
+					</td>
+				</tr>
+			
+			<?php } endforeach; ?>
 			 </tbody>
 			</table>
 		</div>

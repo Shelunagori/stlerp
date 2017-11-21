@@ -97,10 +97,10 @@ class InvoicesController extends AppController
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
 				}
 				]])
+				->where(['Invoices.company_id'=>$st_company_id])
 				
-				->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
-				
-				//pr($invoices); exit;
+				->order(['Invoices.id' => 'DESC']);
+				//pr($invoices->toArray()); exit;
 		}else if($sales_return=='true'){
 			
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
@@ -181,6 +181,33 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
 	}
 	
+	
+ 	
+	public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Quotations=$this->Invoices->SalesOrders->SalesOrderRows->find();
+		//pr($Quotation->toArray()); exit;
+		foreach($Quotations as $Quotation){
+			$Invoices=$this->Invoices->find()->contain(['InvoiceRows'])->where(['Invoices.sales_order_id'=>$Quotation->sales_order_id])->toArray();
+			
+			if(sizeof($Invoices) > 0){
+				foreach($Invoices as $Invoice){
+					foreach($Invoice->invoice_rows as $invoice_row){ //pr($invoice_row->item_id); exit;
+						$query = $this->Invoices->InvoiceRows->query();
+						$query->update()
+							->set(['sales_order_row_id' => $Quotation->id])
+							->where(['item_id' => $Quotation->item_id,'invoice_id'=>$Invoice->id])
+							->execute();
+						}
+				}
+			}
+		}
+		exit;
+	} 
 	
 	
 	
