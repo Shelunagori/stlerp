@@ -191,15 +191,16 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					$q=0; 
 						
-			
+					
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
 						?>
 
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
-								<?php echo ++$q; $q--; ?>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row_id[@$sales_order_row->id],'readonly','class'=>'invoiceid']); ?>
+								<span><?php echo ++$q; $q--; ?></span>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_row->id,'readonly','class'=>'hiddenid']); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row_id[@$sales_order_row->id],'readonly','class'=>'invoiceid']); ?>
+								
 							</td>
 							<td>
 								<?php 
@@ -670,8 +671,9 @@ $(document).ready(function() {
 			var row_no=$(this).attr('row_no');
 			
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
-			if(val){
-				i++;
+			if(val){ 
+				
+				$(this).find("td:nth-child(1) span").html(i++);
 				$(this).find('td:nth-child(1) input.hiddenid').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
 				$(this).find('td:nth-child(1) input.invoiceid').attr("name","invoice_rows["+val+"][id]").attr("id","invoice_rows-"+val+"-id");
 				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
@@ -710,8 +712,8 @@ $(document).ready(function() {
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
 				
 			}else{
-				$(this).find("td:nth-child(1)").html(++i); i--;
-
+				$(this).find("td:nth-child(1) span").html(++i); i--;
+				
 				$(this).find("td:nth-child(1) input.invoiceid").attr({ name:"q", readonly:"readonly"});
 				$(this).find("td:nth-child(1) input.hiddenid").attr({ name:"q", readonly:"readonly"});
 

@@ -1362,7 +1362,7 @@ $(document).ready(function() {
 						required: true,
 						max: sum,
 						messages: {
-							max: "Credit Limit Exieded ."
+							max: "Credit Limit Exceeded ."
 						}
 					});
 	});

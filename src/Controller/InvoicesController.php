@@ -931,7 +931,7 @@ class InvoicesController extends AppController
 					$invoice_row->serial_number=$item_serial_no;
 				}
 			}
-			//pr($invoice);exit;
+			
 			if ($this->Invoices->save($invoice)) {
 				
 				//////start serial Number database changes Oct17	  
