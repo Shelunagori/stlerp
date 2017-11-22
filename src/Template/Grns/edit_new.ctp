@@ -414,28 +414,35 @@ $(document).ready(function() {
 			console.log(serial_number_enable);
 			console.log(old_qty);
 			console.log(row_no); */
-			if(is_checked && serial_number_enable=='1'){
-			
-			for(i=0; i <= old_qty; i++)
-			{ 
-				$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
-			}
-			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
-			var quantity = qty-old_qty;
-			quantity = quantity+old_qty; 
-			if(maxQty>quantity || maxQty==quantity)
-			{  
-				for(i=0; i < (qty-old_qty); i++){ 
-				
-					 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'" required/></div>');
-					
-					$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
-					rename_rows();				
+			if(is_checked && serial_number_enable=='1')
+			{
+				var QTY = $(this).closest('tr').find('td:nth-child(3) input[type="text"]').val();
+				if(QTY.search(/[^0-9]/) != -1)
+				{
+					alert("Item serial number is enabled !!! Please Enter Only Digits");
+					$(this).closest('tr').find('td:nth-child(3) input[type="text"]').val('');
 				}
-			}
-			
-			
-		} 
+				else
+				{
+					for(i=0; i <= old_qty; i++)
+					{ 
+						$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
+					}
+					$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
+					var quantity = qty-old_qty;
+					quantity = quantity+old_qty; 
+					if(maxQty>quantity || maxQty==quantity)
+					{  
+						for(i=0; i < (qty-old_qty); i++){ 
+						
+							 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'" required/></div>');
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
+							rename_rows();				
+						}
+					}
+				}
+			} 
     });
 	rename_rows();
 	
