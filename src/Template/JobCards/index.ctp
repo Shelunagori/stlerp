@@ -98,9 +98,9 @@
 				</thead>
 				<tbody>
 		    <?php    foreach ($jobCards as $jobCard): 
-			$so=$SalesOrderQty[$jobCard->sales_order_id];
-			$in=$InvoiceQty[$jobCard->sales_order_id];
-			$iv=$InventoryVoucherQty[$jobCard->sales_order_id];
+			$so=@$SalesOrderQty[@$jobCard->sales_order_id];
+			$in=@$InvoiceQty[@$jobCard->sales_order_id];
+			$iv=@$InventoryVoucherQty[@$jobCard->sales_order_id];
 			
 			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
 				if($so != $in || $so != $iv || $in != $iv ){

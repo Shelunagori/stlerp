@@ -138,19 +138,7 @@ if($transaction_date <  $start_date ) {
 								$serial_no[$grn_row->purchase_order_row_id] = $grn_row->serial_numbers;
 							}
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
-							<?php  
-							/* $min_val=0;
-							$min_val1=0;
-							foreach($grn->serial_numbers as $item_serial_number){
-									if($item_serial_number->item_id == $grn_rows->item_id){ 
-										if($item_serial_number->status=='Out'){ 
-
-										$min_val=$min_val+1;
-										}
-										$min_val1++;
-									}
-							}  */
-							?>
+							
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 								<td>
@@ -227,6 +215,7 @@ if($transaction_date <  $start_date ) {
 								<?php   
 								if(!empty($serial_no[$grn_rows->id]))
 								{$i=1;
+								//pr($serial_no);
 								foreach($serial_no[$grn_rows->id] as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){
 									 
@@ -245,9 +234,12 @@ if($transaction_date <  $start_date ) {
 										<div class="col-md-2"></div>
 										<?php  } else {?>
 										<div class="row">
-										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly','class'=>'renameSerial']); ?></div>
+										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										
 										<div class="col-md-2">
+										<?php 
+										
+										if(@$parentSerialNo[$grn_rows->id][$serial_number->id]!=$serial_number->id){ ?>
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id], 
 													[
@@ -256,7 +248,7 @@ if($transaction_date <  $start_date ) {
 														'confirm' => __('Are you sure, you want to delete {0}?', $serial_number->id)
 													]
 												) ?>
-											
+										<?php } ?>
 										</div>
 										</div>
 								<?php  $i++; } }  }}
