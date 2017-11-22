@@ -922,20 +922,23 @@ class InventoryTransferVouchersController extends AppController
 				$inventoryTransferVoucher->voucher_no=1;
 			}
 			$inventoryTransferVoucher->company_id=$st_company_id;
-			$inventoryTransferVoucher->in_out='in';
+			$inventoryTransferVoucher->in_out='In';
 			$inventoryTransferVoucher->created_by=$s_employee_id;
+			$inventoryTransferVoucher->created_on=date('d-m-Y');
 			$inventoryTransferVoucher->transaction_date=date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date));
-			
+			pr($inventoryTransferVoucher);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
+				
 				foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
 					$dt=sizeof($inventory_transfer_voucher_row->sr_no);
 						$query= $this->InventoryTransferVouchers->ItemLedgers->query();
-						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','company_id','processed_on','source_id'])
+						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','source_row_id','company_id','processed_on','source_id'])
 							  ->values([
 											'item_id' =>$inventory_transfer_voucher_row->item_id,
 											'quantity' =>$inventory_transfer_voucher_row->quantity,
 											'rate' =>$inventory_transfer_voucher_row->amount,
 											'source_model' => 'Inventory Transfer Voucher',
+											'source_row_id' => $inventory_transfer_voucher_row->id,
 											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
 											'in_out'=>'In',
 											'company_id'=>$st_company_id,
@@ -961,11 +964,6 @@ class InventoryTransferVouchersController extends AppController
 								
 							}
 						}
-						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
-						$query21->update()
-							->set(['status' => 'in'])
-							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'item_id' => $inventory_transfer_voucher_row->item_id])
-							->execute();
 				}
 				$this->Flash->success(__('The Inventory Transfer Vouchers has been saved.'));
                 return $this->redirect(['action' => 'Index']);
