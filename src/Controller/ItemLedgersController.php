@@ -642,13 +642,11 @@ class ItemLedgersController extends AppController
 		}
 		/////fdgdfgdrc disavble
 		
-<<<<<<< HEAD
+
 	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
 	
 	pr($ItemSerialNumbers->toArray()); exit;
-=======
-	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['ItemSerialNumbers.company_id' => $st_company_id,'ItemSerialNumbers.status'=>"In"]);
->>>>>>> origin/master
+
 	
 	$itemSerialRate=[]; $itemSerialQuantity=[]; $i=1;
 	foreach($ItemSerialNumbers as $ItemSerialNumber){
