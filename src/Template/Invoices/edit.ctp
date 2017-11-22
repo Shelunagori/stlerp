@@ -183,7 +183,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
-						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
+						$current_row_items[$current_invoice_row->sales_order_row_id]=$current_invoice_row->quantity;
 						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
 						$sr_nos=$current_invoice_row->serial_number;
 					}
@@ -712,7 +712,7 @@ $(document).ready(function() {
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
 				
 			}else{
-				$(this).find("td:nth-child(1) span").html(++i); i--;
+				$(this).find("td:nth-child(1) span").html(++i); 
 				
 				$(this).find("td:nth-child(1) input.invoiceid").attr({ name:"q", readonly:"readonly"});
 				$(this).find("td:nth-child(1) input.hiddenid").attr({ name:"q", readonly:"readonly"});

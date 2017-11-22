@@ -249,8 +249,6 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						
 					}
 						
-					$current_rows=[];
-					$current_row_items=[];
 					$current_discount=[];
 					$current_pnf=[];
 					$current_cgst=[];
@@ -258,21 +256,18 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$current_igst=[];
 					$sr_nos=[];
 					foreach($invoice->invoice_rows as $current_invoice_row){
-						$current_rows[]=$current_invoice_row->item_id;
-						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
-						$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
-						$current_discount[$current_invoice_row->item_id]=$current_invoice_row->discount_percentage;
-						$current_pnf[$current_invoice_row->item_id]=$current_invoice_row->pnf_percentage;
-						$current_cgst[$current_invoice_row->item_id]=$current_invoice_row->cgst_percentage;
-						$current_sgst[$current_invoice_row->item_id]=$current_invoice_row->sgst_percentage;
-						$current_igst[$current_invoice_row->item_id]=$current_invoice_row->igst_percentage;
+						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
+						$current_discount[$current_invoice_row->sales_order_row_id]=$current_invoice_row->discount_percentage;
+						$current_pnf[$current_invoice_row->sales_order_row_id]=$current_invoice_row->pnf_percentage;
+						$current_cgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->cgst_percentage;
+						$current_sgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->sgst_percentage;
+						$current_igst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->igst_percentage;
 						$sr_nos=$current_invoice_row->serial_number;
 					}
 					
 					$q=0; 
 					
-					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
-						if(@$current_invoice_rows[$sales_order_row->id]!=$sales_order_row->quantity) { ?>
+					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){  ?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; --$q; ?>
@@ -295,20 +290,20 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 								<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm row_textbox','readonly','placeholder' => 'Amount','step'=>0.01,'value'=>$sales_order_row->rate]); ?>
 							</td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
-							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm  row_textbox discount_percentage','placeholder'=>'%','value'=>@$current_discount[$sales_order_row->item_id]]); ?></td>
+							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm  row_textbox discount_percentage','placeholder'=>'%','value'=>@$current_discount[$sales_order_row->id]]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
-							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox pnf_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_pnf[$sales_order_row->item_id]]); ?></td>
+							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox pnf_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_pnf[$sales_order_row->id]]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Taxable Value','readonly','step'=>0.01]); ?></td>
-							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm  row_textbox cgst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_cgst[$sales_order_row->item_id]]); ?></td>
+							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm  row_textbox cgst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_cgst[$sales_order_row->id]]); ?></td>
 							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
-							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox sgst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_sgst[$sales_order_row->item_id]]); ?></td>
+							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox sgst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_sgst[$sales_order_row->id]]); ?></td>
 							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
-							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_igst[$sales_order_row->item_id]]); ?></td>
+							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_igst[$sales_order_row->id]]); ?></td>
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01]); ?></td>
 							<td><label><?php 
-								if(in_array($sales_order_row->item_id,$current_rows)){
+								if(@$current_invoice_rows[$sales_order_row->id] == 0){
 									$check='checked';
 								}else{
 									$check='';
@@ -319,8 +314,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</tr>
 						<tr class="tr2  secondtr" row_no="<?= h($q) ?>">
 							<td colspan="<?php echo $tr2_colspan; ?>">
-							<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>" ><?php echo @$descriptions[$sales_order_row->item_id]; ?></div>
-							<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm  ','placeholder'=>'Description','style'=>['display:none'],'value' => @$descriptions[$sales_order_row->item_id],'readonly','required']); ?>
+							<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>" ><?php echo @$descriptions[$sales_order_row->id]; ?></div>
+							<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm  ','placeholder'=>'Description','style'=>['display:none'],'value' => @$descriptions[$sales_order_row->id],'readonly','required']); ?>
 							</td>
 							<td></td>
 						</tr>
@@ -333,7 +328,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							$this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&in_row_id='. @$invoice_row_id[@$sales_order_row->id]); ?>
 							</td>
 						</tr><?php } ?>
-						<?php  $q++; }  } ?>
+						<?php  $q++;   } ?>
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -876,7 +871,6 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(17) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).css('background-color','#FFF');
 				var uncheck=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				
 				$(uncheck).find('td:nth-child(1) textarea').attr({ name:"q", readonly:"readonly"});
 				//$('#main_tb tbody tr.tr2').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(uncheck).css('background-color','#FFF');
