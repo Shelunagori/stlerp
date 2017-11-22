@@ -610,7 +610,7 @@ class GrnsController extends AppController
 		foreach($grn->grn_rows as $grn_row)
 		{
 			$serialNoDetail = $this->Grns->SerialNumbers->find()
-									 ->where(['grn_id'=>$grn->id,'grn_row_id'=>$grn_row->id,'company_id'=>$st_company_id]);
+									 ->where(['grn_id'=>$grn->id,'grn_row_id'=>$grn_row->id,'company_id'=>$st_company_id]); 
 			if($serialNoDetail->count()>0)
 			{ 
 				foreach($serialNoDetail as $svalue)
@@ -619,12 +619,12 @@ class GrnsController extends AppController
 									 ->where(['parent_id'=>$svalue->id,'company_id'=>$st_company_id]);
 					if($serialNoparentIdExist->count()>0)
 					{
-						$parentSerialNo[$grn_row->purchase_order_row_id][$svalue->id] = $svalue->id;
+						$parentSerialNo[$svalue->id] = $svalue->id;
 					}
 				}
 			}
 		}
-		//pr($parentSerialNo);exit;
+		//pr($serialNoDetail->toArray());exit;
 		
 		$grnDetail = $this->Grns->get($id, [
 			'contain' => [

@@ -232,14 +232,13 @@ if($transaction_date <  $start_date ) {
 										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										</div>
 										<div class="col-md-2"></div>
-										<?php  } else {?>
+										<?php  } else { ?>
 										<div class="row">
 										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										
 										<div class="col-md-2">
 										<?php 
-										
-										if(@$parentSerialNo[$grn_rows->id][$serial_number->id]!=$serial_number->id){ ?>
+										if(@$parentSerialNo[$serial_number->id]!=$serial_number->id){ ?>
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id], 
 													[
