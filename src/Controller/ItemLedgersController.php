@@ -55,7 +55,7 @@ class ItemLedgersController extends AppController
 		}
 		
 		if($source_model=="Inventory Vouchers"){ //echo "IV"; exit;
-			$InventoryVoucher=$this->ItemLedgers->InventoryVouchers->get($source_id);
+			$InventoryVoucher=$this->ItemLedgers->Ivs->get($source_id);
 			//pr($InventoryVoucher); exit;
 			return ['voucher_info'=>$InventoryVoucher,'party_type'=>'-','party_info'=>''];
 		}
@@ -642,16 +642,21 @@ class ItemLedgersController extends AppController
 		}
 		/////fdgdfgdrc disavble
 		
-	$ItemSerialNumbers =$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['ItemSerialNumbers.company_id' => $st_company_id,'ItemSerialNumbers.status'=>"In"]);
+
+	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
+	
+	pr($ItemSerialNumbers->toArray()); exit;
+
 	
 	$itemSerialRate=[]; $itemSerialQuantity=[]; $i=1;
 	foreach($ItemSerialNumbers as $ItemSerialNumber){
 		if(@$ItemSerialNumber->grn_id > 0){
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
+			//pr($ItemLedgerData); 
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 		}
-		else if(@$ItemSerialNumber->master_item_id > 0){
+		else if(@$ItemSerialNumber->is_opening_balance =="Yes"){
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -663,10 +668,16 @@ class ItemLedgersController extends AppController
 			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+		}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
+			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
+			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 		}
 	}
 	
-	//pr($itemSerialRate); exit;
+	pr($itemSerialRate); 
+	pr($itemSerialQuantity); 
+	exit;
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
 			$r=@$itemSerialRate[$key];
@@ -1433,106 +1444,71 @@ class ItemLedgersController extends AppController
 			$where['processed_on <=']=$To;
 		}
 		$itemLedgers = $this->ItemLedgers->find()
-						->where($where)
-						->order(['processed_on'=>'DESC'])
-						->contain(['Items'])
-						->where(['ItemLedgers.company_id' => $st_company_id]); 
-		
-		$itemDatas=[];
-		foreach($itemLedgers as $itemLedger){
-			$itemDatas[$itemLedger['source_model'].$itemLedger['source_id']][]=$itemLedger;
-			
-		}
-		$serial_nos=[];
-		$voucher_no=[];
-		$link=[];
-		foreach($itemDatas as $key=>$itemData){
-			foreach($itemData as $itemDetail){
-				///query in item serial nos where source model && sourch id invoice_id
-				if($itemDetail['source_model']=='Invoices'){
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['invoice_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					//pr($itemDetail['source_id']);  exit;
-					$invoice=$this->ItemLedgers->Invoices->find()->where(['Invoices.id'=>$itemDetail['source_id']])->first();
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					$in_id=$itemDetail['source_id'];
-					$invoice1=($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4);
-					//if()
-					
-					$voucher_no[$key][]=$invoice1;
-					
-					if($invoice['invoice_type']=="GST"){
-						$link1 = ['controller'=>'Invoices','action' => 'gst-confirm'];
-					}else{ 
-						$link1 = ['controller'=>'Invoices','action' => 'confirm'];
-					}
-					$link[$key]=$link1;
-				}
-				if($itemDetail['source_model']=='Grns'){
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['grn_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					//pr($serialnoarray->toArray());
-					$grn=$this->ItemLedgers->Grns->find()->where(['Grns.id'=>$itemDetail['source_id']])->first();
-					$voucher_no[$key][]=($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4);
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					
-					$link1 = ['controller'=>'Grns','action' => 'View'];
-					
-					$link[$key]=$link1;
-					
-					
-				}if($itemDetail['source_model']=='Inventory Vouchers'){
-					//ww
-					$InventoryVoucher=$this->ItemLedgers->InventoryVouchers->find()->where(['InventoryVouchers.id'=>$itemDetail['source_id']])->first();
-					
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['iv_invoice_id'=>$InventoryVoucher->invoice_id,'item_id'=>$itemDetail['item_id']]);
-									
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					$voucher_no[$key][]=('#'.str_pad($InventoryVoucher->iv_number, 4, '0', STR_PAD_LEFT));
-					$link1 = ['controller'=>'InventoryVouchers','action' => 'View'];
-					
-					$link[$key]=$link1;
-				}if($itemDetail['source_model']=='Inventory Transfer Voucher'){
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['inventory_transfer_voucher_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					
-					$InventoryTransferVoucher=$this->ItemLedgers->InventoryTransferVouchers->find()->where(['InventoryTransferVouchers.id'=>$itemDetail['source_id']])->first();
-					
-					 if($InventoryTransferVoucher->in_out=='in_out'){ 
-							$voucher_no[$key][]=('ITV-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
-							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'View'];
-							$link[$key]=$link1;
-						}else if($InventoryTransferVoucher->in_out=='in') { 
-							$voucher_no[$key][]=('ITVI-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT));
-							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'inView'];
-							$link[$key]=$link1;
-						}else {
-							$voucher_no[$key][]=('ITVO-'.str_pad($InventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT)) ;
-							$link1 = ['controller'=>'InventoryTransferVouchers','action' => 'outView'];
-							$link[$key]=$link1;
-						} 
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-				}if($itemDetail['source_model']=='Purchase Return'){
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['invoice_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->find()->where(['PurchaseReturns.id'=>$itemDetail['source_id']])->first();
-					
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					$voucher_no[$key][]=('#'.str_pad($PurchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT));
-					
-					$link1 = ['controller'=>'PurchaseReturns','action' => 'View'];
-					$link[$key]=$link1;
-				}if($itemDetail['source_model']=='Sale Return'){
-					$serialnoarray=$this->ItemLedgers->Items->ItemSerialNumbers->find()->where(['invoice_id'=>$itemDetail['source_id'],'item_id'=>$itemDetail['item_id']]);
-					$SaleReturn=$this->ItemLedgers->SaleReturns->find()->where(['SaleReturns.id'=>$itemDetail['source_id']])->first();
-					
-					$serial_nos[$key][$itemDetail->item_id]=$serialnoarray->toArray();
-					$voucher_no[$key][]=($SaleReturn->sr1.'/SR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4);
-					$link1 = ['controller'=>'SaleReturns','action' => 'View'];
-					$link[$key]=$link1;
-				}
-			}
-			
-		}
+					->where($where)
+					->order(['processed_on'=>'DESC'])
+					->contain(['Items'])
+					->where(['ItemLedgers.company_id' => $st_company_id]); 
 	
-	//pr($link);exit;
-		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','from_date','to_date'));
+	$itemDatas=[];
+	foreach($itemLedgers as $itemLedger){
+		$itemDatas[$itemLedger['source_model'].$itemLedger['source_id']][]=$itemLedger;
+		
+	}
+	//pr($itemLedgers->toArray());exit;
+	$serial_nos=[];
+	$voucher_no=[];
+	$link=[];
+	$AllDatas=[];
+	$AllDatas=[];
+
+		$invoice=$this->ItemLedgers->Invoices->find()->contain(['InvoiceRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+					return $exp->between('date_created',$From ,$To, 'date');
+				})->toArray();
+				//pr($invoice->toArray()); exit;
+		if(!empty($invoice)){
+			$AllDatas[$To]['Invoice']=$invoice;
+		}
+		
+		$Grns=$this->ItemLedgers->Grns->find()->contain(['GrnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+					return $exp->between('date_created',$From ,$To, 'date');
+				})->toArray();
+		if(!empty($Grns)){
+			$AllDatas[$To]['Grns']=$Grns;
+		}
+		
+		$InventoryTransferVouchers=$this->ItemLedgers->InventoryTransferVouchers->find()->contain(['InventoryTransferVoucherRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+					return $exp->between('transaction_date',$From ,$To, 'date');
+				})->toArray();
+		if(!empty($InventoryTransferVouchers)){
+			$AllDatas[$To]['InventoryTransferVouchers']=$InventoryTransferVouchers;
+		}
+		
+		$Ivs=$this->ItemLedgers->Ivs->find()->contain(['IvRows'=>['Items','SerialNumbers','IvRowItems'=>['Items','SerialNumbers']]])->where(function($exp) use($From ,$To) {
+					return $exp->between('transaction_date',$From ,$To, 'date');
+				})->toArray();
+		if(!empty($Ivs)){
+			$AllDatas[$To]['InventoryVouchers']=$Ivs;
+		}
+		
+		$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+					return $exp->between('date_created',$From ,$To, 'date');
+				})->toArray();
+		if(!empty($SaleReturns)){
+			$AllDatas[$To]['SaleReturns']=$SaleReturns;
+		}
+		
+		$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+					return $exp->between('created_on',$From ,$To, 'date');
+				})->toArray();
+				//pr($PurchaseReturns);exit;
+		if(!empty($PurchaseReturns)){
+			$AllDatas[$To]['PurchaseReturns']=$PurchaseReturns;
+			//pr($AllDatas);exit;
+		}
+      
+	
+	//pr($AllDatas);exit;
+		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','from_date','to_date','AllDatas','sourceData'));
 	}
 	
 	

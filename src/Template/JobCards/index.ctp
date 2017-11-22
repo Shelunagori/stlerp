@@ -102,7 +102,8 @@
 			$in=$InvoiceQty[$jobCard->sales_order_id];
 			$iv=$InventoryVoucherQty[$jobCard->sales_order_id];
 			
-			if((($jobCardStatus==null) || ($jobCardStatus=='Pending') && (($so != $in) || ($so != $iv) || ($in != $iv )))){  
+			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
+				if($so != $in || $so != $iv || $in != $iv ){
 			?>
 				<tr>
 					<td><?= h(++$page_no) ?></td>
@@ -143,10 +144,12 @@
 							'confirm' => __('Are you sure ?')
 						]
 					) ?>
-					<?php } } ?>
+					<?php } } }?>
 					</td>
 				</tr>
-		    <?php }  else if($jobCardStatus=='Closed' && (($so == $in) && ($so == $iv) && ($so == $iv) )){   ?>
+		    <?php }  else if($jobCardStatus=='Closed'){
+					if((($so == $in) && ($so == $iv) && ($so == $iv) )  || $jobCard->status=="Closed"){
+			?>
 			<tr>
 					<td><?= h(++$page_no) ?></td>
 					<td><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
@@ -190,7 +193,7 @@
 					</td>
 				</tr>
 			
-			<?php } endforeach; ?>
+			<?php } } endforeach; ?>
 			 </tbody>
 			</table>
 		</div>

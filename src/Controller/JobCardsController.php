@@ -14,12 +14,7 @@ class JobCardsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		/* $where=[];
-		if($status==null or $status=='Pending'){
-			$where['status']='Pending';
-		}elseif($status=='Closed'){
-			$where['status']='Closed';
-		} */
+		
 		$inventory_voucher_status=$this->request->query('inventory_voucher');
 		
 		$where1=[];
@@ -69,58 +64,70 @@ class JobCardsController extends AppController
 			$Created_To=date("Y-m-d",strtotime($this->request->query('Created_To')));
 			$where1['JobCards.created_on <=']=$Created_To;
 		}
-		//pr($inventory_voucher_status); exit;
-        $this->paginate = [
-            'contain' => ['SalesOrders']
-        ];
-		if(!empty($items)){ 
 		
-			$jobCards=$this->paginate($this->JobCards->find()
-			->contain(['SalesOrders','JobCardRows'=>['Items']])
-			->matching(
-					'JobCardRows.Items', function ($q) use($items) {
-						return $q->where(['Items.id' =>$items]);
-					}
-				)
-			->where(['JobCards.company_id'=>$st_company_id])
-			->order(['JobCards.jc2' => 'DESC'])	
-			);
-			
-		}else if($inventory_voucher_status=='true'){
-			$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders','JobCardRows'=>['Items']])->where($where1)->where(['status' => 'Pending','JobCards.company_id'=>$st_company_id]));
-		}else if(!empty($customer_id)){
-			$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-			->where($where1)->where(['JobCards.company_id'=>$st_company_id])->order(['JobCards.jc2' => 'DESC'])
-			->matching(
-					'SalesOrders.Customers', function ($q) use($customer_id) {
-						return $q->where(['Customers.id' =>$customer_id]);
-					}
-				)
-			);
-		}else{ 
-			$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-			->where($where1)->where(['JobCards.company_id'=>$st_company_id])->order(['JobCards.jc2' => 'DESC']));
-		}
+		$where=[];
+		if($status==null or $status=='Pending'){
+			if(!empty($items)){ 
+				$jobCards=$this->paginate($this->JobCards->find()
+				->contain(['SalesOrders','JobCardRows'=>['Items']])
+				->matching(
+						'JobCardRows.Items', function ($q) use($items) {
+							return $q->where(['Items.id' =>$items]);
+						}
+					)
+				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])
+				->order(['JobCards.jc2' => 'DESC'])	
+				);
+			}else if(!empty($customer_id)){
+				$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
+				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC'])
+				->matching(
+						'SalesOrders.Customers', function ($q) use($customer_id) {
+							return $q->where(['Customers.id' =>$customer_id]);
+						}
+					)
+				);
+			}else{ 
+				$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
+				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC']));
+			}
+		}elseif($status=='Closed'){ 
+			if(!empty($items)){ 
+				$jobCards=$this->paginate($this->JobCards->find()
+				->contain(['SalesOrders','JobCardRows'=>['Items']])
+				->matching(
+						'JobCardRows.Items', function ($q) use($items) {
+							return $q->where(['Items.id' =>$items]);
+						}
+					)
+				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])
+				->order(['JobCards.jc2' => 'DESC'])	
+				);
+			}else if(!empty($customer_id)){
+				$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
+				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
+				->matching(
+						'SalesOrders.Customers', function ($q) use($customer_id) {
+							return $q->where(['Customers.id' =>$customer_id]);
+						}
+					)
+				);
+			}else{ 
+				$jobCards = $this->paginate($this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
+				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']));
+			}
+		} 
 		
 		$SalesOrderQty=[];
 		$InvoiceQty=[];
 		$InventoryVoucherQty=[];
-		
-		//$JCs=$this->JobCards->find()->contain(['JobCardRows'=>['SalesOrderRows'=>['InvoiceRows'=>['IvRows']]]])->toArray();
 		$JCs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['Ivs'],'SalesOrderRows',]])->toArray();
-	//	pr($JCs); exit;
-		foreach($JCs as $jc ){ //pr($jc->sales_order->sales_order_rows); exit;
-			foreach($jc->sales_order->sales_order_rows as $sales_order_row){ //pr($sales_order_row['sales_order_id']); exit;
+		foreach($JCs as $jc ){ 
+			foreach($jc->sales_order->sales_order_rows as $sales_order_row){ 
 					@$SalesOrderQty[@$sales_order_row['sales_order_id']]+=@$sales_order_row['quantity'];
-				
 			}
 		}
-		
-		//$Jobs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['InvoiceRows','Ivs']]])->toArray();
-		$Jobs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['InvoiceRows'=>['IvRows']]]])
-		
-		->toArray();
-		//pr($jobCards->toArray()); exit;
+		$Jobs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['InvoiceRows'=>['IvRows']]]])->toArray();
 		foreach($Jobs as $jc ){ //pr($jc->sales_order->invoices); exit;
 			foreach($jc->sales_order->invoices as $invoice){   //pr($invoice); 
 				foreach($invoice->invoice_rows as $invoice_row){ 

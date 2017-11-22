@@ -77,6 +77,7 @@ class ItemLedgersTable extends Table
 		$this->belongsTo('MaterialIndents');
 		$this->belongsTo('NewItems');
 		$this->belongsTo('Ivs');
+		$this->belongsTo('SerialNumbers');
 		
     }
 
