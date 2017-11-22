@@ -113,7 +113,7 @@
 								?></td>
 								<td>
 									<?php echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->item_id]);
-									 echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->item->item_companies[0]->serial_number_enable]);
+									 echo $this->Form->input('q', ['type' => 'hidden','class'=>'enable','value'=>@$purchase_order_rows->item->item_companies[0]->serial_number_enable]);
 									 echo $purchase_order_rows->item->name;
 
 									 echo $this->Form->input('q', ['type' => 'hidden','class'=>'purchase_order_row_id','value'=>@$purchase_order_rows->id]);
@@ -267,24 +267,32 @@ $(document).ready(function() {
 			var item_id=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val();
 			var l=$('.tr2[row_no="'+row_no+'"]').find('input').length;
 		//alert(serial_number_enable);
-				if(val && serial_number_enable=='1'){ 
-			
-					if(qty < l){
-						
-						for(i=l;i>qty;i--){
-						$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
-						
-						}
+				if(val && serial_number_enable=='1')
+				{ 
+					if(qty.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits");
+						$(this).find('td:nth-child(3) input[type="text"]').val('');
 					}
-					if(qty > l){
-						l=l+1;
-						
-						for(i=l;i<=qty;i++){
-						
-						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required/></div>');
-						
-						$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
-						r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+					else
+					{
+						if(qty < l){
+							
+							for(i=l;i>qty;i--){
+							$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+							
+							}
+						}
+						if(qty > l){
+							l=l+1;
+							
+							for(i=l;i<=qty;i++){
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required/></div>');
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
+							r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+							}
 						}
 					}
 				}
@@ -341,6 +349,8 @@ $(document).ready(function() {
 			}
 		});
 	}
+	
+	
 	
 	
 });		
