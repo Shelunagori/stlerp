@@ -466,7 +466,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(2) input.hid').val();
 			var no=0;
 			$(this).find('.renameSerial').each(function(){
-				$(this).attr({ name:"grn_rows["+val+"][serial_numbers][]"});
+				$(this).attr({ name:"grn_rows["+val+"][serial_number][]"});
 				no++;
 			});
 		});

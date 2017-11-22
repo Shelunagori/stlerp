@@ -580,12 +580,11 @@ class GrnsController extends AppController
 					foreach($grn->grn_rows as $grn_row)
 					{ 
                         
-						if(!empty($grn_row->serial_numbers))
+						if(!empty($grn_row->serial_number))
 						{
-							foreach($grn_row->serial_numbers as $serial_number)
-							{ //pr($serial_number);
-						      
-							    $query = $this->Grns->SerialNumbers->query();
+							foreach($grn_row->serial_number as $serial_number)
+							{ 
+						       $query = $this->Grns->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
 									->values([
 									'name' => $serial_number,
