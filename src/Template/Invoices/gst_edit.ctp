@@ -1186,7 +1186,7 @@ $(document).ready(function() {
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
-		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
+		$(this).closest('tr').find('td:eq(2) input').val(round(due_amount,2));
 		do_ref_total();
 	});
 	
