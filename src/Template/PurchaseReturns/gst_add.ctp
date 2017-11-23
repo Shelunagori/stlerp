@@ -190,7 +190,9 @@
 							}
 							
 					$q=0; $p=1; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): 
-							//if(@$PurchaseReturnQty[@$invoice_booking_row->id]!=$invoice_booking_row->quantity){
+					$max_qty=sizeof(@$options[@$invoice_booking_row->grn_row_id]);
+					//echo $min_qty;
+					if(@$options[@$invoice_booking_row->grn_row_id]){
 					?>
 						<tr class="tr1" row_no='<?php echo @$q; ?>'>
 							<td rowspan="2"><?php echo $p++; ?></td>
@@ -204,7 +206,7 @@
 							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.unit_rate_from_po',['value'=>$invoice_booking_row->unit_rate_from_po,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
 							
 							<td><?php 
-							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>'0','readonly','max'=>@$invoice_booking_row->quantity,'type'=>'text','style'=>'width:50px;']); ?></td>
+							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>'0','readonly','type'=>'text','style'=>'width:50px;','max'=>$max_qty]); ?></td>
 							
 							<td align="center">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.misc',['type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly','value'=>0,'value'=>$invoice_booking_row->misc]); ?>
@@ -275,14 +277,14 @@
 						<tr class="tr3" row_no="<?php echo @$q; ?>">
 							<td></td>
 							<td colspan="18">
-								<?php 
-								echo '/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id;
-								echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id); ?>
+							<?php 
+								echo $this->Form->input('sr_nos', ['label'=>false,'options' => $options[$invoice_booking_row->grn_row_id],'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']); 
+								?>
 							</td>
 						</tr>
-					<?php } ?>
+						<?php } ?>
 							<?php //}
-							$q++;  endforeach; ?>
+							$q++; }   endforeach; ?>
 				
 				</tbody>
 				<tfoot>

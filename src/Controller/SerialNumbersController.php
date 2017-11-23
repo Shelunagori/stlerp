@@ -256,6 +256,33 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['out_dropdown']);
 	}
 	
+	public function getSerialNumberPurchaseReturnListSr(){
+		$grn_row_id=$this->request->query('grn_row_id'); 
+		$in_row_id=$this->request->query('in_row_id'); 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+		$serialnumbers = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id,'grn_row_id'=>$grn_row_id,'SerialNumbers.status'=>'In']);
+		$inserialnumbersSize=sizeof($serialnumbers->toArray());
+		$k=0;
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id]);
+			if($outExist > 0){
+				++$k;
+			}
+		}
+		if($inserialnumbersSize==$k){
+				echo "true";
+		
+		}
+	$this->set(compact('inserialnumbersSize'));
+        $this->set('_serialize', ['out_dropdown']);
+	}
+	
+	
 	public function getSerialNumberPurchaseReturnList(){
 		$grn_row_id=$this->request->query('grn_row_id'); 
 		$in_row_id=$this->request->query('in_row_id'); 
