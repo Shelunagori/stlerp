@@ -344,7 +344,7 @@ class IvsController extends AppController
 			$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers']);
 				foreach($iv->iv_rows as $iv_row){ 
 				
-					$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);
+					/* $this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);
 					/////For In
 					if(!empty($iv_row->serial_numbers))
 					{
@@ -363,7 +363,7 @@ class IvsController extends AppController
 									$query->execute(); 
 							}
 						}
-					}
+					} */
 					$unit_rate_In=0;$unit_rate=0;	
 				 	foreach($iv_row->iv_row_items as $iv_row_item){
 					if(!empty($iv_row_item['id'])){
