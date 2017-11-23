@@ -38,35 +38,11 @@ class SerialNumbersController extends AppController
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
-		
-		$totalInCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'In']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-		$totalOutCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'Out']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-
-			
-		$query->select([
-			'total_in' => $query->func()->count($totalInCase),
-			'total_out' => $query->func()->count($totalOutCase),'id','item_id'
-		])
-		->where(['company_id'=>$st_company_id,'item_id'=>$item_id])
-		->group('SerialNumbers.name')
-		->autoFields(true);
-		$SerialNumbers =$query->toArray();
-		
-		foreach($SerialNumbers as $serialnumbers){
-			if($serialnumbers->total_in > $serialnumbers->total_out){
-				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-				//$values=$sr_nos;
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id]);
+			if($outExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
 			}
 		}
 		//pr($values);exit;
@@ -189,61 +165,29 @@ class SerialNumbersController extends AppController
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
 		$in_row_id=$this->request->query('in_row_id');
+		$invoice_id=$this->request->query('invoice_id');
+		//pr($invoice_id); exit;
 		$sr_no=explode(',',$sr_nos);
 		
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
-		
 		$this->viewBuilder()->layout('');
 		
+		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
-		
-		$totalInCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'In']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-		$totalOutCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'Out']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-
-			
-		$query->select([
-			'total_in' => $query->func()->count($totalInCase),
-			'total_out' => $query->func()->count($totalOutCase)
-		])
-		->where(['company_id'=>$st_company_id,'item_id'=>$item_id])
-		->group('SerialNumbers.name')
-		->autoFields(true);
-		$SerialNumbers =$query->toArray();
-		
-		$invoice_srnos = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out','sales_return_row_id'=>'0','sales_return_id'=>'0']);
-		$SerialNumbers_out = $invoice_srnos->toArray();
-		
-		$sr_number=[];
-		foreach($SerialNumbers_out as $sr_nos){
-			$sr_number[$sr_nos->invoice_row_id][]=$sr_nos->name;
-		}
-		
-		foreach($SerialNumbers as $serialnumbers){
-			if(!empty($in_row_id)){
-				if(($serialnumbers->total_in > $serialnumbers->total_out) || (in_array($serialnumbers->name,$sr_number[$in_row_id]))){
-					$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-				}
-			}else{
-				if(($serialnumbers->total_in > $serialnumbers->total_out)){
-					$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-				}
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'invoice_row_id'=>$in_row_id]);
+			if($outExist > 0){
+				$values[]=$serialnumber->id;
 			}
-				
-			@$values=$sr_number[$in_row_id];
+			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'invoice_row_id != '=>$in_row_id]);
+			
+			if($inExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
+			}
 		}
-		//pr($values);exit;
+		//pr($in_row_id);
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
 	}	

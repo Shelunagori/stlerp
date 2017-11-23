@@ -782,6 +782,7 @@ $(document).ready(function() {
 				p++;
 			}			
 			else{
+				$(this).find('td:nth-child(1) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
@@ -797,6 +798,10 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(14) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(15) select').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(16) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(17) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				
+				var uncheck=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
+				$(uncheck).find('td:nth-child(1) textarea').attr({ name:"q", readonly:"readonly"});
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
 				//$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
