@@ -264,7 +264,7 @@ class SerialNumbersController extends AppController
 		
 		$this->viewBuilder()->layout('');
 		
-		$options=[];$values=[];
+/* 		$options=[];$values=[];
         $query = $this->SerialNumbers->find('list');
 		$query->where(['SerialNumbers.company_id'=>$st_company_id,'grn_row_id'=>$grn_row_id,'SerialNumbers.status'=>'In']);
 		$SerialNumbers_in = $query->toArray();
@@ -272,9 +272,18 @@ class SerialNumbersController extends AppController
 		$serialnumbers_out = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.status'=>'Out','purchase_return_row_id >'=>0])->toArray();
 
 		
-		$out_dropdown = array_diff($SerialNumbers_in,$serialnumbers_out);
+		//$out_dropdown = array_diff($SerialNumbers_in,$serialnumbers_out);
 		foreach($out_dropdown as $option){  	
 			$options[]=['text' =>$option, 'value' => $option];
+		} */
+		
+		$options=[];$values=[];
+		$serialnumbers = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id,'grn_row_id'=>$grn_row_id,'SerialNumbers.status'=>'In']);
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id]);
+			if($outExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
+			}
 		}
 		
         $this->set(compact('options', 'values','out_dropdown'));

@@ -756,17 +756,28 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
 		$invoice_booking_id=@(int)$this->request->query('invoiceBooking');
-		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
-            'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
-				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
-										->group(['PurchaseReturnRows.invoice_booking_row_id'])
-										->autoFields(true);
-			}],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
-							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
-							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
+		/* $invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
+            'contain' => ['Grns','InvoiceBookingRows' => ['Items','PurchaseReturnRows']]
         ]);
+		 */
+		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($invoice_booking_id, [
+            'contain' => (['PurchaseReturns'=>['PurchaseReturnRows' => function($q) {
+				return $q->select(['purchase_return_id','invoice_booking_row_id','item_id','total_qty' => $q->func()->sum('PurchaseReturnRows.quantity')])->group('PurchaseReturnRows.invoice_booking_row_id');
+			}],'InvoiceBookingRows'=> ['Items','PurchaseReturnRows'],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]])
+        ]);
+		// pr($invoiceBooking->toArray()); exit;	
+		/*$sales_orders_qty=[];
+			foreach($SalesOrders->invoices as $invoices){ 
+				foreach($invoices->invoice_rows as $invoice_row){ 
+					$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
+				}
+			} */
+				
 		
-		$PurchaseReturnQty=[];
+	//	pr($invoiceBooking->toArray()); exit;
+		/* $PurchaseReturnQty=[];
 		$remainingQty=[];
         foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
 		{ 
@@ -783,7 +794,7 @@ class PurchaseReturnsController extends AppController
 				$remainingQty[$invoice_booking_row->id]=$invoice_booking_row->quantity;
 			}				
 		}
-		
+		pr($remainingQty); exit; */
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();	
 			$vendor_ledger_acc_id=$v_LedgerAccount->id;
 		//pr($invoiceBooking);exit;

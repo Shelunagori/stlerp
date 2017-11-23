@@ -653,7 +653,7 @@ class ItemLedgersController extends AppController
 		if(@$ItemSerialNumber->grn_id > 0){ 
 			$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 			if($outExist == 0){
-				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
+				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
 				@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 				@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			}
@@ -664,26 +664,29 @@ class ItemLedgersController extends AppController
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 		}else if(@$ItemSerialNumber->sale_return_id > 0){
-			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'item_id'=>$ItemSerialNumber->item_id])->first();
-			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
-			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-		}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
 			$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 			if($outExist == 0){
-				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
+				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
+				@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+			}
+			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+		}else if(@$ItemSerialNumber->itv_id > 0){
+			$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
+			if($outExist == 0){
+				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
 				@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 				@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 			}
 		}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
-			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
+			$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Vouchers",'item_id'=>$ItemSerialNumber->item_id])->first();
 			@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 			@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 		}
 	}
 	
-	pr($itemSerialRate); 
+	/* pr($itemSerialRate); 
 	pr($itemSerialQuantity); 
-	exit;
+	exit; */
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
 			$r=@$itemSerialRate[$key];

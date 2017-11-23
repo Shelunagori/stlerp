@@ -66,6 +66,9 @@ class InvoiceBookingsTable extends Table
         $this->hasMany('InvoiceBookings', [
             'foreignKey' => 'grn_id'
         ]);
+		$this->hasMany('PurchaseReturns', [
+            'foreignKey' => 'invoice_booking_id'
+        ]);
 		
 		$this->belongsTo('Vendors', [
             'foreignKey' => 'vendor_id',

@@ -204,7 +204,7 @@
 							<td><?php echo $this->Form->input('purchase_return_rows.'.$q.'.unit_rate_from_po',['value'=>$invoice_booking_row->unit_rate_from_po,'type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly']); ?></td>
 							
 							<td><?php 
-							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>'0','readonly','max'=>@$remainingQty[@$invoice_booking_row->id],'type'=>'text','style'=>'width:50px;']); ?></td>
+							echo $this->Form->input('purchase_return_rows.'.$q.'.quantity',['label' => false,'class' => 'form-control input-sm cal', 'value'=>'0','readonly','max'=>@$invoice_booking_row->quantity,'type'=>'text','style'=>'width:50px;']); ?></td>
 							
 							<td align="center">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.misc',['type'=>'text','label'=>false,'class'=>'form-control input-sm row_textbox cal','readonly','value'=>0,'value'=>$invoice_booking_row->misc]); ?>
@@ -275,7 +275,9 @@
 						<tr class="tr3" row_no="<?php echo @$q; ?>">
 							<td></td>
 							<td colspan="18">
-								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id); ?>
+								<?php 
+								echo '/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id;
+								echo $this->requestAction('/SerialNumbers/getSerialNumberPurchaseReturnList?grn_row_id='.$invoice_booking_row->grn_row_id); ?>
 							</td>
 						</tr>
 					<?php } ?>
