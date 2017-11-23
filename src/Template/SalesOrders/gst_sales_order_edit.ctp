@@ -822,31 +822,31 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){ var row_total=0;
 			var qty=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
-			var Amount=qty*Rate;
+			var Amount=qty*round(Rate,2);
 			$(this).find("td:nth-child(5) input").val(round(Amount,2));
 			//total=total+Amount;
-			row_total =row_total+Amount;
+			row_total =row_total+round(Amount2),;
 			var discount=$(this).find("td:nth-child(6) input").val();
 			if(!discount){ discount=0; $(this).find("td:nth-child(7) input").val('');}
-			var discount_value = (Amount*discount)/100;
-			var value_after_discount = Amount-discount_value;
+			var discount_value = (round(Amount,2)*round(discount,3))/100;
+			var value_after_discount = round(Amount,2)-round(discount_value,2);
 			if(discount)
 			{   
-		         row_total =row_total-parseFloat(discount_value);
-				 total_discount_amt = total_discount_amt+parseFloat(discount_value);
-				 $(this).find("td:nth-child(7) input").val(round(discount_value,2));
+				row_total =row_total-parseFloat(round(discount_value,2));
+				total_discount_amt = total_discount_amt+parseFloat(round(discount_value,2));
+				$(this).find("td:nth-child(7) input").val(round(discount_value,2));
 			}
 			var pnf=$(this).find("td:nth-child(8) input").val(); 
 			if(!pnf){ pnf=0; $(this).find("td:nth-child(9) input").val('');}
-			var pnf_value = (value_after_discount*pnf)/100;
-			var value_after_pnf =value_after_discount+parseFloat(pnf_value);
+			var pnf_value = (round(value_after_discount,2)*round(pnf,3))/100;
+			var value_after_pnf =value_after_discount+parseFloat(round(pnf_value,2));
 			if(pnf)
 			{
 				total_pnf_amt =total_pnf_amt+parseFloat(pnf_value);
 				row_total =value_after_pnf;
 				$(this).find("td:nth-child(9) input").val(round(pnf_value,2));
 			}
-			tatal_taxable_amt = tatal_taxable_amt+parseFloat(value_after_pnf);
+			tatal_taxable_amt = tatal_taxable_amt+parseFloat(round(value_after_pnf,2));
 			$(this).find("td:nth-child(10) input").val(round(value_after_pnf,2));
 			var cgst_percentage=parseFloat($(this).find("td:nth-child(11) option:selected").attr("percentage"));
 			if(isNaN(cgst_percentage))
@@ -856,9 +856,9 @@ $(document).ready(function() {
 			}else
 			{  
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-					var cgst_amount = (taxable_value*cgst_percentage)/100;
+					var cgst_amount = (round(taxable_value,2)*round(cgst_percentage,3))/100;
 					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
-					row_total=row_total+((taxable_value*cgst_percentage)/100);
+					row_total=row_total+((round(taxable_value,2)*round(cgst_percentage,3))/100);
 			}
 			total_cgst=total_cgst+cgst_amount;
 			
@@ -868,9 +868,9 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 			}else{ 
 			    var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-				var sgst_amount = (taxable_value*sgst_percentage)/100;
+				var sgst_amount = (round(taxable_value,2)*round(sgst_percentage,3))/100;
 				$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
-				row_total=row_total+((taxable_value*sgst_percentage)/100);
+				row_total=row_total+((round(taxable_value,2)*round(sgst_percentage,3))/100);
 			}
 			total_sgst=total_sgst+sgst_amount;
 			var igst_percentage=parseFloat($(this).find("td:nth-child(15) option:selected").attr("percentage"));
@@ -879,9 +879,9 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 			}else{ 
 				var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-				var igst_amount = (taxable_value*igst_percentage)/100;
+				var igst_amount = (round(taxable_value,2)*round(igst_percentage,3))/100;
 				$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
-				row_total=row_total+((taxable_value*igst_percentage)/100);
+				row_total=row_total+((round(taxable_value2),*round(igst_percentage,3))/100);
 			}
 			total_igst=total_igst+igst_amount;
 			$(this).find("td:nth-child(17) input").val(round(row_total,2));

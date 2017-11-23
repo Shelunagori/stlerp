@@ -2314,7 +2314,7 @@ class InvoicesController extends AppController
 											->execute(); 
 					/////for delete serial number in table					
 										
-					 foreach($item_serial_no as $serial){ pr($serial);
+					 foreach($item_serial_no as $serial){
 							$serial_data=$this->Invoices->InvoiceRows->SerialNumbers->get($serial);
 							 $query  = $this->Invoices->InvoiceRows->SerialNumbers->query();
 										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id','parent_id'])

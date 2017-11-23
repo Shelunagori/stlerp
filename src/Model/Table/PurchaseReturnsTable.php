@@ -38,6 +38,7 @@ class PurchaseReturnsTable extends Table
         $this->displayField('id');
         $this->primaryKey('id');
 		$this->belongsTo('ItemLedgers');
+		$this->belongsTo('SerialNumbers');
         $this->belongsTo('InvoiceBookings', [
             'foreignKey' => 'invoice_booking_id',
             'joinType' => 'INNER'

@@ -102,7 +102,7 @@
 							$location='/InventoryTransferVouchers/View/'.$itemData->id;
 							
 						}
-						else if($itemData['in_out']=='in') 
+						else if($itemData['in_out']=='In') 
 						{ 
 							$voucher=('ITV-'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
 							$location='/InventoryTransferVouchers/inView/'.$itemData->id;

@@ -557,27 +557,10 @@ class GrnsController extends AppController
 				if ($this->Grns->save($grn)) 
 				{
 					$this->Grns->ItemLedgers->deleteAll(['source_id' => $grn->id, 'source_model' => 'Grns','company_id' =>$st_company_id ]);
-						$grn->check=array_filter($grn->check);
+						//$grn->check=array_filter($grn->check);
 						$i=0; 
 						
-						// foreach($grn->check as $purchase_order_row_id)
-						// {
-							// $qty=$grn->grn_rows[$i]['quantity'];
-							// $item_id=$grn->grn_rows[$i]['item_id'];
-							// $i++;
-							
-							
-							// $itemLedger = $this->Grns->ItemLedgers->newEntity();
-							// $itemLedger->item_id = $item_id;
-							// $itemLedger->quantity = $qty;
-							// $itemLedger->company_id = $grn->company_id;
-							// $itemLedger->source_model = 'Grns';
-							// $itemLedger->source_id = $grn->id;
-							// $itemLedger->in_out = 'In';
-							// $itemLedger->processed_on = $grn->transaction_date;
-							// $itemLedger->source_row_id = $grn_row->id;
-							// $this->Grns->ItemLedgers->save($itemLedger);
-						// } 
+						
 					foreach($grn->grn_rows as $grn_row)
 					{ 
                         
@@ -741,11 +724,11 @@ class GrnsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
-	public function DeleteSerialNumbers($id=null,$item_id=null,$grn_id=null){
-		
+	public function DeleteSerialNumbers($id=null,$item_id=null,$grn_id=null,$grn_row_id=null)
+	{
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$ItemLedger=$this->Grns->ItemLedgers->find()->where(['item_id'=>$item_id,'source_model'=>'Grns'])->first();
+		$ItemLedger=$this->Grns->ItemLedgers->find()->where(['item_id'=>$item_id,'source_model'=>'Grns','source_row_id'=>$grn_row_id])->first();
 		
 		//pr($ItemLedger);exit;
 		
@@ -759,16 +742,16 @@ class GrnsController extends AppController
 		$SerialNumber = $this->Grns->SerialNumbers->get($id);
 
 		
-		if($SerialNumber->status=='In'){
+		if($SerialNumber->status=='In'){  
 			$query = $this->Grns->ItemLedgers->query();
 			$query->update()
 				->set(['quantity' => $ItemLedger->quantity-1])
-				->where(['item_id' => $item_id,'company_id'=>$st_company_id,'source_model'=>'Grns'])
+				->where(['item_id' => $item_id,'company_id'=>$st_company_id,'source_model'=>'Grns','source_row_id'=>$grn_row_id])
 				->execute();
 			$query1 = $this->Grns->GrnRows->query();
 			$query1->update()
 				->set(['quantity' => $GrnRow->quantity-1])
-				->where(['item_id'=>$item_id,'grn_id'=>$grn_id])
+				->where(['item_id'=>$item_id,'grn_id'=>$grn_id,'id'=>$grn_row_id])
 				->execute();
 /* 			$query2 = $this->Grns->PurchaseOrderRows->query();
 			$query2->update()
