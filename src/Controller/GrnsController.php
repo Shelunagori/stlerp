@@ -560,23 +560,24 @@ class GrnsController extends AppController
 						$grn->check=array_filter($grn->check);
 						$i=0; 
 						
-						foreach($grn->check as $purchase_order_row_id)
-						{
-							$qty=$grn->grn_rows[$i]['quantity'];
-							$item_id=$grn->grn_rows[$i]['item_id'];
-							$i++;
+						// foreach($grn->check as $purchase_order_row_id)
+						// {
+							// $qty=$grn->grn_rows[$i]['quantity'];
+							// $item_id=$grn->grn_rows[$i]['item_id'];
+							// $i++;
 							
-							//Insert in Item Ledger//
-							$itemLedger = $this->Grns->ItemLedgers->newEntity();
-							$itemLedger->item_id = $item_id;
-							$itemLedger->quantity = $qty;
-							$itemLedger->company_id = $grn->company_id;
-							$itemLedger->source_model = 'Grns';
-							$itemLedger->source_id = $grn->id;
-							$itemLedger->in_out = 'In';
-							$itemLedger->processed_on = $grn->transaction_date;
-							$this->Grns->ItemLedgers->save($itemLedger);
-						} 
+							
+							// $itemLedger = $this->Grns->ItemLedgers->newEntity();
+							// $itemLedger->item_id = $item_id;
+							// $itemLedger->quantity = $qty;
+							// $itemLedger->company_id = $grn->company_id;
+							// $itemLedger->source_model = 'Grns';
+							// $itemLedger->source_id = $grn->id;
+							// $itemLedger->in_out = 'In';
+							// $itemLedger->processed_on = $grn->transaction_date;
+							// $itemLedger->source_row_id = $grn_row->id;
+							// $this->Grns->ItemLedgers->save($itemLedger);
+						// } 
 					foreach($grn->grn_rows as $grn_row)
 					{ 
                         
@@ -598,6 +599,17 @@ class GrnsController extends AppController
 							}
 						}
 						
+						//Insert in Item Ledger//
+							$itemLedger = $this->Grns->ItemLedgers->newEntity();
+							$itemLedger->item_id = $grn_row->item_id;
+							$itemLedger->quantity = $grn_row->quantity;
+							$itemLedger->company_id = $grn->company_id;
+							$itemLedger->source_model = 'Grns';
+							$itemLedger->source_id = $grn->id;
+							$itemLedger->in_out = 'In';
+							$itemLedger->processed_on = $grn->transaction_date;
+							$itemLedger->source_row_id = $grn_row->id;
+							$this->Grns->ItemLedgers->save($itemLedger);
 					}
 					
 					$this->Flash->success(__('The grn has been saved.'));
