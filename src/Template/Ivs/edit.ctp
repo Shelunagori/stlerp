@@ -59,6 +59,7 @@
 								<td>
 								<?php if($iv_row->item->item_companies[0]->serial_number_enable == '1'){ ?>
 									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberListIV?iv_row_id='.$iv_row->id.'&item_id='.$iv_row->item_id); ?>
+									
 								<?php } ?>
 								</td>
 								<td colspan="3">
