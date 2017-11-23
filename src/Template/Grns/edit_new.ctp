@@ -395,6 +395,7 @@ $(document).ready(function() {
 		rename_rows();
 		update_sr_textbox();
     });
+	
 	$('.quantity').die().live("blur",function() {
 			var is_checked=$(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').val();
 			var count_serial_no = $('#count_serial_no').val();

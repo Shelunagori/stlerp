@@ -69,6 +69,8 @@ if($transaction_date <  $start_date ) {
 								</td>
 								<td  width="10%"> 
 									<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row_in->quantity,'class' => 'form-control input-sm qty_bx_in','placeholder' => 'Quantity','old_qty'=>$inventory_transfer_voucher_row_in->quantity]); ?>
+									
+									<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm status','placeholder' => 'Quantity','value'=>'In']); ?>
 								</td>
 								
 								<td width="30%">
@@ -79,23 +81,27 @@ if($transaction_date <  $start_date ) {
 									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ ?>
-											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name,'class'=>'sr_no']); ?>
+											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]); ?>
+										<?php
+										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ ?>
 											<?=  $this->Html->link('<i class="fa fa-trash"></i> ',
-														['action' => 'DeleteSerialNumberIn', $item_serial_number->name, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id,$item_serial_number->id], 
+														['action' => 'DeleteSerialNumberIn', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 														[
 															'escape' => false,
 															'class' => 'btn btn-xs red',
 															'confirm' => __('Are you sure, you want to delete {0}?', $item_serial_number->id)
 														]
 													) ?>
-												
+												<?php } ?>
 										<?php echo "<br>"; $i++; } }  ?>
 										<div class="col-md-6 offset sr_container"></div>				
 									</div>
 									
 								</td>
 								<td width="10%">
-									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
+									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm amount','placeholder' => 'Rate']); ?>
+									
+									<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm itvrowid','placeholder' => 'Quantity','value'=>$inventory_transfer_voucher_row_in->id]); ?>
 								</td>
 								<td width="30%">
 									<?php echo $this->Form->input('amount', ['type' => 'textarea','label' => false,'value'=>$inventory_transfer_voucher_row_in->narration,'class' => 'form-control input-sm ','placeholder' => 'Narration']); ?>
@@ -255,7 +261,7 @@ $(document).ready(function() {
 		
 			var len=tr_obj.find("td:nth-child(1) select").length;
 			if(len>0){
-			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr(	'serial_number_enable');
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
 			var item_id=tr_obj.find('td:nth-child(1) select option:selected').val();
 			var old_qty=0;
 			}else{
@@ -265,13 +271,20 @@ $(document).ready(function() {
 			}
 		
 		if(item_id > 0){ 
-		sr_nos(tr_obj,serial_number_enable,old_qty);
+		if(serial_number_enable == '1'){
+				var quantity=tr_obj.find('td:nth-child(2) input').val();
+				 if(quantity.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits")
+						tr_obj.find('td:nth-child(2) input').val("");
+					}
+				sr_nos(tr_obj,serial_number_enable,old_qty);
+			}
+		
 		}
     });
 	
 	function sr_nos(tr_obj,serial_number_enable,old_qty){  
-
-		
 		if(serial_number_enable==1){ 
 			var OriginalQty=tr_obj.find('td:nth-child(2) input').val();
 			Quantity = OriginalQty.split('.'); qty=Quantity[0];
@@ -287,7 +300,7 @@ $(document).ready(function() {
 		
 	}
 	
-	rename_input();
+	//rename_input();
 	
 	function rename_input()
 	{
@@ -297,7 +310,7 @@ $(document).ready(function() {
 				var i=0;
 				$(this).find("td:nth-child(3) .sr_no").each(function()
 				{
-					$(this).attr({name:"inventory_transfer_voucher_rows["+q+"][serial_numbers]["+i+"]"}).rules("add", "required");
+					$(this).attr({name:"inventory_transfer_voucher_rows["+q+"][sr_no]["+i+"]"}).rules("add", "required");
 					i++;
 				});
 				q++;
@@ -322,7 +335,11 @@ rename_rows_in();
 			
 			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows["+j+"][quantity]", id:"inventory_transfer_voucher_rows-"+j+"-quantity", row:j}).rules("add", "required");
 		
-			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.status').attr({name:"inventory_transfer_voucher_rows["+j+"][status]", id:"inventory_transfer_voucher_rows-"+j+"-status", row:j});
+			
+			$(this).find('td:nth-child(4) input.amount').attr({name:"inventory_transfer_voucher_rows["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
+			
+			$(this).find('td:nth-child(4) input.itvrowid').attr({name:"inventory_transfer_voucher_rows["+j+"][id]", id:"inventory_transfer_voucher_rows-"+j+"-id"}).rules("add", "required");
 			
 			$(this).find('td:nth-child(5) textarea').attr({name:"inventory_transfer_voucher_rows["+j+"][narration]", id:"inventory_transfer_voucher_rows-"+j+"-narration"}).rules("add", "required");
 			j++; 
