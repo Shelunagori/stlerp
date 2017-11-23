@@ -672,7 +672,7 @@ $(document).ready(function() {
 						required: true,
 						max: response,
 						messages: {
-							max: "Credit Limit Exieded ."
+							max: "Credit Limit Exceeded ."
 						}
 					});
 		});
@@ -686,7 +686,7 @@ $(document).ready(function() {
 						required: true,
 						max: sum,
 						messages: {
-							max: "Credit Limit Exieded ."
+							max: "Credit Limit Exceeded ."
 						}
 					});
 	});
@@ -1348,7 +1348,7 @@ $(document).ready(function() {
 						required: true,
 						max: response,
 						messages: {
-							max: "Credit Limit Exieded ."
+							max: "Credit Limit Exceeded ."
 						}
 					});
 		});
@@ -1498,10 +1498,15 @@ $(document).ready(function() {
 			
 			}
 			else{
-				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
-				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
-				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
-				$(this).find('td:nth-child(5) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(1) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(5) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				
+				var uncheck=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
+				$(uncheck).find('td:nth-child(1) textarea').attr({ name:"q", readonly:"readonly"});
+				
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;

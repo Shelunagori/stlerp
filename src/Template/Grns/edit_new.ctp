@@ -138,19 +138,7 @@ if($transaction_date <  $start_date ) {
 								$serial_no[$grn_row->purchase_order_row_id] = $grn_row->serial_numbers;
 							}
 							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
-							<?php  
-							/* $min_val=0;
-							$min_val1=0;
-							foreach($grn->serial_numbers as $item_serial_number){
-									if($item_serial_number->item_id == $grn_rows->item_id){ 
-										if($item_serial_number->status=='Out'){ 
-
-										$min_val=$min_val+1;
-										}
-										$min_val1++;
-									}
-							}  */
-							?>
+							
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
 								<td>
@@ -227,6 +215,7 @@ if($transaction_date <  $start_date ) {
 								<?php   
 								if(!empty($serial_no[$grn_rows->id]))
 								{$i=1;
+								//pr($serial_no);
 								foreach($serial_no[$grn_rows->id] as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){
 									 
@@ -243,11 +232,13 @@ if($transaction_date <  $start_date ) {
 										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										</div>
 										<div class="col-md-2"></div>
-										<?php  } else {?>
+										<?php  } else { ?>
 										<div class="row">
-										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly','class'=>'renameSerial']); ?></div>
+										<div class="col-md-10"><?php echo $this->Form->input('q', ['label' => false,'type'=>'text','value' => $serial_number->name,'readonly']); ?></div>
 										
 										<div class="col-md-2">
+										<?php 
+										if(@$parentSerialNo[$serial_number->id]!=$serial_number->id){ ?>
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id], 
 													[
@@ -256,7 +247,7 @@ if($transaction_date <  $start_date ) {
 														'confirm' => __('Are you sure, you want to delete {0}?', $serial_number->id)
 													]
 												) ?>
-											
+										<?php } ?>
 										</div>
 										</div>
 								<?php  $i++; } }  }}
@@ -422,28 +413,35 @@ $(document).ready(function() {
 			console.log(serial_number_enable);
 			console.log(old_qty);
 			console.log(row_no); */
-			if(is_checked && serial_number_enable=='1'){
-			
-			for(i=0; i <= old_qty; i++)
-			{ 
-				$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
-			}
-			$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
-			var quantity = qty-old_qty;
-			quantity = quantity+old_qty; 
-			if(maxQty>quantity || maxQty==quantity)
-			{  
-				for(i=0; i < (qty-old_qty); i++){ 
-				
-					 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'"/></div>');
-					
-					$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
-					rename_rows();				
+			if(is_checked && serial_number_enable=='1')
+			{
+				var QTY = $(this).closest('tr').find('td:nth-child(3) input[type="text"]').val();
+				if(QTY.search(/[^0-9]/) != -1)
+				{
+					alert("Item serial number is enabled !!! Please Enter Only Digits");
+					$(this).closest('tr').find('td:nth-child(3) input[type="text"]').val('');
 				}
-			}
-			
-			
-		} 
+				else
+				{
+					for(i=0; i <= old_qty; i++)
+					{ 
+						$('.tr2[row_no="'+row_no+'"]').find('td div.td_append'+i+row_no+'').remove();
+					}
+					$('.tr2[row_no="'+row_no+'"]').find('td.td_append').html(''); 
+					var quantity = qty-old_qty;
+					quantity = quantity+old_qty; 
+					if(maxQty>quantity || maxQty==quantity)
+					{  
+						for(i=0; i < (qty-old_qty); i++){ 
+						
+							 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'" required/></div>');
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+l+row_no).rules('add', {required: true});
+							rename_rows();				
+						}
+					}
+				}
+			} 
     });
 	rename_rows();
 	
@@ -474,7 +472,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(2) input.hid').val();
 			var no=0;
 			$(this).find('.renameSerial').each(function(){
-				$(this).attr({ name:"grn_rows["+val+"][serial_numbers][]"});
+				$(this).attr({ name:"grn_rows["+val+"][serial_number][]"});
 				no++;
 			});
 		});

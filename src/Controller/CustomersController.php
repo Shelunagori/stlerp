@@ -318,6 +318,52 @@ class CustomersController extends AppController
 		}
 	}
 	
+	public function BreakupRangeOverdueNew(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$request=$this->request->query('request');
+		
+		
+		$range_data=[];
+		if($request == 'vendor'){
+				if ($this->request->is(['post'])) {
+			$range_data['range0']=$this->request->data['range_0']; 
+			$range_data['range1']=$this->request->data['range_1']; 
+			$range_data['range2']=$this->request->data['range_2']; 
+			$range_data['range3']=$this->request->data['range_3']; 
+			$range_data['range4']=$this->request->data['range_4']; 
+			$range_data['range5']=$this->request->data['range_5']; 
+			$range_data['range6']=$this->request->data['range_6']; 
+			$range_data['range7']=$this->request->data['range_7']; 
+			$range_data['tdate']=$this->request->data['to'];
+			$to=json_encode($range_data);  
+			$this->redirect(['controller'=>'Vendors','action' => 'OverDueReport/'.$to.'']);
+			//$this->redirect(['controller'=>'Vendors','action' => 'exportExcel/'.$to.'']);
+		 }
+		}
+		if($request == 'customer'){
+			if ($this->request->is(['post'])) {
+			$range_data['range0']=$this->request->data['range_0']; 
+			$range_data['range1']=$this->request->data['range_1']; 
+			$range_data['range2']=$this->request->data['range_2']; 
+			$range_data['range3']=$this->request->data['range_3']; 
+			$range_data['range4']=$this->request->data['range_4']; 
+			$range_data['range5']=$this->request->data['range_5']; 
+			$range_data['range6']=$this->request->data['range_6']; 
+			$range_data['range7']=$this->request->data['range_7']; 
+			$range_data['tdate']=$this->request->data['to'];
+			
+		$to=json_encode($range_data);  
+		if($request == 'customer'){
+			$this->redirect(['controller'=>'Customers','action' => 'OutstandingReportCustomer/'.$to.'']);
+		}
+		
+		//$this->redirect(['controller'=>'Customers','action' => 'exportExcel/'.$to.'']);
+		 }
+		}
+	}
+	
 	public function exportExcel($to_send = null){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -1003,6 +1049,56 @@ class CustomersController extends AppController
 				$this->Customers->VoucherLedgerAccounts->save($voucherLedgerAccount);
 		
 		return $this->redirect(['action' => 'EditCompany/'.$customer_id]);
+	}
+	
+	
+	public function OutstandingReportCustomer($to_send = null){
+		$to_send = json_decode($to_send, true);
+		$TillDate=date('Y-m-d', strtotime($to_send['tdate']));
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
+			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
+			->order(['LedgerAccounts.name'=>'ASC']);
+		$CustmerPaymentTerms=[]; $Outstanding=[];
+		foreach($LedgerAccounts as $LedgerAccount){
+			$Customer =$this->Customers->get($LedgerAccount->source_id);
+			$CustmerPaymentTerms[$LedgerAccount->id]=$Customer->payment_terms;
+			
+			$ReferenceDetails=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$LedgerAccount->id,'ReferenceDetails.transaction_date <='=>date('Y-m-d', strtotime($to_send['tdate']))]);
+			
+			
+			foreach($ReferenceDetails as $ReferenceDetail){
+				if($ReferenceDetail->reference_type=="On_account"){
+					@$Outstanding[$LedgerAccount->id]['OnAccount']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+				}else{
+					$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					$TransactionDateAfterPaymentTerms = date('Y-m-d', strtotime($transaction_date. ' + '.$Customer->payment_terms.' days'));
+					
+					$datediff = strtotime($TillDate) - strtotime($TransactionDateAfterPaymentTerms);
+					$Diff=floor($datediff / (60 * 60 * 24));
+					
+					if($Diff<=0){
+						@$Outstanding[$LedgerAccount->id]['NoDue']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range0']) and ($Diff<=$to_send['range1'])){
+						@$Outstanding[$LedgerAccount->id]['Slab1']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range2']) and ($Diff<=$to_send['range3'])){
+						@$Outstanding[$LedgerAccount->id]['Slab2']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range4']) and ($Diff<=$to_send['range5'])){
+						@$Outstanding[$LedgerAccount->id]['Slab3']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range6']) and ($Diff<=$to_send['range7'])){
+						@$Outstanding[$LedgerAccount->id]['Slab4']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range7'])){
+						@$Outstanding[$LedgerAccount->id]['Slab5']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}
+					
+				}
+			}
+		}
+		
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
 	}
 	
 }

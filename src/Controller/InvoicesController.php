@@ -566,7 +566,7 @@ class InvoicesController extends AppController
 			}
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
-			
+			 //	 pr($invoice);exit;
             if ($this->Invoices->save($invoice)) 
 			{
 				foreach($invoice->invoice_rows as $invoice_row)
@@ -779,13 +779,10 @@ class InvoicesController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'confirm/'.$invoice->id]);
-            } else {
+            } else {  pr($invoice);exit;
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }
-		
-		
-		
 		
 		$items = $this->Invoices->Items->find('list');
 		$transporters = $this->Invoices->Transporters->find('list', ['limit' => 200])->order(['Transporters.transporter_name' => 'ASC']);
@@ -2141,6 +2138,7 @@ class InvoicesController extends AppController
 
                 return $this->redirect(['action' => 'GstConfirm/'.$invoice->id]);
             } else { //pr($invoice); exit;
+
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }

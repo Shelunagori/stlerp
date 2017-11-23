@@ -183,7 +183,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					foreach($invoice->invoice_rows as $current_invoice_row){
 						$current_rows[]=$current_invoice_row->item_id;
-						$current_row_items[$current_invoice_row->item_id]=$current_invoice_row->quantity;
+						$current_row_items[$current_invoice_row->sales_order_row_id]=$current_invoice_row->quantity;
 						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
 						$sr_nos=$current_invoice_row->serial_number;
 					}
@@ -712,7 +712,7 @@ $(document).ready(function() {
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
 				
 			}else{
-				$(this).find("td:nth-child(1) span").html(++i); i--;
+				$(this).find("td:nth-child(1) span").html(++i); 
 				
 				$(this).find("td:nth-child(1) input.invoiceid").attr({ name:"q", readonly:"readonly"});
 				$(this).find("td:nth-child(1) input.hiddenid").attr({ name:"q", readonly:"readonly"});
@@ -775,7 +775,7 @@ $(document).ready(function() {
 				total=total+Amount;
 				var sale_tax=parseFloat($(this).find("td:nth-child(7) input[type=hidden]").eq(1).val());
 				if(isNaN(sale_tax)) { var sale_tax = 0; }
-				$('input[name="sale_tax_per"]').val(sale_tax);
+				$('input[name="sale_tax_per"]').val(round(sale_tax,2));
 				var sale_tax_description=$(this).find("td:nth-child(7) input[type=hidden]").eq(2).val();
 				//alert(sale_tax_description);
 				$('input[name="sale_tax_description"]').val(sale_tax_description);
@@ -955,7 +955,7 @@ $(document).ready(function() {
 			$(this).closest('tr').find('.amount_box').removeAttr('readonly');
 			var amount=$(this).closest('tr').find('.amount_box').attr('amount');
 			
-			$(this).closest('tr').find('.amount_box').val(amount);
+			$(this).closest('tr').find('.amount_box').val(round(amount,2));
 			calculation_for_total();
    
 		}else{
@@ -1097,8 +1097,8 @@ $(document).ready(function() {
 	
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
-		var due_amount=$(this).find('option:selected').attr('amt');
-		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
+		var due_amount=$(this).find('option:selected').attr('amt'); //alert(due_amount);
+		$(this).closest('tr').find('td:eq(2) input').val(round(due_amount,2));
 		do_ref_total();
 	});
 	

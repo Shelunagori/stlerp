@@ -205,13 +205,23 @@ $(document).ready(function() {
 		rename_rows_in();
 	});
 	
-	$('.qty_bx_in').die().live("blur",function() { 
+	 $('.qty_bx_in').die().live("blur",function() { 
 		var tr_obj=$(this).closest('tr');  
 		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
 		if(item_id > 0){ 
-		sr_nos(tr_obj);
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+			if(serial_number_enable == '1'){
+				var quantity=tr_obj.find('td:nth-child(2) input').val();
+				 if(quantity.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits")
+						tr_obj.find('td:nth-child(2) input').val("");
+					}
+				sr_nos(tr_obj);	
+			}
+			
 		}
-    });
+    }); 
 	
 	function sr_nos(tr_obj){  
 		var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
@@ -240,8 +250,11 @@ $(document).ready(function() {
 					{ 
 						required: true
 					});
-			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows["+j+"][quantity]", id:"inventory_transfer_voucher_rows-"+j+"-quantity", row:j}).rules("add", "required");
-		
+			var serial_number_enable=$(this).find("td:nth-child(1) select").attr('serial_number_enable');		
+			$(this).find('td:nth-child(2) input.qty_bx_in').attr({name:"inventory_transfer_voucher_rows["+j+"][quantity]", id:"inventory_transfer_voucher_rows-"+j+"-quantity", row:j}).rules("add", "required");
+			
+			$(this).find('td:nth-child(2) input.status').attr({name:"inventory_transfer_voucher_rows["+j+"][status]", id:"inventory_transfer_voucher_rows-"+j+"-status", row:j});
+			
 			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
 			
 			$(this).find('td:nth-child(5) textarea').attr({name:"inventory_transfer_voucher_rows["+j+"][narration]", id:"inventory_transfer_voucher_rows-"+j+"-narration"}).rules("add", "required");
@@ -292,6 +305,7 @@ $(document).ready(function() {
 			</td>
 			<td width="10%"> 
 				<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx_in','placeholder' => 'Quantity']); ?>
+				<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm status','placeholder' => 'Quantity','value'=>'In']); ?>
 			</td>
 			<td width="20%" ><div class="sr_container"></div></td>
 			<td width="10%">

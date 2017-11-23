@@ -250,8 +250,6 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						
 					}
 						
-					$current_rows=[];
-					$current_row_items=[];
 					$current_discount=[];
 					$current_pnf=[];
 					$current_cgst=[];
@@ -260,24 +258,36 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$descriptions=[];
 					$sr_nos=[];
 					foreach($invoice->invoice_rows as $current_invoice_row){
+<<<<<<< HEAD
 						
 						$current_rows[]=$current_invoice_row->sales_order_row_id;
 						$current_row_items[$current_invoice_row->sales_order_row_id]=$current_invoice_row->quantity;
+=======
+						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
+>>>>>>> origin/master
 						$current_discount[$current_invoice_row->sales_order_row_id]=$current_invoice_row->discount_percentage;
 						$current_pnf[$current_invoice_row->sales_order_row_id]=$current_invoice_row->pnf_percentage;
 						$current_cgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->cgst_percentage;
 						$current_sgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->sgst_percentage;
 						$current_igst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->igst_percentage;
+<<<<<<< HEAD
 						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
 						
+=======
+						$sr_nos=$current_invoice_row->serial_number;
+>>>>>>> origin/master
 					}
 					
 					$q=0; 
 					
+<<<<<<< HEAD
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
 						 if($sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id] > 0){
 						 
 						 ?>
+=======
+					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){  ?>
+>>>>>>> origin/master
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; --$q; ?>
@@ -314,6 +324,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01]); ?></td>
 							<td><label><?php 
 								if(in_array($sales_order_row->id,$current_rows)){
+
 									$check='checked';
 								}else{
 									$check='';
@@ -343,6 +354,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 						</tr><?php } ?>
 						 <?php  $q++;  }}   ?>
+
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -885,7 +897,6 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(17) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).css('background-color','#FFF');
 				var uncheck=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				
 				$(uncheck).find('td:nth-child(1) textarea').attr({ name:"q", readonly:"readonly"});
 				//$('#main_tb tbody tr.tr2').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(uncheck).css('background-color','#FFF');
@@ -1201,7 +1212,7 @@ $(document).ready(function() {
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
-		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
+		$(this).closest('tr').find('td:eq(2) input').val(round(due_amount,2));
 		do_ref_total();
 	});
 	
