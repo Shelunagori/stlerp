@@ -1,3 +1,4 @@
+<?PHP //EXIT; ?>
 <style>
 table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table > thead > tr > td, table > tbody > tr > td, table > tfoot > tr > td{
 	vertical-align: top !important;
@@ -254,20 +255,39 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					$current_cgst=[];
 					$current_sgst=[];
 					$current_igst=[];
+					$descriptions=[];
 					$sr_nos=[];
 					foreach($invoice->invoice_rows as $current_invoice_row){
+<<<<<<< HEAD
+						
+						$current_rows[]=$current_invoice_row->sales_order_row_id;
+						$current_row_items[$current_invoice_row->sales_order_row_id]=$current_invoice_row->quantity;
+=======
 						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
+>>>>>>> origin/master
 						$current_discount[$current_invoice_row->sales_order_row_id]=$current_invoice_row->discount_percentage;
 						$current_pnf[$current_invoice_row->sales_order_row_id]=$current_invoice_row->pnf_percentage;
 						$current_cgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->cgst_percentage;
 						$current_sgst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->sgst_percentage;
 						$current_igst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->igst_percentage;
+<<<<<<< HEAD
+						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
+						
+=======
 						$sr_nos=$current_invoice_row->serial_number;
+>>>>>>> origin/master
 					}
 					
 					$q=0; 
 					
+<<<<<<< HEAD
+					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
+						 if($sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id] > 0){
+						 
+						 ?>
+=======
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){  ?>
+>>>>>>> origin/master
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td rowspan="2">
 								<?php echo ++$q; --$q; ?>
@@ -303,7 +323,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01]); ?></td>
 							<td><label><?php 
-								if(@$current_invoice_rows[$sales_order_row->id] == 0){
+								if(in_array($sales_order_row->id,$current_rows)){
+
 									$check='checked';
 								}else{
 									$check='';
@@ -324,11 +345,16 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td></td>
 							<td colspan="<?php echo $tr2_colspan; ?>">
 							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo 
-							$this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&in_row_id='. @$invoice_row_id[@$sales_order_row->id]); ?>
+							<?php
+							if(!empty($invoice_row_id[@$sales_order_row->id])){
+								echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$sales_order_row->item_id.'&in_row_id='. @$invoice_row_id[@$sales_order_row->id].'&invoice_id='. @$cur_invoice_id[@$sales_order_row->id]); 
+							}else{
+								echo $this->requestAction('/SerialNumbers/getSerialNumberList?item_id='.$sales_order_row->item_id);
+							}?>
 							</td>
 						</tr><?php } ?>
-						<?php  $q++;   } ?>
+						 <?php  $q++;  }}   ?>
+
 				</tbody>
 				<tfoot><?php 
 							$cgst_options=array();
@@ -876,7 +902,7 @@ $(document).ready(function() {
 				$(uncheck).css('background-color','#FFF');
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 					if(serial_l>0){
-						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).select2().rules( "remove", "required" );
+						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] select').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
 					}
 				}
@@ -1186,7 +1212,7 @@ $(document).ready(function() {
 	$('.ref_list').live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
-		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
+		$(this).closest('tr').find('td:eq(2) input').val(round(due_amount,2));
 		do_ref_total();
 	});
 	

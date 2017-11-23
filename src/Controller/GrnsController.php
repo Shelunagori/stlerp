@@ -560,23 +560,24 @@ class GrnsController extends AppController
 						$grn->check=array_filter($grn->check);
 						$i=0; 
 						
-						foreach($grn->check as $purchase_order_row_id)
-						{
-							$qty=$grn->grn_rows[$i]['quantity'];
-							$item_id=$grn->grn_rows[$i]['item_id'];
-							$i++;
+						// foreach($grn->check as $purchase_order_row_id)
+						// {
+							// $qty=$grn->grn_rows[$i]['quantity'];
+							// $item_id=$grn->grn_rows[$i]['item_id'];
+							// $i++;
 							
-							//Insert in Item Ledger//
-							$itemLedger = $this->Grns->ItemLedgers->newEntity();
-							$itemLedger->item_id = $item_id;
-							$itemLedger->quantity = $qty;
-							$itemLedger->company_id = $grn->company_id;
-							$itemLedger->source_model = 'Grns';
-							$itemLedger->source_id = $grn->id;
-							$itemLedger->in_out = 'In';
-							$itemLedger->processed_on = $grn->transaction_date;
-							$this->Grns->ItemLedgers->save($itemLedger);
-						} 
+							
+							// $itemLedger = $this->Grns->ItemLedgers->newEntity();
+							// $itemLedger->item_id = $item_id;
+							// $itemLedger->quantity = $qty;
+							// $itemLedger->company_id = $grn->company_id;
+							// $itemLedger->source_model = 'Grns';
+							// $itemLedger->source_id = $grn->id;
+							// $itemLedger->in_out = 'In';
+							// $itemLedger->processed_on = $grn->transaction_date;
+							// $itemLedger->source_row_id = $grn_row->id;
+							// $this->Grns->ItemLedgers->save($itemLedger);
+						// } 
 					foreach($grn->grn_rows as $grn_row)
 					{ 
                         
@@ -598,6 +599,17 @@ class GrnsController extends AppController
 							}
 						}
 						
+						//Insert in Item Ledger//
+							$itemLedger = $this->Grns->ItemLedgers->newEntity();
+							$itemLedger->item_id = $grn_row->item_id;
+							$itemLedger->quantity = $grn_row->quantity;
+							$itemLedger->company_id = $grn->company_id;
+							$itemLedger->source_model = 'Grns';
+							$itemLedger->source_id = $grn->id;
+							$itemLedger->in_out = 'In';
+							$itemLedger->processed_on = $grn->transaction_date;
+							$itemLedger->source_row_id = $grn_row->id;
+							$this->Grns->ItemLedgers->save($itemLedger);
 					}
 					
 					$this->Flash->success(__('The grn has been saved.'));
@@ -610,7 +622,7 @@ class GrnsController extends AppController
 		foreach($grn->grn_rows as $grn_row)
 		{
 			$serialNoDetail = $this->Grns->SerialNumbers->find()
-									 ->where(['grn_id'=>$grn->id,'grn_row_id'=>$grn_row->id,'company_id'=>$st_company_id]);
+									 ->where(['grn_id'=>$grn->id,'grn_row_id'=>$grn_row->id,'company_id'=>$st_company_id]); 
 			if($serialNoDetail->count()>0)
 			{ 
 				foreach($serialNoDetail as $svalue)
@@ -619,12 +631,12 @@ class GrnsController extends AppController
 									 ->where(['parent_id'=>$svalue->id,'company_id'=>$st_company_id]);
 					if($serialNoparentIdExist->count()>0)
 					{
-						$parentSerialNo[$grn_row->purchase_order_row_id][$svalue->id] = $svalue->id;
+						$parentSerialNo[$svalue->id] = $svalue->id;
 					}
 				}
 			}
 		}
-		//pr($parentSerialNo);exit;
+		//pr($serialNoDetail->toArray());exit;
 		
 		$grnDetail = $this->Grns->get($id, [
 			'contain' => [
