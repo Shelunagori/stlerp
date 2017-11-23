@@ -119,7 +119,7 @@ if($transaction_date <  $start_date ) {
 								$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
 								
 							}
-								//pr($current_rows); 	 exit;
+								//pr($grn->grn_rows); 	// exit;
 							
 							/* foreach($grn->purchase_order->purchase_order_rows as $data3){
 								$total_items[$data3->item_id]=@$total_items[$data3->item_id]+$data3->quantity;
@@ -154,12 +154,16 @@ if($transaction_date <  $start_date ) {
 								
 								if(!empty($serial_no[$grn_rows->id]))
 									{   $old_Quantity=[];
-										foreach($serial_no[$grn_rows->id] as $old_quantity)
+								        foreach($serial_no[$grn_rows->id] as $old_quantity)
 										{
 											$old_Quantity[] =$old_quantity; //$serial_no[$grn_rows->id];
 										}
 									}
-									
+									else{
+										unset($old_Quantity);
+										$old_Quantity =1;
+									}
+																	
 								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quan quantity','placeholder' => 'Quantity','value' => @$current_row_items[$grn_rows->id],'max'=>@$maxQty[$grn_rows->id],'min'=>sizeof(@$old_Quantity)]); 
 								?>
 								<span>Max: <?php
@@ -194,19 +198,30 @@ if($transaction_date <  $start_date ) {
 									}
 										//$serial_number;
 									//}
-									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($old_Quantity),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id]]); ?></label>
+									$disable='';
+									
+									if(sizeof(@$serial_no[$grn_rows->id])>0)
+									{
+										$disable = 'disabled';
+									}
+									else{
+										$disable='';
+									}
+									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','old_qty_size'=>sizeof($old_Quantity),'old_qty'=>@$current_row_items[$grn_rows->item_id],'value' => @$grn_rows->id,$check,'max_qty'=>$grn_rows->quantity-@$existing_rows[$grn_rows->item_id],@$disable]); ?></label>
 								</td>
 								
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$grn_rows->id; ?>'>
 
-								<?php  $i=1; foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number){
+								<?php  $i=1; 
+								if(!empty($grn_rows->grn_rows[0]->serial_numbers)){
+								foreach($grn_rows->grn_rows[0]->serial_numbers as $serial_number){
 									if($serial_number->item_id == $grn_rows->item_id){ ?>
 
 									<div style="margin-bottom:6px;">
 									
 									</div>
-									<?php  $i++;  }  }?><br/>
+								<?php  $i++;  }  }}?><br/>
 								<td colspan="2" class="td_append">
 								
 								</td>
@@ -240,7 +255,7 @@ if($transaction_date <  $start_date ) {
 										<?php 
 										if(@$parentSerialNo[$serial_number->id]!=$serial_number->id){ ?>
 											<?= $this->Html->link('<i class="fa fa-trash"></i> ',
-													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id], 
+													['action' => 'DeleteSerialNumbers', $serial_number->id, $serial_number->item_id,$grn->id,$grnRowIds[$grn_rows->id]], 
 													[
 														'escape' => false,
 														'class' => 'btn btn-xs red',
