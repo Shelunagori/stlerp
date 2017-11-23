@@ -956,7 +956,7 @@ $(document).ready(function() {
 				$('input[name="fright_cgst_amount"]').val(round(fright_cgst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
-				var fright_cgst_amount = (fright_amount*round(fright_cgst_percent,3))/100;
+				var fright_cgst_amount = (round(fright_amount,2)*round(fright_cgst_percent,3))/100;
 				$('input[name="fright_cgst_amount"]').val(round(fright_cgst_amount,2));
 			}
 		
@@ -966,7 +966,7 @@ $(document).ready(function() {
 				$('input[name="fright_sgst_amount"]').val(round(fright_sgst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
-				var fright_sgst_amount = (fright_amount*round(fright_sgst_percent,3))/100;
+				var fright_sgst_amount = (round(fright_amount,2)*round(fright_sgst_percent,3))/100;
 				$('input[name="fright_sgst_amount"]').val(round(fright_sgst_amount,2));
 			}
 			
@@ -976,7 +976,7 @@ $(document).ready(function() {
 				$('input[name="fright_igst_amount"]').val(round(fright_igst_amount,2));
 			}else{ 
 				var fright_amount=parseFloat($('input[name="fright_amount"]').val());
-				var fright_igst_amount = (fright_amount*round(fright_igst_percent,3))/100;
+				var fright_igst_amount = (round(fright_amount,2)*round(fright_igst_percent,3))/100;
 				$('input[name="fright_igst_amount"]').val(round(fright_igst_amount,2));
 			}
 			var total_fright=fright_amount+fright_cgst_amount+fright_igst_amount+fright_sgst_amount;
@@ -997,17 +997,17 @@ $(document).ready(function() {
 			if(val){
 				var qty=parseInt($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
-				var Amount=qty*Rate;
+				var Amount=qty*round(Rate,2);
 				$(this).find("td:nth-child(5) input").val(round(Amount,2));
 				var amount=parseFloat($(this).find("td:nth-child(5) input").val());
-				total_amt=total_amt+amount;
+				total_amt=total_amt+round(amount,2);
 				var discount_percentage=parseFloat($(this).find("td:nth-child(6) input").val());
 				if(isNaN(discount_percentage)){ 
 					 var discount_amount = 0; 
 					$(this).find("td:nth-child(7) input").val(round(discount_amount,2));
 				}else{ 
 					var amount=parseFloat($(this).find("td:nth-child(5) input").val());
-					var discount_amount = (amount*round(discount_percentage,3))/100;
+					var discount_amount = (round(amount,2)*round(discount_percentage,3))/100;
 					$(this).find("td:nth-child(7) input").val(round(discount_amount,2));
 				}
 				total_discount=total_discount+discount_amount;
@@ -1017,15 +1017,15 @@ $(document).ready(function() {
 					$(this).find("td:nth-child(9) input").val(round(pnf_amount,2));
 				}else{ 
 					var amount=parseFloat($(this).find("td:nth-child(5) input").val());
-					var amount_after_dis=amount-discount_amount;
-					var pnf_amount = (amount_after_dis*round(pnf_percentage,3))/100;
+					var amount_after_dis=round(amount,2)-round(discount_amount,2);
+					var pnf_amount = (round(amount_after_dis,2)*round(pnf_percentage,3))/100;
 					$(this).find("td:nth-child(9) input").val(round(pnf_amount,2));
 				}
 				total_pnf=total_pnf+pnf_amount;
 				var amount=parseFloat($(this).find("td:nth-child(5) input").val());
 				var discount_amount=parseFloat($(this).find("td:nth-child(7) input").val());
 				var pnf_amount=parseFloat($(this).find("td:nth-child(9) input").val());
-				var taxable_value=(amount-discount_amount)+pnf_amount;
+				var taxable_value=(round(amount,2)-round(discount_amount,2))+round(pnf_amount,2);
 				$(this).find("td:nth-child(10) input").val(round(taxable_value,2));
 				total_taxable_value=total_taxable_value+taxable_value;
 				var cgst_percentage=parseFloat($(this).find("td:nth-child(11) option:selected").attr("percentage"));
@@ -1034,7 +1034,7 @@ $(document).ready(function() {
 					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-					var cgst_amount = (taxable_value*round(cgst_percentage,3))/100;
+					var cgst_amount = (round(taxable_value,2)*round(cgst_percentage,3))/100;
 					$(this).find("td:nth-child(12) input").val(round(cgst_amount,2));
 				}
 				total_cgst=total_cgst+cgst_amount;
@@ -1044,7 +1044,7 @@ $(document).ready(function() {
 					$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-					var sgst_amount = (taxable_value*round(sgst_percentage,2))/100;
+					var sgst_amount = (round(taxable_value,2)*round(sgst_percentage,2))/100;
 					$(this).find("td:nth-child(14) input").val(round(sgst_amount,2));
 				}
 				total_sgst=total_sgst+sgst_amount;
@@ -1054,7 +1054,7 @@ $(document).ready(function() {
 					$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 				}else{ 
 					var taxable_value=parseFloat($(this).find("td:nth-child(10) input").val());
-					var igst_amount = (taxable_value*round(igst_percentage,3))/100;
+					var igst_amount = (round(taxable_value,2)*round(igst_percentage,3))/100;
 					$(this).find("td:nth-child(16) input").val(round(igst_amount,2));
 				}
 				total_igst=total_igst+igst_amount;
