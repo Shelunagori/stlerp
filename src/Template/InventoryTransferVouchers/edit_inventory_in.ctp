@@ -287,17 +287,20 @@ $(document).ready(function() {
 		
 	}
 	
+	rename_input();
 	
 	function rename_input()
 	{
-		
+		var q=0;
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
 			var row_no = $(this).attr('row_no');
-			
+				var i=0;
 				$(this).find("td:nth-child(3) .sr_no").each(function()
 				{
-					$(this).attr({name:"inventory_transfer_voucher_rows["+row_no+"][sr_no][]"}).rules("add", "required");
+					$(this).attr({name:"inventory_transfer_voucher_rows["+q+"][serial_numbers]["+i+"]"}).rules("add", "required");
+					i++;
 				});
+				q++;
 			});
 	}
 	

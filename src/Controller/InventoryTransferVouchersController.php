@@ -922,11 +922,11 @@ class InventoryTransferVouchersController extends AppController
 				$inventoryTransferVoucher->voucher_no=1;
 			}
 			$inventoryTransferVoucher->company_id=$st_company_id;
-			$inventoryTransferVoucher->in_out='In';
+			$inventoryTransferVoucher->in_out='in';
 			$inventoryTransferVoucher->created_by=$s_employee_id;
-			$inventoryTransferVoucher->created_on=date('d-m-Y');
+			$inventoryTransferVoucher->created_on=date('Y-m-d');
 			$inventoryTransferVoucher->transaction_date=date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date));
-			pr($inventoryTransferVoucher);exit;
+			//pr($inventoryTransferVoucher);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 				
 				foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
@@ -1354,7 +1354,6 @@ class InventoryTransferVouchersController extends AppController
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 			
 				$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id]);
-				//$this->InventoryTransferVouchers->ItemSerialNumbers->deleteAll(['inventory_transfer_voucher_id' => $inventoryTransferVoucher->id,'company_id'=>$st_company_id]);
 				
 				foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
 					$dt=sizeof($inventory_transfer_voucher_row->sr_no);
@@ -1367,6 +1366,7 @@ class InventoryTransferVouchersController extends AppController
 											'source_model' => 'Inventory Transfer Voucher',
 											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
 											'in_out'=>'In',
+											'source_row_id' => $inventory_transfer_voucher_row->id,
 											'company_id'=>$st_company_id,
 											'source_id'=>$inventoryTransferVoucher->id
 										])

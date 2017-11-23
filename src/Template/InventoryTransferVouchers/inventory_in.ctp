@@ -195,7 +195,6 @@ $(document).ready(function() {
 		var tr2=$("#sampletable_1 tbody tr").clone();
 		$("#main_table_1 tbody#maintbody_1").append(tr2);
 		rename_rows_in();
-		
 	}
 
 	
@@ -222,6 +221,7 @@ $(document).ready(function() {
 			
 		}
     }); 
+	
 	
 	function sr_nos(tr_obj){  
 		var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
@@ -260,30 +260,8 @@ $(document).ready(function() {
 			$(this).find('td:nth-child(5) textarea').attr({name:"inventory_transfer_voucher_rows["+j+"][narration]", id:"inventory_transfer_voucher_rows-"+j+"-narration"}).rules("add", "required");
 			j++; 
 	   });
-	}	
-
-	
-	$('.qty_bx').die().live("keyup",function() {
-		validate_serial();
-    });
-	
-	function validate_serial(){
-		$("#main_table tbody#maintbody tr.main").each(function(){
-			var OriginalQty=$(this).find('td:nth-child(2) input').val();
-			Quantity = OriginalQty.split('.'); qty=Quantity[0];
-			if($(this).find('td:nth-child(3) select').length>0){
-				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
-							required: true,
-							minlength: qty,
-							maxlength: qty,
-							messages: {
-								maxlength: "select serial number equal to quantity.",
-								minlength: "select serial number equal to quantity."
-							}
-					});
-			}
-		});	
 	}
+	
 });
 
 	

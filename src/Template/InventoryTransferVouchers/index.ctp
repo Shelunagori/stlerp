@@ -51,7 +51,7 @@
 							<td><?= h(++$page_no) ?></td>
 							<?php if($inventory_transfer_vouch_data->in_out=='in_out'){ ?>
 							<td><?= h('ITV-'.str_pad($inventory_transfer_vouch_data->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
-							<?php }else if($inventory_transfer_vouch_data->in_out=='in') { ?>
+							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
 							<td><?= h('ITVI-'.str_pad($inventory_transfer_vouch_data->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
 							<?php }else { ?>
 							<td><?= h('ITVO-'.str_pad($inventory_transfer_vouch_data->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
@@ -60,7 +60,7 @@
 							<td>
 							<?php if($inventory_transfer_vouch_data->in_out=='Out'){ ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'outView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
-							<?php }else if($inventory_transfer_vouch_data->in_out=='in') { ?>
+							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'inView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
 							<?php }else { ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
@@ -68,7 +68,7 @@
 							
 							<?php if($inventory_transfer_vouch_data->in_out=='Out'){ ?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryOut', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));    ?>
-							<?php }else if($inventory_transfer_vouch_data->in_out=='in') { ?>
+							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryIn', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));   ?>
 							<?php }else { ?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>

@@ -362,7 +362,6 @@ $(document).ready(function() {
 	rename_input();
 	function rename_input()
 	{
-		
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
 			var row_no =$(this).attr('row_no');
 			
