@@ -642,7 +642,7 @@ class ItemLedgersController extends AppController
 			}
 		}
 		/////fdgdfgdrc disavble
-	//pr($stock);
+//	pr($stock);
 	//exit;
 
 	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
