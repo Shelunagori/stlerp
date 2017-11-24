@@ -112,7 +112,7 @@ if($transaction_date <  $start_date ) {
 							
 							foreach($grn->grn_rows as $current_invoice_row){ 
 							
-							 
+							//pr($current_invoice_row); 
 								@$existing_rows[$current_invoice_row->item_id]=$existing_rows[$current_invoice_row->item_id]-$current_invoice_row->quantity;
 								$current_rows[]=$current_invoice_row->purchase_order_row_id;
 								$current_row_items[$current_invoice_row->purchase_order_row_id]=$current_invoice_row->quantity;
@@ -129,9 +129,8 @@ if($transaction_date <  $start_date ) {
 							{
 								$serial_no[$grn_row->purchase_order_row_id] = $grn_row->serial_numbers;
 							}
-							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): 
-							//pr($actuleQty[$grn_rows->id]);
-							if(!empty($actuleQty[$grn_rows->id])){
+							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows):
+							if($actuleQty[$grn_rows->id]>0){
 							?>
 							
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
@@ -264,7 +263,7 @@ if($transaction_date <  $start_date ) {
 									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>
-							<?php  } 
+							<?php  }
 							?>
 						<?php $q++; endforeach; ?>
 					</tbody>
@@ -387,16 +386,48 @@ $(document).ready(function() {
 	//$('.update_serial_number').on("click",function() {
 		function update_sr_textbox(){
 		var r=0;
-		
-		$("#main_tb tbody tr.tr1").each(function(){ 
+		$("#main_tb tbody tr.tr1").each(function(){
+			var row_no=$(this).attr('row_no');
 			var serial_number_enable=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
-			var old_qty=parseInt($(this).closest('tr').find('td:nth-child(4) input[type="checkbox"]:checked').attr('old_qty'));
-			if(serial_number_enable && old_qty)
-			{ 
-				$(this).find('.hide_lebel').hide();
-			}
-			
+			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
+			var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
+			var item_id=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val(); 
+			var l=$('.tr2[row_no="'+row_no+'"]').find('input.sr_no').length;
+		//alert(serial_number_enable);
+				if(val && serial_number_enable=='1')
+				{ 
+					if(qty.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits");
+						$(this).find('td:nth-child(3) input[type="text"]').val('');
+					}
+					else
+					{
+						if(qty < l){
+							
+							for(i=l;i>qty;i--){
+							$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+							
+							}
+						}
+						if(qty > l){ 
+							l=l+1;
+							//alert(l);
+							for(i=l;i<=qty;i++){
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required/></div>');
+							
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
+							r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+							}
+						}
+					}
+				}
 				
+				else{
+					$('tr.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input.sr_no').remove();
+				}
+			
 		});
 	}
 		
@@ -462,7 +493,7 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var row_no=$(this).attr('row_no');
 			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
-			var qty=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').attr('max_qty');			
+			var qty=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').attr('max_qty');					
 			if(val){
 				$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1).item').attr({ name:"grn_rows["+val+"][item_id]"});
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
