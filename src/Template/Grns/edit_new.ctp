@@ -109,24 +109,16 @@ if($transaction_date <  $start_date ) {
 									$existing_rows[$data2->item_id]=@$existing_rows[$data2->item_id]+$data2->quantity;
 								}
 							}
-							//pr($existing_rows);
+							
 							foreach($grn->grn_rows as $current_invoice_row){ 
 							
-							//pr($current_invoice_row); 
+							 
 								@$existing_rows[$current_invoice_row->item_id]=$existing_rows[$current_invoice_row->item_id]-$current_invoice_row->quantity;
 								$current_rows[]=$current_invoice_row->purchase_order_row_id;
 								$current_row_items[$current_invoice_row->purchase_order_row_id]=$current_invoice_row->quantity;
 								$descriptions[$current_invoice_row->item_id]=$current_invoice_row->description;
 								
 							}
-								//pr($grn->grn_rows); 	// exit;
-							
-							/* foreach($grn->purchase_order->purchase_order_rows as $data3){
-								$total_items[$data3->item_id]=@$total_items[$data3->item_id]+$data3->quantity;
-								//pr($total_items[$data3->item_id]);
-							} */
-							
-							//pr($current_row_items);
 							$grnRowIds=[];
 							foreach ($grn->grn_rows as $grn_row)
 							{
@@ -137,7 +129,10 @@ if($transaction_date <  $start_date ) {
 							{
 								$serial_no[$grn_row->purchase_order_row_id] = $grn_row->serial_numbers;
 							}
-							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): ?>
+							$q=0; foreach ($grn->purchase_order->purchase_order_rows as $grn_rows): 
+							//pr($actuleQty[$grn_rows->id]);
+							if(!empty($actuleQty[$grn_rows->id])){
+							?>
 							
 							<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
 								<td rowspan="2"><?php echo ++$q; --$q; ?></td>
@@ -269,7 +264,7 @@ if($transaction_date <  $start_date ) {
 									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>
-							<?php  
+							<?php  } 
 							?>
 						<?php $q++; endforeach; ?>
 					</tbody>
