@@ -55,8 +55,8 @@ if($transaction_date <  $start_date ) {
 									<thead>
 										<tr>
 											<th>Item</th>
-											<th >Qty</th>
-											<th >Serial Number</th>
+											<th>Qty</th>
+											<th>Serial Number</th>
 											<th>Narration</th>
 											<th></th>
 										</tr>
@@ -71,26 +71,18 @@ if($transaction_date <  $start_date ) {
 									</td>
 									<td width="15%">
 										<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row->quantity,'class' => 'form-control input-sm qty_bx','placeholder' => 'Quantity']); ?>
+										<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'value'=>$inventory_transfer_voucher_row->id,'class' => 'form-control input-sm itvrowid','placeholder' => 'Quantity']); ?>
 									</td>
 									<td>
 									<?php
 									$selected_sr_nos=[]; 
-									
-									foreach($inventory_transfer_voucher_row->item->serial_numbers as $item_serial_number){
-										
-									   if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row->id 
-										&& $item_serial_number->status=='Out'){
-											
-										$selected_sr_nos[]=$item_serial_number->name;
-										}
-										
-									} 
-									$sr_nos=implode(',',$selected_sr_nos); 
+									 if(@$inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable==1){ 
+									 
 									?>
 									
-									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$inventory_transfer_voucher_row->item_id.'&sr_nos='.$sr_nos); ?> 
+									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditListItv?item_id='.$inventory_transfer_voucher_row->item_id.'&itv_row_id='. $inventory_transfer_voucher_row->id); ?>
 									 
-										
+									 <?php } ?>	
 									</td>
 									<td width="20%">
 								<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control','placeholder' => 'Narration','style' => 'width:100%;','value'=>$inventory_transfer_voucher_row->narration]); ?>
@@ -126,6 +118,7 @@ if($transaction_date <  $start_date ) {
 								</td>
 								<td  width="15%"> 
 									<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row_in->quantity,'class' => 'form-control input-sm qty_bx_in','placeholder' => 'Quantity','old_qty'=>$inventory_transfer_voucher_row_in->quantity]); ?>
+									<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'value'=>$inventory_transfer_voucher_row_in->id,'class' => 'form-control input-sm itvrowid1','placeholder' => 'Quantity']); ?>
 								</td>
 								
 								<td width="30%">
@@ -134,11 +127,13 @@ if($transaction_date <  $start_date ) {
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
 									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+										
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ 
-											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name,'class'=>'sr_no']); ?>
+											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]); ?>
 											
-											
+											<?php
+										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ ?>
 												<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 														['action' => 'DeleteSerialNumbers', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 														[
@@ -147,7 +142,7 @@ if($transaction_date <  $start_date ) {
 															'confirm' => __('Are you sure, you want to delete {0}?', $item_serial_number->id)
 														]
 													) ?>
-												
+											<?php } ?>	
 										<?php echo "<br>"; $i++; } }  ?>
 										<div class="col-md-12 offset sr_container"></div>
 									</div>
@@ -332,44 +327,87 @@ $(document).ready(function() {
 	});
 	
 	$('.qty_bx_in').die().live("blur",function() {
-		var tr_obj=$(this).closest('tr');
-		sr_nos(tr_obj);
+		var tr_obj=$(this).closest('tr');  
+		
+			var len=tr_obj.find("td:nth-child(1) select").length;
+			if(len>0){
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+			var item_id=tr_obj.find('td:nth-child(1) select option:selected').val();
+			var old_qty=0;
+			}else{
+				var item_id=tr_obj.find('td:nth-child(1) input').val()
+				var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
+				var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
+			}
+		
+		if(item_id > 0){ 
+		if(serial_number_enable == '1'){
+				var quantity=tr_obj.find('td:nth-child(2) input').val();
+				 if(quantity.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits")
+						tr_obj.find('td:nth-child(2) input').val("");
+					}
+				sr_nos(tr_obj,serial_number_enable,old_qty);
+			}
+		
+		}
     });
 	
-	function sr_nos(tr_obj){
-		
-		var len=tr_obj.find("td:nth-child(1) select").length; 
-		if(len>0){
-			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
-		}else{
-			var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
-		} 
-		var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
-		
-		if(serial_number_enable==1){
+	
+	function sr_nos(tr_obj,serial_number_enable,old_qty){  
+		if(serial_number_enable==1){ 
 			var OriginalQty=tr_obj.find('td:nth-child(2) input').val();
 			Quantity = OriginalQty.split('.'); qty=Quantity[0];
-			var row_no=tr_obj.attr('row_no'); 
-			tr_obj.find('td:nth-child(3) div.sr_container').html(''); 
-			for(var w=0; w < (qty-old_qty); w++){
-				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" style=" width: 120px;" required="required" placeholder="serial number '+w+'" class="sr_no" /><br/>');
+			var row_no=tr_obj.attr('row_no');
+			tr_obj.find('td:nth-child(3) div.sr_container').html('');
+			for(var w=1; w<=qty-old_qty; w++){ 
+				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" class="sr_no" style=" width: 120px;" />');
 			}
 			rename_input();
 		}else{
-			tr_obj.find('td:nth-child(3)').html('');
+			tr_obj.find('td:nth-child(3) div.sr_container').html('');
 		}
+		
 	}
+	
 	rename_input();
+	
 	function rename_input()
 	{
+		var q=0;
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
-			var row_no =$(this).attr('row_no');
-			
+			var row_no = $(this).attr('row_no');
+				var i=0;
 				$(this).find("td:nth-child(3) .sr_no").each(function()
 				{
-					$(this).attr({name:"inventory_transfer_voucher_rows[in]["+row_no+"][sr_no][]"}).rules("add", "required");
+					$(this).attr({name:"inventory_transfer_voucher_rows[in]["+q+"][sr_no]["+i+"]"}).rules("add", "required");
+					i++;
 				});
+				q++;
 			});
+	}
+	
+	$('.qty_bx').die().live("keyup",function() {
+		validate_serial();
+    });	
+	
+	function validate_serial(){
+		$("#main_table tbody#maintbody tr.main").each(function(){
+			var OriginalQty=$(this).find('td:nth-child(2) input').val();
+			Quantity = OriginalQty.split('.'); qty=Quantity[0];
+			if($(this).find('td:nth-child(3) select').length>0){
+				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
+							required: true,
+							minlength: qty,
+							maxlength: qty,
+							messages: {
+								maxlength: "select serial number equal to quantity.",
+								minlength: "select serial number equal to quantity."
+							}
+					});
+			}
+		});	
 	}
 	
 	rename_rows_in();
@@ -384,7 +422,10 @@ $(document).ready(function() {
 			}else{
 			$(this).find("td:nth-child(1) input").attr({name:"inventory_transfer_voucher_rows[in]["+j+"][item_id_in]", id:"inventory_transfer_voucher_rows-"+j+"-item_id_in"}).rules("add", "required");	
 			}
-			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][quantity_in]", id:"inventory_transfer_voucher_rows-"+j+"-quantity_in"}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.qty_bx_in').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][quantity_in]", id:"inventory_transfer_voucher_rows-"+j+"-quantity_in"}).rules("add", "required");
+			
+			$(this).find('td:nth-child(2) input.itvrowid1').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][id]", id:"inventory_transfer_voucher_rows-"+j+"-id"});
+			
 			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
 			
 			j++; 
@@ -419,7 +460,9 @@ $(document).ready(function() {
 			}else{
 			$(this).find("td:nth-child(1) input").attr({name:"inventory_transfer_voucher_rows[out]["+i+"][item_id]", id:"inventory_transfer_voucher_rows-"+i+"-item_id"}).rules("add", "required");	
 			}
-			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows[out]["+i+"][quantity]", id:"inventory_transfer_voucher_rows-"+i+"-quantity"}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.qty_bx').attr({name:"inventory_transfer_voucher_rows[out]["+i+"][quantity]", id:"inventory_transfer_voucher_rows-"+i+"-quantity"}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.itvrowid').attr({name:"inventory_transfer_voucher_rows[out]["+i+"][id]", id:"inventory_transfer_voucher_rows-"+i+"-id"});
+			
 			if($(this).find('td:nth-child(3) select').length>0){
 				$(this).find('td:nth-child(3) select').select2().attr({name:"inventory_transfer_voucher_rows[out]["+i+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+i+"-serial_number_data"}).rules("add", "required");
 			}

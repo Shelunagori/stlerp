@@ -84,7 +84,7 @@ margin-bottom: 0;
 					<thead> 
 					<?php $status=0;
 					foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row ){
-						if($inventory_transfer_voucher_row->status == 'out' && $inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable == 1) {
+						if($inventory_transfer_voucher_row->status == 'Out' && $inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable == 1) {
 						$status=1;
 						}
 					}
@@ -138,7 +138,7 @@ margin-bottom: 0;
 					<?php $status_in=0;
 						foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_rows_in ){
 							
-							if($inventory_transfer_voucher_rows_in->status == 'in' &&$inventory_transfer_voucher_rows_in->item->item_companies[0]->serial_number_enable == 1 ) {
+							if($inventory_transfer_voucher_rows_in->status == 'In' &&$inventory_transfer_voucher_rows_in->item->item_companies[0]->serial_number_enable == 1 ) {
 								$status_in=1;
 								}
 						} ?>
@@ -162,7 +162,7 @@ margin-bottom: 0;
 							<?php foreach ($in_item->serial_numbers as  $item_serial_number){ 
 							if($item_serial_number->itv_id == $in_item->inventory_transfer_voucher_id){ ?>
 							<tr>
-								<td><?php echo $item_serial_number->serial_no ?></td>
+								<td><?php echo $item_serial_number->name ?></td>
 							</tr>
 							<?php }} ?>
 							</table>

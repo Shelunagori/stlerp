@@ -57,10 +57,10 @@
 					<table id="main_table"  class="table table-condensed" style="width: 1000px;">
 						<thead>
 							<tr>
-								<th >Item</th>
-								<th  >Quantity</th>
-								<th >Serial Number</th>
-								<th >Narration</th>
+								<th>Item</th>
+								<th>Quantity</th>
+								<th>Serial Number</th>
+								<th>Narration</th>
 								<th></th>
 							</tr>
 						</thead>
@@ -255,7 +255,17 @@ $(document).ready(function() {
 		var tr_obj=$(this).closest('tr');  
 		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
 		if(item_id > 0){ 
-		sr_nos(tr_obj);
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+			if(serial_number_enable == '1'){
+				var quantity=tr_obj.find('td:nth-child(2) input').val();
+				 if(quantity.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits")
+						tr_obj.find('td:nth-child(2) input').val("");
+					}
+				sr_nos(tr_obj);	
+			}
+			
 		}
     });
 	
@@ -286,7 +296,9 @@ $(document).ready(function() {
 					{ 
 						required: true
 					});
-			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][quantity_in]", id:"inventory_transfer_voucher_rows-"+j+"-quantity_in", row:j}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.qty_bx_in').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][quantity_in]", id:"inventory_transfer_voucher_rows-"+j+"-quantity_in", row:j}).rules("add", "required");
+			
+			$(this).find('td:nth-child(2) input.status').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][status]", id:"inventory_transfer_voucher_rows-"+j+"-status", row:j});
 		
 			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
 			j++; 
@@ -297,15 +309,21 @@ $(document).ready(function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val(); 
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
 		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
 		url1=url1+'?item_id='+select_item_id,
 		//alert(url1);
 		$.ajax({
 			url: url1
 		}).done(function(response) { 
-		$(t).closest('tr').find('td:nth-child(3)').html(response);
-		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows[out]["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
-			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+			if(serial_number_enable == 1){
+				$(t).closest('tr').find('td:nth-child(3)').html(response);
+				$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows[out]["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+					$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+			}else{
+				$(t).closest('tr').find('td:nth-child(3)').html('');
+				$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows[out]["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+			 }	
   			
 		});
 	});
@@ -328,7 +346,20 @@ $(document).ready(function() {
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {
-		validate_serial();
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(2) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(2) input').val("");
+						}
+					validate_serial();
+				}
+		}
     });
 	
 	function validate_serial(){
@@ -393,6 +424,8 @@ $(document).ready(function() {
 			</td>
 			<td style="width: 100px;"> 
 				<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx_in','placeholder' => 'Quantity']); ?>
+				
+				<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm status','placeholder' => 'Quantity','value'=>'In']); ?>
 			</td>
 			<td style="width: 200px;"><div class="sr_container"></div></td>
 			<td style="width: 300px;">

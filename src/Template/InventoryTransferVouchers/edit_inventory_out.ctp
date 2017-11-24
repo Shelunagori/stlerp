@@ -69,8 +69,12 @@ if($transaction_date <  $start_date ) {
 									</td>
 									<td width="10%">
 										<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row->quantity,'class' => 'form-control input-sm qty_bx','placeholder' => 'Quantity']); ?>
+										
+										<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm itvrowid','placeholder' => 'Quantity','value'=>$inventory_transfer_voucher_row->id]); ?>
 									</td>
+									
 									<td>
+									<?php if(@$inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable==1){ ?>
 									<?php
 									$selected=[]; $options=[];
 									
@@ -85,8 +89,10 @@ if($transaction_date <  $start_date ) {
 									} 
 									$sr_nos=implode(',',$selected_sr_nos);  
 								?>
-									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditList?item_id='.$inventory_transfer_voucher_row->item_id.'&sr_nos='.$sr_nos); ?> 
+									<?php echo $this->requestAction('/SerialNumbers/getSerialNumberEditListItv?item_id='.$inventory_transfer_voucher_row->item_id.'&itv_row_id='. $inventory_transfer_voucher_row->id); ?> 
+									<?php } ?>
 									</td>
+									
 									<td width="25%">
 										<?php echo $this->Form->input('q', ['type' => 'textarea','label' => false,'value'=>$inventory_transfer_voucher_row->narration,'class' => 'form-control input-sm qty_bx','placeholder' => 'Narration']); ?>
 									</td>
@@ -237,15 +243,20 @@ $(document).ready(function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val();
-		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumber']); ?>";
-		url1=url1+'/'+select_item_id,
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
+		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
+		url1=url1+'?item_id='+select_item_id,
 		$.ajax({
 			url: url1,
 		}).done(function(response) { 
-		$(t).closest('tr').find('td:nth-child(3)').html(response);
-		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
-			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
-  			
+		if(serial_number_enable == 1){
+			$(t).closest('tr').find('td:nth-child(3)').html(response);
+			$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+				$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+  		}else{
+				$(t).closest('tr').find('td:nth-child(3)').html('');
+				$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+		}
 		});
 	});
 	
@@ -261,7 +272,10 @@ $(document).ready(function() {
 			}else{
 				$(this).find('td:nth-child(1) input').attr({name:"inventory_transfer_voucher_rows["+i+"][item_id]", id:"inventory_transfer_voucher_rows-"+i+"-item_id"}).rules("add", "required");
 			}
-			$(this).find('td:nth-child(2) input').attr({name:"inventory_transfer_voucher_rows["+i+"][quantity]", id:"inventory_transfer_voucher_rows-"+i+"-quantity"}).rules("add", "required");
+			$(this).find('td:nth-child(2) input.qty_bx').attr({name:"inventory_transfer_voucher_rows["+i+"][quantity]", id:"inventory_transfer_voucher_rows-"+i+"-quantity"}).rules("add", "required");
+			
+			$(this).find('td:nth-child(2) input.itvrowid').attr({name:"inventory_transfer_voucher_rows["+i+"][id]", id:"inventory_transfer_voucher_rows-"+i+"-id"});
+			
 			if($(this).find('td:nth-child(3) select').length>0){
 				$(this).find('td:nth-child(3) select').select2().attr({name:"inventory_transfer_voucher_rows["+i+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+i+"-serial_number_data"}).rules("add", "required");
 			}
@@ -271,8 +285,21 @@ $(document).ready(function() {
 		});
 	}
 	
-	$('.qty_bx').die().live("keyup",function() { 
-		validate_serial();
+	$('.qty_bx').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
+		if(item_id > 0){
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(2) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(2) input').val("");
+						}
+					validate_serial();
+				}
+		}	
     });
 	 
 	function validate_serial(){

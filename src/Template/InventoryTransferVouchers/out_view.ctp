@@ -109,7 +109,7 @@ margin-bottom: 0;
 					<?php foreach ($out_item->serial_numbers as  $item_serial_number){ 
 					if($item_serial_number->itv_id == $out_item->inventory_transfer_voucher_id){ ?>
 						<tr>
-								<td><?php echo $item_serial_number->serial_no ?></td>
+								<td><?php echo $item_serial_number->name; ?></td>
 						</tr>
 					<?php }} ?>
 					</table>

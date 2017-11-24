@@ -2359,14 +2359,7 @@ class InvoicesController extends AppController
 			
 				$this->Invoices->Ledgers->deleteAll(['voucher_id' => $invoice->id, 'voucher_source' => 'Invoice']);
 				
-				if($invoice->inventory_voucher_status == 'Converted'){
 				
-				$InventoryVoucher = $this->Invoices->InventoryVouchers->find()->where(['invoice_id' => $invoice->id])->first();
-				
-				$this->Invoices->InventoryVouchers->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $InventoryVoucher->id,'source_model'=>'Inventory Voucher']);
-				$this->Invoices->InventoryVouchers->InventoryVoucherRows->deleteAll(['InventoryVoucherRows.inventory_voucher_id' => $InventoryVoucher->id]);
-				$this->Invoices->InventoryVouchers->delete($InventoryVoucher);
-				}
 				
 				$query = $this->Invoices->query();
 					$query->update()

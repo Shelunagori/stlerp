@@ -79,7 +79,7 @@ margin-bottom: 0;
 <div class="portlet-body form">
 <?php $status=0;
 		foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row ){
-		if($inventory_transfer_voucher_row->status == 'in' &&$inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable == 1) {
+		if($inventory_transfer_voucher_row->status == 'In' &&$inventory_transfer_voucher_row->item->item_companies[0]->serial_number_enable == 1) {
 		$status=1;
 		}
 	}?>

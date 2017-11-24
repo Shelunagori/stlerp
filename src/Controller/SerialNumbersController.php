@@ -192,6 +192,37 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['serialNumbers']);
 	}	
 	
+	public function getSerialNumberEditListItv(){
+		$item_id=$this->request->query('item_id');
+		$itv_row_id=$this->request->query('itv_row_id');
+		
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		$this->viewBuilder()->layout('');
+		
+		
+		$options=[];$values=[];
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
+		foreach($serialnumbers as $serialnumber){ 
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'itv_row_id'=>$itv_row_id]);
+			
+			if($outExist > 0){
+				$values[]=$serialnumber->id;
+			}
+			
+			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'itv_row_id != '=>$itv_row_id]);
+
+			if($inExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
+			}
+			
+		}
+		//pr($in_row_id);
+        $this->set(compact('options', 'values'));
+        $this->set('_serialize', ['serialNumbers']);
+	}
+	
+	
 	
 	public function getSerialNumberSalesReturnList(){
 		 $item_id=$this->request->query('item_id'); 

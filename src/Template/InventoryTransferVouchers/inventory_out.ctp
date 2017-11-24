@@ -205,15 +205,20 @@ $(document).ready(function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val();
-		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumbers']); ?>";
-		url1=url1+'/'+select_item_id, 
+		var serial_number_enable = $(this).find('option:selected').attr('serial_number_enable');
+		var url1="<?php echo $this->Url->build(['controller'=>'SerialNumbers','action'=>'getSerialNumberList']); ?>";
+		url1=url1+'?item_id='+select_item_id, 
 		$.ajax({
 			url: url1,
 		}).done(function(response) { 
-		$(t).closest('tr').find('td:nth-child(3)').html(response);
-		$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
-			$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
-  			
+		if(serial_number_enable == 1){
+			$(t).closest('tr').find('td:nth-child(3)').html(response);
+			$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+				$(t).closest('tr').find('td:nth-child(3) select').select2({ placeholder: "Serial Number"});
+  		}else{
+				$(t).closest('tr').find('td:nth-child(3)').html('');
+				$(t).closest('tr').find('td:nth-child(3) select').attr({name:"inventory_transfer_voucher_rows["+row_no+"][serial_number_data][]", id:"inventory_transfer_voucher_rows-"+row_no+"-serial_number_data"});
+			 }
 		});
 	});
 	
@@ -235,8 +240,22 @@ $(document).ready(function() {
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {
-		validate_serial();
-    });
+		
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(2) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(2) input').val("");
+						}
+					validate_serial();
+				}
+		}	
+	});
 	
 	function validate_serial(){
 		$("#main_table tbody#maintbody tr.main").each(function(){
