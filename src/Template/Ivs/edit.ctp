@@ -160,7 +160,7 @@ $(document).ready(function() {
 		rename_rows_name();
 	}
 	
-	rename_input();
+	/* rename_input();
 	function rename_input()
 	{
 		var q=0;
@@ -175,7 +175,7 @@ $(document).ready(function() {
 				});
 				q++;
 			});
-	}
+	} */
 	
 	
 	$('.select_item ').die().live("change",function() {
@@ -238,10 +238,24 @@ $(document).ready(function() {
 			q++;
 		});
 	}
-	
+	validate_serial();
 	$('.qty_bx').die().live("keyup",function() {
-		rename_rows_name();
-		validate_serial();
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(1) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(2) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(2) input').val("");
+						}
+				rename_rows_name();
+				validate_serial();
+				}
+		}	
+		
     });
 	
 	function validate_serial(){

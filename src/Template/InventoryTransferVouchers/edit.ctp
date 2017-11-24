@@ -71,6 +71,7 @@ if($transaction_date <  $start_date ) {
 									</td>
 									<td width="15%">
 										<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row->quantity,'class' => 'form-control input-sm qty_bx','placeholder' => 'Quantity']); ?>
+										
 										<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'value'=>$inventory_transfer_voucher_row->id,'class' => 'form-control input-sm itvrowid','placeholder' => 'Quantity']); ?>
 									</td>
 									<td>
@@ -122,7 +123,7 @@ if($transaction_date <  $start_date ) {
 								</td>
 								
 								<td width="30%">
-									<div class="row">
+									<div class="row" style='padding-left:5%'>
 										
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;

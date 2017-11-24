@@ -141,7 +141,7 @@ class IvsController extends AppController
 			
 			$iv->created_by=$s_employee_id;
 			
-        // pr($iv); exit;
+        //pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
 				
 				foreach($iv->iv_rows as $iv_row){   
@@ -150,7 +150,8 @@ class IvsController extends AppController
 						$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
 						 if(!empty($serial_numbers_iv_row)){
 							 foreach($serial_numbers_iv_row as $sr_nos){
-							 $query = $this->Ivs->IvRows->SerialNumbers->query();
+								 
+							$query = $this->Ivs->IvRows->SerialNumbers->query();
 										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
 										->values([
 										'name' => $sr_nos,
@@ -174,14 +175,17 @@ class IvsController extends AppController
 						if(!empty($serial_numbers_iv_row_item)){
 						
 						 foreach($serial_numbers_iv_row_item as $sr_nos_out){ 
+						 
+							 $serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
 							 $query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id'])
+										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id','parent_id'])
 										->values([
-										'name' => $sr_nos_out,
+										'name' => $serial_data->name,
 										'item_id' => $iv_row_item->item_id,
 										'status' => 'Out',
 										'iv_row_items' => $iv_row_item->id,
-										'company_id'=>$st_company_id
+										'company_id'=>$st_company_id,
+										'parent_id'=>$sr_nos_out
 										]);
 									$query->execute(); 
 							}
@@ -344,26 +348,6 @@ class IvsController extends AppController
 			$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers']);
 				foreach($iv->iv_rows as $iv_row){ 
 				
-					/* $this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_id' => $iv_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);
-					/////For In
-					if(!empty($iv_row->serial_numbers))
-					{
-						$serial_numbers_iv_row = array_filter($iv_row->serial_numbers);
-						 if(!empty($serial_numbers_iv_row)){
-							foreach($serial_numbers_iv_row as $sr_nos){
-							 $query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
-										->values([
-										'name' => $sr_nos,
-										'item_id' => $iv_row->item_id,
-										'status' => 'In',
-										'iv_row_id' => $iv_row->id,
-										'company_id'=>$st_company_id
-										]);
-									$query->execute(); 
-							}
-						}
-					} */
 					$unit_rate_In=0;$unit_rate=0;	
 				 	foreach($iv_row->iv_row_items as $iv_row_item){
 					if(!empty($iv_row_item['id'])){
@@ -378,15 +362,17 @@ class IvsController extends AppController
 						
 						$serial_numbers_iv_row_item = @$iv_row_item['serial_numbers'];
 						if(!empty($serial_numbers_iv_row_item)){
-						foreach($serial_numbers_iv_row_item as $sr_nos_out){
+						foreach($serial_numbers_iv_row_item as $sr_nos_out){ pr($sr_nos_out);
+							$serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
 							 $query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id'])
+										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id','parent_id'])
 										->values([
-										'name' => $sr_nos_out,
+										'name' => $serial_data->name,
 										'item_id' => $iv_row_item['item_id'],
 										'status' => 'Out',
 										'iv_row_items' => $iv_row_item['id'],
-										'company_id'=>$st_company_id
+										'company_id'=>$st_company_id,
+										'parent_id'=>$sr_nos_out
 										]);
 									$query->execute(); 
 							}

@@ -232,7 +232,7 @@ class InventoryTransferVouchersController extends AppController
 					if($serial_data>0)
 					{
 						$serial_number_datas=$inventory_transfer_voucher_row_data['serial_number_data'];
-						foreach($serial_number_datas as $key=>$serial_number_data){
+						foreach($serial_number_datas as $serial_number_data){
 							
 						$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
 						

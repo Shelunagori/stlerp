@@ -111,50 +111,21 @@ class SerialNumbersController extends AppController
 		
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
-		
 		$this->viewBuilder()->layout('');
 		
+		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
-		
-		$totalInCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'In']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-		$totalOutCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['status' => 'Out']),
-				$query->newExpr()->add(['name']),
-				'integer'
-			);
-
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'iv_row_items'=>$iv_row_items]);
+			if($outExist > 0){
+				$values[]=$serialnumber->id;
+			}
+			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'iv_row_items != '=>$iv_row_items]);
 			
-		$query->select([
-			'total_in' => $query->func()->count($totalInCase),
-			'total_out' => $query->func()->count($totalOutCase)
-		])
-		->where(['company_id'=>$st_company_id,'item_id'=>$item_id])
-		->group('SerialNumbers.name')
-		->autoFields(true);
-		$SerialNumbers =$query->toArray();
-		
-		$query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
-		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'iv_row_items'=>$iv_row_items,'status'=>'Out']);
-		$SerialNumbers_out = $query->toArray();
-		
-		foreach($SerialNumbers_out as $sr_out) {
-			$values[]=$sr_out;
-			$options[]=['text' =>$sr_out, 'value' => $sr_out];
-		}
-		//pr($options);exit;
-		
-		foreach($SerialNumbers as $serialnumbers){
-			if(($serialnumbers->total_in > $serialnumbers->total_out)){
-				$options[]=['text' =>$serialnumbers->name, 'value' => $serialnumbers->name];
-			}	
-			///$values=$sr_no;
+			if($inExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
+			}
 		}
 		
         $this->set(compact('options', 'values'));
