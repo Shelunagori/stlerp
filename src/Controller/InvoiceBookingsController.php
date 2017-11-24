@@ -386,11 +386,13 @@ class InvoiceBookingsController extends AppController
 					$qty_total=$qty_total+$qty;
 				$j++;
 				}
-				
-				$per_unit_cost=$rate_total/$qty_total;
+				if($qty_total!=0)
+				{
+					$per_unit_cost=$rate_total/$qty_total;
+				}
 				$query1 = $this->InvoiceBookings->Items->ItemCompanies->query();
 				$query1->update()
-					->set(['dynamic_cost' => $per_unit_cost])
+					->set(['dynamic_cost' => @$per_unit_cost])
 					->where(['company_id' => $st_company_id,'item_id'=>$item_id])
 					->execute();
 				$i++;
@@ -666,8 +668,10 @@ class InvoiceBookingsController extends AppController
 					$qty_total=$qty_total+$qty;
 				$j++;
 				}
-				
-				$per_unit_cost=$rate_total/$qty_total;
+				if($qty_total!=0)
+				{
+					$per_unit_cost=$rate_total/$qty_total;
+				}
 				$query1 = $this->InvoiceBookings->Items->ItemCompanies->query();
 				$query1->update()
 					->set(['dynamic_cost' => $per_unit_cost])
@@ -1046,11 +1050,13 @@ class InvoiceBookingsController extends AppController
 					$qty_total=$qty_total+$qty;
 				$j++;
 				}
-				
-				$per_unit_cost=$rate_total/$qty_total;
+				if($qty_total!=0)
+				{
+					$per_unit_cost=$rate_total/$qty_total;
+				}
 				$query1 = $this->InvoiceBookings->Items->ItemCompanies->query();
 				$query1->update()
-					->set(['dynamic_cost' => $per_unit_cost])
+					->set(['dynamic_cost' => @$per_unit_cost])
 					->where(['company_id' => $st_company_id,'item_id'=>$item_id])
 					->execute();
 					
@@ -1317,7 +1323,10 @@ class InvoiceBookingsController extends AppController
 				$j++;
 				}
 				
-				$per_unit_cost=$rate_total/$qty_total;
+				if($qty_total!=0)
+				{
+					$per_unit_cost=$rate_total/$qty_total;
+				}
 				$query1 = $this->InvoiceBookings->Items->ItemCompanies->query();
 				$query1->update()
 					->set(['dynamic_cost' => $per_unit_cost])

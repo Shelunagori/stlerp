@@ -730,6 +730,8 @@ $(document).ready(function() {
 		
 
 		submitHandler: function (form) {
+			$('#add_submit').prop('disabled', true);
+			$('#add_submit').text('Submitting.....');
 			success3.show();
 			error3.hide();
 			form[0].submit();

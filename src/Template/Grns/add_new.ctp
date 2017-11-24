@@ -107,7 +107,6 @@
 							if(@$actuleQty[$purchase_order_rows->id]>0){
 							?>
 							<tr class="tr1" row_no='<?php echo @$purchase_order_rows->id; ?>'>
-								
 								<td rowspan="2"><?php echo ++$q; --$q; 
 									 echo $this->Form->input('q', ['type' => 'hidden','value'=>@$purchase_order_rows->id,'class'=>'hide']);
 								?></td>
