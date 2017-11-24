@@ -237,7 +237,8 @@ if(!empty($copy))
 									<div class="col-md-10 padding-right-decrease">
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									</div>
-							<?php } ?>		
+							<?php } ?>	
+							
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
 										<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;" popup_div_id="<?php echo $q; ?>"><div class="modal-backdrop fade in" ></div>
@@ -843,6 +844,9 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) select.item_id").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
 						required: true
 					});
+			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
+			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
+			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
 						min: 0.01,

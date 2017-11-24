@@ -207,11 +207,22 @@ class InvoiceBookingsController extends AppController
 			if(!empty($book_no)){
 				$where['InvoiceBookings.ib2 LIKE']=$book_no;
 			}
-			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'yes'])->order(['InvoiceBookings.id' => 'DESC']);
+			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'yes'])->toArray();
 			$status=1;
 		}	
-		//pr($invoiceBookings->toArray());exit;
-		$this->set(compact('invoiceBookings','status','purchase_return','book_no'));
+		//pr($invoiceBookings[0]); exit;
+		$InvoiceBookingExist="No";
+		if(!empty($invoiceBookings)){
+			$SalesReturnexists = $this->InvoiceBookings->PurchaseReturns->exists(['PurchaseReturns.invoice_booking_id' => 
+			$invoiceBookings[0]->id]);
+			if($SalesReturnexists==1){
+				$PurchaseReturns=$this->InvoiceBookings->PurchaseReturns->find()->where(['PurchaseReturns.invoice_booking_id' => $invoiceBookings[0]->id,'PurchaseReturns.company_id'=>$st_company_id])->first();
+				$PurchaseReturnId=$PurchaseReturns->id;
+				$InvoiceBookingExist="Yes";
+			}
+		}
+		//pr($invoiceBookings); exit;
+		$this->set(compact('invoiceBookings','status','purchase_return','book_no','PurchaseReturnId','InvoiceBookingExist'));
         $this->set('_serialize', ['invoiceBookings']);
 		$this->set(compact('url'));
 	}

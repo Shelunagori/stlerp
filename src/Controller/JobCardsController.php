@@ -132,7 +132,10 @@ class JobCardsController extends AppController
 			foreach($jc->sales_order->invoices as $invoice){   //pr($invoice); 
 				foreach($invoice->invoice_rows as $invoice_row){ 
 					@$InvoiceQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
-						@$InventoryVoucherQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
+						$outExist = $this->JobCards->SalesOrders->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
+						if($outExist > 0){
+							@$InventoryVoucherQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
+						}
 				}
 			}
 		}
