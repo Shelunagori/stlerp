@@ -430,7 +430,7 @@ class PurchaseReturnsController extends AppController
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
         ]);
-		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
+		/* $invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
             'contain' => ['InvoiceBookingRows' => ['Items','PurchaseReturnRows'=>function ($q){
 				return $q->select(['totalQty'=>$q->func()->SUM('PurchaseReturnRows.quantity')])
 										->group(['PurchaseReturnRows.invoice_booking_row_id'])
@@ -439,37 +439,57 @@ class PurchaseReturnsController extends AppController
 							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
 							}]],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
+		 */
+
 		
-		$Qty=[];
-		$invoiceBookingItemQty=[];$maxQty=[];
-		if(!empty($PurchaseReturn->invoice_booking->invoice_booking_rows))
-		{
-			foreach($PurchaseReturn->invoice_booking->invoice_booking_rows as $invoice_booking_row)
-			{
-				$invoiceBookingItemQty[@$invoice_booking_row->id] =$invoice_booking_row->quantity;
-				if(!empty($invoice_booking_row->purchase_return_rows))
-				{
-					foreach($invoice_booking_row->purchase_return_rows as $purchase_return_row)
-					{ 
-					    if($purchase_return_row->item_id!=0)
-						{
-							@$Qty[@$purchase_return_row->invoice_booking_row_id] +=@$purchase_return_row->quantity;
-						}
-					}
+		
+		$invoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($PurchaseReturn->invoice_booking_id, [
+            'contain' => (['PurchaseReturns'=>['PurchaseReturnRows' => function($q) {
+				return $q->select(['purchase_return_id','invoice_booking_row_id','item_id','total_qty' => $q->func()->sum('PurchaseReturnRows.quantity')])->group('PurchaseReturnRows.invoice_booking_row_id');
+			}],'InvoiceBookingRows'=> ['Items','PurchaseReturnRows'],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+							}]],'PurchaseOrders'=>['PurchaseOrderRows']]])
+        ]);
+		
+		$options=[];$values=[]; $purchaseReturnRowId=[];
+		foreach ($PurchaseReturn->purchase_return_rows as $purchase_return_row){
+		$serialnumberOut = $this->PurchaseReturns->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id,'purchase_return_row_id'=>$purchase_return_row->id,'SerialNumbers.status'=>'Out']);
+			foreach($serialnumberOut as $serialnumber){
+				$outExist = $this->PurchaseReturns->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id]);
+				if($outExist == 0){
+					$sr=$this->PurchaseReturns->SerialNumbers->get($serialnumber->id);
+					$values[$purchase_return_row->invoice_booking_row_id][]= $sr->parent_id;
 				}
 			}
-		}
-		
-		$purchaseReturnRowItemQty=[];
-		$purchaseReturnRowId=[];
-		foreach($PurchaseReturn->purchase_return_rows as $purchase_return_row)
-		{
 			$purchaseReturnRowId[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->id;
-			$maxQty[$purchase_return_row->invoice_booking_row_id] =@$invoiceBookingItemQty[@$purchase_return_row->invoice_booking_row_id]-@$Qty[@$purchase_return_row->invoice_booking_row_id]+$purchase_return_row->quantity;
-			$purchaseReturnRowItemDetail[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->quantity.','.$purchase_return_row->total;
-		}
-		//pr($purchaseReturnRowItemDetail);exit;
+		 }
+		 
+		 foreach ($PurchaseReturn->purchase_return_rows as $purchase_return_row){
+		$serialnumberOut = $this->PurchaseReturns->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id,'purchase_return_row_id'=>$purchase_return_row->id,'SerialNumbers.status'=>'Out']);
+			foreach($serialnumberOut as $serialnumber){
+				$outExist = $this->PurchaseReturns->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id]);
+				if($outExist == 0){
+					$sr=$this->PurchaseReturns->SerialNumbers->get($serialnumber->parent_id);
+					$options[$purchase_return_row->invoice_booking_row_id][]=['text' =>$sr->name, 'value' => $sr->id];
+				}
+			}
+		 }
+		 
+		foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row){ //pr($invoice_booking_row);
+		$serialnumbers = $this->PurchaseReturns->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id,'grn_row_id'=>$invoice_booking_row->grn_row_id,'SerialNumbers.status'=>'In']); 
+			foreach($serialnumbers as $serialnumber1){ 
+			$inExist = $this->PurchaseReturns->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber1->id]);
+				if($inExist == 0){ //pr($serialnumber1);
+				$PurchaseReturn=$this->PurchaseReturns->SerialNumbers->find()->where(['SerialNumbers.parent_id' => $serialnumber1->id])->first();
+					$options[$invoice_booking_row->id][]=['text' =>$serialnumber1->name, 'value' => $serialnumber1->id];
+				}
+				
+			}
+		 }
+		 
+	 
 		
+		 
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();	
 		$vendor_ledger_acc_id=$v_LedgerAccount->id;
 			
@@ -523,25 +543,30 @@ class PurchaseReturnsController extends AppController
 
 				$this->PurchaseReturns->ItemLedgers->deleteAll(['source_id' => $purchaseReturn->id, 'source_model' => 'Purchase Return','company_id'=>$st_company_id]);
 				$this->PurchaseReturns->ReferenceDetails->deleteAll(['purchase_return_id' => $purchaseReturn->id]);
+				
+				$this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->deleteAll(['SerialNumbers.purchse_return_id'=>$purchaseReturn->id,'status'=>'Out']);
 				//////start serial Number database changes Oct17	  
 				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){ 
 					
 					$item_serial_no=$purchase_return_row->serial_numbers;
 				/////for delete serial number in table					
-					$this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->deleteAll(['SerialNumbers.purchse_return_id'=>$purchaseReturn->id,'SerialNumbers.purchase_return_row_id' => $purchase_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
-				 foreach($item_serial_no as $serial){
-				 $query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id'])
-									->values([
-									'name' => $serial,
-									'item_id' => $purchase_return_row->item_id,
-									'status' => 'Out',
-									'purchase_return_row_id' => $purchase_return_row->id,
-									'purchse_return_id' => $purchaseReturn->id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute();  
-						
+				if($item_serial_no){
+					 foreach($item_serial_no as $serial){
+							$serial_data=$this->PurchaseReturns->SerialNumbers->get($serial);
+							$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id','parent_id'])
+										->values([
+										'name' => $serial_data->name,
+										'item_id' => $purchase_return_row->item_id,
+										'status' => 'Out',
+										'purchase_return_row_id' => $purchase_return_row->id,
+										'purchse_return_id' => $purchaseReturn->id,
+										'company_id'=>$st_company_id,
+										'parent_id'=>$serial
+										]);
+									$query->execute();  
+							
+						}
 					}
 				}
 			//////End serial Number database changes Oct17	
@@ -636,27 +661,24 @@ class PurchaseReturnsController extends AppController
 					$i++;
 				}
 				$i=0;
+				//pr($purchaseReturn->purchase_return_rows); exit;
 			foreach($purchaseReturn->purchase_return_rows as $purchase_return_row)
-				{
-						$item_id=$purchase_return_row['item_id'];
-						$qty=$purchase_return_row['quantity'];
-						$itemLedger_data = $this->PurchaseReturns->ItemLedgers->find()->where(['item_id'=>$item_id,'in_out'=>'In','company_id' => $st_company_id,'source_model'=>'Grns','source_id'=>$invoiceBooking->grn_id])->first();
-						$InvoiceBookingRows = $this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->get($check_row[$i]);
-						$InvoiceBookingRows->purchase_return_quantity=$qty;
-						$this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->save($InvoiceBookingRows);
-
-						//Insert in Item Ledger//
+				{ 
+						$InvoiceBookingRow = $this->PurchaseReturns->InvoiceBookings->InvoiceBookingRows->get($purchase_return_row->invoice_booking_row_id);
+						//$InvoiceBooking = $this->PurchaseReturns->InvoiceBookings->get($InvoiceBookingRow->grn_row_id);
+						$itemLedger_data = $this->PurchaseReturns->ItemLedgers->find()->where(['in_out'=>'In','company_id' => $st_company_id,'source_model'=>'Grns','source_row_id'=>$InvoiceBookingRow->grn_row_id])->first();
+					//	pr($itemLedger_data->rate);exit;
 						$itemLedger = $this->PurchaseReturns->ItemLedgers->newEntity();
-						$itemLedger->item_id = $item_id;
-						$itemLedger->quantity = $qty;
+						$itemLedger->item_id = $purchase_return_row->item_id;
+						$itemLedger->quantity = $purchase_return_row->quantity;
 						$itemLedger->source_model = 'Purchase Return';
 						$itemLedger->source_id = $purchaseReturn->id;
 						$itemLedger->in_out = 'Out';
-						$itemLedger->rate = $itemLedger_data['rate'];
+						$itemLedger->rate = $itemLedger_data->rate;
 						$itemLedger->company_id = $purchaseReturn->company_id;
 						$itemLedger->processed_on =$purchaseReturn->transaction_date;   
+						$itemLedger->source_row_id =$purchase_return_row->id;   
 						$this->PurchaseReturns->ItemLedgers->save($itemLedger);
-						$i++;
 				}
 				
 					
@@ -744,7 +766,7 @@ class PurchaseReturnsController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId'));
+			$this->set(compact('purchaseReturn', 'invoiceBooking', 'companies','financial_year_data','v_LedgerAccount','ledger_account_details','ledger_account_vat','chkdate','st_company_id','financial_month_first','financial_month_last','GstTaxes','ReferenceDetails','maxQty','purchaseReturnRowItemDetail','purchaseReturnRowId','options','values'));
 			$this->set('_serialize', ['purchaseReturn']);
 	}
 	

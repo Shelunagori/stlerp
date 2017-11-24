@@ -617,6 +617,7 @@ class ItemLedgersController extends AppController
 		$stock=[];  $sumValue=[];
 		foreach($Items as $Item){
 			$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+			//pr($StockLedgers->toArray());
 			foreach($StockLedgers as $StockLedger){ 
 				if($StockLedger->in_out=='In'){
 					if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
@@ -641,7 +642,8 @@ class ItemLedgersController extends AppController
 			}
 		}
 		/////fdgdfgdrc disavble
-		
+	//pr($stock);
+	//exit;
 
 	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
 	

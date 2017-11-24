@@ -22,7 +22,7 @@
 					</tbody>
 				</table>
 			</form>
-			<?php } else if($status==1){ 
+			<?php  } else if($status==1){  
 			 $page_no=$this->Paginator->current('InvoiceBookings'); $page_no=($page_no-1)*20; ?>
 				<form method="GET">
 					<table class="table table-condensed">
@@ -67,8 +67,12 @@
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
 							<td class="actions">
 								
-								<?php
-								echo $this->Html->link('<i class="fa fa-repeat"></i> Create  GST Purchase Return','/PurchaseReturns/GstAdd?invoiceBooking='.$invoiceBooking->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								<?php 
+								if($InvoiceBookingExist=="No"){ 
+									echo $this->Html->link('<i class="fa fa-repeat"></i> Create  GST Purchase Return','/PurchaseReturns/GstAdd?invoiceBooking='.$invoiceBooking->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}else{ 
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['controller'=>'PurchaseReturns','action' => 'gstEdit?purchaseReturn='.$PurchaseReturnId,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								}
 								 ?> 
 								</td>
 							</tr>
