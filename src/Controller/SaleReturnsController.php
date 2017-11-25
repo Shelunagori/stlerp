@@ -296,7 +296,7 @@ class SaleReturnsController extends AppController
 				
 				 $saleReturn->check=array_filter($saleReturn->check);
 					$i=0; 
-					foreach($saleReturn->check as $sale_return_row){
+					foreach($saleReturn->check as $sale_return_row){ pr($sale_return_row);
 						$item_id=$sale_return_row;
 						$item_details=$this->SaleReturns->ItemLedgers->find()->where(['item_id'=>$item_id,'in_out'=>'In','processed_on <='=>$saleReturn->transaction_date,'rate >'=>0,'quantity >'=>0]);
 						//pr($item_details->toArray()); exit;
@@ -316,7 +316,7 @@ class SaleReturnsController extends AppController
 						}
 						$per_unit_cost=$Itemledger_rate/$Itemledger_qty;
 						$query= $this->SaleReturns->ItemLedgers->query();
-						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id'])
+						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
 							  ->values([
 											'item_id' => $item_id,
 											'quantity' => $saleReturn->sale_return_rows[$i]['quantity'],
@@ -325,7 +325,8 @@ class SaleReturnsController extends AppController
 											'processed_on' => date("Y-m-d",strtotime($saleReturn->transaction_date)),
 											'in_out'=>'In',
 											'company_id'=>$st_company_id,
-											'source_id'=>$saleReturn->id
+											'source_id'=>$saleReturn->id,
+											'source_row_id'=>$sale_return_row->id
 										])
 					    ->execute();
 						$i++;

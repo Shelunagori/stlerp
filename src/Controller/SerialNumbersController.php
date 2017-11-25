@@ -205,15 +205,15 @@ class SerialNumbersController extends AppController
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
+        $query = $this->SerialNumbers->find()->where(['SerialNumbers.company_id'=>$st_company_id]);
 		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out']);
 		$SerialNumbers_out = $query->toArray();
 		
-		$serialnumbers_in = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In'])->toArray();
+		/* $serialnumbers_in = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In'])->toArray(); */
 
-		$out_dropdown = array_diff($SerialNumbers_out,$serialnumbers_in);
-		foreach($out_dropdown as $option){  	
-			$options[]=['text' =>$option, 'value' => $option];
+		//$out_dropdown = array_diff($SerialNumbers_out,$serialnumbers_in);
+		foreach($SerialNumbers_out as $option){ 	
+			$options[]=['text' =>$option->name, 'value' => $option->id];
 		}
 		
         $this->set(compact('options', 'values','out_dropdown'));
