@@ -934,12 +934,12 @@ $(document).ready(function() {
 		$("#myModal2").hide();
     });
 	
-	$("select.item_box").die().live("change",function(){
+	$("select.item_box").die().live("change",function(){ 
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		last_three_rates(popup_id,item_id);
 	})
-	$("select.item_box").each(function(){
+	$("select.item_box").each(function(){ 
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		if(popup_id){
@@ -947,7 +947,7 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("select.item_box").die().live("change",function(){ 
+	$("select.item_box").die().live("change",function(){  
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		var obj = $(this);
@@ -977,39 +977,36 @@ $(document).ready(function() {
 		}else{
 			$(this).val();
 		}
-		//last_three_rates(popup_id,item_id);
+		last_three_rates(popup_id,item_id);
 	})
 	
-	function last_three_rates_onload(popup_id,item_id){
-			var customer_id=$('select[name="customer_id"]').val();
-			//$('.modal[popup_div_id='+popup_id+']').show();
-			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
-			if(customer_id){
-				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
-				url=url+'/'+item_id+'/'+customer_id,
-				$.ajax({
-					url: url,
-					dataType: 'json',
-				}).done(function(response) {
-					var values = parseFloat(response);
-					$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price "+values
-						}
-					});
-					$('div[popup_ajax_id='+popup_id+']').html(values.html);
+	function last_three_rates_onload(popup_id,item_id)
+	{ 
+		var customer_id=$('select[name="customer_id"]').val();  
+		//$('.modal[popup_div_id='+popup_id+']').show();
+		$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+		if(customer_id)
+		{
+			var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
+			url=url+'/'+item_id+'/'+customer_id,
+			$.ajax({
+				url: url,
+				dataType: 'json',
+			}).done(function(response) { 
+				$('div[popup_ajax_id='+popup_id+']').html(response.html);
+			});
+		}
+		else
+		{
+			$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
+					min: 0.01,
+					messages: {
+						min: "Rate can't be zero."
+					}
 				});
-			}else{
-				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
-						min: 0.01,
-						messages: {
-							min: "Rate can't be zero."
-						}
-					});
-				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
-				$(".item_box[popup_id="+popup_id+"]").val('').select2();
-			}
+			$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
+			$(".item_box[popup_id="+popup_id+"]").val('').select2();
+		}
 	}
 	function last_three_rates(popup_id,item_id){
 			var customer_id=$('select[name="customer_id"]').val();

@@ -570,12 +570,26 @@ if(!empty($copy))
 	<tbody>
 		<tr class="tr1 preimp maintr">
 			<td rowspan="2" width="10">0</td>
-			<td width="280px;">
+			<td width="460px;">
 				<div class="row">
-					<div class="col-md-10 padding-right-decrease">
+					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
 						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
-					
+					<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
+						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
+						<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-body" >
+										
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn default closebtn">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</td>
 			<td width="100"><?php echo $this->Form->input('unit[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity']); ?></td>
@@ -876,6 +890,9 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
 						required: true
 					});
+			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
+			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
+			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
 						min: 1,
@@ -926,14 +943,15 @@ $(document).ready(function() {
 		});
 	}
 	put_code_description();
-	function put_code_description(){
+	function put_code_description()
+	{
 			var i=0;
 			$("#main_tb tbody#main_tbody tr.tr2").each(function(){
 				var row_no=$(this).attr('row_no');		
 				var code=$(this).find('div#summer'+i).code();
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').find('td:nth-child(1) textarea').val(code);
 			i++; });
-		}
+	}
 	
 	$('#main_tb input,#tbl2 input').die().live("keyup","blur",function() { 
 		calculate_total();
@@ -1236,9 +1254,9 @@ $(document).ready(function() {
 		$("#myModal2").hide();
     });
 	
-		$("select.item_box").die().live("change",function(){
+	$("select.item_box").die().live("change",function(){
 		var popup_id=$(this).attr('popup_id');
-		var item_id=$(this).val();
+		var item_id=$(this).val(); 
 		last_three_rates(popup_id,item_id);
 	})
 	$("select.item_box").each(function(){
