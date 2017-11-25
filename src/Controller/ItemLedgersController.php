@@ -437,7 +437,6 @@ class ItemLedgersController extends AppController
 	public function stockSummery($stockstatus=null){ 
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
-		
 		$this->viewBuilder()->layout('index_layout');
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -454,14 +453,18 @@ class ItemLedgersController extends AppController
 		$financial_year = $this->ItemLedgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$date = $financial_year->date_from;
 		$due_date= $financial_year->date_from;
-		if(empty($from_date)){
-			$from_date=$date;
-			$to_date=date('Y-m-d');
-		};
-		$where=[];
 		$where1=[];
+		$where=[];
+		if($from_date){
+			$from_date=date("Y-m-d",strtotime($from_date));
+            $where1['processed_on >=']=$from_date;  
+		};
 		
-		$this->set(compact('item_category','item_group','item_sub_group','stock','item_name'));
+		if($to_date){
+			$to_date=date("Y-m-d",strtotime($to_date));
+            $where1['processed_on <=']=$to_date;
+		}; //pr($where1); exit;
+		
 		if(!empty($item_name)){ 
 			$where['Item_id']=$item_name;
 			
@@ -475,43 +478,9 @@ class ItemLedgersController extends AppController
 		if(!empty($item_sub_group)){
 			$where['Items.item_sub_group_id ']=$item_sub_group;
 		}
-		if(!empty($search_date)){
-			$search_date=date("Y-m-d",strtotime($search_date));
-            $where1['processed_on <=']=$search_date;
-		}
-		//pr($where);exit;
-		$item_stocks =[];$items_names =[];
 		
-		$query = $this->ItemLedgers->find()->where(['ItemLedgers.processed_on >='=> date("Y-m-d",strtotime($from_date)), 'ItemLedgers.processed_on <=' =>date("Y-m-d",strtotime($to_date)),'company_id'=>$st_company_id]);
-		
-		$totalInCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['in_out' => 'In']),
-				$query->newExpr()->add(['quantity']),
-				'integer'
-			);
-		$totalOutCase = $query->newExpr()
-			->addCase(
-				$query->newExpr()->add(['in_out' => 'Out']),
-				$query->newExpr()->add(['quantity']),
-				'integer'
-			);
+		$this->set(compact('item_category','item_group','item_sub_group','stock','item_name'));
 
-			
-		$query->select([
-			'total_in' => $query->func()->sum($totalInCase),
-			'total_out' => $query->func()->sum($totalOutCase),'id','item_id'
-		])
-		->contain(['Items'=>function ($q) use($where) { 
-				return $q->where($where)->contain(['Units']);
-				}])
-		->where(['company_id'=>$st_company_id])
-		->group('item_id')
-		->autoFields(true)
-		->where($where)
-		
-		->order(['Items.name'=>'ASC']);
-		$results =$query->toArray();
 		
 		//pr($results); exit;
 		
@@ -551,15 +520,7 @@ class ItemLedgersController extends AppController
 					
 				}
 			}
-		}else{ 
-			foreach($results as $result){
-				
-					$item_stocks[$result->item_id] = $result->total_in - $result->total_out;
-					$items_names[$result->item_id] = $result->item->name;
-					$items_unit_names[$result->item_id] = $result->item->unit->name;
-				
-				}
-			}
+		}
 		
 		//pr($item_stocks); exit;
 		
@@ -575,76 +536,47 @@ class ItemLedgersController extends AppController
 					@$in_qty[$ItemLedger->item_id] += $ItemLedger->quantity;
 				}
 		}
-		
-		
-		$where=[];
-		if(!empty($item_name)){ 
-			$where['Items.id']=$item_name;
-			
-		}
-		if(!empty($item_category)){
-			$where['Items.item_category_id']=$item_category;
-		}
-		if(!empty($item_group)){
-			$where['Items.item_group_id ']=$item_group;
-		}
-		if(!empty($item_sub_group)){
-			$where['Items.item_sub_group_id ']=$item_sub_group;
-		}
-		if(!empty($search_date)){
-			$search_date=date("Y-m-d",strtotime($search_date));
-            $where1['processed_on <=']=$search_date;
-		} 
+
 		 $ItemDatas=[];
 		 $ItemUnits=[]; 
 
 		 $Items =$this->ItemLedgers->Items->find()->contain(['Units','ItemCompanies'=>function($p) use($st_company_id){
 						return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 		}])->where($where);
-		
-		$itemSerialNumberStatus=[];
-		foreach($Items as $Item){ 
-			$ItemLedgersexists = $this->ItemLedgers->exists(['item_id' => $Item->id,'company_id'=>$st_company_id]);
-			$itemSerialNumberStatus[$Item->id]=@$Item->item_companies[0]->serial_number_enable;
-			
-			if(empty($ItemLedgersexists)){
-				$ItemDatas[$Item->id]=$Item->name;
-				$ItemUnits[$Item->id]=$Item->unit->name;
-			}
-		}
-	
+
 		//Stock valuation Start// disable   fhgdf
 		$stock=[];  $sumValue=[];
 		foreach($Items as $Item){
-			$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
-			//pr($StockLedgers->toArray());
-			foreach($StockLedgers as $StockLedger){ 
-				if($StockLedger->in_out=='In'){
-					if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-						for($inc=0;$inc<$StockLedger->quantity;$inc++){
-							$stock[$Item->id][]=$StockLedger->rate;
+			if($Item->item_companies[0]->serial_number_enable==0){
+				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC'])->where($where1);
+
+				foreach($StockLedgers as $StockLedger){ 
+					if($StockLedger->in_out=='In'){
+						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								$stock[$Item->id][]=$StockLedger->rate;
+							}
 						}
 					}
 				}
-			}
-			foreach($StockLedgers as $StockLedger){
-				if($StockLedger->in_out=='Out'){
-					if(sizeof(@$stock[$Item->id])>0){
-						$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+				foreach($StockLedgers as $StockLedger){
+					if($StockLedger->in_out=='Out'){
+						if(sizeof(@$stock[$Item->id])>0){
+							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+						}
 					}
 				}
-			}
-			//echo "hello"; exit;
-			if(sizeof(@$stock[$Item->id]) > 0){ 
-				foreach(@$stock[$Item->id] as $stockRate){
-					@$sumValue[$Item->id]+=@$stockRate;
+				//echo "hello"; exit;
+				if(sizeof(@$stock[$Item->id]) > 0){ 
+					foreach(@$stock[$Item->id] as $stockRate){
+						@$sumValue[$Item->id]+=@$stockRate;
+					}
 				}
-			}
+		}else{
+			
 		}
-		/////fdgdfgdrc disavble
-//	pr($stock);
-	//exit;
-
+	}
+	
 	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
 	
 	//pr($ItemSerialNumbers->toArray()); exit;
@@ -655,9 +587,11 @@ class ItemLedgersController extends AppController
 		if(@$ItemSerialNumber->grn_id > 0){ 
 			$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 			if($outExist == 0){
-				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
+				$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->where($where1)->first();
+				if($ItemLedgerData){
 				@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 				@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+				}
 			}
 			
 		}
