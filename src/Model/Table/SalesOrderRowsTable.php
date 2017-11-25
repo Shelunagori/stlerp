@@ -63,7 +63,10 @@ class SalesOrderRowsTable extends Table
             'foreignKey' => 'sales_order_row_id',
             'joinType' => 'LEFT'
         ]);
-		
+		$this->belongsTo('QuotationRows', [
+            'foreignKey' => 'quotation_row_id',
+            'joinType' => 'INNER'
+        ]);
 		
     }
 

@@ -45,6 +45,10 @@ class QuotationRowsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		$this->hasMany('SalesOrderRows', [
+            'foreignKey' => 'quotation_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
