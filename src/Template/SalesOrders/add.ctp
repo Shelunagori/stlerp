@@ -862,7 +862,7 @@ $(document).ready(function() {
 					});
 			$(this).find("td:nth-child(5) input").attr({name:"sales_order_rows["+i+"][amount]", id:"sales_order_rows-"+i+"-amount"}).rules("add", "required");
 			$(this).find("td:nth-child(6) select").attr("name","sales_order_rows["+i+"][excise_duty]");
-			$(this).find("td:nth-child(7) select").select2().attr("name","sales_order_rows["+i+"][sale_tax_id]");
+			$(this).find("td:nth-child(7) select").select2().attr("name","sales_order_rows["+i+"][sale_tax_id]").rules('add', {required: true});
 			$(this).find("td:nth-child(7) input:eq( 0 )").attr("name","sales_order_rows["+i+"][sale_tax_description]");
 			var description=$(this).find("td:nth-child(7) select option:selected").attr("description");
 			$(this).find("td:nth-child(7) input:eq( 0 )").val(description);
