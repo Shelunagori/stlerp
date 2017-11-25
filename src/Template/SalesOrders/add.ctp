@@ -1067,7 +1067,7 @@ $(document).ready(function() {
 		last_three_rates(popup_id,item_id);
 	});
 	
-	$("select.item_box").each(function(){
+	$("select.item_box").each(function(){ 
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 	

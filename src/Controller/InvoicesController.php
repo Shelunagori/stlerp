@@ -89,18 +89,23 @@ class InvoicesController extends AppController
 				->where(['Invoices.company_id'=>$st_company_id])
 				->where($where);
 		}
-		else if($inventory_voucher=='true'){  
+		else if($inventory_voucher=='true'){
 			$invoices=[]; 
-			$invoices=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+			$invoices=$this->Invoices->find()->where($where)->contain(['Ivs','Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
 				return $q->where(['source !='=>'Purchessed']);
 				},'SalesOrderRows'=>function ($q) {
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
 				}
 				]])
 				->where(['Invoices.company_id'=>$st_company_id])
-				
 				->order(['Invoices.id' => 'DESC']);
-				//pr($invoices->toArray()); exit;
+				
+				foreach($invoices as $invoice){
+					if($invoice->iv){
+						$current_rows[]=$invoice->iv->invoice_id;
+					}
+				} 
+				
 		}else if($sales_return=='true'){
 			
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
@@ -109,7 +114,7 @@ class InvoicesController extends AppController
 		} 
 		
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
-		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url'));
+		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url','current_rows'));
 		
         $this->set('_serialize', ['invoices']);
 		$this->set(compact('url'));
