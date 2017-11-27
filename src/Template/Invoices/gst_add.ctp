@@ -262,7 +262,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->id,'readonly']); ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item_id,'readonly']); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item_id,'readonly','class'=>'item_ids']); 
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$sales_order_rows->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
 								<?php echo $sales_order_rows->item->name; ?>
 							</td>
 							<td>
@@ -723,6 +724,29 @@ $(document).ready(function() {
 		rename_rows();   calculate_total();
     });
 	
+	
+	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					rename_rows(); 
+					calculate_total();
+				}
+		}
+		
+    });	
+	
+	
 	rename_rows();
 	function rename_rows(){
 		var list = new Array();
@@ -734,8 +758,8 @@ $(document).ready(function() {
 			if(val){ 
 				i++;
 				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
-				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
-				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
+				$(this).find('td:nth-child(2) input.item_ids').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(3) input.quantity').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");
 				$(this).find('td:nth-child(6) input').attr("name","invoice_rows["+val+"][discount_percentage]").removeAttr("readonly").attr("id","q"+val).attr("id","invoice_rows-"+val+"-discount_percentage");
@@ -760,8 +784,8 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				var OriginalQty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				Quantity = OriginalQty.split('.'); qty=Quantity[0];
+				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
+				
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){

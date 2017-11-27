@@ -285,7 +285,8 @@ class SaleReturnsController extends AppController
 									'status' => 'In',
 									'sales_return_id' => $saleReturn->id,
 									'sales_return_row_id' => $sale_return_row->id,
-									'company_id'=>$st_company_id
+									'company_id'=>$st_company_id,
+									'transaction_date'=>$saleReturn->transaction_date
 									]);
 								$query->execute();  	
 					}
@@ -1100,7 +1101,7 @@ class SaleReturnsController extends AppController
 			$saleReturn->sale_return_status="Yes";
 			$saleReturn->transaction_date=date("Y-m-d",strtotime($saleReturn->transaction_date)); 
 			
-		//pr($saleReturn); exit;
+		
 
 			$ref_rows=@$saleReturn->ref_rows;
 			if ($this->SaleReturns->save($saleReturn)) {
@@ -1180,15 +1181,15 @@ class SaleReturnsController extends AppController
 						foreach($sale_return_row->serial_numbers as $serial_nos){
 							$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial_nos);
 							$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','invoice_row_id'])
+										$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','transaction_date'])
 										->values([
-										'name' => $serial_data,
+										'name' => $serial_data->name,
 										'item_id' => $sale_return_row->item_id,
 										'status' => 'In',
 										'sales_return_id' => $saleReturn->id,
 										'sales_return_row_id' => $sale_return_row->id,
-										'invoice_row_id' => $sale_return_row->invoice_row_id,
-										'company_id'=>$st_company_id
+										'company_id'=>$st_company_id,
+										'transaction_date'=>$saleReturn->transaction_date
 										]);
 									$query->execute();  	
 						}	

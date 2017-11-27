@@ -317,7 +317,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td colspan="6">
 							
-								<?php echo '/SerialNumbers/getSerialNumberSalesReturnEditListText?item_id='.$invoice_row->item_id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id].'&sale_id='.@$sale_return_id[$invoice_row->id]; ?>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditListText?item_id='.$invoice_row->item_id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id].'&sale_id='.@$sale_return_id[$invoice_row->id]); ?>
 							</td>
 							
 							<td></td>
@@ -650,8 +650,23 @@ $(document).ready(function() {
 
 	});
 	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
-		rename_rows(); calculate_total();
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					rename_rows(); 
+					calculate_total();
+				}
+		}
+		
     });
 	$('.discount_percentage').die().live("keyup",function() {
 		var qty =$(this).val();
@@ -719,8 +734,8 @@ $(document).ready(function() {
 				i++;
 				$(this).find('td:nth-child(1) input.Invoicerowid').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
 				$(this).find('td:nth-child(1) input.hiddenid').attr("name","sale_return_rows["+row_no+"][id]").attr("id","sale_return_rows-"+row_no+"-id");
-				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+val+"][item_id]").attr("id","sale_return_rows-"+val+"-item_id").rules("add", "required");
-				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+val+"][quantity]").attr("id","q"+val).removeAttr("readonly").attr("id","sale_return_rows-"+val+"-quantity").rules("add", "required");
+				$(this).find('td:nth-child(2) input.item_ids').attr("name","sale_return_rows["+val+"][item_id]").attr("id","sale_return_rows-"+val+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(3) input.quantity').attr("name","sale_return_rows["+val+"][quantity]").attr("id","q"+val).removeAttr("readonly").attr("id","sale_return_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+val+"][rate]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+val+"][amount]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-amount").rules("add", "required");
 				$(this).find('td:nth-child(6) input').attr("name","sale_return_rows["+val+"][discount_percentage]").attr("id","q"+val).attr({readonly:"readonly"}).attr("id","sale_return_rows-"+val+"-discount_percentage");
@@ -747,7 +762,7 @@ $(document).ready(function() {
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
 				
 				var count_srtext = parseFloat($('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(3) input.sr_no').length);
-				
+				$(this).find('td:nth-child(3) input.quantity').attr('min',count_srtext);
 				var qty=parseFloat($(this).find('td:nth-child(3) input.quantity').val());
 				
 				var qtty = parseFloat(qty)-parseFloat(count_srtext);
@@ -761,7 +776,7 @@ $(document).ready(function() {
 						var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 					
 						if(serial_l>0){ 	
-							$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+							$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 									required: false,
 									minlength: qtty,
 									maxlength: qtty,
@@ -781,7 +796,7 @@ $(document).ready(function() {
 					
 					if(serial_l>0){ 	
 					
-						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
 							minlength: qtty,
 							maxlength: qtty,

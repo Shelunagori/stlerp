@@ -234,10 +234,10 @@ class SerialNumbersController extends AppController
 		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In','sales_return_row_id'=>$sale_row_id]);
 		
 		foreach($serialnumbers as $serialnumber){ 
-			pr($serialnumber);
+			
 			$values[]=$serialnumber->name;
 		}
-		exit;
+		
 		$salereturn = $this->SerialNumbers->SaleReturnRows->SaleReturns->get($sale_id, [
 				'contain' => ['SaleReturnRows'=>['SerialNumbers']
 					]
