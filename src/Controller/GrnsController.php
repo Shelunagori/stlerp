@@ -578,7 +578,7 @@ class GrnsController extends AppController
 									'grn_id' => $grn->id,
 									'grn_row_id' => $grn_row->id,
 									'company_id'=>$st_company_id,
-									'transaction_date'=>$transaction_date
+									'transaction_date'=>$grn->transaction_date
 									]);
 									$query->execute();
 							}
