@@ -106,7 +106,9 @@
 							$total_mi_qty=@$mi_qty[$data['item_id']]; 
 							$open_mi_qty=$total_mi_qty-$total_po_qty;
 							
-							$total_indent=$Current_Stock-@$open_so_qty+$open_po_qty-$open_qo_qty+$open_mi_qty;
+							$open_jc_qty=@$job_card_qty[$data['item_id']]; 
+						//	pr($total_jc_qty); 
+							$total_indent=$Current_Stock-@$open_so_qty-$open_jc_qty+$open_po_qty-$open_qo_qty+$open_mi_qty;
 							$qty="";
 							if($stock=="Positive" && $total_indent < 0){ //exit; ?>
 								<tr class="tr1" row_no='<?php echo @$i; ?>'>
@@ -117,7 +119,9 @@
 									<td style="text-align:center"><?php if($open_so_qty > 0){ 
 										echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
 									 }else{ echo "-"; } ?></td>
-									<td style="text-align:center"><?php echo "-"; ?></td>
+									<td style="text-align:center"><?php if($total_jc_qty > 0){ 
+										echo $$total_jc_qty; 
+									 }else{ echo "-"; } ?></td>
 									<td style="text-align:center"><?php if($open_po_qty > 0){ 
 										echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 
 									 }else{ echo "-"; } ?></td>
@@ -170,7 +174,9 @@
 										<td style="text-align:center"><?php if($open_so_qty > 0){ 
 											echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
 										 }else{ echo "-"; } ?></td>
-										<td style="text-align:center"><?php echo "-"; ?></td>
+										<td style="text-align:center"><?php if($open_jc_qty > 0){ 
+											echo $this->Html->link(@$open_jc_qty ,'/ItemLedgers/material_indent?status=jobcard&id='.@$job_id[$item_id],['target' => '_blank']); 
+										 }else{ echo "-"; } ?></td>
 										<td style="text-align:center"><?php if($open_po_qty > 0){ 
 											echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 
 										 }else{ echo "-"; } ?></td>

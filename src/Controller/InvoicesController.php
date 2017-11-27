@@ -90,8 +90,8 @@ class InvoicesController extends AppController
 				->where($where);
 		}
 		else if($inventory_voucher=='true'){
-			$invoices=[]; 
-			$invoices=$this->Invoices->find()->where($where)->contain(['Ivs','Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+			$invoices=[]; $current_rows=[];
+			$invoices=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
 				return $q->where(['source !='=>'Purchessed']);
 				},'SalesOrderRows'=>function ($q) {
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
@@ -105,7 +105,7 @@ class InvoicesController extends AppController
 						$current_rows[]=$invoice->iv->invoice_id;
 					}
 				} 
-				
+				//pr($current_rows); exit;
 		}else if($sales_return=='true'){
 			
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);

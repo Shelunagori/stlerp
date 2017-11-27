@@ -484,7 +484,37 @@ class ItemLedgersController extends AppController
 		
 		//pr($results); exit;
 		
+		$item_stocks =[];$items_names =[];
+		$query = $this->ItemLedgers->find()->where(['ItemLedgers.processed_on >='=> date("Y-m-d",strtotime($from_date)), 'ItemLedgers.processed_on <=' =>date("Y-m-d",strtotime($to_date))]);
+				//pr($query->toArray()); exit;
+		$totalInCase = $query->newExpr()
+			->addCase(
+				$query->newExpr()->add(['in_out' => 'In']),
+				$query->newExpr()->add(['quantity']),
+				'integer'
+			);
+		$totalOutCase = $query->newExpr()
+			->addCase(
+				$query->newExpr()->add(['in_out' => 'Out']),
+				$query->newExpr()->add(['quantity']),
+				'integer'
+			);
+
+			
+		$query->select([
+			'total_in' => $query->func()->sum($totalInCase),
+			'total_out' => $query->func()->sum($totalOutCase),'id','item_id'
+		])
+		->contain(['Items'=>function ($q) use($where) { 
+				return $q->where($where)->contain(['Units']);
+				}])
+		->where(['company_id'=>$st_company_id])
+		->group('item_id')
+		->autoFields(true)
+		->where($where)
 		
+		->order(['Items.name'=>'ASC']);
+		$results =$query->toArray();
 		if($stock == "Negative"){
 			foreach($results as $result){
 				if($result->total_in - $result->total_out < 0){
@@ -520,9 +550,17 @@ class ItemLedgersController extends AppController
 					
 				}
 			}
-		}
+		}else{
+			foreach($results as $result){
+				
+					$item_stocks[$result->item_id] = $result->total_in - $result->total_out;
+					$items_names[$result->item_id] = $result->item->name;
+					$items_unit_names[$result->item_id] = $result->item->unit->name;
+				
+				}
+			}
 		
-		//pr($item_stocks); exit;
+	//	pr($item_stocks); exit;
 		
 		$ItemLedgers = $this->ItemLedgers->find()->contain(['Items'=>function ($q) use($where){
 			return $q->where($where);
@@ -544,12 +582,13 @@ class ItemLedgersController extends AppController
 						return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 		}])->where($where);
 
+		//pr($Items->toArray());
+	
 		//Stock valuation Start// disable   fhgdf
-		$stock=[];  $sumValue=[];
-		foreach($Items as $Item){
-			if($Item->item_companies[0]->serial_number_enable==0){
+		$stock=[];  $sumValue=[]; $itemSerialRate=[]; $itemSerialQuantity=[];
+		foreach($Items as $Item){ //pr(@$Item->item_companies[0]->serial_number_enable);
+			if(@$Item->item_companies[0]->serial_number_enable==0){ 
 				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC'])->where($where1);
-
 				foreach($StockLedgers as $StockLedger){ 
 					if($StockLedger->in_out=='In'){
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
@@ -566,20 +605,19 @@ class ItemLedgersController extends AppController
 						}
 					}
 				}
-				//echo "hello"; exit;
 				if(sizeof(@$stock[$Item->id]) > 0){ 
 					foreach(@$stock[$Item->id] as $stockRate){
 						@$sumValue[$Item->id]+=@$stockRate;
 					}
 				}
-		}else{
+		}else if(@$Item->item_companies[0]->serial_number_enable==1){ 
 			
 		}
 	}
 	
 	$ItemSerialNumbers =$this->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
-	
-	//pr($ItemSerialNumbers->toArray()); exit;
+	/* pr($stock); item_stocks
+	 exit; */
 
 	
 	$itemSerialRate=[]; $itemSerialQuantity=[]; $i=1;
@@ -950,6 +988,51 @@ class ItemLedgersController extends AppController
 			}
 		}
 //exit;
+	
+	//$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'=>['SalesOrderRows'=>['InvoiceRows']]])->where($where2)->toArray();
+	$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'])->where($where2)->toArray();
+	
+	$job_card_qty=[];
+	$job_id=[];
+	
+	foreach($JobCards as $JobCard){
+		foreach($JobCard->job_card_rows as $job_card_row){
+			$sales_order_row_id=$job_card_row->sales_order_row_id;
+			$SalesOrderRows = $this->ItemLedgers->SalesOrders->SalesOrderRows->get($job_card_row->sales_order_row_id);
+			//$SalesOrderRows->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+			//$InvoiceRows = $this->ItemLedgers->InvoiceRows->find()->where(['InvoiceRows.sales_order_row_id'=>$job_card_row->sales_order_row_id]);
+			$Invoices = $this->ItemLedgers->SalesOrders->Invoices->find()->contain(['InvoiceRows' => function($q) use($sales_order_row_id) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id')->where(['InvoiceRows.sales_order_row_id'=>$sales_order_row_id]);
+					},'Ivs'])->toArray();
+			
+			
+			foreach($Invoices as $Invoice){
+				foreach($Invoice->invoice_rows as $invoice_row){
+					$Invoices_quantity[$invoice_row->sales_order_row_id]=$invoice_row->total_qty;
+				}
+			}
+			
+			if($Invoices_quantity[$invoice_row->sales_order_row_id]){
+				$invoice_qty=@$SalesOrderRows->quantity-@$Invoices_quantity[@$sales_order_row_id];
+			}else{
+				$invoice_qty=@$SalesOrderRows->quantity;
+			}
+			
+			$SalesOrderQty=$SalesOrderRows->quantity;
+			$job_card_Qt=$job_card_row->quantity;
+			$jciq=(@$invoice_qty*@$job_card_Qt)/@$SalesOrderQty;
+			@$job_card_qty[@$job_card_row->item_id]+=$jciq;
+			if(@$jciq > 0){
+				@$job_id[$job_card_row->item_id].=@$job_card_row->job_card_id.',';
+			}
+		}
+	}
+	/* pr($job_card_qty);
+	pr($job_id);
+ exit; */
+ 
+
+
 		
 	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows','Invoices'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
@@ -1144,7 +1227,7 @@ class ItemLedgersController extends AppController
 		$Items = $this->ItemLedgers->Items->find('list')->order(['Items.name' => 'ASC']);
 		$Companies = $this->ItemLedgers->Companies->find('list')->order(['Companies.name' => 'ASC']);
 			
-		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock','invoice_qty','sales_order_qty','sales_id','purchase_order_qty','grn_qty','purchase_id','qotation_id','qo_qty','so_qty','mi_qty','po_qty','mi_id'));
+		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock','invoice_qty','sales_order_qty','sales_id','purchase_order_qty','grn_qty','purchase_id','qotation_id','qo_qty','so_qty','mi_qty','po_qty','mi_id','job_id','job_card_qty'));
 			
 	 }
 	
