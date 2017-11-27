@@ -551,7 +551,7 @@ class GrnsController extends AppController
             $grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->edited_on = date("Y-m-d"); 
 			$grn->edited_by=$this->viewVars['s_employee_id'];
-			//pr($grn->transaction_date); exit;
+			$transaction_date=$grn->transaction_date;
 			unset($grn->count_serial_no);
 			unset($grn->q);
 			//pr($grn); exit;
