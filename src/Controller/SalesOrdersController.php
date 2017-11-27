@@ -419,7 +419,7 @@ class SalesOrdersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		
+		$status = $status_close=$this->request->query('status');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$Company = $this->SalesOrders->Companies->get($st_company_id);
@@ -565,7 +565,7 @@ class SalesOrdersController extends AppController
 							}
 						}
 					}
-				} 
+				}  
 				else if($status_close=="close"){
 					$query = $this->SalesOrders->Quotations->query();
 					$query->update()
@@ -667,7 +667,27 @@ class SalesOrdersController extends AppController
 				@$MaxQty[@$quotation_row->id] = @$QuotaionQty[@$quotation_row->id]-@$totalSalesOrderQty[@$quotation_row->id];
 			}
 		}
-		
+		if(!empty($status))
+		{
+			$totalSalesOrderQty =[];
+				$Quotation = $this->SalesOrders->Quotations->get($salesOrder->quotation_id, [
+				 'contain' => ['QuotationRows'=>['SalesOrderRows'],'SalesOrders' => ['SalesOrderRows']]
+				]);
+				
+				if(!empty($Quotation->quotation_rows))
+				{
+					foreach($Quotation->quotation_rows as $quotation_row)
+					{
+						if(!empty($quotation_row->sales_order_rows))
+						{
+							foreach($quotation_row->sales_order_rows as $sales_order_row)
+							{
+								@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+							}
+						}
+					}
+				}
+		}
         $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','sales_orders_qty'));
         $this->set('_serialize', ['salesOrder']);
     }
