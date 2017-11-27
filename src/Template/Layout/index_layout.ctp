@@ -672,6 +672,7 @@ select
 								<?php echo '<li>'.$this->Html->link( 'Overdue Report for Supplier', '/Customers/Breakup-Range-Overdue?request=vendor' ).'</li>';?>
 								<hr/>
 								<?php echo '<li>'.$this->Html->link( 'Outstandings for Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>';?>
+								<?php echo '<li>'.$this->Html->link( 'Outstandings for Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>';?>
 							</ul>
 						</li>
 						<?php } ?>

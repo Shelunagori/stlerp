@@ -554,7 +554,7 @@ class PurchaseReturnsController extends AppController
 					 foreach($item_serial_no as $serial){
 							$serial_data=$this->PurchaseReturns->SerialNumbers->get($serial);
 							$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id','parent_id'])
+										$query->insert(['name', 'item_id', 'status', 'purchase_return_row_id','purchse_return_id','company_id','transaction_date','parent_id'])
 										->values([
 										'name' => $serial_data->name,
 										'item_id' => $purchase_return_row->item_id,
@@ -562,6 +562,7 @@ class PurchaseReturnsController extends AppController
 										'purchase_return_row_id' => $purchase_return_row->id,
 										'purchse_return_id' => $purchaseReturn->id,
 										'company_id'=>$st_company_id,
+										'transaction_date'=>$purchaseReturn->transaction_date,
 										'parent_id'=>$serial
 										]);
 									$query->execute();  
@@ -800,38 +801,9 @@ class PurchaseReturnsController extends AppController
 				}
 			}
 		 }
-		// pr($options); exit;
-		// pr($invoiceBooking->toArray()); exit;	
-		/*$sales_orders_qty=[];
-			foreach($SalesOrders->invoices as $invoices){ 
-				foreach($invoices->invoice_rows as $invoice_row){ 
-					$sales_orders_qty[@$invoice_row->sales_order_row_id]=@$sales_orders_qty[$invoice_row->sales_order_row_id]+$invoice_row->total_qty;
-				}
-			} */
-				
 		
-	//	pr($invoiceBooking->toArray()); exit;
-		/* $PurchaseReturnQty=[];
-		$remainingQty=[];
-        foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
-		{ 
-			if(!empty($invoice_booking_row->purchase_return_rows))
-			{
-				foreach($invoice_booking_row->purchase_return_rows as $purchase_return_row)
-				{
-					$PurchaseReturnQty[$purchase_return_row->invoice_booking_row_id]=$purchase_return_row->totalQty;
-					$remainingQty[$purchase_return_row->invoice_booking_row_id]=$invoice_booking_row->quantity-$purchase_return_row->totalQty;
-				}
-			}
-            else
-			{
-				$remainingQty[$invoice_booking_row->id]=$invoice_booking_row->quantity;
-			}				
-		}
-		pr($remainingQty); exit; */
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();	
 			$vendor_ledger_acc_id=$v_LedgerAccount->id;
-		//pr($invoiceBooking);exit;
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseReturns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		 
@@ -933,7 +905,7 @@ class PurchaseReturnsController extends AppController
 					$ledger->voucher_id = $purchaseReturn->id;
 					$ledger->voucher_source = 'Purchase Return';
 					$ledger->company_id = $purchaseReturn->company_id;
-					$ledger->transaction_date = $purchaseReturn->supplier_date; 
+					$ledger->transaction_date = $purchaseReturn->transaction_date; 
 					$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->sgst > 0){
@@ -945,7 +917,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->supplier_date;
+						$ledger->transaction_date = $purchaseReturn->transaction_date;
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->igst > 0){
@@ -957,7 +929,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->supplier_date;
+						$ledger->transaction_date = $purchaseReturn->transaction_date;
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 								
@@ -977,7 +949,7 @@ class PurchaseReturnsController extends AppController
 					foreach($purchase_return_row->serial_numbers as $serial_nos){
 						$serial_data=$this->PurchaseReturns->SerialNumbers->get($serial_nos);
 						$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'purchse_return_id','purchase_return_row_id','company_id','parent_id'])
+									$query->insert(['name', 'item_id', 'status', 'purchse_return_id','purchase_return_row_id','company_id','transaction_date','parent_id'])
 									->values([
 									'name' => $serial_data->name,
 									'item_id' => $purchase_return_row->item_id,
@@ -985,6 +957,7 @@ class PurchaseReturnsController extends AppController
 									'purchse_return_id' => $purchaseReturn->id,
 									'purchase_return_row_id' => $purchase_return_row->id,
 									'company_id'=>$st_company_id,
+									'transaction_date'=>$purchaseReturn->transaction_date,
 									'parent_id'=>$serial_nos
 									]);
 								$query->execute();  	

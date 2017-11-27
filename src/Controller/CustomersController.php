@@ -326,8 +326,8 @@ class CustomersController extends AppController
 		
 		
 		$range_data=[];
-		if($request == 'vendor'){
-				if ($this->request->is(['post'])) {
+		if($request == 'vendor'){ 
+			if ($this->request->is(['post'])) {
 			$range_data['range0']=$this->request->data['range_0']; 
 			$range_data['range1']=$this->request->data['range_1']; 
 			$range_data['range2']=$this->request->data['range_2']; 
@@ -337,8 +337,11 @@ class CustomersController extends AppController
 			$range_data['range6']=$this->request->data['range_6']; 
 			$range_data['range7']=$this->request->data['range_7']; 
 			$range_data['tdate']=$this->request->data['to'];
-			$to=json_encode($range_data);  
-			$this->redirect(['controller'=>'Vendors','action' => 'OverDueReport/'.$to.'']);
+			$to=json_encode($range_data); 
+			if($request == 'vendor'){
+				$this->redirect(['controller'=>'Vendors','action' => 'OutstandingReportVendor/'.$to.'']);
+			}
+			//$this->redirect(['controller'=>'Vendors','action' => 'OverDueReport/'.$to.'']);
 			//$this->redirect(['controller'=>'Vendors','action' => 'exportExcel/'.$to.'']);
 		 }
 		}

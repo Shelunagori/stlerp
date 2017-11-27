@@ -91,7 +91,7 @@ class InvoicesController extends AppController
 		}
 		else if($inventory_voucher=='true'){
 			$invoices=[];
-			$invoices=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+			$invoice1=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
 				return $q->where(['source !='=>'Purchessed']);
 				},'SalesOrderRows'=>function ($q) {
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
@@ -100,15 +100,15 @@ class InvoicesController extends AppController
 				->where(['Invoices.company_id'=>$st_company_id])
 				->order(['Invoices.id' => 'DESC']);
 				
-				foreach($invoices as $invoice){
-					if(!$invoice->iv){ // pr($invoice);
-						//$invoices[]=$invoice;
+				foreach($invoice1 as $invoice){
+					$AccountGroupsexists = $this->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
+					if(!$AccountGroupsexists){ // pr($invoice);
+						$invoices[]=$invoice;
 					}
 				} 
 				
 				
-				//pr($invoices->toArray()); 
-			//	exit;
+				//pr($invoices);exit;
 		}else if($sales_return=='true'){
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
