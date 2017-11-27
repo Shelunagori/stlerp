@@ -409,8 +409,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						<label class="col-md-6 control-label">Credit Limits</label>
 						<div class="col-md-6" id="due">
 							<?php echo $this->Form->input('credit_limit', ['label' => false,'class' => 'form-control input-md','placeholder'=>'','readonly','value' => @$sales_order->customer->credit_limit]); ?><br/>
-							<a href="#" role="button" id="update_credit_limit">Update Credit Limit</a>
-							<span id="update_credit_limit_wait"></span>
+							<!--<a href="#" role="button" id="update_credit_limit">Update Credit Limit</a>
+							<span id="update_credit_limit_wait"></span>-->
 						</div>
 					</div>
 				</div>

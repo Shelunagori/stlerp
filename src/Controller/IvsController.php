@@ -252,7 +252,7 @@ class IvsController extends AppController
 					return $q->where(['company_id'=>$st_company_id]);
 				}]
 			]);
-
+			$to_date = date('Y-m-d');
 			$unit_rate=0;
 			if($Items->item_companies[0]->serial_number_enable == '0'){   
 				$stock=[];  $sumValue=0;
@@ -291,34 +291,53 @@ class IvsController extends AppController
 				
 				
 			}else{
-				$ItemSerialNumbers =$this->Ivs->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In",'SerialNumbers.item_id'=>$item_id]);
 				
+				$ItemSerialNumbers=$this->Ivs->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Items->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
-				foreach($ItemSerialNumbers as $ItemSerialNumber){
-					if(@$ItemSerialNumber->grn_id > 0){
-						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialQuantity+=1;
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-					}
-					else if(@$ItemSerialNumber->is_opening_balance == 'Yes'){
-						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();  
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity+=1;
-					}else if(@$ItemSerialNumber->sale_return_id > 0){
-						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity+=1;
-					}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
-						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity+=1;
+					foreach($ItemSerialNumbers as $ItemSerialNumber){		
+						if(@$ItemSerialNumber->grn_id > 0){ 
+							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
 					}
 				}
-				if($itemSerialRate > 0 && $itemSerialQuantity > 0){
-					$unit_rate = @$itemSerialRate/@$itemSerialQuantity;
+				if(@$ItemSerialNumber->sale_return_id > 0){ 
+				$outExist = $this->Ivs->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}
+				
+				if(@$ItemSerialNumber->itv_id > 0){
+				$outExist = $this->Ivs->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
+					if($outExist == 0){  
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
 				}
 				
 			}
+			
+			if($itemSerialRate > 0 && $itemSerialQuantity > 0){
+					$unit_rate = @$itemSerialRate/@$itemSerialQuantity;
+				}
+		}	
+				
+				
 			return $unit_rate; 
 		//exit;	
 	}
@@ -397,7 +416,7 @@ class IvsController extends AppController
 						//$itemledgers->iv_row_item_id=$iv_row_item['id'];
 						$this->Ivs->ItemLedgers->save($itemledgers);	
 					}  
-					$unit_rate_item_in = $unit_rate_In/$iv_row->quantity; 
+					/* $unit_rate_item_in = $unit_rate_In/$iv_row->quantity; 
 					
 					$itemledgersIN = $this->Ivs->ItemLedgers->newEntity();
 										
@@ -410,7 +429,7 @@ class IvsController extends AppController
 						$itemledgersIN->processed_on=$iv->transaction_date;
 						$itemledgersIN->company_id=$st_company_id;
 						$itemledgersIN->iv_row_id=$iv_row->id;
-						$this->Ivs->ItemLedgers->save($itemledgersIN);
+						$this->Ivs->ItemLedgers->save($itemledgersIN); */
 				}
 				
 				
