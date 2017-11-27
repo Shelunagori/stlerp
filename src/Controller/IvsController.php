@@ -132,6 +132,7 @@ class IvsController extends AppController
 			
 			$iv->invoice_id=$invoice_id;
 			$iv->company_id=$st_company_id	;
+			$transaction_date=$iv->transaction_date	;
 			$last_voucher_no=$this->Ivs->find()->select(['Ivs.voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
 				$iv->voucher_no=$last_voucher_no->voucher_no+1;
@@ -152,13 +153,14 @@ class IvsController extends AppController
 							 foreach($serial_numbers_iv_row as $sr_nos){
 								 
 							$query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id'])
+										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id','transaction_date'])
 										->values([
 										'name' => $sr_nos,
 										'item_id' => $iv_row->item_id,
 										'status' => 'In',
 										'iv_row_id' => $iv_row->id,
-										'company_id'=>$st_company_id
+										'company_id'=>$st_company_id,
+										'transaction_date'=>$transaction_date
 										]);
 									$query->execute(); 
 							} 
@@ -343,6 +345,8 @@ class IvsController extends AppController
 			'associated' => ['IvRows', 'IvRows.IvRowItems']
 			]);
 			$iv->created_by=$s_employee_id;
+			$iv->st_company_id=$st_company_id;
+			$transaction_date=$iv->transaction_date	;
             if ($this->Ivs->save($iv)) {  
 			//pr($iv);exit;
 			$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers']);
@@ -365,13 +369,14 @@ class IvsController extends AppController
 						foreach($serial_numbers_iv_row_item as $sr_nos_out){ pr($sr_nos_out);
 							$serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
 							 $query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id','parent_id'])
+										$query->insert(['name', 'item_id', 'status', 'iv_row_items','company_id','transaction_date','parent_id'])
 										->values([
 										'name' => $serial_data->name,
 										'item_id' => $iv_row_item['item_id'],
 										'status' => 'Out',
 										'iv_row_items' => $iv_row_item['id'],
 										'company_id'=>$st_company_id,
+										'transaction_date'=>$transaction_date,
 										'parent_id'=>$sr_nos_out
 										]);
 									$query->execute(); 

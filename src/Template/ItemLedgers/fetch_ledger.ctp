@@ -96,9 +96,9 @@
 		{ 
 			
 			$party_name='-';
-			$voucher_no='#'.str_pad($itemLedger->voucher_info->iv_number, 4, '0', STR_PAD_LEFT);
+			$voucher_no='#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT);
 
-			$url_path="/inventory-vouchers/view/".$itemLedger->voucher_info->id;
+			$url_path="/ivs/view/".$itemLedger->voucher_info->id;
 			$data=$itemLedger->voucher_info->transaction_date;
 			//pr($itemLedger);
 		} else if($source_model=='Inventory Return')

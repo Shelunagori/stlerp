@@ -424,14 +424,15 @@ class GrnsController extends AppController
 						foreach($grn_row->serial_numbers as $data)
 						{ 
 							$query = $this->Grns->SerialNumbers->query();
-							$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+							$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id','transaction_date'])
 							->values([
 							'name' => $data,
 							'item_id' => $grn_row->item_id,
 							'status' => 'In',
 							'grn_id' => $grn->id,
 							'grn_row_id' => $grn_row->id,
-							'company_id'=>$st_company_id
+							'company_id'=>$st_company_id,
+							'transaction_date'=>$transaction_date
 							]);
 							$query->execute();										
 						}
@@ -550,7 +551,7 @@ class GrnsController extends AppController
             $grn = $this->Grns->patchEntity($grn, $this->request->data);
 			$grn->edited_on = date("Y-m-d"); 
 			$grn->edited_by=$this->viewVars['s_employee_id'];
-			//pr($grn->transaction_date); exit;
+			$transaction_date=$grn->transaction_date;
 			unset($grn->count_serial_no);
 			unset($grn->q);
 			//pr($grn); exit;
@@ -569,14 +570,15 @@ class GrnsController extends AppController
 							foreach($grn_row->serial_number as $serial_number)
 							{ 
 						       $query = $this->Grns->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id'])
+									$query->insert(['name', 'item_id', 'status', 'grn_id','grn_row_id','company_id','transaction_date'])
 									->values([
 									'name' => $serial_number,
 									'item_id' => $grn_row->item_id,
 									'status' => 'In',
 									'grn_id' => $grn->id,
 									'grn_row_id' => $grn_row->id,
-									'company_id'=>$st_company_id
+									'company_id'=>$st_company_id,
+									'transaction_date'=>$grn->transaction_date
 									]);
 									$query->execute();
 							}

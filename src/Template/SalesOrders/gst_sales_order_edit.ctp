@@ -194,12 +194,12 @@
 						<td rowspan="2"><?= h($q) ?>
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', ['type' => 'hidden','value'=>$sales_order_rows->id]); ?>
 						</td>
-						<td>						
-							<div class="row">
-								<div class="col-md-10 padding-right-decrease">
+						<td width="460px">						
+							<div class="row" >
+								<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
 									<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q, $disable_class ]); ?>
 								</div>
-								<div class="col-md-1 padding-left-decrease" style="display:none">
+								<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
 									<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
 									<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;" popup_div_id="<?php echo $q; ?>"><div class="modal-backdrop fade in" ></div>
 										<div class="modal-dialog">
@@ -441,12 +441,26 @@
 	<tbody>
 		<tr class="tr1 preimp main_tr">
 			<td rowspan="2" width="10">0</td>
-			<td width="280px;">
+			<td width="460px;">
 				<div class="row">
-					<div class="col-md-10 padding-right-decrease">
+					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
 						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
-					
+					<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
+						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
+						<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+							<div class="modal-dialog">
+								<div class="modal-content">
+									<div class="modal-body" >
+										
+									</div>
+									<div class="modal-footer">
+										<button type="button" class="btn default closebtn">Close</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			</td>
 			<td width="100"><?php echo $this->Form->input('unit[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity']); ?></td>
@@ -1129,7 +1143,11 @@ $(document).ready(function() {
 	$('.closebtn2').on("click",function() { 
 		$("#myModal2").hide();
     });
-	
+	$("select.item_box").die().live("change",function(){ 
+		var popup_id=$(this).attr('popup_id');
+		var item_id=$(this).val();
+		last_three_rates(popup_id,item_id);
+	});
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
@@ -1139,7 +1157,7 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("select.item_box").die().live("change",function(){ 
+	$("select.item_box").die().live("change",function(){  
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		var obj = $(this);
@@ -1150,9 +1168,6 @@ $(document).ready(function() {
 		}else{
 			row_no.find('.rate').val('');
 		}
-		//row_no.find('.rate').attr({ min:response}).rules('remove');
-		
-		//row_no.find('.rate');
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
 		if(item_id){
@@ -1172,38 +1187,36 @@ $(document).ready(function() {
 		}else{
 			$(this).val();
 		}
-		//last_three_rates(popup_id,item_id);
-	});
+		last_three_rates(popup_id,item_id);
+	})
 	
-	function last_three_rates_onload(popup_id,item_id){
-			var customer_id=$('select[name="customer_id"]').val();
-			//$('.modal[popup_div_id='+popup_id+']').show();
-			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
-			if(customer_id){
-				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
-				url=url+'/'+item_id+'/'+customer_id,
-				$.ajax({
-					url: url
-				}).done(function(response) {
-					var values = parseFloat(response);
-					$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price "+values
-						}
-					});
-					$('div[popup_ajax_id='+popup_id+']').html(values.html);
+	function last_three_rates_onload(popup_id,item_id)
+	{ 
+		var customer_id=$('select[name="customer_id"]').val();  
+		//$('.modal[popup_div_id='+popup_id+']').show();
+		$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+		if(customer_id)
+		{
+			var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
+			url=url+'/'+item_id+'/'+customer_id,
+			$.ajax({
+				url: url,
+				dataType: 'json',
+			}).done(function(response) { 
+				$('div[popup_ajax_id='+popup_id+']').html(response.html);
+			});
+		}
+		else
+		{
+			$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
+					min: 0.01,
+					messages: {
+						min: "Rate can't be zero."
+					}
 				});
-			}else{
-				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
-						min: 0.01,
-						messages: {
-							min: "Rate can't be zero."
-						}
-					});
-				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
-				$(".item_box[popup_id="+popup_id+"]").val('').select2();
-			}
+			$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
+			$(".item_box[popup_id="+popup_id+"]").val('').select2();
+		}
 	}
 	function last_three_rates(popup_id,item_id){
 			var customer_id=$('select[name="customer_id"]').val();
@@ -1216,17 +1229,16 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					var values = parseFloat(response);
-					if(values>0){
-						$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
-							min: values,
+					if(response.minimum_selling_price>0){
+						$('input[r_popup_id='+popup_id+']').attr({ min:response.minimum_selling_price}).rules('add', {
+							min: response.minimum_selling_price,
 							messages: {
-								min: "Minimum selling price: "+values
+								min: "Minimum selling price: "+response.minimum_selling_price
 							}
 						});
 					}
 					else{
-						$('input[r_popup_id='+popup_id+']').attr({ min:values}).rules('add', {
+						$('input[r_popup_id='+popup_id+']').attr({ min:response.minimum_selling_price}).rules('add', {
 							min: 0.01,
 							messages: {
 								min: "Rate Can't be 0"
@@ -1234,7 +1246,7 @@ $(document).ready(function() {
 						});
 						
 					}
-					$('div[popup_ajax_id='+popup_id+']').html(values.html);
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				});
 			}else{
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
