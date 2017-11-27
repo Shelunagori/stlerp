@@ -220,6 +220,50 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['out_dropdown']);
 	}
 
+	public function getSerialNumberSalesReturnEditListText(){
+		$item_id=$this->request->query('item_id'); 
+		$sale_row_id=$this->request->query('sale_row_id'); 
+		$sale_id=$this->request->query('sale_id'); 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->viewBuilder()->layout('');
+		
+		$options=[];$values=[];
+		
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In','sales_return_row_id'=>$sale_row_id]);
+		
+		foreach($serialnumbers as $serialnumber){ 
+			pr($serialnumber);
+			$values[]=$serialnumber->name;
+		}
+		exit;
+		$salereturn = $this->SerialNumbers->SaleReturnRows->SaleReturns->get($sale_id, [
+				'contain' => ['SaleReturnRows'=>['SerialNumbers']
+					]
+		]);
+		
+		foreach($salereturn->sale_return_rows as $sale_return_row)
+		{
+			$serialNoDetail = $this->SerialNumbers->find()
+									 ->where(['sales_return_id'=>$salereturn->id,'sales_return_row_id'=>$sale_return_row->id,'company_id'=>$st_company_id]); 
+			if($serialNoDetail->count()>0)
+			{ 
+				foreach($serialNoDetail as $svalue)
+				{
+					$serialNoparentIdExist = $this->SerialNumbers->find()
+									 ->where(['parent_id'=>$svalue->id,'company_id'=>$st_company_id]);
+					if($serialNoparentIdExist->count()>0)
+					{
+						$parentSerialNo[$svalue->id] = $svalue->id;
+					}
+				}
+			}
+		}
+		
+		 $this->set(compact('options', 'values','serialnumbers','parentSerialNo'));
+        $this->set('_serialize', ['out_dropdown']);
+	}
 
 	public function getSerialNumberSalesReturnEditList(){
 		
@@ -227,34 +271,24 @@ class SerialNumbersController extends AppController
 		$in_row_id=$this->request->query('in_row_id'); 
 		$sale_row_id=$this->request->query('sale_row_id'); 
 		
+		
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		
 		$this->viewBuilder()->layout('');
 		
 		$options=[];$values=[];
-        $query = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id]);
-		$query->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'Out']);
-		$SerialNumbers_out = $query->toArray();
+		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'Out','company_id'=>$st_company_id,'invoice_row_id'=>$in_row_id]);
 		
-		$serialnumbers_in = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In'])->toArray();
-		
-		$serialnumbers_in1 = $this->SerialNumbers->find('list')->where(['SerialNumbers.company_id'=>$st_company_id,'item_id'=>$item_id,'invoice_row_id'=>$in_row_id,'status'=>'In','sales_return_row_id'=>$sale_row_id])->toArray();
-		
-		
-		foreach($serialnumbers_in1 as $sr_in) {
-			$values=$sr_in;
-			$options[]=['text' =>$sr_in, 'value' => $sr_in];
+		foreach($serialnumbers as $serialnumber){
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.name' => $serialnumber->name,'sales_return_row_id'=>$sale_row_id]);
+			if($outExist == 0){
+				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
+				
+			}
 		}
 		
-		$out_dropdown = array_diff($SerialNumbers_out,$serialnumbers_in);
-		
-		foreach($out_dropdown as $option){  	
-			$options[]=['text' =>$option, 'value' => $option];
-			
-		}
-		
-        $this->set(compact('options', 'values','out_dropdown'));
+        $this->set(compact('options', 'values','out_dropdown','parentSerialNo'));
         $this->set('_serialize', ['out_dropdown']);
 	}
 	

@@ -765,11 +765,7 @@ class GrnsController extends AppController
 				->set(['quantity' => $GrnRow->quantity-1])
 				->where(['item_id'=>$item_id,'grn_id'=>$grn_id,'id'=>$grn_row_id])
 				->execute();
-/* 			$query2 = $this->Grns->PurchaseOrderRows->query();
-			$query2->update()
-				->set(['processed_quantity' => $PurchaseOrderRow->processed_quantity-1])
-				->where(['item_id' => $item_id,'purchase_order_id'=>$PO->id])
-				->execute(); */
+
 						
 
 			$this->Grns->SerialNumbers->delete($SerialNumber);

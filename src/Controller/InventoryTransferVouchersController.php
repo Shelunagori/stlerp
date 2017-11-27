@@ -793,7 +793,6 @@ class InventoryTransferVouchersController extends AppController
 		if($ItemSerialNumberExist<1)
 		{
 			$InventoryTransferVoucherRowdetail = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->get($in_voucher_id);
-			pr($InventoryTransferVoucherRowdetail);
 			$this->InventoryTransferVouchers->InventoryTransferVoucherRows->delete($InventoryTransferVoucherRowdetail);
 		}
 		

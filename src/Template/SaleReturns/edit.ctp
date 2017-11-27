@@ -105,7 +105,7 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 					<?php 
 					$q=0; $p=1; 
 					foreach ($invoice->invoice_rows as $invoice_row){  
-						if(@$current_salesreturn_rows[@$invoice_row->id] != @$sales_return_qty[$invoice_row->id]){
+						
 					?>
 						<tr class="tr1" row_no="<?= h($q) ?>">
 							<td >
@@ -118,15 +118,19 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 							<td>
 								
 								<?php 
-								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id,'class'=>'item_ids']);
 								echo $invoice_row->item->name;
+								
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']);
+								echo @$invoice_row->item->name;
 								?>
 							</td>
 							<td>
 								<?php  
 								echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity'
 								,'value'=>@$current_salesreturn_rows[@$invoice_row->id],'max'=>@$sales_return_qty[$invoice_row->id]-@$existing_salesreturn_rows[$invoice_row->id]+@$current_salesreturn_rows[$invoice_row->id]]); 
-								?>
+								
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>@$current_salesreturn_rows[@$invoice_row->id],'class'=>'old_qty']); ?>
 							</td>
 							<td>
 								<?php echo $this->Form->input('rate', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly','placeholder' => 'Rate','step'=>0.01,'value'=>$invoice_row->rate]); ?>
@@ -156,13 +160,18 @@ if($transaction_date <  $start_date && !empty(@$saleReturn->transaction_date)) {
 						
 						<tr class="tr2" row_no="<?= h($q) ?>">
 							<td></td>
-							<td colspan="6">
-								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
+							<td colspan="3" class='td_append'>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.@$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
 							</td>
+							<td colspan="2">
+							
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditListText?item_id='.$invoice_row->item_id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id].'&sale_id='.@$sale_return_id[$invoice_row->invoice_id]); ?>
+							</td>
+							<td></td>
 						</tr>
 					<?php  } 
 					$q++; 
-					} } ?>
+					 } ?>
 				</tbody>
 			</table>
 			<table class="table tableitm" id="tbl2">
@@ -458,25 +467,55 @@ $(document).ready(function() {
 			if(val){
 				$(this).find('td:nth-child(1) input.Invoicerowid').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
 				$(this).find('td:nth-child(1) input.hiddenid').attr("name","sale_return_rows["+row_no+"][id]").attr("id","sale_return_rows-"+row_no+"-id");
-				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
-				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+row_no+"][quantity]").attr("id","sale_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
+				$(this).find('td:nth-child(2) input.item_ids').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(3) input.quantity').attr("name","sale_return_rows["+row_no+"][quantity]").attr("id","sale_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+row_no+"][rate]").attr("id","sale_return_rows-"+row_no+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
 				$(this).css('background-color','#fffcda');
-				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
-				if(serial_l>0){ 	
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
-						    required: true,
-							minlength: qty,
-							maxlength: qty,
-							messages: {
-								maxlength: "select serial number equal to quantity.",
-								minlength: "select serial number equal to quantity."
-							}
-					});
-					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
-				}
+				var count_srtext = parseFloat($('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(3) input.sr_no').length);
+				var qty=parseFloat($(this).find('td:nth-child(3) input.quantity').val());
+				var qtty = parseFloat(qty)-parseFloat(count_srtext);
+				var max_qty=$(this).find('td:nth-child(3) input.quantity').attr('max');
+				var len =  parseFloat(max_qty)- parseFloat(count_srtext);
+				if(len){
+					if(count_srtext == qty){ 
+					var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').length;
+					
+					if(serial_l>0){ 	
+					
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+								required:false,
+								minlength: qtty,
+								maxlength: qtty,
+								messages: {
+									maxlength: "select serial number equal to quantity.",
+									minlength: "select serial number equal to quantity."
+								}
+						});
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+					}
+				}else{ 
+					var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').length;
+					
+					if(serial_l>0){ 	
+					
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+								required:true,
+								minlength: qtty,
+								maxlength: qtty,
+								messages: {
+									maxlength: "select serial number equal to quantity.",
+									minlength: "select serial number equal to quantity."
+								}
+						});
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+					}
+					}	
+				}else{
+					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td.td_append').html("");
+					
+				}	
+				
 			}else{
 
 				$(this).find('td:nth-child(1) input.Invoicerowid').attr({ name:"q" , readonly:"readonly"}).rules( "remove", "required" );
@@ -583,6 +622,27 @@ $(document).ready(function() {
 		$(this).closest("tr").remove();
 		do_ref_total();
 	});
+	
+	
+	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					rename_rows(); 
+					calculate_total();
+				}
+		}
+		
+    });	
 	
 	$('.ref_type').live("change",function() {
 		var current_obj=$(this);

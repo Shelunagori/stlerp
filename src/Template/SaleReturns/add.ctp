@@ -178,7 +178,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php 
-								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id]);
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item_id,'class'=>'item_ids']);
+								
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$invoice_row->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']);
 								echo @$invoice_row->item->name;
 								?>
 							</td>
@@ -537,13 +539,19 @@ var list = new Array();
 			if(val){i++;
 				$(this).find('td:nth-child(1) input').attr("name","sale_return_rows["+row_no+"][invoice_row_id]").attr("id","sale_return_rows-"+row_no+"-invoice_row_id");
 				
-				$(this).find('td:nth-child(2) input').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(2) input.item_ids').attr("name","sale_return_rows["+row_no+"][item_id]").attr("id","sale_return_rows-"+row_no+"-item_id").rules("add", "required");
+				
 				$(this).find('td:nth-child(3) input').attr("name","sale_return_rows["+row_no+"][quantity]").attr("id","sale_return_rows-"+row_no+"-quantity").removeAttr("readonly").rules("add", "required");
+				
 				$(this).find('td:nth-child(4) input').attr("name","sale_return_rows["+row_no+"][rate]").attr("id","sale_return_rows-"+row_no+"-rate").rules("add", "required");
+				
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
+				
 				$(this).css('background-color','#fffcda');
+				
 				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 				var serial_l=$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').length;
+				
 				if(serial_l>0){ 	
 					$('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+row_no+"][serial_numbers][]").attr("id","sale_return_rows-"+row_no+"-item_serial_no").attr('maxlength',qty).rules('add', {
 						    required: true,
@@ -576,8 +584,24 @@ var list = new Array();
 	}
 	
 	$('.quantity').die().live("keyup",function() {
-			rename_rows(); 
-			calculate_total();
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					rename_rows(); 
+					calculate_total();
+				}
+		}
+		
     });	
 			
 	calculate_total();

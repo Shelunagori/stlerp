@@ -266,8 +266,9 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 								<?php echo $this->Form->input('q',['label' => false,'type' => 'hidden','value' => @$invoice_row->id,'readonly','class'=>'Invoicerowid']); ?>
 							</td>
 							<td>
-								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row->item_id,'readonly']); ?>
-								<?php echo $invoice_row->item->name; ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$invoice_row->item_id,'readonly','class'=>'item_ids']); 
+								
+								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>@$invoice_row->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
 								<?php echo $invoice_row->item->name; ?>
 							</td>
 							<td>
@@ -311,10 +312,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						if($invoice_row->item->item_companies[0]->serial_number_enable==1) { ?>
 						<tr class="tr3" row_no='<?php echo @$invoice_row->id; ?>'>
 							<td></td>
-							<td colspan="<?php echo $tr2_colspan; ?>">
-							<label class="control-label">Item Serial Number <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
+							<td colspan="6" class='td_append'>
+								<?php echo $this->requestAction('/SerialNumbers/getSerialNumberSalesReturnEditList?item_id='.$invoice_row->item_id.'&in_row_id='.@$invoice_row->id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id]); ?>
 							</td>
+							<td colspan="6">
+							
+								<?php echo '/SerialNumbers/getSerialNumberSalesReturnEditListText?item_id='.$invoice_row->item_id.'&sale_row_id='.@$sale_return_row_id[@$invoice_row->id].'&sale_id='.@$sale_return_id[$invoice_row->id]; ?>
+							</td>
+							
 							<td></td>
 						</tr><?php } ?>
 						<?php $q++; endforeach; }?>
@@ -740,26 +745,63 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
-				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+				var count_srtext = parseFloat($('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(3) input.sr_no').length);
+				
+				var qty=parseFloat($(this).find('td:nth-child(3) input.quantity').val());
+				
+				var qtty = parseFloat(qty)-parseFloat(count_srtext);
+				
+				var max_qty=$(this).find('td:nth-child(3) input.quantity').attr('max');
+				
+				var len =  parseFloat(max_qty)- parseFloat(count_srtext);
+				
+				if(len){
+					if(count_srtext == qty){ 
+						var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
+					
+						if(serial_l>0){ 	
+							$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
+									required: false,
+									minlength: qtty,
+									maxlength: qtty,
+									messages: {
+										maxlength: "select serial number equal to quantity.",
+										minlength: "select serial number equal to quantity."
+									}
+							});
+						}
+						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
+						var s_tax=$(this).find('td:nth-child(6)').text();
+						$(this).css('background-color','#fffcda');
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+						p++;
+				}else{ 
+					var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select.sr_noss').length;
+					
+					if(serial_l>0){ 	
+					
+						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","sale_return_rows["+val+"][serial_numbers][]").attr("id","sale_return_rows-"+val+"-itm_serial_number").attr('maxlength',qty).rules('add', {
 						    required: true,
-							minlength: qty,
-							maxlength: qty,
+							minlength: qtty,
+							maxlength: qtty,
 							messages: {
 								maxlength: "select serial number equal to quantity.",
 								minlength: "select serial number equal to quantity."
 							}
-					});
+							});
+						}
+						$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
+						var s_tax=$(this).find('td:nth-child(6)').text();
+						$(this).css('background-color','#fffcda');
+						$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+						p++;
+					}
+				}else{
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td.td_append').html("");
+					
 				}
-				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
-				var s_tax=$(this).find('td:nth-child(6)').text();
-				$(this).css('background-color','#fffcda');
-				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
-				p++;
-			}			
+			}					
 			else{ 
 				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(1) input.Invoicerowid').attr({ name:"q", readonly:"readonly"});
