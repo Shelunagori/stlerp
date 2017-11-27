@@ -44,7 +44,7 @@
 											$options = [['text'=>'All','value'=>'All'],['text'=>'Negative','value'=>'Negative'],['text'=>'Zero','value'=>'Zero'],['text'=>'Close Stock','value'=>'Positive']];
 										echo $this->Form->input('stock', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$stock)]); ?></div>
 									</td>
-									<td width="15%">
+								<!--	<td width="15%">
 										<label class="control-label">From</label>
 										<div>
 										<?php 
@@ -58,7 +58,7 @@
 											echo $this->Form->input('from_date', ['type'=>'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder'=>'Date','id'=>'from_date','data-date-format'=>'dd-mm-yyyy','value' =>date('d-m-Y')]);
 											
 										} ?>
-									</div>	
+									</div>	-->
 									
 									</td>
 									<td width="15%">
