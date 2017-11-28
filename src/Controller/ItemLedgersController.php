@@ -1017,7 +1017,7 @@ class ItemLedgersController extends AppController
 				}
 			}
 			
-			if($Invoices_quantity[$invoice_row->sales_order_row_id]){
+			if(@$Invoices_quantity[@$invoice_row->sales_order_row_id]){
 				$invoice_qty=@$SalesOrderRows->quantity-@$Invoices_quantity[@$sales_order_row_id];
 			}else{
 				$invoice_qty=@$SalesOrderRows->quantity;

@@ -1047,7 +1047,7 @@ class InvoiceBookingsController extends AppController
 				$query = $this->InvoiceBookings->ItemLedgers->query();
 				$query->update()
 					->set(['rate' => $rate, 'rate_updated' => 'Yes'])
-					->where(['item_id' => $item_id, 'source_id' => $grn_id, 'company_id' => $st_company_id, 'source_model'=> 'Grns'])
+					->where(['item_id' => $item_id, 'source_id' => $grn_id, 'company_id' => $st_company_id, 'source_model'=> 'Grns','source_row_id'=>$invoice_booking_row->grn_row_id])
 					->execute();
 				
 				$results=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id' => $item_id,'ItemLedgers.in_out' => 'In','rate_updated' => 'Yes','company_id' => $st_company_id ,'quantity >'=>0])->toArray(); 
@@ -1321,7 +1321,7 @@ class InvoiceBookingsController extends AppController
 				$query = $this->InvoiceBookings->ItemLedgers->query();
 				$query->update()
 					->set(['rate' => $rate, 'rate_updated' => 'Yes'])
-					->where(['item_id' => $item_id, 'source_id' => $grn_id, 'company_id' => $st_company_id, 'source_model'=> 'Grns'])
+					->where(['item_id' => $item_id, 'source_id' => $grn_id, 'company_id' => $st_company_id, 'source_model'=> 'Grns','source_row_id'=>$invoice_booking_row->grn_row_id])
 					->execute();
 				$results=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id' => $item_id,'ItemLedgers.in_out' => 'In','rate_updated' => 'Yes','company_id' => $st_company_id,'quantity >'=>0]); 
 				$j=0; $qty_total=0; $rate_total=0; $per_unit_cost=0;
@@ -1450,7 +1450,7 @@ class InvoiceBookingsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-							$ReferenceDetail->transaction_date = date("d-m-Y");
+							$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 							
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 							
@@ -1467,7 +1467,7 @@ class InvoiceBookingsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-						$ReferenceDetail->transaction_date = date("d-m-Y");
+						$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 						if($invoiceBooking->on_account > 0){
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 						}

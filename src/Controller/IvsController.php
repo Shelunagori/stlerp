@@ -56,7 +56,7 @@ class IvsController extends AppController
             'contain' => ['Invoices'=>['Customers'],'IvRows', 'Companies']
         ];
 		
-		$ivs = $this->paginate($this->Ivs->find()->contain(['Invoices'])->where($where)->where(['ivs.company_id'=>$st_company_id])->order(['ivs.id' => 'DESC']));
+		$ivs = $this->paginate($this->Ivs->find()->contain(['Invoices'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']));
         $this->set(compact('ivs','url'));
         $this->set('_serialize', ['ivs']);
     }
