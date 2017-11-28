@@ -252,7 +252,6 @@ $(document).ready(function() {
 	$('.select_item_in').die().live("change",function() { 
 		var tr_obj=$(this).closest('tr');
 		sr_nos(tr_obj);
-		var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
 		rename_rows_in();
 	});
 	
@@ -261,13 +260,14 @@ $(document).ready(function() {
 		
 			var len=tr_obj.find("td:nth-child(1) select").length;
 			if(len>0){
-			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
-			var item_id=tr_obj.find('td:nth-child(1) select option:selected').val();
-			var old_qty=0;
+				var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+				var item_id=tr_obj.find('td:nth-child(1) select option:selected').val();
+				var old_qty=0;
 			}else{
 				var item_id=tr_obj.find('td:nth-child(1) input').val()
 				var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
 				var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
+				tr_obj.find('td:nth-child(2) input').attr('min',old_qty);
 			}
 		
 		if(item_id > 0){ 
@@ -339,7 +339,7 @@ rename_rows_in();
 			
 			$(this).find('td:nth-child(4) input.amount').attr({name:"inventory_transfer_voucher_rows["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
 			
-			$(this).find('td:nth-child(4) input.itvrowid').attr({name:"inventory_transfer_voucher_rows["+j+"][id]", id:"inventory_transfer_voucher_rows-"+j+"-id"}).rules("add", "required");
+			$(this).find('td:nth-child(4) input.itvrowid').attr({name:"inventory_transfer_voucher_rows["+j+"][id]", id:"inventory_transfer_voucher_rows-"+j+"-id"});
 			
 			$(this).find('td:nth-child(5) textarea').attr({name:"inventory_transfer_voucher_rows["+j+"][narration]", id:"inventory_transfer_voucher_rows-"+j+"-narration"}).rules("add", "required");
 			j++; 
@@ -392,7 +392,7 @@ rename_rows_in();
 			</td>
 			<td width="20%" ><div class="sr_container"></div></td>
 			<td width="10%">
-				<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
+				<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm amount','placeholder' => 'Rate']); ?>
 			</td>
 			<td width="30%">
 				<?php echo $this->Form->input('narration', ['type' => 'textarea','label' => false,'class' => 'form-control input-sm ','placeholder' => 'Narration']); ?>

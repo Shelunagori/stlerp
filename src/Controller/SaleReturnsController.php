@@ -278,7 +278,7 @@ class SaleReturnsController extends AppController
 					foreach($sale_return_row->serial_numbers as $serial_nos){
 						$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial_nos);
 						$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id'])
+									$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','transaction_date'])
 									->values([
 									'name' => $serial_data->name,
 									'item_id' => $sale_return_row->item_id,
@@ -1548,11 +1548,16 @@ class SaleReturnsController extends AppController
 					$item_serial_no=$sale_return_row->serial_numbers;
 					$serial_nos=implode(",", $item_serial_no); 
 				/////for delete serial number in table					
-					$this->SaleReturns->SaleReturnRows->SerialNumbers->deleteAll(['SerialNumbers.sales_return_id'=>$saleReturn->id,'SerialNumbers.sales_return_row_id' => $sale_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);					
+					/* $this->SaleReturns->SaleReturnRows->SerialNumbers->deleteAll(['SerialNumbers.sales_return_id'=>$saleReturn->id,'SerialNumbers.sales_return_row_id' => $sale_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In']);	 */		
+					$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
+					$query->update()
+						->set(['transaction_date' => $saleReturn->transaction_date])
+						->where(['sales_return_row_id' => $sale_return_row->id,'company_id'=>$st_company_id,'status'=>'In'])
+						->execute();					
 				 foreach($item_serial_no as $serial){
 
 				 $query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'sales_return_row_id','invoice_row_id','sales_return_id','company_id'])
+									$query->insert(['name', 'item_id', 'status', 'sales_return_row_id','invoice_row_id','sales_return_id','company_id','transaction_date'])
 									->values([
 									'name' => $serial,
 									'item_id' => $sale_return_row->item_id,
@@ -1560,7 +1565,8 @@ class SaleReturnsController extends AppController
 									'sales_return_row_id' => $sale_return_row->id,
 									'invoice_row_id' => $sale_return_row->invoice_row_id,
 									'sales_return_id' => $saleReturn->id,
-									'company_id'=>$st_company_id
+									'company_id'=>$st_company_id,
+									'transaction_date'=>$saleReturn->transaction_date
 									]);
 								$query->execute();  
 						

@@ -339,6 +339,8 @@ $(document).ready(function() {
 				var item_id=tr_obj.find('td:nth-child(1) input').val()
 				var serial_number_enable=tr_obj.find('td:nth-child(1) input').attr('item_sr');
 				var old_qty=tr_obj.find('td:nth-child(2) input').attr('old_qty');
+				tr_obj.find('td:nth-child(2) input').attr('min',old_qty);
+				
 			}
 		
 		if(item_id > 0){ 

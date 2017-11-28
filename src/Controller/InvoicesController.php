@@ -1423,30 +1423,44 @@ class InvoicesController extends AppController
 				
 				
 			}else{ 
-			
-				$ItemSerialNumbers =$this->Invoices->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
-				
+				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
+				$to_date = date('Y-m-d');
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 				foreach($ItemSerialNumbers as $ItemSerialNumber){
-					if(@$ItemSerialNumber->grn_id > 0){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
+					if(@$ItemSerialNumber->grn_id > 0){ 
+						$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+							if($outExist == 0){
+								$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
+							//	pr($ItemLedgerData); 
+								if($ItemLedgerData){
+								@$itemSerialQuantity=$itemSerialQuantity+1;
+								@$itemSerialRate+=@$ItemLedgerData['rate'];
+								}
+							}
 					}
-					else if(@$ItemSerialNumber->is_opening_balance == 'Yes'){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
+					if(@$ItemSerialNumber->sale_return_id > 0){ 
+				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+						@$itemSerialQuantity=$itemSerialQuantity+1;
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-					}else if(@$ItemSerialNumber->sale_return_id > 0){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-					}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
+						}
 					}
 				}
+				if(@$ItemSerialNumber->itv_id > 0){
+				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
+					if($outExist == 0){  
+						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){
+						@$itemSerialQuantity=$itemSerialQuantity+1;
+						@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}	
+			}
 				
 				$minimumSellingPrice=0;
 				if(empty($Items->item_companies[0]->minimum_selling_price_factor)){ 
@@ -1458,7 +1472,6 @@ class InvoicesController extends AppController
 			}
 			$Number = new NumberHelper(new \Cake\View\View());
 			echo $Number->format($minimumSellingPrice,[ 'places' => 2]);
-			 //$this->NumberFormat($minimumSellingPrice,['places'=>2]);
 			exit;
 	}
 	
@@ -1538,30 +1551,44 @@ class InvoicesController extends AppController
 					
 				
 			}else{
-				$ItemSerialNumbers =$this->Invoices->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id' => $st_company_id,'SerialNumbers.status'=>"In"]);
-				
+				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
+				$to_date = date('Y-m-d');
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 				foreach($ItemSerialNumbers as $ItemSerialNumber){
-					if(@$ItemSerialNumber->grn_id > 0){  
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						
+					if(@$ItemSerialNumber->grn_id > 0){ 
+						$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+							if($outExist == 0){
+								$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
+							//	pr($ItemLedgerData); 
+								if($ItemLedgerData){
+								@$itemSerialQuantity=$itemSerialQuantity+1;
+								@$itemSerialRate+=@$ItemLedgerData['rate'];
+								}
+							}
 					}
-					else if(@$ItemSerialNumber->is_opening_balance == 'Yes'){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->item_id,'source_model'=>"Items",'item_id'=>$ItemSerialNumber->item_id])->first();
+					if(@$ItemSerialNumber->sale_return_id > 0){ 
+				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+						@$itemSerialQuantity=$itemSerialQuantity+1;
 						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-					}else if(@$ItemSerialNumber->sale_return_id > 0){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
-					}else if(@$ItemSerialNumber->inventory_transfer_voucher_id > 0){
-						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->inventory_transfer_voucher_id,'source_model'=>"Inventory Transfer Voucher",'item_id'=>$ItemSerialNumber->item_id])->first();
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
-						@$itemSerialQuantity=@$itemSerialQuantity+1;
+						}
 					}
 				}
+				if(@$ItemSerialNumber->itv_id > 0){
+				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
+					if($outExist == 0){  
+						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){
+						@$itemSerialQuantity=$itemSerialQuantity+1;
+						@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}	
+			}
 				
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){  
