@@ -41,7 +41,7 @@ if(!empty($status)){
 				); ?>
 				<?= $this->Html->link(
 					'Converted in Sales Order',
-					'/Quotations/index/Converted Into Sales Order',
+					'/Quotations/index/Converted into SalesOrder',
 					['class' => $class2]
 				); ?>
 				

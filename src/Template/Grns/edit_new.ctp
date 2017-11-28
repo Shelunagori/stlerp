@@ -389,10 +389,10 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var row_no=$(this).attr('row_no');
 			var serial_number_enable=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
-			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
+			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val(); 
 			var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 			var item_id=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val(); 
-			var l=$('.tr2[row_no="'+row_no+'"]').find('input.sr_no').length;
+			var l=$('.tr2[row_no="'+row_no+'"]').find('input.sr_no').length; alert(l);
 		//alert(serial_number_enable);
 				if(val && serial_number_enable=='1')
 				{ 
@@ -402,10 +402,10 @@ $(document).ready(function() {
 						$(this).find('td:nth-child(3) input[type="text"]').val('');
 					}
 					else
-					{
+					{ //alert(qty+' < '+l);
 						if(qty < l){
 							
-							for(i=l;i>qty;i--){
+							for(i=l;i>qty;i--){ 
 							$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
 							
 							}
@@ -478,7 +478,8 @@ $(document).ready(function() {
 					quantity = quantity+old_qty; 
 					if(maxQty>quantity || maxQty==quantity)
 					{  
-						for(i=0; i < (qty-old_qty); i++){ 
+						for(i=0; i < (qty-old_qty); i++)
+						{ 
 						
 							 $('.tr2[row_no="'+row_no+'"]').find('td.td_append').append('<div style="margin-bottom:6px;" class="td_append'+i+row_no+'"><input type="text" class="sr_no renameSerial" name="grn_rows['+val+'][serial_numbers][]" ids="sr_no['+i+']" id="sr_no'+l+row_no+'" required/></div>');
 							

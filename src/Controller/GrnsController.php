@@ -583,14 +583,13 @@ class GrnsController extends AppController
 									$query->execute();
 							}
 						}
-						else
-						{
+						
 							$query = $this->Grns->SerialNumbers->query();
 							$query->update()
 								->set(['transaction_date' => $grn->transaction_date])
 								->where(['grn_id' => $grn->id,'company_id'=>$st_company_id])
 								->execute();
-						}
+						
 						
 						//Insert in Item Ledger//
 							$itemLedger = $this->Grns->ItemLedgers->newEntity();

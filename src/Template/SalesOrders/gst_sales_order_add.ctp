@@ -247,7 +247,8 @@ if(!empty($copy))
 					{ 
 					if(!empty($quotation->quotation_rows)){
 					$q=0; foreach ($quotation->quotation_rows as $quotation_rows): 
-						
+					if(@$MaxQty[@$quotation_rows->id]!=0)
+					{
 					?>
 						<tr class="tr1 maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
 							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
@@ -313,7 +314,7 @@ if(!empty($copy))
 							</td>
 							
 						</tr>
-					<?php $q++; endforeach; } } elseif(!empty($copy)) { 
+					<?php $q++;} endforeach; } } elseif(!empty($copy)) { 
 					if(!empty($salesOrder->sales_order_rows)){
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): ?>
 						<tr class="tr1 maintr" row_no='<?php echo @$sales_order_rows->id; ?>'>
