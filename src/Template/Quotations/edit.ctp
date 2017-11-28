@@ -187,9 +187,16 @@
 							<td>
 								<div class="row">
 									<div class="col-md-11 padding-right-decrease">
-										<?php echo $this->Form->input('quotation_rows['.$q.'][item_id]', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => $quotation_row->item_id,'required','popup_id'=>$q]); ?>
-										
-										
+										<?php 
+										if(sizeof($MinQty[@$quotation_row->id])>0)
+										{
+											$disable="disabled";
+										}
+										else
+										{
+											$disable="";
+										}
+										echo $this->Form->input('quotation_rows['.$q.'][item_id]', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => $quotation_row->item_id,'required','popup_id'=>$q,$disable]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -214,7 +221,6 @@
 							</td>
 							<td width="100">
 								<?php echo $this->Form->input('quotation_rows['.$q.'][quantity]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => $quotation_row->quantity,'required','min'=>@$MinQty[@$quotation_row->id]]); ?>
-								
 							</td>
 							<td width="130">
 								<?php echo $this->Form->input('quotation_rows['.$q.'][rate]', ['label' => false,'class' => 'form-control input-sm rate','placeholder' => 'Rate','value' => $quotation_row->rate,'required','r_popup_id'=>$q ,'step'=>'0.01']); ?>
@@ -224,7 +230,14 @@
 							
 							</td>
 							<td  width="70"><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
+							<?php
+							if(sizeof($MinQty[@$quotation_row->id])<1)
+							{
+							?>
 							<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
+							<?php
+							}
+							?>
 							</td>
 						</tr>
 						<tr class="tr2 preimp" row_no='<?php echo @$quotation_row->id; ?>'>
