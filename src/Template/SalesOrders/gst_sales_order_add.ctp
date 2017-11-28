@@ -283,7 +283,7 @@ if(!empty($copy))
 									</div>
 								</div>
 							</td>
-							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','value' => @$quotation_rows->quantity-@$sales_orders_qty[@$quotation_rows->id]]); ?></td>
+							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','value' => @$MaxQty[@$quotation_rows->id],'max'=>@$MaxQty[@$quotation_rows->id]]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','min'=>'0.01','value' => @$quotation_rows->rate,'r_popup_id'=>$q]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$quotation_rows->amount]); ?></td>
 							<td width="110px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount Per','value' => '']); ?></td>

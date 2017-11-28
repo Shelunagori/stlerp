@@ -569,7 +569,7 @@ class SalesOrdersController extends AppController
 				else if($status_close=="close"){
 					$query = $this->SalesOrders->Quotations->query();
 					$query->update()
-					->set(['status' => 'Close'])
+					->set(['status' => 'Converted Into Sales Order'])
 					->where(['id' => $quotation_id])
 					->execute();
 				}
@@ -1027,18 +1027,64 @@ class SalesOrdersController extends AppController
 				$status_close=$this->request->query('status');
 			
 			
-				if($status_close=='close'){
-				$query = $this->SalesOrders->Quotations->query();
+				if($status_close=='close')
+				{
+					$query = $this->SalesOrders->Quotations->query();
 					$query->update()
 						->set(['status' => 'Converted Into Sales Order'])
 						->where(['id' => $quotation_id])
 						->execute();
-				} else if($status_close=='open'){
-						$query = $this->SalesOrders->Quotations->query();
+				} 
+				else if($status_close=='open')
+				{
+					/* $query = $this->SalesOrders->Quotations->query();
 					$query->update()
-						->set(['status' => 'Pending'])
-						->where(['id' => $quotation_id])
-						->execute();
+					->set(['status' => 'Pending'])
+					->where(['id' => $quotation_id])
+					->execute(); */
+					
+					
+					$totalSalesOrderQty =[];
+					$Quotation = $this->SalesOrders->Quotations->get($salesOrder->quotation_id, [
+                     'contain' => ['QuotationRows'=>['SalesOrderRows'],'SalesOrders' => ['SalesOrderRows']]
+                    ]);
+					
+					if(!empty($Quotation->quotation_rows))
+					{
+						foreach($Quotation->quotation_rows as $quotation_row)
+						{
+							if(!empty($quotation_row->sales_order_rows))
+							{
+								foreach($quotation_row->sales_order_rows as $sales_order_row)
+								{
+									@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+								}
+							}
+						}
+					}
+					
+					if(!empty($Quotation->quotation_rows))
+					{
+						foreach($Quotation->quotation_rows as $quotation_row)
+						{
+							if($quotation_row->quantity!=$totalSalesOrderQty[$quotation_row->id])
+							{
+								$query_pending = $this->SalesOrders->Quotations->query();
+								$query_pending->update()
+								->set(['Quotations.status' => 'Pending'])
+								->where(['id' => $salesOrder->quotation_id])
+								->execute();
+							}
+							else if($quotation_row->quantity==$totalSalesOrderQty[$quotation_row->id])
+							{
+								$query_pending = $this->SalesOrders->Quotations->query();
+								$query_pending->update()
+								->set(['Quotations.status' => 'Converted into SalesOrder'])
+								->where(['id' => $salesOrder->quotation_id])
+								->execute();
+							}
+						}
+					}
 				}
 				
 				$this->Flash->success(__('The sales order has been saved.'));
@@ -1095,8 +1141,38 @@ class SalesOrdersController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
+		
+			$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
+			if(!empty(@$quotation_id))
+			{
+				$Quotations = $this->SalesOrders->Quotations->get($quotation_id, [
+				'contain' => (['SalesOrders'=>['SalesOrderRows'],'QuotationRows'])
+				 ]);
+				if(!empty($Quotations->sales_orders))
+				{ 
+					foreach($Quotations->sales_orders as $sales_order)
+					{
+						if(!empty($sales_order->sales_order_rows))
+						{
+							foreach($sales_order->sales_order_rows as $sales_order_row)
+							{
+								@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+							}
+						}
+					}
+				}
+				foreach($Quotations->quotation_rows as $quotation_row)
+				{
+					@$QuotaionQty[@$quotation_row->id]=@$quotation_row->quantity;
+				}
+				
+				foreach($Quotations->quotation_rows as $quotation_row)
+				{
+					@$MaxQty[@$quotation_row->id] = @$QuotaionQty[@$quotation_row->id]-@$totalSalesOrderQty[@$quotation_row->id];
+				}
+			}
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty'));
+        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
@@ -1229,9 +1305,35 @@ class SalesOrdersController extends AppController
 					
 				}
 			}	
-
+			$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
+			if(!empty($id))
+			{
+				$SalesOrdersDetail = $this->SalesOrders->get($id, [
+				'contain' => (['SalesOrderRows','Quotations'=>['QuotationRows'=>['SalesOrderRows']]])
+				 ]);
+				
+				if(!empty($SalesOrdersDetail->quotation->quotation_rows))
+				{ 
+					foreach($SalesOrdersDetail->quotation->quotation_rows as $quotation_row)
+					{ 
+						@$QuotaionQty[@$quotation_row->id]=@$quotation_row->quantity;
+						if(!empty($quotation_row->sales_order_rows))
+						{
+							foreach($quotation_row->sales_order_rows as $sales_order_row)
+							{
+								@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+							}
+						}
+					}
+				} 
+				
+				foreach($SalesOrdersDetail->sales_order_rows as $sales_order_row)
+				{
+					@$MaxQty[@$sales_order_row->quotation_row_id] = @$QuotaionQty[@$sales_order_row->quotation_row_id]-@$totalSalesOrderQty[@$sales_order_row->quotation_row_id]+$sales_order_row->quantity;
+				}
+			}
 			////end unique validation and procees qty
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty'));
+			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
