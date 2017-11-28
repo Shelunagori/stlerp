@@ -188,7 +188,7 @@
 								<div class="row">
 									<div class="col-md-11 padding-right-decrease">
 										<?php 
-										if(sizeof($MinQty[@$quotation_row->id])>0)
+										if(sizeof(@$MinQty[@$quotation_row->id])>0)
 										{
 											$disable="disabled";
 										}
