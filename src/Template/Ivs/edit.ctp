@@ -23,7 +23,7 @@
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y")]); ?>
+					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($iv->transaction_date))]); ?>
 				</div>
 			</div>
 		</div>
@@ -227,7 +227,7 @@ $(document).ready(function() {
 				$(this).find("td:nth-child(1) input.ivrowitemsId").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-id"});
 				$(this).find("td:nth-child(1) select").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][item_id]", id:"iv_rows-"+q+"-iv_row_items"+i+"-item_id"}).select2().rules('add', {required: true});
 				
-				$(this).find("td:nth-child(2) input").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][quantity]", id:"iv_rows-"+q+"-iv_row_items"+i+"-quantity"}).rules('add', {
+				$(this).find("td:nth-child(2) input.qty_bx").attr({name:"iv_rows["+q+"][iv_row_items]["+i+"][quantity]", id:"iv_rows-"+q+"-iv_row_items"+i+"-quantity"}).rules('add', {
 							required: true
 					});
 				if($(this).find('td:nth-child(3) select').length>0){

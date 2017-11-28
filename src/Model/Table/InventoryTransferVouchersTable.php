@@ -49,6 +49,7 @@ class InventoryTransferVouchersTable extends Table
 		
         //$this->belongsTo('InventoryTransferVoucherRows');
 		$this->belongsTo('Items');
+		$this->belongsTo('Ivs');
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('SerialNumbers');
 		$this->belongsTo('Creator', [

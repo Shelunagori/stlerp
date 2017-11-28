@@ -116,12 +116,13 @@ class SerialNumbersController extends AppController
 		
 		$options=[];$values=[];
 		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
+		//pr($serialnumbers->toArray());
 		foreach($serialnumbers as $serialnumber){
 			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'iv_row_items'=>$iv_row_items]);
 			if($outExist > 0){
 				$values[]=$serialnumber->id;
 			}
-			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'iv_row_items != '=>$iv_row_items]);
+			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id ' => $serialnumber->id,'iv_row_items != '=>$iv_row_items]);
 			
 			if($inExist == 0){
 				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
