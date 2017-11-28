@@ -213,7 +213,7 @@
 								 
 							</td>
 							<td width="100">
-								<?php echo $this->Form->input('quotation_rows['.$q.'][quantity]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => $quotation_row->quantity,'required','min'=>0.01]); ?>
+								<?php echo $this->Form->input('quotation_rows['.$q.'][quantity]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value' => $quotation_row->quantity,'required','min'=>@$MinQty[@$quotation_row->id]]); ?>
 								
 							</td>
 							<td width="130">

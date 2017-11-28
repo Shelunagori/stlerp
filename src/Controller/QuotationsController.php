@@ -543,10 +543,32 @@ class QuotationsController extends AppController
 					
 				}
 			}	
-
+			
+			$MinQty=[];
+			if(!empty($id))
+			{
+				$Quotations = $this->Quotations->get($id, [
+				'contain' => (['SalesOrders'=>['SalesOrderRows'],'QuotationRows'])
+				 ]);
+				if(!empty($Quotations->sales_orders))
+				{ 
+					foreach($Quotations->sales_orders as $sales_order)
+					{
+						if(!empty($sales_order->sales_order_rows))
+						{
+							foreach($sales_order->sales_order_rows as $sales_order_row)
+							{
+								@$MinQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+							}
+						}
+					}
+				}
+				
+			}
+			//pr($MinQty);exit;
 			////end unique validation and procees qty
 			
-			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate','quotation_qty'));
+			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate','quotation_qty','MinQty'));
 			$this->set('_serialize', ['quotation']);
 		}
 		else
