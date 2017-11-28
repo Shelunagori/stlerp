@@ -641,18 +641,18 @@ class SalesOrdersController extends AppController
 		$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
 		if(!empty(@$quotation_id))
 		{
-			 $Quotations = $this->SalesOrders->Quotations->get($quotation_id, [
+			$Quotations = $this->SalesOrders->Quotations->get($quotation_id, [
             'contain' => (['SalesOrders'=>['SalesOrderRows'],'QuotationRows'])
              ]);
 			if(!empty($Quotations->sales_orders))
-			{
+			{ 
 				foreach($Quotations->sales_orders as $sales_order)
 				{
 					if(!empty($sales_order->sales_order_rows))
 					{
-						foreach($Quotations->sales_orders as $sales_order)
+						foreach($sales_order->sales_order_rows as $sales_order_row)
 						{
-							@$totalSalesOrderQty[@$sales_order->quotation_row_id] +=@$sales_order->quantity;
+							@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
 						}
 					}
 				}
@@ -668,7 +668,7 @@ class SalesOrdersController extends AppController
 			}
 		}
 		
-		
+		//pr($totalSalesOrderQty);exit;
         $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','sales_orders_qty','MaxQty'));
         $this->set('_serialize', ['salesOrder']);
     }
@@ -856,8 +856,39 @@ class SalesOrdersController extends AppController
 							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 						} 
 					);
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows'));
+					
+			$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
+			if(!empty($id))
+			{
+				$SalesOrdersDetail = $this->SalesOrders->get($id, [
+				'contain' => (['SalesOrderRows','Quotations'=>['QuotationRows'=>['SalesOrderRows']]])
+				 ]);
+				
+				if(!empty($SalesOrdersDetail->quotation->quotation_rows))
+				{ 
+					foreach($SalesOrdersDetail->quotation->quotation_rows as $quotation_row)
+					{ 
+						@$QuotaionQty[@$quotation_row->id]=@$quotation_row->quantity;
+						if(!empty($quotation_row->sales_order_rows))
+						{
+							foreach($quotation_row->sales_order_rows as $sales_order_row)
+							{
+								@$totalSalesOrderQty[@$sales_order_row->quotation_row_id] +=@$sales_order_row->quantity;
+							}
+						}
+					}
+				} 
+				
+				foreach($SalesOrdersDetail->sales_order_rows as $sales_order_row)
+				{
+					@$MaxQty[@$sales_order_row->quotation_row_id] = @$QuotaionQty[@$sales_order_row->quotation_row_id]-@$totalSalesOrderQty[@$sales_order_row->quotation_row_id]+$sales_order_row->quantity;
+				}
+			}
+			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows','MaxQty'));
 			$this->set('_serialize', ['salesOrder']);
+			
+			
+			//pr($MaxQty);exit;
 		}
 		else
 		{
