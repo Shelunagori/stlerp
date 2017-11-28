@@ -392,7 +392,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val(); 
 			var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
 			var item_id=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(1)').val(); 
-			var l=$('.tr2[row_no="'+row_no+'"]').find('input.sr_no').length; alert(l);
+			var l=$('.tr2[row_no="'+row_no+'"]').find('input.sr_no').length; 
 		//alert(serial_number_enable);
 				if(val && serial_number_enable=='1')
 				{ 
@@ -410,7 +410,8 @@ $(document).ready(function() {
 							
 							}
 						}
-						if(qty > l){ 
+						if(qty > l)
+						{ 
 							l=l+1;
 							//alert(l);
 							var old_qty=parseInt($(this).find('td:nth-child(4) input[type="checkbox"]:checked').attr('old_qty_size'));
@@ -421,7 +422,8 @@ $(document).ready(function() {
 								$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required/></div>');
 								
 								$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
-								r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+								r++;	
+								$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
 								}
 							}
 						}
