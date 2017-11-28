@@ -573,7 +573,7 @@ class InvoicesController extends AppController
 			}
 			//pr($invoice->ref_rows); exit;
 			$ref_rows=$invoice->ref_rows;
-			 //	 pr($invoice);exit;
+			 // pr($invoice);exit;
             if ($this->Invoices->save($invoice)) 
 			{
 				foreach($invoice->invoice_rows as $invoice_row)
@@ -684,21 +684,22 @@ class InvoicesController extends AppController
 						$item_serial_no=$invoice_row->serial_numbers;
 						$serial_nos=implode(",", $item_serial_no); 
 						$query = $this->Invoices->InvoiceRows->query();
-									$query->update()
-										->set(['serial_number' => $serial_nos])
-										->where(['id' => $invoice_row->id])
-										->execute(); 
+									 
 						foreach($item_serial_no as $serial){
 						////////
 						 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
+						 $serial_data=$this->Invoices->InvoiceRows->SerialNumbers->get($serial);
+									$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','transaction_date','company_id','parent_id'])
 									->values([
-									'name' => $serial,
+									'name' => $serial_data->name,
 									'item_id' => $invoice_row->item_id,
 									'status' => 'Out',
 									'invoice_id' => $invoice->id,
 									'invoice_row_id' => $invoice_row->id,
-									'company_id'=>$st_company_id
+									'transaction_date' => $invoice->date_created,
+									'company_id'=>$st_company_id,
+									'parent_id'=>$serial
+
 									]);
 								$query->execute();  
 						
@@ -953,16 +954,20 @@ class InvoicesController extends AppController
 					 foreach($item_serial_no as $serial){
 
 					 $query = $this->Invoices->InvoiceRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id'])
-										->values([
-										'name' => $serial,
-										'item_id' => $invoice_row->item_id,
-										'status' => 'Out',
-										'invoice_id' => $invoice->id,
-										'invoice_row_id' => $invoice_row->id,
-										'company_id'=>$st_company_id
-										]);
-									$query->execute();  
+					 $serial_data=$this->Invoices->InvoiceRows->SerialNumbers->get($serial);
+							$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','transaction_date','company_id','parent_id'])
+							->values([
+							'name' => $serial_data->name,
+							'item_id' => $invoice_row->item_id,
+							'status' => 'Out',
+							'invoice_id' => $invoice->id,
+							'invoice_row_id' => $invoice_row->id,
+							'transaction_date' => $invoice->date_created,
+							'company_id'=>$st_company_id,
+							'parent_id'=>$serial
+
+							]);
+							$query->execute();  
 							
 						}
 					}	
@@ -1907,7 +1912,7 @@ class InvoicesController extends AppController
 							$serial_data=$this->Invoices->InvoiceRows->SerialNumbers->get($serial);
 							
 							 $query  = $this->Invoices->InvoiceRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id','parent_id'])
+										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id','transaction_date','parent_id'])
 										->values([
 										'name' => $serial_data->name,
 										'item_id' => $invoice_row->item_id,
@@ -1915,6 +1920,7 @@ class InvoicesController extends AppController
 										'invoice_id' => $invoice->id,
 										'invoice_row_id' => $invoice_row->id,
 										'company_id'=>$st_company_id,
+										'transaction_date'=>$invoice->date_created,
 										'parent_id'=>$serial
 										]);
 									$query->execute();  
@@ -2324,7 +2330,7 @@ class InvoicesController extends AppController
 					 foreach($item_serial_no as $serial){
 							$serial_data=$this->Invoices->InvoiceRows->SerialNumbers->get($serial);
 							 $query  = $this->Invoices->InvoiceRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id','parent_id'])
+										$query->insert(['name', 'item_id', 'status', 'invoice_id','invoice_row_id','company_id','transaction_date','parent_id'])
 										->values([
 										'name' => $serial_data->name,
 										'item_id' => $invoice_row->item_id,
@@ -2332,6 +2338,7 @@ class InvoicesController extends AppController
 										'invoice_id' => $invoice->id,
 										'invoice_row_id' => $invoice_row->id,
 										'company_id'=>$st_company_id,
+										'transaction_date'=>$invoice->date_created,
 										'parent_id'=>$serial
 										]);
 									$query->execute(); 
@@ -2549,13 +2556,14 @@ class InvoicesController extends AppController
 					if(sizeof(@$ref_rows)== 0){
 						
 						$query = $this->Invoices->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type'])
+							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit','transaction_date', 'reference_type'])
 							->values([
 								'ledger_account_id' => $c_LedgerAccount->id,
 								'invoice_id' => $invoice->id,
 								'reference_no' => 'i'.$invoice->in2,
 								'credit' => 0,
 								'debit' => $invoice->grand_total,
+								'transaction_date' => $invoice->date_created,
 								'reference_type' => 'New Reference'
 							]);
 							
