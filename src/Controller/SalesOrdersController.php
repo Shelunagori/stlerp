@@ -1137,11 +1137,20 @@ class SalesOrdersController extends AppController
 			
         $companies = $this->SalesOrders->Companies->find('all');
 		$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
-		$items = $this->SalesOrders->Items->find('list')->matching(
+		/* $items = $this->SalesOrders->Items->find('list')->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
 						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 					} 
-				)->order(['Items.name' => 'ASC']);
+				)->order(['Items.name' => 'ASC']); */
+				
+		$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
+			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+		}]);		
+				
+		$ItemsOptions=[];
+		foreach($Items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+		}			
 		$transporters = $this->SalesOrders->Carrier->find('list')->order(['Carrier.transporter_name' => 'ASC']);
 		//$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC']);
 		$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -1191,7 +1200,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty'));
+        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty','ItemsOptions'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
@@ -1331,11 +1340,19 @@ class SalesOrdersController extends AppController
 					);
 			$companies = $this->SalesOrders->Companies->find('all', ['limit' => 200]);
 			$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
-			$items = $this->SalesOrders->Items->find('list')->matching(
+			/* $items = $this->SalesOrders->Items->find('list')->matching(
 						'ItemCompanies', function ($q) use($st_company_id) {
 							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 						}
-					)->order(['Items.name' => 'ASC']);
+					)->order(['Items.name' => 'ASC']); */
+			$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
+			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+		}]);		
+				
+		$ItemsOptions=[];
+		foreach($Items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+		}		
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 						'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -1394,7 +1411,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 			////end unique validation and procees qty
-			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty'));
+			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
