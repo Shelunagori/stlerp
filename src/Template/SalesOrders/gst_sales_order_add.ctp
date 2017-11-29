@@ -258,11 +258,13 @@ if(!empty($copy))
 								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->item->id,'readonly','class'=>'itemsid']);?>
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease">	
-								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
 								</div>
 							<?php }else{			
 								?>	
 								<div class="row">
+									<div class="col-md-10 padding-right-decrease">
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									</div>
@@ -322,7 +324,7 @@ if(!empty($copy))
 							<td width="280Px">
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -345,21 +347,21 @@ if(!empty($copy))
 							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'r_popup_id'=>$q]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount]); ?></td>
-							<td width="110px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount Per','value' => '']); ?></td>
-							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount','value' => '']); ?></td>
-							<td width="110px;><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf Per','value' => '']); ?></td>
-							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf','value' => '']); ?></td>
-							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.taxable_value', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Taxable Value','value' => '']); ?></td>
+							<td width="110px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount Per','value'=>$sales_order_rows->discount_per]); ?></td>
+							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount','value'=>$sales_order_rows->discount]); ?></td>
+							<td width="110px;><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf Per','value'=>$sales_order_rows->pnf_per]); ?></td>
+							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf','value'=>$sales_order_rows->pnf]); ?></td>
+							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.taxable_value', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Taxable Value','value'=>$sales_order_rows->taxable_value]); ?></td>
 							<td class="cgst_display" width="150px;"><?php 
-							echo $this->Form->input('sales_order_rows.'.$q.'.cgst_per', ['options'=>$cgst_options,'label' => false,'class' => 'form-control input-sm cgst_display','empty'=>'Select',]); ?></td>
+							echo $this->Form->input('sales_order_rows.'.$q.'.cgst_per', ['options'=>$cgst_options,'label' => false,'class' => 'form-control input-sm cgst_display','empty'=>'Select','value'=>$sales_order_rows->cgst_per]); ?></td>
 							<td class="cgst_display" width="150px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.cgst_amount', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity cgst_display','placeholder' => 'cgst Amount']); ?></td>
 							<td class="sgst_display" width="150px;">
-							<?php  echo $this->Form->input('sales_order_rows.'.$q.'.sgst_per', ['options'=>$sgst_options,'label' => false,'class' => 'form-control input-sm change_des sgst_display','empty'=>'Select',]);
+							<?php  echo $this->Form->input('sales_order_rows.'.$q.'.sgst_per', ['options'=>$sgst_options,'label' => false,'class' => 'form-control input-sm change_des sgst_display','empty'=>'Select','value'=>$sales_order_rows->sgst_per]);
 							?>
 							</td>
 							<td class="sgst_display" width="150px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.sgst_amount', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity sgst_display','placeholder' => 'Sgst Amount']); ?></td>
 							<td class="igst_display" width="150px;">
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.igst_per', ['options'=>$igst_options,'label' => false,'class' => 'form-control input-sm change_des igst_display','empty'=>'Select',]);
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.igst_per', ['options'=>$igst_options,'label' => false,'class' => 'form-control input-sm change_des igst_display','empty'=>'Select','value'=>$sales_order_rows->igst_per]);
 							?>
 							</td>
 							<td class="igst_display" width="150px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.igst_amount', ['type' => 'type','label' => false,'class' => 'form-control input-sm quantity igst_display','placeholder' => 'Igst Amount']); ?></td>
@@ -414,12 +416,12 @@ if(!empty($copy))
 					<div class="form-group">
 						<label class="control-label">Transporter <span class="required" aria-required="true">*</span></label>
 						<?php
-							echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$quotation->customer->transporter_id]);  ?>
+							echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$salesOrder->transporter_id]);  ?>
 					</div>
 					<br/>
 					<div class="form-group">
 						<label class="control-label">Documents Courier <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('documents_courier_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$quotation->customer->customer_address[0]->transporter_id]); ?>
+						<?php echo $this->Form->input('documents_courier_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$salesOrder->documents_courier_id]); ?>
 					</div>
 				</div>
 				<div class="col-md-4">
@@ -519,8 +521,18 @@ if(!empty($copy))
 						<div class="radio-list" data-error-container="#road_permit_required_error">
 						<label class="control-label">Road Permit Required <span class="required" aria-required="true">*</span></label>
 						<?php 
-						
-						echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
+						if(!empty($copy)){
+							if($salesOrder->road_permit_required == 'Yes'){
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]);
+							}else if($salesOrder->road_permit_required == 'No'){
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No','checked']]);
+							}else{
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+							}
+							
+						}else{
+							echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+						}	?>
 						</div>
 						<div id="road_permit_required_error"></div>
 					</div>
@@ -529,7 +541,18 @@ if(!empty($copy))
 					<div class="form-group">
 						<div class="radio-list" data-error-container="#form49_error">
 						<label class="control-label">Form-49 Required <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
+						<?php 
+						if(!empty($copy)){
+							if($salesOrder->form49 == 'Yes'){
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]);
+							}else if($salesOrder->form49 == 'No'){
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No','checked']]);
+							}else{
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+							}
+						}else{
+							echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+						}	?>
 						</div>
 						<div id="form49_error"></div>
 					</div>
@@ -537,7 +560,13 @@ if(!empty($copy))
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label">Additional Note  <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$quotation->customer_address]); ?>
+						<?php 
+						if(!empty($copy)){
+							echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$salesOrder->additional_note]);
+						}else{
+							echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$quotation->additional_note]);
+						}	
+							?>
 					</div>
 				</div>
 			</div>
@@ -574,7 +603,7 @@ if(!empty($copy))
 			<td width="460px;">
 				<div class="row">
 					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
-						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
+						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
 					<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
 						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
@@ -863,6 +892,25 @@ $(document).ready(function() {
 		} 
     });
 	
+	//////
+		$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows();
+				}
+		}	
+    });
+	//////
+	
 	function add_row(){
 		var tr1=$("#sample_tb tbody tr.tr1").clone();
 		$("#main_tb tbody#main_tbody").append(tr1);
@@ -896,7 +944,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input:eq( 0 )").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
-						min: 1,
+						min: 0.1,
 						messages: {
 							min: "Quantity can't be zero."
 						}
@@ -1258,13 +1306,15 @@ $(document).ready(function() {
 	$("select.item_box").die().live("change",function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val(); 
-		last_three_rates(popup_id,item_id);
+		var row_no = $(this).closest('tr.tr1');
+		last_three_rates(popup_id,item_id,row_no);
 	})
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
+		var row_no = $(this).closest('tr.tr1');
 		if(popup_id){
-			last_three_rates_onload(popup_id,item_id);
+			last_three_rates_onload(popup_id,item_id,row_no);
 		}
 	});
 	
@@ -1295,7 +1345,7 @@ $(document).ready(function() {
 		}
 		
 		 if(popup_id){ 
-			last_three_rates_onload(popup_id,item_id);
+			last_three_rates_onload(popup_id,item_id,row_no);
 		}
 	});
 	
@@ -1317,20 +1367,22 @@ $(document).ready(function() {
 					row_no.find('.rate').attr({ min:values}).rules('add', {
 							required:true,
 							min: values,
-							
+							messages: {
+								min: "Minimum selling price : "+values
+							}
 						});
 			});
 		}else{
 			$(this).val();
 		}
-		last_three_rates(popup_id,item_id);
+		last_three_rates(popup_id,item_id,row_no);
 	});
 	
 	
 	
 	
 	
-	function last_three_rates_onload(popup_id,item_id){
+	function last_three_rates_onload(popup_id,item_id,row_no){
 			var customer_id=$('select[name="customer_id"]').val(); 
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
 			if(customer_id){ 
@@ -1341,6 +1393,13 @@ $(document).ready(function() {
 					dataType: 'json',
 				}).done(function(response) {
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -1353,7 +1412,7 @@ $(document).ready(function() {
 				$(".item_box[popup_id="+popup_id+"]").val('').select2();
 			}
 	}
-	function last_three_rates(popup_id,item_id){ 
+	function last_three_rates(popup_id,item_id,row_no){ 
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
@@ -1364,8 +1423,14 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					//var values = parseFloat(response);
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				});
 			}else{ 
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
