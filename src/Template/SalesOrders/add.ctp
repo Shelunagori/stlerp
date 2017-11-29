@@ -312,7 +312,7 @@ if(!empty($copy))
 							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount]); ?></td>
 							<td><?php 
 							$options=['Yes'=>'Yes','No'=>'No'];
-							echo $this->Form->input('sales_order_rows.'.$q.'.excise_duty', ['options'=>$options,'label' => false,'class' => 'form-control input-sm']); ?></td>
+							echo $this->Form->input('sales_order_rows.'.$q.'.excise_duty', ['options'=>$options,'label' => false,'class' => 'form-control input-sm','value'=>$sales_order_rows->excise_duty]); ?></td>
 							<td>
 							<?php $options=[];
 							foreach($SaleTaxes as $SaleTaxe){ 
@@ -373,12 +373,12 @@ if(!empty($copy))
 					<div class="form-group">
 						<label class="control-label">Transporter <span class="required" aria-required="true">*</span></label>
 						<?php
-							echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$quotation->customer->transporter_id]);  ?>
+							echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$salesOrder->transporter_id]);  ?>
 					</div>
 					<br/>
 					<div class="form-group">
 						<label class="control-label">Documents Courier <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('documents_courier_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$quotation->customer->customer_address[0]->transporter_id]); ?>
+						<?php echo $this->Form->input('documents_courier_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$salesOrder->documents_courier_id]); ?>
 					</div>
 				</div>
 				<div class="col-md-4">
@@ -477,8 +477,17 @@ if(!empty($copy))
 						<div class="radio-list" data-error-container="#road_permit_required_error">
 						<label class="control-label">Road Permit Required <span class="required" aria-required="true">*</span></label>
 						<?php 
-						
-						echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
+						if(!empty($copy)){
+							if($salesOrder->road_permit_required == 'Yes'){
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]);
+							}else if($salesOrder->road_permit_required == 'No'){
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No','checked']]);
+							}else{
+								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+							}
+						}else{
+							echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+						}	?>
 						</div>
 						<div id="road_permit_required_error"></div>
 					</div>
@@ -487,7 +496,18 @@ if(!empty($copy))
 					<div class="form-group">
 						<div class="radio-list" data-error-container="#form49_error">
 						<label class="control-label">Form-49 Required <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
+						<?php 
+						if(!empty($copy)){
+							if($salesOrder->form49 == 'Yes'){
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]); 
+							}else if($salesOrder->road_permit_required == 'No'){
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No','checked']]); 
+							}else{	
+								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+							}
+						}else{
+							echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
+						}	?>
 						</div>
 						<div id="form49_error"></div>
 					</div>
@@ -495,7 +515,7 @@ if(!empty($copy))
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label">Additional Note  <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$quotation->customer_address]); ?>
+						<?php echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$salesOrder->additional_note]); ?>
 					</div>
 				</div>
 			</div>
