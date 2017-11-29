@@ -91,7 +91,8 @@ class EmployeesController extends AppController
             if ($this->Employees->save($employee)) {
 
 
-                foreach ($employee->companies as $data) {
+                foreach ($employee->companies as $data) 
+				{
                     $ledgerAccount = $this->Employees->LedgerAccounts->newEntity();
                     $ledgerAccount->account_second_subgroup_id = $employee->account_second_subgroup_id;
                     $ledgerAccount->name = $employee->name;
@@ -107,10 +108,10 @@ class EmployeesController extends AppController
 					$this->Employees->VoucherLedgerAccounts->save($voucherLedgerAccount);
 					//
 					$VouchersReferences = $this->Employees->VouchersReferences->find()->where(['company_id'=>$data->id,'voucher_entity'=>'Receipt Voucher -> Received From'])->first();
-				$voucherLedgerAccount = $this->Employees->VoucherLedgerAccounts->newEntity();
-				$voucherLedgerAccount->vouchers_reference_id =$VouchersReferences->id;
-				$voucherLedgerAccount->ledger_account_id =$ledgerAccount->id;
-				$this->Employees->VoucherLedgerAccounts->save($voucherLedgerAccount);
+					$voucherLedgerAccount = $this->Employees->VoucherLedgerAccounts->newEntity();
+					$voucherLedgerAccount->vouchers_reference_id =$VouchersReferences->id;
+					$voucherLedgerAccount->ledger_account_id =$ledgerAccount->id;
+					$this->Employees->VoucherLedgerAccounts->save($voucherLedgerAccount);
 				
                 }
 

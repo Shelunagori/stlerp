@@ -437,6 +437,9 @@ $(document).ready(function() {
 			ifsc_code:{
 				 required: true,
 			},
+			over_time:{
+				required: true,
+			}
 		},
 
 		messages: { // custom messages for radio buttons and checkboxes
