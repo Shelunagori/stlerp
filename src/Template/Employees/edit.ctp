@@ -110,29 +110,29 @@
 					</div>
 				</div>
 				
-				<div class="row">
+				<!--<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Date Of Probation Period</label>
-							<?php echo $this->Form->input('probation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Probation Period']); ?>
+							<?php //echo $this->Form->input('probation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Probation Period']); ?>
 						</div>
 					</div>
 					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Date Of Resignation</label>
-							<?php echo $this->Form->input('resignation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Resignation']); ?>
+							<?php //echo $this->Form->input('resignation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Resignation']); ?>
 						</div>
 					</div>
 					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Date Of Releave</label>
-							<?php echo $this->Form->input('releave_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Releave']); ?>
+							<?php //echo $this->Form->input('releave_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Releave']); ?>
 						</div>
 					</div>
 					
-				</div>
+				</div>-->
 				<div class="row">
 				<div class="col-md-4">
 						<div class="form-group">
@@ -159,20 +159,20 @@
 					</div>
 					
 					<div class="col-md-4">
-						<div class="form-group">
+						<!--<div class="form-group">
 							<label class="control-label">Over Time Applicable<span class="required" aria-required="true">*</span></label>
 								<div class="radio-list">
 								<div class="radio-inline" >
-									<?php echo $this->Form->radio(
+									<?php /* echo $this->Form->radio(
 											'over_time',
 											[
 												['value' => 'Yes', 'text' => 'Yes'],
 												['value' => 'No', 'text' => 'No']
 											]
-									); ?>
+									); */ ?>
 								</div>
 							</div>
-						</div>
+						</div>-->
 					</div>
 					</div>
 				<div class="row"  id="married_info" style="display:none;">

@@ -139,20 +139,20 @@
 						</div>
 					</div>
 					<div class="col-md-4">
-						<div class="form-group">
+						<!--<div class="form-group">
 							<label class="control-label">Over Time Applicable<span class="required" aria-required="true">*</span></label>
 								<div class="radio-list">
 								<div class="radio-inline" >
-									<?php echo $this->Form->radio(
+									<?php /*echo $this->Form->radio(
 											'over_time',
 											[
 												['value' => 'Yes', 'text' => 'Yes'],
 												['value' => 'No', 'text' => 'No']
 											]
-									); ?>
+									);*/ ?>
 								</div>
 							</div>
-						</div>
+						</div>-->
 					</div>
 				</div>
 				<div class="row"  id="married_info" style="display:none;">
