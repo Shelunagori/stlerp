@@ -17,7 +17,7 @@ class QuotationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$this->viewBuilder()->layout('index_layout');
-		$where=[];
+		$where=[];$where1=[];
 		$company_id=$this->request->query('company_id');
 		$qt2=$this->request->query('qt2');
 		$file=$this->request->query('file');
@@ -74,7 +74,7 @@ class QuotationsController extends AppController
 		
 		if($status==null or $status=='Pending'){ 
 			$where['Quotations.status']='Pending'; 
-		}elseif($status=='Converted Into Sales Order'){
+		}elseif($status=='Converted into SalesOrder'){
 			$where['Quotations.status']='Converted Into Sales Order';
 		}elseif($status=='Closed'){
 			$where['Quotations.status']='Closed';
@@ -87,10 +87,10 @@ class QuotationsController extends AppController
 			$max_ids[]=$data->max_id;
 		} 
 		
-		if(sizeof($max_ids)>0){ 
+		if(sizeof($max_ids)>0){
 			$quotations = $this->paginate($this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']));
 				
-		}else{ 
+		}else{  
 			$quotations = $this->paginate($this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC'])); 
 		}
 		 
@@ -428,11 +428,20 @@ class QuotationsController extends AppController
 		
 		$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		
-		$items = $this->Quotations->Items->find('list')->order(['Items.name' => 'ASC'])->matching(
+		/* $items = $this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
 						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 					}
-				);
+				); */
+				
+		$Items=$this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
+			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+		}]);		
+				
+		$ItemsOptions=[];
+		foreach($Items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+		}					
 		
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Quotations->FinancialYears->find()->where(['id'=>$st_year_id])->first();
@@ -440,7 +449,7 @@ class QuotationsController extends AppController
 		$financial_month_last = $this->Quotations->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		$termsConditions = $this->Quotations->TermsConditions->find('all',['limit' => 200]);
 		
-        $this->set(compact('quotation', 'customers','companies','revision','employees','Filenames','ItemGroups','items','termsConditions','copy','Company','chkdate','financial_month_first','financial_month_last'));
+        $this->set(compact('quotation', 'customers','companies','revision','employees','Filenames','ItemGroups','items','termsConditions','copy','Company','chkdate','financial_month_first','financial_month_last','ItemsOptions'));
         $this->set('_serialize', ['quotation']);
     }
 
@@ -523,11 +532,19 @@ class QuotationsController extends AppController
 						}
 					);
 			$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
-			$items = $this->Quotations->Items->find('list')->order(['Items.name' => 'ASC'])->matching(
+			/* $items = $this->Quotations->Items->find('list')->order(['Items.name' => 'ASC'])->matching(
 						'ItemCompanies', function ($q) use($st_company_id) {
 							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 						}
-					);
+					); */
+			$Items=$this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
+			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+		}]);		
+				
+		$ItemsOptions=[];
+		foreach($Items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+		}			
 			$termsConditions = $this->Quotations->TermsConditions->find('all',['limit' => 200]);
 			////start unique validation and procees qty
 			$QuotationsId = $this->Quotations->get($id, [
@@ -568,7 +585,7 @@ class QuotationsController extends AppController
 			//pr($MinQty);exit;
 			////end unique validation and procees qty
 			
-			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate','quotation_qty','MinQty'));
+			$this->set(compact('quotation', 'customers','companies','employees','ItemGroups','items','termsConditions','Filenames','chkdate','quotation_qty','MinQty','ItemsOptions'));
 			$this->set('_serialize', ['quotation']);
 		}
 		else

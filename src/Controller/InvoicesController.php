@@ -1423,7 +1423,7 @@ class InvoicesController extends AppController
 				
 				
 			}else{ 
-				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
+				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Items->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
 				$to_date = date('Y-m-d');
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 				foreach($ItemSerialNumbers as $ItemSerialNumber){
@@ -1550,8 +1550,8 @@ class InvoicesController extends AppController
 				}
 					
 				
-			}else{
-				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
+			}else{ 
+				$ItemSerialNumbers=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
 				$to_date = date('Y-m-d');
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 				foreach($ItemSerialNumbers as $ItemSerialNumber){
@@ -1561,8 +1561,8 @@ class InvoicesController extends AppController
 								$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
 							//	pr($ItemLedgerData); 
 								if($ItemLedgerData){
-								@$itemSerialQuantity=$itemSerialQuantity+1;
-								@$itemSerialRate+=@$ItemLedgerData['rate'];
+									@$itemSerialQuantity=$itemSerialQuantity+1;
+									@$itemSerialRate+=@$ItemLedgerData['rate'];
 								}
 							}
 					}
@@ -1572,8 +1572,8 @@ class InvoicesController extends AppController
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
 					//	pr($ItemLedgerData); 
 						if($ItemLedgerData){
-						@$itemSerialQuantity=$itemSerialQuantity+1;
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
 						}
 					}
 				}
@@ -1583,12 +1583,13 @@ class InvoicesController extends AppController
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
 						//pr($ItemLedgerData); 
 						if($ItemLedgerData){
-						@$itemSerialQuantity=$itemSerialQuantity+1;
-						@$itemSerialRate+=@$ItemLedgerData['rate'];
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
 						}
 					}
 				}	
 			}
+			
 				
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){  

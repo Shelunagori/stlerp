@@ -229,13 +229,13 @@ if(!empty($copy))
 								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->item->id,'readonly','class'=>'itemsid']);?>
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease">	
-								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
 								</div>
 							<?php }else{			
 								?>
 								<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									</div>
 							<?php } ?>	
 							
@@ -287,7 +287,7 @@ if(!empty($copy))
 							<td>
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -318,7 +318,7 @@ if(!empty($copy))
 							foreach($SaleTaxes as $SaleTaxe){ 
 								$options[]=['text' => (string) $SaleTaxe->tax_figure.'('.$SaleTaxe->invoice_description.')', 'value' => $SaleTaxe->id, 'description' => $SaleTaxe->quote_description];
 							} 
-							echo $this->Form->input('sales_order_rows.'.$q.'.sale_tax_id', ['empty'=>'---Select---','options'=>$options,'label' => false,'class' => 'form-control input-sm change_des']);
+							echo $this->Form->input('sales_order_rows.'.$q.'.sale_tax_id', ['empty'=>'---Select---','options'=>$options,'label' => false,'class' => 'form-control input-sm change_des','value'=>$sales_order_rows->sale_tax_id]);
 							?>
 							</td>
 							<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
@@ -538,7 +538,7 @@ if(!empty($copy))
 			<td>
 				<div class="row">
 					<div class="col-md-10 padding-right-decrease">
-						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
+						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
 					<div class="col-md-1 padding-left-decrease">
 						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
@@ -1061,20 +1061,20 @@ $(document).ready(function() {
 		$("#myModal2").hide();
     });
 	
-	$("select.item_box").die().live("change",function(){
+	/* $("select.item_box").die().live("change",function(){
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 		last_three_rates(popup_id,item_id);
 	});
-	
-	$("select.item_box").each(function(){ 
+	 */
+	/* $("select.item_box").each(function(){ 
 		var popup_id=$(this).attr('popup_id');
 		var item_id=$(this).val();
 	
 		if(popup_id){
 			last_three_rates_onload(popup_id,item_id);
 		}
-	});
+	}); */
 	
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
@@ -1101,9 +1101,27 @@ $(document).ready(function() {
 		}
 		
 		 if(popup_id){ 
-			last_three_rates_onload(popup_id,item_id);
+			last_three_rates_onload(popup_id,item_id,row_no);
 		}
 	});
+	
+	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows();
+				}
+		}	
+    });
+	
 	
 	
 	$("select.item_box").die().live("change",function(){ 
@@ -1130,10 +1148,10 @@ $(document).ready(function() {
 		}else{
 			$(this).val();
 		}
-		last_three_rates(popup_id,item_id);
+		last_three_rates(popup_id,item_id,row_no);
 	});
 	
-	function last_three_rates_onload(popup_id,item_id){
+	function last_three_rates_onload(popup_id,item_id,row_no){
 			var customer_id=$('select[name="customer_id"]').val(); 
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
 			if(customer_id){ 
@@ -1143,7 +1161,15 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
+					
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -1157,7 +1183,7 @@ $(document).ready(function() {
 			}
 	}
 	
-	function last_three_rates(popup_id,item_id){ 
+	function last_three_rates(popup_id,item_id,row_no){ 
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
@@ -1170,6 +1196,13 @@ $(document).ready(function() {
 				}).done(function(response) {
 					//var values = parseFloat(response);
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				});
 			}else{ 
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');

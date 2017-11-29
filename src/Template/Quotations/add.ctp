@@ -215,7 +215,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 							<td>
 								<div class="row">
 									<div class="col-md-11 padding-right-decrease">
-										<?php echo $this->Form->input('quotation_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$quotation_rows->item->id,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('quotation_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$quotation_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -233,9 +233,9 @@ $end_date=$last.'-'.$financial_month_last->month;
 										</div>
 									</div>
 								</div>
-								<?php echo $this->Form->input('quotation_rows['.$q.'][height]', ['type' => 'hidden','value' => @$quotation_rows->height]); ?>
+								<?php echo $this->Form->input('quotation_rows['.$q.'][height]', ['type' => 'hidden','value' => @$quotation_rows->height,'class'=>'heights']); ?>
 							</td>
-							<td><?php echo $this->Form->input('quotation_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Quantity','value' => @$quotation_rows->quantity]); ?></td>
+							<td><?php echo $this->Form->input('quotation_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$quotation_rows->quantity]); ?></td>
 							<td><?php echo $this->Form->input('quotation_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','value' => @$quotation_rows->rate,'r_popup_id'=>$q]); ?></td>
 
 							<td><?php echo $this->Form->input('quotation_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$quotation_rows->amount]); ?></td>
@@ -314,7 +314,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 			<td>
 				<div class="row">
 					<div class="col-md-11 padding-right-decrease">
-						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
+						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
 					<div class="col-md-1 padding-left-decrease">
 						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
@@ -333,7 +333,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 					</div>
 				</div>
 			</td>
-			<td width="100"><?php echo $this->Form->input('quantity[]', ['label' => false,'class' => 'form-control input-sm','placeholder' => 'Quantity']); ?></td>
+			<td width="100"><?php echo $this->Form->input('quantity[]', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity']); ?></td>
 			<td class='data' width="130"><?php echo $this->Form->input('rate[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm rate', 'min'=>'0.01','placeholder' => 'Rate']); ?></td>
 			<td width="130"><?php echo $this->Form->input('amount[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount']); ?></td>
 			<td  width="70"><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
@@ -522,7 +522,7 @@ $(document).ready(function() {
     });
 	
 	
-	$('.deleterow').die().live("click",function() {
+	/* $('.deleterow').die().live("click",function() {
 		var l=$(this).closest("table tbody").find("tr").length;
 		if (confirm("Are you sure to remove row ?") == true) {
 			if(l>2){
@@ -533,7 +533,19 @@ $(document).ready(function() {
 				rename_rows();
 			}
 		} 
-    });
+    }); */
+	
+	$('.deleterow').live("click",function() {
+		var l=$(this).closest("table tbody").find("tr").length;
+		if (confirm("Are you sure to remove row ?") == true) {
+			if(l>2){
+				var row_no=$(this).closest("tr").attr("row_no");
+				var del="tr[row_no="+row_no+"]";
+				$(del).remove();
+				rename_rows();
+			}
+		} 
+	});
 	
 	function add_row(){
 		
@@ -562,12 +574,13 @@ $(document).ready(function() {
 						required: true
 					});
 			
+			$(this).find("td:nth-child(2) input.heights").attr({name:"quotation_rows["+i+"][height]", id:"quotation_rows-"+i+"-height"});
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
-			$(this).find("td:nth-child(3) input").attr({name:"quotation_rows["+i+"][quantity]", id:"quotation_rows-"+i+"-quantity"}).rules('add', {
+			$(this).find("td:nth-child(3) input.quantity").attr({name:"quotation_rows["+i+"][quantity]", id:"quotation_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
-						min: 1,
+						min: 0.1,
 						messages: {
 							min: "Quantity can't be zero."
 						}
@@ -727,6 +740,22 @@ $(document).ready(function() {
 		$("#myModal2").hide();
     });
 
+	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows();
+				}
+		}	
+    });
 	
 	$('.insert_tc').die().live("click",function() {
 		$('#sortable').html("");
@@ -801,7 +830,7 @@ $(document).ready(function() {
 		}
 		
 		 if(popup_id){ 
-			last_three_rates_onload(popup_id,item_id);
+			last_three_rates_onload(popup_id,item_id,row_no);
 		}
 	});
 	
@@ -817,7 +846,7 @@ $(document).ready(function() {
 		url=url+'/'+item_id,
 		$.ajax({
 			url: url
-		}).done(function(response) { 
+		}).done(function(response) { //alert(response);	
 			var values = parseFloat(response);
 				row_no.find('.rate').attr({ min:values}).rules('add', {
 						min: values,
@@ -827,10 +856,11 @@ $(document).ready(function() {
 					});
 		});
 		
-		last_three_rates(popup_id,item_id);
+		last_three_rates(popup_id,item_id,row_no);
 	});
 	
-	function last_three_rates_onload(popup_id,item_id){
+	function last_three_rates_onload(popup_id,item_id,row_no){
+		   // row_no.find('.rate').val('');
 			var customer_id=$('select[name="customer_id"]').val();
 			//$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
@@ -841,7 +871,15 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
+					
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -857,10 +895,12 @@ $(document).ready(function() {
 			
 	}
 	
-	function last_three_rates(popup_id,item_id){
+	function last_three_rates(popup_id,item_id,row_no){ 
+			//row_no.find('.rate').val('');
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+			
 			if(customer_id){
 				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,
@@ -868,8 +908,15 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					
 					$('div[popup_ajax_id='+popup_id+']').html(response.html);
+					var values = parseFloat(response.minimum_selling_price);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
+					
 				});
 			}else{
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
@@ -887,7 +934,7 @@ $(document).ready(function() {
 		$(this).closest('textarea.note-codable').val(htm);
 	});
 		
-
+	
 
 	
 	
