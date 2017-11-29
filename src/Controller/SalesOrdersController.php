@@ -876,7 +876,7 @@ class SalesOrdersController extends AppController
 					);
 					
 			$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
-			if(!empty($id))
+			if($so->quotation_id>0)
 			{
 				$SalesOrdersDetail = $this->SalesOrders->get($id, [
 				'contain' => (['SalesOrderRows','Quotations'=>['QuotationRows'=>['SalesOrderRows']]])
@@ -1367,7 +1367,7 @@ class SalesOrdersController extends AppController
 				}
 			}	
 			$QuotaionQty=[];$totalSalesOrderQty=[];$MaxQty=[];
-			if(!empty($id))
+			if($salesOrder->quotation_id>0)
 			{
 				$SalesOrdersDetail = $this->SalesOrders->get($id, [
 				'contain' => (['SalesOrderRows','Quotations'=>['QuotationRows'=>['SalesOrderRows']]])
