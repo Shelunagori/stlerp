@@ -524,6 +524,11 @@ class SalesOrdersController extends AppController
 				$status_close=$this->request->query('status');
 				if($status_close=="open")
 				{
+					$totalSalesOrderIDs=[];
+					foreach($salesOrder->sales_order_rows as $sales_order_row)
+					{
+						$totalSalesOrderIDs[$sales_order_row->quotation_row_id]=$sales_order_row->quotation_row_id;
+					}
 					$totalSalesOrderQty =[];
 					$Quotation = $this->SalesOrders->Quotations->get($salesOrder->quotation_id, [
                      'contain' => ['QuotationRows'=>['SalesOrderRows'],'SalesOrders' => ['SalesOrderRows']]
@@ -547,7 +552,7 @@ class SalesOrdersController extends AppController
 					{
 						foreach($Quotation->quotation_rows as $quotation_row)
 						{
-							if($quotation_row->quantity!=$totalSalesOrderQty[$quotation_row->id])
+							if($quotation_row->quantity!=$totalSalesOrderQty[$quotation_row->id] )
 							{
 								$query_pending = $this->SalesOrders->Quotations->query();
 								$query_pending->update()
@@ -555,7 +560,7 @@ class SalesOrdersController extends AppController
 								->where(['id' => $salesOrder->quotation_id])
 								->execute();
 							}
-							else if($quotation_row->quantity==$totalSalesOrderQty[$quotation_row->id])
+							else if($quotation_row->quantity==$totalSalesOrderQty[$quotation_row->id] && $quotation_row->id==@$totalSalesOrderIDs[@$quotation_row->id])
 							{
 								$query_pending = $this->SalesOrders->Quotations->query();
 								$query_pending->update()
