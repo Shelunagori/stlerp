@@ -238,7 +238,7 @@
 							
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.id', [ 'class'=>'SalesOrderRowId','type' => 'hidden','value'=>$sales_order_rows->id]); ?>
 							
-							
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$quotation_row_id[@$sales_order_row->quotation_row_id],'readonly','class'=>'quotationId']); ?>
 							
 						</td>
 						
@@ -795,6 +795,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
+			$(this).find("td:nth-child(2) input[type=hidden]:eq(2) .quotationId").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
 			$(this).find("td:nth-child(3) input").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true
 					});

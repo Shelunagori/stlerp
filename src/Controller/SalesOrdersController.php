@@ -905,10 +905,11 @@ class SalesOrdersController extends AppController
 				foreach($SalesOrdersDetail->sales_order_rows as $sales_order_row)
 				{
 					@$MaxQty[@$sales_order_row->quotation_row_id] = @$QuotaionQty[@$sales_order_row->quotation_row_id]-@$totalSalesOrderQty[@$sales_order_row->quotation_row_id]+$sales_order_row->quantity;
+					@$quotation_row_id[@$sales_order_row->quotation_row_id] =@$sales_order_row->quotation_row_id;
 				}
 			}
 			//pr($MaxQty);exit;
-			$this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows','MaxQty','ItemsOptions'));
+			$this->set(compact('salesOrder', 'customers', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows','MaxQty','ItemsOptions'));
 			$this->set('_serialize', ['salesOrder']);
 			
 			
@@ -1427,10 +1428,11 @@ class SalesOrdersController extends AppController
 				foreach($SalesOrdersDetail->sales_order_rows as $sales_order_row)
 				{
 					@$MaxQty[@$sales_order_row->quotation_row_id] = @$QuotaionQty[@$sales_order_row->quotation_row_id]-@$totalSalesOrderQty[@$sales_order_row->quotation_row_id]+$sales_order_row->quantity;
+					@$quotation_row_id[@$sales_order_row->quotation_row_id] =@$sales_order_row->quotation_row_id;
 				}
 			}
 			////end unique validation and procees qty
-			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions'));
+			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else
