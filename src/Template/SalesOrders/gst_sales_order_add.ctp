@@ -252,7 +252,7 @@ if(!empty($copy))
 					?>
 						<tr class="tr1 maintr" row_no='<?php echo @$quotation_rows->id; ?>'>
 							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
-							<td width="280Px">
+							<td width="450px">
 								<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->id,'readonly','class'=>'rowid']);
 							if(!empty($quotation)){ ?>
 								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->item->id,'readonly','class'=>'itemsid']);?>
@@ -263,11 +263,16 @@ if(!empty($copy))
 							<?php }else{			
 								?>	
 								<div class="row">
+<<<<<<< HEAD
 									<div class="col-md-10 padding-right-decrease">
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+=======
+									<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+>>>>>>> 473035e2f989121393d241745f41d67ba60172fb
 									</div>
 							<?php } ?>				
-									 <div class="col-md-1 padding-left-decrease">
+									 <div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
 										<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;" popup_div_id="<?php echo $q; ?>"><div class="modal-backdrop fade in" ></div>
 											<div class="modal-dialog">
