@@ -1049,7 +1049,11 @@ class SalesOrdersController extends AppController
 			
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status_close=$this->request->query('status');
-			
+				$totalSalesOrderIDs=[];
+				foreach($salesOrder->sales_order_rows as $sales_order_row)
+				{
+					$totalSalesOrderIDs[$sales_order_row->quotation_row_id]=$sales_order_row->quotation_row_id;
+				}
 			
 				if($status_close=='close')
 				{
@@ -1099,7 +1103,7 @@ class SalesOrdersController extends AppController
 								->where(['id' => $salesOrder->quotation_id])
 								->execute();
 							}
-							else if($quotation_row->quantity==$totalSalesOrderQty[$quotation_row->id])
+							else if($quotation_row->quantity==$totalSalesOrderQty[$quotation_row->id] && $quotation_row->id==@$totalSalesOrderIDs[@$quotation_row->id])
 							{
 								$query_pending = $this->SalesOrders->Quotations->query();
 								$query_pending->update()
