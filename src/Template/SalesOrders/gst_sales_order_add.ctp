@@ -263,13 +263,10 @@ if(!empty($copy))
 							<?php }else{			
 								?>	
 								<div class="row">
-<<<<<<< HEAD
 									<div class="col-md-10 padding-right-decrease">
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
-=======
 									<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
->>>>>>> 473035e2f989121393d241745f41d67ba60172fb
 									</div>
 							<?php } ?>				
 									 <div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
