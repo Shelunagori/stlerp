@@ -321,13 +321,18 @@ class JobCardsController extends AppController
                 $this->Flash->error(__('The job card could not be saved. Please, try again.'));
             }
         }
-		$items = $this->JobCards->Items->find('list')->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+		$items = $this->JobCards->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
 						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 					}
 				);
+		$ItemsOptions=[];
+		foreach($items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+		}		
+			
         $companies = $this->JobCards->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('jobCard', 'salesOrder', 'companies','items','customers','last_jc_no'));
+        $this->set(compact('jobCard', 'salesOrder', 'companies','items','customers','last_jc_no','ItemsOptions'));
         $this->set('_serialize', ['jobCard']);
     }
 
@@ -384,12 +389,16 @@ class JobCardsController extends AppController
 				}
 			}
 			
-			$items = $this->JobCards->Items->find('list')->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
-						'ItemCompanies', function ($q) use($st_company_id) {
-							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
-						}
-					);
-			$this->set(compact('jobCard', 'salesOrders', 'companies','items','financial_year_data'));
+			$items = $this->JobCards->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+					'ItemCompanies', function ($q) use($st_company_id) {
+						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+					}
+				);
+		$ItemsOptions=[];
+		foreach($items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+		}	
+			$this->set(compact('jobCard', 'salesOrders', 'companies','items','financial_year_data','ItemsOptions'));
 			$this->set('_serialize', ['jobCard']);
 		}
 		else

@@ -473,6 +473,9 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(5) input').attr("name","sale_return_rows["+row_no+"][amount]").attr("id","sale_return_rows-"+row_no+"-amount").rules("add", "required");
 				$(this).css('background-color','#fffcda');
 				var count_srtext = parseFloat($('#main_tb tbody tr.tr2[row_no="'+row_no+'"] td:nth-child(3) input.sr_no').length);
+				if(count_srtext > 0){ 
+					$(this).find('.rename_check').attr('disabled','disabled');
+				}
 				$(this).find('td:nth-child(3) input.quantity').attr('min',count_srtext);
 				var qty=parseFloat($(this).find('td:nth-child(3) input.quantity').val());
 				var qtty = parseFloat(qty)-parseFloat(count_srtext);

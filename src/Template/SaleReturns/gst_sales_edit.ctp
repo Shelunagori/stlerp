@@ -763,6 +763,9 @@ $(document).ready(function() {
 				
 				var count_srtext = parseFloat($('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(3) input.sr_no').length);
 				$(this).find('td:nth-child(3) input.quantity').attr('min',count_srtext);
+				if(count_srtext > 0){ 
+					$(this).find('.rename_check').attr('disabled','disabled');
+				}
 				var qty=parseFloat($(this).find('td:nth-child(3) input.quantity').val());
 				
 				var qtty = parseFloat(qty)-parseFloat(count_srtext);

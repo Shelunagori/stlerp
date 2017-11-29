@@ -216,8 +216,11 @@ $('.closetin').on("click",function() {
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->id,'readonly']); ?>
 							</td>
 							<td>
-							<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item->id,'readonly']); ?>
-							<?php echo $sales_order_rows->item->name; ?></td>
+							<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item->id,'readonly','class'=>'itemids']); 
+							
+							echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$sales_order_rows->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
+							<?php echo $sales_order_rows->item->name; ?>
+							</td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount,'readonly','step'=>0.01]); ?></td>
@@ -363,7 +366,7 @@ $('.closetin').on("click",function() {
 						<label class="col-md-6 control-label">Credit Limits</label>
 						<div class="col-md-6" id="due">
 							<?php echo $this->Form->input('credit_limit', ['label' => false,'class' => 'form-control input-md','placeholder'=>'','readonly','value' => @$sales_order->customer->credit_limit]); ?><br/>
-							<a href="#" role="button" id="update_credit_limit">Update Credit Limit</a>
+							<!--<a href="#" role="button" id="update_credit_limit">Update Credit Limit</a>-->
 							<span id="update_credit_limit_wait"></span>
 						</div>
 					</div>
@@ -773,10 +776,7 @@ $(document).ready(function() {
 		rename_rows(); calculate_total();
     });
 	
-	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
-			rename_rows(); 
-    });
+	
 	
 	<?php if($process_status!="New"){ ?>
 	function rename_rows(){
@@ -788,7 +788,7 @@ $(document).ready(function() {
 			var val=$(this).find('td:nth-child(7) input[type="checkbox"]:checked').val();
 			if(val){
 				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
-				$(th is).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
+				$(th is).find('td:nth-child(2) input.itemids').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");
@@ -803,8 +803,8 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				var OriginalQty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				Quantity = OriginalQty.split('.'); qty=Quantity[0];
+				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
+				
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
@@ -1445,9 +1445,23 @@ $(document).ready(function() {
 		rename_rows(); calculate_total();
     });
 	
-	$('.quantity').die().live("keyup",function() {
-		var qty =$(this).val();
-			rename_rows(); 
+	$('.quantity').die().live("keyup",function() { 
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.itemids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input.quantity').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					rename_rows(); 
+				}
+		} 
     });
 	
 	<?php if($process_status!="New"){ ?>
@@ -1460,7 +1474,7 @@ $(document).ready(function() {
 			if(val){
 				$(this).find('td:nth-child(1) input').attr(
 				"name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
-				$(this).find('td:nth-child(2) input').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
+				$(this).find('td:nth-child(2) input.itemids').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
 				$(this).find('td:nth-child(3) input').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");
@@ -1475,9 +1489,8 @@ $(document).ready(function() {
 				$(this).css('background-color','#fffcda');
 				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]');
-				var OriginalQty=$(this).find('td:nth-child(3) input[type="text"]').val();
-				Quantity = OriginalQty.split('.'); 
-				qty=Quantity[0];
+				var qty=$(this).find('td:nth-child(3) input[type="text"]').val();
+				
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				
 				if(serial_l>0){
@@ -1499,7 +1512,7 @@ $(document).ready(function() {
 			}
 			else{
 				$(this).find('td:nth-child(1) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
-				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find('td:nth-child(2) input.itemids').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(5) input').attr({ name:"q", readonly:"readonly"}).attr({ id:"q", readonly:"readonly"}).rules( "remove", "required" );

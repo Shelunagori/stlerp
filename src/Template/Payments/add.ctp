@@ -41,7 +41,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				<div class="form-group">
 					<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
 					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y"),'data-date-start-date' 
-					=>$start_date ,'data-date-end-date' => $end_date]); ?>
+					=>$start_date ,'data-date-end-date' => $end_date,'required']); ?>
 				</div>
 
 					<span style="color: red;">
@@ -292,7 +292,7 @@ $(document).ready(function() {
 	
 	function rename_ref_rows(sel,received_from_id){
 		var i=0;
-		$(sel).find("table.ref_table tbody tr").each(function(){
+		$(sel).find("table.ref_table tbody tr").each(function(){ 
 			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
 			$(this).find("td:nth-child(1) select").attr({name:"payment_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+received_from_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
@@ -318,7 +318,7 @@ $(document).ready(function() {
 	
 	
 	
-	$('.received_from').live("change",function() {
+	$('.received_from').live("change",function() { 
 		var sel=$(this);
 		$(this).closest('div.select').css("width","266px");
 		load_ref_section(sel);
@@ -337,12 +337,15 @@ $(document).ready(function() {
 		var sel2=$(sel).closest('tr.main_tr');
 		var received_from_id=$(sel).closest("tr.main_tr").find("td:nth-child(1) select").find('option:selected').val();
 		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
-		url=url+'/'+received_from_id,
+		var a =url+'/'+received_from_id;
+		alert(a);
+		url=a,
 		$.ajax({
 			url: url,
 			type: 'GET',
 			dataType: 'text'
 		}).done(function(response) {
+			alert(response);
 			if(response.trim()=="Yes"){
 				var ref_table=$("#sample_ref div.ref").clone();
 				$(sel).closest("tr").find("td:nth-child(3)").html(ref_table);

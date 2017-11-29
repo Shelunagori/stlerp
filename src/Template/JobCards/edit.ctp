@@ -130,9 +130,9 @@
 												
 												<td>
 												<?php echo $this->Form->input('job_card_rows['.$p.'][sales_order_row_id]',['class' => 'form-control input-sm','type'=>'hidden','label'=>false,'value'=>$job_card_row->sales_order_row_id]); ?>
-												<?php echo $this->Form->input('job_card_rows['.$p.'][item_id]',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm item_id ','label'=>false,'value'=>$job_card_row->item_id]); ?>
+												<?php echo $this->Form->input('job_card_rows['.$p.'][item_id]',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm item_id ','label'=>false,'value'=>$job_card_row->item_id]); ?>
 												</td>
-												<td><?php echo $this->Form->input('job_card_rows['.$p.'][quantity]',['class' => 'form-control input-sm','placeholder'=>'Quantity','label'=>false,'value'=>$job_card_row->quantity]); ?></td>
+												<td><?php echo $this->Form->input('job_card_rows['.$p.'][quantity]',['class' => 'form-control input-sm quantity','placeholder'=>'Quantity','label'=>false,'value'=>$job_card_row->quantity]); ?></td>
 												<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
 												
 											</tr>
@@ -309,6 +309,25 @@ var form3 = $('#form_sample_3');
 		} 
     });
 	
+	$('.quantity').die().live("keyup",function() {   
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows_name();
+				}
+		}	
+	
+	
+	
+	});
 	function rename_rows_name(){
 		var i=0; 
 		$("#main_tb tbody#maintbody tr.main_tr").each(function(){
@@ -353,9 +372,9 @@ var form3 = $('#form_sample_3');
 			<td>0</td>
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm item_id','label'=>false,'required']); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm item_id','label'=>false,'required']); ?>
 			</td>
-			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm','label'=>false,'placeholder'=>'Quantity','required']); ?></td>
+			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','label'=>false,'placeholder'=>'Quantity','required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
 		</tr>
 		
@@ -369,9 +388,9 @@ var form3 = $('#form_sample_3');
 			<td>0</td>
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm item_id','label'=>false,'required']); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm item_id','label'=>false,'required']); ?>
 			</td>
-			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm','placeholder'=>'Quantity','label'=>false,'required']); ?></td>
+			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','placeholder'=>'Quantity','label'=>false,'required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
 		</tr>
 		

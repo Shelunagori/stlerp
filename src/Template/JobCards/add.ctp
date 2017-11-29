@@ -122,35 +122,10 @@
 		<!-- END FORM-->
 	</div>
 </div>
-<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
-<script>
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?><script>
 
 $(document).ready(function() { 
 //--------- FORM VALIDATION
-
-	jQuery.validator.addMethod("notEqualToGroup", function (value, element, options) {
-		// get all the elements passed here with the same class
-		var elems = $(element).parents('form').find(options[0]);
-		// the value of the current element
-		var valueToCompare = value;
-		// count
-		var matchesFound = 0;
-		// loop each element and compare its value with the current value
-		// and increase the count every time we find one
-		jQuery.each(elems, function () {
-			thisVal = $(this).val();
-			if (thisVal == valueToCompare) {
-				matchesFound++;
-			}
-		});
-		// count should be either 0 or 1 max
-		if (this.optional(element) || matchesFound <= 1) {
-			//elems.removeClass('error');
-			return true;
-		} else {
-			//elems.addClass('error');
-		}
-	}, jQuery.format(""))
 
 	var form3 = $('#form_sample_3');
 	var error3 = $('.alert-danger', form3);
@@ -162,17 +137,17 @@ $(document).ready(function() {
 		
 		rules: {
 				packing:{
-					required: true,
+					required: true
 				},
 				dispatch_destination:{
-					required: true,
+					required: true
 				},
 				required_date : {
-					  required: true,
+					  required: true
 				},
 				remark : {
-					  required: true,
-				},
+					  required: true
+				}
 			
 		},
 
@@ -228,8 +203,27 @@ $(document).ready(function() {
 		}
 
 	});
-	//--	 END OF VALIDATION
 	
+	//--	 END OF VALIDATION
+	$('.quantity').die().live("keyup",function() {   
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows_name();
+				}
+		}	
+	
+	
+	
+	});
 
 
 	onload_add_row();
@@ -274,7 +268,8 @@ $(document).ready(function() {
 		rename_rows_name();
     });
 	
-	$('.quantity').die().live("keyup",function() {
+	
+	/* $('.quantity').die().live("keyup",function() {
 		var asc=$(this).val();
 		var numbers =  /^[0-9]*\.?[0-9]*$/;
 		if(asc==0)
@@ -290,7 +285,7 @@ $(document).ready(function() {
 			$(this).val('');
 			return false;  
 		}
-	});
+	}); */
 	
 	
 	function rename_rows_name(){
@@ -346,7 +341,7 @@ $(document).ready(function() {
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
 			<?php echo $this->Form->input('sales_order_item_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm ','label'=>false]); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm ','label'=>false]); ?>
 			</td>
 			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','label'=>false,'placeholder'=>'Quantity','required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
@@ -364,7 +359,7 @@ $(document).ready(function() {
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
 			<?php echo $this->Form->input('sales_order_item_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$items,'class' => 'form-control input-sm item_id ','label'=>false,'required']); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm item_id ','label'=>false,'required']); ?>
 			</td>
 			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','placeholder'=>'Quantity','label'=>false,'required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>

@@ -1038,9 +1038,7 @@ class PurchaseReturnsController extends AppController
 					return $this->redirect(['action' => 'index']);
 				}
 				
-				else{
-					pr($purchaseReturn); exit;
-				}
+				
 			}
 				//}
 			///save GST Purchase Return End	
