@@ -154,8 +154,8 @@ class CustomersController extends AppController
 				$query = $this->Customers->LedgerAccounts->query();
 					$query->update()
 						->set(['bill_to_bill_account' => $customer->bill_to_bill_account])
-						->set(['account_second_subgroup_id' => $customer->account_second_subgroup_id])
-						->where(['id' => $customer->ledger_account_id])
+						->set(['account_second_subgroup_id' => $customer->account_second_subgroup_id,'name'=>$customer->customer_name,'alias'=>$customer->alias])
+						->where(['source_model' =>'Customers','source_id' => $customer->id])
 						->execute();
                 $this->Flash->success(__('The customer has been saved.'));
 

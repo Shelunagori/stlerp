@@ -128,8 +128,8 @@ class VendorsController extends AppController
             if ($this->Vendors->save($vendor)) {
 				$query = $this->Vendors->LedgerAccounts->query();
 					$query->update()
-						->set(['account_second_subgroup_id' => $vendor->account_second_subgroup_id])
-						->where(['id' => $vendor->ledger_account_id])
+						->set(['account_second_subgroup_id' => $vendor->account_second_subgroup_id,'name'=>$vendor->company_name])
+						->where(['source_model' =>'Vendors','source_id'=>$vendor->id])
 						->execute();
                 $this->Flash->success(__('The vendor has been saved.'));
 				return $this->redirect(['action' => 'index']);
