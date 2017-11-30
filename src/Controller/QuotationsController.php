@@ -75,7 +75,7 @@ class QuotationsController extends AppController
 		if($status==null or $status=='Pending'){ 
 			$where['Quotations.status']='Pending'; 
 		}elseif($status=='Converted into SalesOrder'){
-			$where['Quotations.status']='Converted Into Sales Order';
+			$where['Quotations.status']='Converted into SalesOrder';
 		}elseif($status=='Closed'){
 			$where['Quotations.status']='Closed';
 		}
