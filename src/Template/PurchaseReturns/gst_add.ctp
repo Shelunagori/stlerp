@@ -192,7 +192,7 @@
 					$q=0; $p=1; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): 
 					$max_qty=sizeof(@$options[@$invoice_booking_row->grn_row_id]);
 					//echo $min_qty;
-					if(@$options[@$invoice_booking_row->grn_row_id]){
+					
 					?>
 						<tr class="tr1" row_no='<?php echo @$q; ?>'>
 							<td rowspan="2"><?php echo $p++; ?></td>
@@ -273,18 +273,18 @@
 							</td>
 							<td></td>
 						</tr>
-						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						<?php if(@$options[$invoice_booking_row->grn_row_id]){  ?>
 						<tr class="tr3" row_no="<?php echo @$q; ?>">
 							<td></td>
 							<td colspan="18">
 							<?php 
-								echo $this->Form->input('sr_nos', ['label'=>false,'options' => $options[$invoice_booking_row->grn_row_id],'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']); 
+								echo $this->Form->input('sr_nos', ['label'=>false,'options' => @$options[$invoice_booking_row->grn_row_id],'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%']); 
 								?>
 							</td>
 						</tr>
 						<?php } ?>
 							<?php //}
-							$q++; }   endforeach; ?>
+							$q++;   endforeach; ?>
 				
 				</tbody>
 				<tfoot>
