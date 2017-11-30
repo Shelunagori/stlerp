@@ -579,7 +579,7 @@ class PaymentsController extends AppController
 
 			}
 			
-			
+			//pr($payment);exit;
 			if ($this->Payments->save($payment)) {
 				//pr($payment);exit;
 				foreach($payment->payment_rows as $key => $payment_row)

@@ -43,7 +43,7 @@ if($transaction_date <  $start_date ) {
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($nppayment->transaction_date)),'data-date-start-date' => $start_date,'data-date-end-date' => $end_date]); ?>
+                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($nppayment->transaction_date)),'data-date-start-date' => $start_date,'data-date-end-date' => $end_date,'required']); ?>
                 </div>
 					<span style="color: red;">
 						<?php if($chkdate == 'Not Found'){  ?>
@@ -105,7 +105,7 @@ if($transaction_date <  $start_date ) {
 					
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm  received_from','value'=>$nppayment_row->received_from_id,'style'=>'width: 266px; display: block;']); ?>
 					<div class="show_result">
-					<?php if($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='GRN'){
+					<?php if($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='grn'){
 							 $option=[];
 							foreach($grn as $grn1)
 								{ 
@@ -125,9 +125,9 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns select2me','style'=>'width:100%']);
 					}
-					elseif($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='INVOICE'){
+					elseif($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='invoice'){
 							 $option=[];
 							foreach($invoice as $invoice1)
 								{ 
@@ -147,7 +147,7 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices select2me','style'=>'width:100%']);
 					}
 					
 					?>
@@ -344,7 +344,7 @@ $(document).ready(function() {
 				{
 					if(thela_type=='grn')
 					{				
-						$(this).find("td:eq(0) select.grns").select2().attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.grns").attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.grns'],
 							messages: {
@@ -354,7 +354,7 @@ $(document).ready(function() {
 					}
 					if(thela_type=='invoice')
 					{				
-						$(this).find("td:eq(0) select.invoices").select2().attr({name:"nppayment_rows["+i+"][invoice_ids][]", id:"nppayment_rows-"+i+"-invoice_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.invoices").attr({name:"nppayment_rows["+i+"][invoice_ids][]", id:"nppayment_rows-"+i+"-invoice_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.invoices'],
 							messages: {

@@ -580,7 +580,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
 			$(this).find("td:nth-child(3) input.quantity").attr({name:"quotation_rows["+i+"][quantity]", id:"quotation_rows-"+i+"-quantity"}).rules('add', {
 						required: true,
-						min: 0.1,
+						min: 0.01,
 						messages: {
 							min: "Quantity can't be zero."
 						}
@@ -871,15 +871,22 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					
-					$('div[popup_ajax_id='+popup_id+']').html(response.html);
-					var values = parseFloat(response.minimum_selling_price);
-						row_no.find('.rate').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price : "+values
-						}
-					});
+					if(response){
+						$('div[popup_ajax_id='+popup_id+']').html(response.html);
+						var values = parseFloat(response.minimum_selling_price);
+							row_no.find('.rate').attr({ min:values}).rules('add', {
+							min: values,
+							messages: {
+								min: "Minimum selling price : "+values
+							}
+						});
+					}else{
+						$('div[popup_ajax_id='+popup_id+']').html('');
+						row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+					}	
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -908,15 +915,22 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					$('div[popup_ajax_id='+popup_id+']').html(response.html);
-					var values = parseFloat(response.minimum_selling_price);
-						row_no.find('.rate').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price : "+values
-						}
-					});
-					
+					if(response){
+						$('div[popup_ajax_id='+popup_id+']').html(response.html);
+						var values = parseFloat(response.minimum_selling_price);
+							row_no.find('.rate').attr({ min:values}).rules('add', {
+							min: values,
+							messages: {
+								min: "Minimum selling price : "+values
+							}
+						});
+					}else{
+						$('div[popup_ajax_id='+popup_id+']').html('');
+						row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+					}
 				});
 			}else{
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');

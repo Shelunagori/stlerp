@@ -776,13 +776,19 @@ $(document).ready(function() {
 			$.ajax({
 				url: url
 			}).done(function(response) {
-				
-				var values = parseFloat(response);
-					row_no.find('.rate').attr({ min:values}).rules('add', {
-							required:true,
-							min: values,
-							
-						});
+				if(response){
+					var values = parseFloat(response);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+								required:true,
+								min: values,
+								
+							});
+				}else{
+					row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+				}			
 			});
 		}else{
 			$(this).val();
@@ -806,15 +812,21 @@ $(document).ready(function() {
 			$.ajax({
 				url: url
 			}).done(function(response) {
-				
-				var values = parseFloat(response);
-					row_no.find('.rate').attr({ min:values}).rules('add', {
-							required:true,
-							min: values,
-							messages: {
-							min: "Minimum selling price : "+values
-						}
-						});
+				if(response){
+					var values = parseFloat(response);
+						row_no.find('.rate').attr({ min:values}).rules('add', {
+								required:true,
+								min: values,
+								messages: {
+								min: "Minimum selling price : "+values
+							}
+							});
+				}else{
+					row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+				}			
 			});
 		}else{
 			$(this).val();
@@ -834,14 +846,22 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					$('div[popup_ajax_id='+popup_id+']').html(response.html);
-					var values = parseFloat(response.minimum_selling_price);
-						row_no.find('.rate').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price : "+values
-						}
-					});
+					if(response){
+						$('div[popup_ajax_id='+popup_id+']').html(response.html);
+						var values = parseFloat(response.minimum_selling_price);
+							row_no.find('.rate').attr({ min:values}).rules('add', {
+							min: values,
+							messages: {
+								min: "Minimum selling price : "+values
+							}
+						});
+					}else{
+						$('div[popup_ajax_id='+popup_id+']').html('');
+						row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+					}	
 				});
 			}else{
 				$('input[r_popup_id='+popup_id+']').attr({ min:1}).rules('add', {
@@ -866,14 +886,22 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					$('div[popup_ajax_id='+popup_id+']').html(response.html);
-					var values = parseFloat(response.minimum_selling_price);
-						row_no.find('.rate').attr({ min:values}).rules('add', {
-						min: values,
-						messages: {
-							min: "Minimum selling price : "+values
-						}
-					});
+					if(response){
+						$('div[popup_ajax_id='+popup_id+']').html(response.html);
+						var values = parseFloat(response.minimum_selling_price);
+							row_no.find('.rate').attr({ min:values}).rules('add', {
+							min: values,
+							messages: {
+								min: "Minimum selling price : "+values
+							}
+						});
+					}else{
+						$('div[popup_ajax_id='+popup_id+']').html('');
+						row_no.find('.rate').attr({ min:0}).rules('add', {
+								required:true,
+								min: 0
+							});
+					}	
 				});
 			}else{
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
