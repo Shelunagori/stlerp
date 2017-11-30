@@ -238,6 +238,7 @@ $(document).ready(function() {
 			
 				//var thela_type = $(this).find("td:eq(0) select.received_from").val();
 				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				
 				if(thela_type)
 				{
 					if(thela_type=='grn')
@@ -338,14 +339,12 @@ $(document).ready(function() {
 		var received_from_id=$(sel).closest("tr.main_tr").find("td:nth-child(1) select").find('option:selected').val();
 		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
 		var a =url+'/'+received_from_id;
-		alert(a);
 		url=a,
 		$.ajax({
 			url: url,
 			type: 'GET',
 			dataType: 'text'
 		}).done(function(response) {
-			alert(response);
 			if(response.trim()=="Yes"){
 				var ref_table=$("#sample_ref div.ref").clone();
 				$(sel).closest("tr").find("td:nth-child(3)").html(ref_table);

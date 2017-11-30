@@ -103,7 +103,7 @@ if($transaction_date <  $start_date ) {
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$payment_row->received_from_id,'style'=>'width:266px;']); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					<div class="show_grns">
-					<?php if($payment_row->received_from_id=='101' || $payment_row->received_from_id=="165" || $payment_row->received_from_id=='313'){
+					<?php  if($payment_row->grn_ids){
 							 $option=[];
 							    foreach($grn as $grn1)
 								{ 
@@ -123,9 +123,9 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns select2me','style'=>'width:100%']);
 					}
-					elseif($payment_row->received_from_id=='105' || $payment_row->received_from_id=="168" || $payment_row->received_from_id=='316'){
+					elseif($payment_row->invoice_ids){
 							 $option=[];
 							foreach($invoice as $invoice1)
 								{ 
@@ -145,7 +145,7 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices select2me' ,'style'=>'width:100%']);
 					}
 					
 					?>
@@ -395,7 +395,9 @@ $(document).ready(function() {
 					});
 			$(this).find("td:eq(0) .row_id").val(i);
 			
-				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				var thela_type=$(this).find('td:nth-child(1) select.received_from  option:selected').attr('thelatype');
+				
+				
 				if(thela_type)
 				{
 					if(thela_type=='grn')

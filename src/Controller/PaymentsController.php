@@ -578,7 +578,10 @@ class PaymentsController extends AppController
 				}
 
 			}
+			
+			
 			if ($this->Payments->save($payment)) {
+				//pr($payment);exit;
 				foreach($payment->payment_rows as $key => $payment_row)
 				{
 					if(count($grnIds)>0)
@@ -733,7 +736,7 @@ class PaymentsController extends AppController
 		foreach($vouchersReferences->voucher_ledger_accounts as $data){
 			$where[]=$data->ledger_account_id;
 		}
-		$ReceivedFroms_selected='yes';
+		/* $ReceivedFroms_selected='yes';
 		if(sizeof($where)>0){
 			$receivedFroms = $this->Payments->ReceivedFroms->find('list',
 				['keyField' => function ($row) {
@@ -747,6 +750,17 @@ class PaymentsController extends AppController
 					}
 					
 				}])->where(['ReceivedFroms.id IN' => $where]);
+		}else{
+			$ReceivedFroms_selected='no';
+		} */
+		
+		$receivedFroms=[];
+		$receivedDatas = $this->Payments->ReceivedFroms->find();
+		$ReceivedFroms_selected='yes';
+		if(sizeof($where)>0){
+			foreach($receivedDatas as $receivedData){
+				$receivedFroms[$receivedData->id]=['text'=>$receivedData->name,'value'=>$receivedData->id,'thelatype'=>$receivedData->grn_invoice];
+			}
 		}else{
 			$ReceivedFroms_selected='no';
 		}

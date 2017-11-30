@@ -897,12 +897,12 @@ public function firstSubGroupsPnl($group_id,$from_date,$to_date)
 		
 		if($Ledger->expense_tracking=='yes')
 		{
-			if($Ledger->grn_invoice=='GRN')
+			if($Ledger->grn_invoice=='grn')
 			{
 				$grn_invoice=$this->LedgerAccounts->Grns->find()->where(['company_id' => $st_company_id,'purchase_thela_bhada_status'=>'no']);
 				$status ="GRN";
 			}
-			if($Ledger->grn_invoice=='INVOICE')
+			if($Ledger->grn_invoice=='invoice')
 			{
 				$grn_invoice=$this->LedgerAccounts->Invoices->find()->where(['company_id' => $st_company_id,'sales_thela_bhada_status'=>'no']);
 			 	$status ="INVOICE"; 
