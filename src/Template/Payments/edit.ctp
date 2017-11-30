@@ -402,7 +402,7 @@ $(document).ready(function() {
 				{
 					if(thela_type=='grn')
 					{				
-						$(this).find("td:eq(0) select.grns").select2().attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.grns").attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.grns'],
 							messages: {
@@ -412,7 +412,7 @@ $(document).ready(function() {
 					}
 					else if(thela_type=='invoice')
 					{		 		
-						$(this).find("td:eq(0) select.invoices").select2().attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.invoices").attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.invoices'],
 							messages: {
