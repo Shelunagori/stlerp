@@ -1107,7 +1107,7 @@ class CustomersController extends AppController
 	public function CustomerExportExcel($url = null){
 		$to_send = json_decode($url, true);
 		$TillDate=date('Y-m-d', strtotime($to_send['tdate']));
-		//$this->viewBuilder()->layout('index_layout');
+		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
@@ -1122,7 +1122,8 @@ class CustomersController extends AppController
 			$ReferenceDetails=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$LedgerAccount->id,'ReferenceDetails.transaction_date <='=>date('Y-m-d', strtotime($to_send['tdate']))]);
 			
 			
-			foreach($ReferenceDetails as $ReferenceDetail){
+			foreach($ReferenceDetails as $ReferenceDetail)
+			{
 				if($ReferenceDetail->reference_type=="On_account"){
 					@$Outstanding[$LedgerAccount->id]['OnAccount']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 				}else{
@@ -1151,5 +1152,6 @@ class CustomersController extends AppController
 		}
 		
 		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
+		$this->set('_serialize', ['LedgerAccounts']);
 	}
 }

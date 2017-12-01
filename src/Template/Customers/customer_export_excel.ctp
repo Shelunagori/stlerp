@@ -50,37 +50,37 @@
 			<td><?php echo $CustmerPaymentTerms[$LedgerAccount->id].' Days'; ?></td>
 			<td>
 				<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
-					echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab1'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab1'];
 				}else{
-					echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab1'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab1'];
 				} ?>
 			</td>
 			<td>
 				<?php if(@$Outstanding[$LedgerAccount->id]['Slab2'] > 0){
-					echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab2'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab2'];
 				}else{
-					echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab2'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab2'];
 				} ?>
 			</td>
 			<td>
 				<?php if(@$Outstanding[$LedgerAccount->id]['Slab3'] > 0){
-					echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab3'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab3'];
 				}else{
-					echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab3'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab3'];
 				} ?>
 			</td>
 			<td>
 				<?php if(@$Outstanding[$LedgerAccount->id]['Slab4'] > 0){
-					echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab4'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab4'];
 				}else{
-					echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab4'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab4'];
 				} ?>
 			</td>
 			<td>
 				<?php if(@$Outstanding[$LedgerAccount->id]['Slab5'] > 0){
-					echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab5'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab5'];
 				}else{
-					echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab5'].'</span>';
+					echo @$Outstanding[$LedgerAccount->id]['Slab5'];
 				} ?>
 			</td>
 			
@@ -94,9 +94,9 @@
 			<?php $TotalOutStanding=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
 			<?php 
 			if($TotalOutStanding>0){
-				echo '<span class="clrRed"><b>'.@$TotalOutStanding.'</b></span>';
+				echo @$TotalOutStanding;
 			}elseif($TotalOutStanding<0){
-				echo '<span>'.@$TotalOutStanding.'</span>';
+				echo @$TotalOutStanding;
 			} ?>
 			<?php
 				@$ColumnOutStanding+=@$TotalOutStanding;
