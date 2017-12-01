@@ -108,13 +108,13 @@ class InvoicesController extends AppController
 				} 
 				
 				
-				//pr($invoices);exit;
+			//pr($invoices);exit;
 		}else if($sales_return=='true'){
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
 			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
 		} 
-		
+		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url','current_rows'));
 		
