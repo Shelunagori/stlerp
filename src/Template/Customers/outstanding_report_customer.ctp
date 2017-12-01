@@ -7,12 +7,21 @@ table td, table th{
 	color:red;
 }
 </style>
+
 <div class="portlet box red">
+	
 	<div class="portlet-title">
 		<div class="caption">Outstandings for Customers for <?php echo $to_send['tdate']; ?></div>
 	</div>
+	
 	<div class="portlet-body">
+	<div class="actions">
+			<?php 
+			$url=json_encode($to_send, true);
+			echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+	</div>
 		<div class="table-responsive" >
+		
 			<table class="table table-bordered">
 			<thead>
 			<tr>
