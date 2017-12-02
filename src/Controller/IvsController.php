@@ -345,10 +345,11 @@ class IvsController extends AppController
 			
 			if($itemSerialRate > 0 && $itemSerialQuantity > 0){
 					$unit_rate = @$itemSerialRate/@$itemSerialQuantity;
+					//pr($unit_rate);
 				}
 		}	
 				
-				
+				// pr($unit_rate); exit;
 			return $unit_rate; 
 		//exit;	
 	}
@@ -428,6 +429,7 @@ class IvsController extends AppController
 						$itemledgers->quantity=$iv_row_item['quantity'];
 						$itemledgers->source_model='Inventory Vouchers';
 						$itemledgers->source_id=$iv->id;
+						$itemledgers->iv_row_item_id=$iv_row_item['id'];
 						$itemledgers->in_out='Out';
 						$itemledgers->rate=$unit_rate;
 						$itemledgers->processed_on=$iv->transaction_date;

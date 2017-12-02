@@ -1162,6 +1162,9 @@ class InvoiceBookingsController extends AppController
 				$ledger->voucher_source = 'Invoice Booking';
 				$this->InvoiceBookings->Ledgers->save($ledger);
 				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
 				//Reference Number coding
 					if(sizeof(@$ref_rows)>0){
 						
@@ -1302,11 +1305,6 @@ class InvoiceBookingsController extends AppController
 			//pr($invoiceBooking); exit;
             if ($this->InvoiceBookings->save($invoiceBooking)) { 
 			
-			foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
-				//pr($invoice_booking_row); 
-				$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
-			}
-				exit;
 			
 				$ref_rows=@$this->request->data['ref_rows'];
 				$invoiceBookingId=$invoiceBooking->id;
@@ -1437,6 +1435,12 @@ class InvoiceBookingsController extends AppController
 				$ledger->company_id = $invoiceBooking->company_id;
 				$ledger->voucher_source = 'Invoice Booking';
 				$this->InvoiceBookings->Ledgers->save($ledger);
+				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
+				//echo "hhhh";	exit;
+				
 				//pr($invoiceBooking); exit;
 				//Reference Number coding 
 				if(sizeof(@$ref_rows)>0){
@@ -1512,20 +1516,88 @@ class InvoiceBookingsController extends AppController
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
 			$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'Out'])->where(['ItemLedgers.source_model IN'=>['Inventory Vouchers','Inventory Transfer Voucher']])->toArray();
-			
-			foreach($ItemLedgersOuts as $ItemLedgersOut){
+
+			$ItemSerialNo=$this->InvoiceBookings->Items->ItemCompanies->find()->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.item_id'=>$item_id])->first();
+			//pr($ItemSerialNo); exit;
+			$serial_number_enable=$ItemSerialNo->serial_number_enable;
+
+			if($serial_number_enable==1){ 
 				
-				$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on < = '=>$supplier_date])->toArray();
-				foreach($ItemLedgersIns as $ItemLedgersIn){
-					pr($ItemLedgersIn->processed_on);
+				foreach($ItemLedgersOuts as $ItemLedgersOut){
+					
+					if($ItemLedgersOut->source_model=="Inventory Vouchers"){
+						$ItemSerialOuts=$this->InvoiceBookings->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out','SerialNumbers.iv_row_items '=>$ItemLedgersOut->iv_row_item_id])->toArray();
+					}else if($ItemLedgersOut->source_model=="Inventory Transfer Voucher"){
+						$ItemSerialOuts=$this->InvoiceBookings->ItemLedgers->Items->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out','SerialNumbers.iv_row_items '=>$ItemLedgersOut->iv_row_item_id])->toArray();
+					}
+					$ItemAmt=0;
+					$Itemqty=0;
+
+					foreach($ItemSerialOuts as $ItemSerialOut){
+						$ItemSerialParent=$this->InvoiceBookings->ItemLedgers->Items->SerialNumbers->get($ItemSerialOut->parent_id);
+						if(@$ItemSerialParent->grn_id > 0){ 
+							$ItemLedgerData =$this->InvoiceBookings->ItemLedgers->find()->where(['source_id'=>$ItemSerialParent->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialParent->grn_row_id])->first();
+							$ItemAmt+=@$ItemLedgerData->rate*@$ItemLedgerData->quantity;
+							$Itemqty+=@$ItemLedgerData->quantity;
+							
+						}
+						if(@$ItemSerialParent->sale_return_id > 0){ 
+							$ItemLedgerData =$this->InvoiceBookings->ItemLedgers->find()->where(['source_id'=>$ItemSerialParent->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialParent->sales_return_row_id])->first();
+							$ItemAmt+=@$ItemLedgerData->rate*@$ItemLedgerData->quantity;
+							$Itemqty+=@$ItemLedgerData->quantity;
+							
+						}
+						if(@$ItemSerialNumber->itv_id > 0){
+							$ItemLedgerData =$this->InvoiceBookings->ItemLedgers->find()->where(['source_id'=>$ItemSerialParent->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialParent->itv_row_id])->first();
+							$ItemAmt+=@$ItemLedgerData->rate*@$ItemLedgerData->quantity;
+							$Itemqty+=@$ItemLedgerData->quantity;
+							
+						}
+						if(@$ItemSerialParent->iv_row_id > 0){ 
+							$ItemLedgerData =$this->InvoiceBookings->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialParent->iv_row_id])->first();
+							$ItemAmt+=@$ItemLedgerData->rate*@$ItemLedgerData->quantity;
+							$Itemqty+=@$ItemLedgerData->quantity;
+							
+						}
+						
+					}
+					if($Itemqty==0){
+						$itemUnitRate=0;
+					}else{
+						$itemUnitRate=$ItemAmt/$Itemqty;
+					}
+
+					$query1 = $this->InvoiceBookings->ItemLedgers->query();
+					$query1->update()
+						->set(['rate' => $itemUnitRate])
+						->where(['id' => $ItemLedgersOut->id])
+						->execute();
+				}
+			}else{
+				foreach($ItemLedgersOuts as $ItemLedgersOut){
+					$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on <= '=>$ItemLedgersOut->processed_on])->toArray();
+					$ItemAmt=0;
+					$Itemqty=0;
+					foreach($ItemLedgersIns as $ItemLedgersIn){
+						$ItemAmt+=@$ItemLedgersIn->rate*@$ItemLedgersIn->quantity;
+						$Itemqty+=@$ItemLedgersIn->quantity;
+					} 
+					if($Itemqty==0){
+						$itemUnitRate=0;
+					}else{
+						$itemUnitRate=$ItemAmt/$Itemqty;
+					}
+					
+					
+				$query1 = $this->InvoiceBookings->ItemLedgers->query();
+				$query1->update()
+					->set(['rate' => $itemUnitRate])
+					->where(['id' => $ItemLedgersOut->id])
+					->execute();
+					
 				}
 			}
-			
-			exit;
-			
-			
-			pr($item_id); 
-			pr($st_company_id); 
+			return;
 		}
 
 	public function GstInvoiceBookingView($id = null)

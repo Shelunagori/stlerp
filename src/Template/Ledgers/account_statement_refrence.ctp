@@ -1,4 +1,4 @@
-<?php //$url_excel="/?".$url;?>
+<?php $url_excel="/?".$url;?>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -6,7 +6,7 @@
 			<span class="caption-subject font-blue-steel uppercase">Account Statement For Reference Balance</span>
 		</div>
 		<div class="actions">
-			<?php /* echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/Excel-Export-Account-Ref/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); */ ?>
+			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/Excel-Export-Account-Ref/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 		</div>
 <div class="portlet-body form">
 	<form method="GET" >
@@ -82,18 +82,10 @@
 					<td  align="right" colspan="3">On Account</td>	
 					<?php 
 						$on_acc=0;
-						/* $closing_balance=0;
-						$on_dr=@$ledger_amt['Debit']-@$ref_amt['debit'];
-						$on_cr=@$ledger_amt['Credit']-@$ref_amt['credit']; */
-						
 						$on_acc=$on_dr-$on_cr;
-						
-						
 						?>
 					<?php if($on_acc >= 0){ 
 					$closing_balance=($on_acc+$total_debit)-$total_credit;
-					
-					
 					?>
 								<td align="right"><?php echo $this->Number->format(abs($on_acc),['places'=>2]); ?>Dr.</td>	
 								<td align="right">0 Cr.</td>
@@ -111,7 +103,7 @@
 			
 			<div class="col-md-12">
 				<div class="col-md-8"></div>	
-				<div class="col-md-4 caption-subject " align="left" style="background-color:#E3F2EE; font-size: 16px;"><b>Closing Balance:- </b>
+				<div class="col-md-4 caption-subject " align="left" style="background-color:#E3F2EE; font-size: 16px;"><b>Closing Balance: </b>
 				<?php if(($on_acc+$total_debit)>$total_credit){
 					echo $this->Number->format(abs($closing_balance),['places'=>2]).'Dr.'; 
 				}else{
