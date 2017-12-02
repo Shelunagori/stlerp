@@ -82,7 +82,7 @@
 					
 					<div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label"> Last Company worked Name</label>
+							<label class="control-label"> Last Company worked </label>
 							<?php echo $this->Form->input('last_company', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Last Company Name']); ?>
 						</div>
 					</div>
@@ -372,12 +372,12 @@
 				</table>
 				
 				<?php //pr($Companies) ?>
-				<div class="row" id="used_comp">
+				<!--<div class="row" id="used_comp">
 					<div class="col-md-4">
 		<label class="control-label">Used By Companies <span class="required" aria-required="true">*</span></label>
 			<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
 </div>
-				</div>
+				</div>-->
 				
 				</div>
 		</div>

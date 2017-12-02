@@ -787,7 +787,7 @@ class InvoicesController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'confirm/'.$invoice->id]);
-            } else {  pr($invoice);exit;
+            } else {  
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }

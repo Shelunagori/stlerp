@@ -8,7 +8,7 @@
 		<!-- BEGIN FORM-->
 		<div class="row ">
 		<div class="col-md-6">
-		 <?= $this->Form->create($saleTax,array("class"=>"form-horizontal")) ?>
+		 <?= $this->Form->create($saleTax,array("class"=>"form-horizontal",'id'=>'form_sample_3')) ?>
 			<div class="form-body">
 				<div class="form-group">
 					<label class="control-label col-md-3">Figure  <span class="required" aria-required="true">
@@ -49,7 +49,7 @@
 					<div class="col-md-9">
 						<div class="input-icon right">
 							<i class="fa"></i>
-							<?php echo $this->Form->input('account_category_id', ['options'=>$AccountCategories,'empty' => "--Select Account Category--",'label' => false,'class' => 'form-control input-sm select2me']); ?>
+							<?php echo $this->Form->input('account_category_id', ['options'=>$AccountCategories,'empty' => "--Select Account Category--",'label' => false,'class' => 'form-control input-sm select2me','required']); ?>
 						</div>
 					</div>
 				</div>
@@ -61,7 +61,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_group_div">
-							<?php echo $this->Form->input('account_group_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Group--']); ?>
+							<?php echo $this->Form->input('account_group_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -74,7 +74,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_first_subgroup_div">
-							<?php echo $this->Form->input('account_first_subgroup_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account First Sub Group--']); ?>
+							<?php echo $this->Form->input('account_first_subgroup_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account First Sub Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -87,7 +87,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_second_subgroup_div">
-							<?php echo $this->Form->input('account_second_subgroup_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Second Sub Group--']); ?>
+							<?php echo $this->Form->input('account_second_subgroup_id', ['options' => [],'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Second Sub Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -96,14 +96,16 @@
 				<div class="form-group">
 					<label class="control-label col-md-3">Use In Companies </span>
 					</label>
-					<div class="col-md-9">
+					<div class="col-md-9" data-error-container="#form_2_services_error">
 						<div class="input-icon right">
 							<i class="fa"></i>
-							<div id="account_second_subgroup_div">
-							<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
+							<div id="account_second_subgroup_div" >
+								<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
 							</div>
+							
 						</div>
 					</div>
+					<div id="form_2_services_error"></div>
 				</div>
 				<div class="row">
 					<div class="col-md-12">
@@ -138,7 +140,7 @@
 				</div>	
 				<div class="row">
 					<div class="col-md-offset-4 col-md-8">
-						<button type="submit" class="btn btn-primary">Add Sale Tax</button>
+						<button type="submit" id='submitbtn' class="btn btn-primary">Add Sale Tax</button>
 					</div>
 				</div>
 			</div>
@@ -165,7 +167,14 @@
 						<?php if($saleTax->freeze==1) { $saletax ="Yes"; } else 
 							{ $saletax ="No"; } ?>
 						<td><?= h(++$page_no) ?></td>
-						<td><?php echo $saleTax->tax_figure.'('.$saleTax->invoice_description.')';?></td>
+						<td><?php 
+						if(!empty($saleTax->invoice_description)){
+							echo $saleTax->tax_figure.'('.$saleTax->invoice_description.')';
+						}else if(empty($saleTax->invoice_description)){
+							echo $saleTax->tax_figure.'('.$saleTax->quote_description.')';
+						}else{
+							echo $saleTax->tax_figure.'('.$saleTax->invoice_description.')';
+						}	?></td>
 						<td><?php echo $saletax; ?></td>
 						<td class="actions">
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $saleTax->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
@@ -179,7 +188,7 @@
 								]
 							) ?>-->
 							
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditCompany', $saleTax->id],array('escape'=>false,'class'=>'btn btn-xs green tooltips','data-original-title'=>'Add/Remove in other companies, Freeze/Unfreeze, Serial Number Enable/Disable')); ?>
+							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditCompany', $saleTax->id],array('escape'=>false,'class'=>'btn btn-xs green tooltips','data-original-title'=>'Add/Remove in other companies, Freeze/Unfreeze')); ?>
 						</td>
 					</tr>
 					<?php endforeach; ?>
@@ -205,7 +214,68 @@
 <script>
 
 $(document).ready(function() {
+	var form3 = $('#form_sample_3');
+	var error3 = $('.alert-danger', form3);
+	var success3 = $('.alert-success', form3);
+	form3.validate({
+		errorElement: 'span', //default input error message container
+		errorClass: 'help-block help-block-error', // default input error message class
+		focusInvalid: true, // do not focus the last invalid input
+		rules: {
+				
+			},
+
+		errorPlacement: function (error, element) { // render error placement for each input type
+			if (element.parent(".input-group").size() > 0) {
+				error.insertAfter(element.parent(".input-group"));
+			} else if (element.attr("data-error-container")) { 
+				error.appendTo(element.attr("data-error-container"));
+			} else if (element.parents('.radio-list').size() > 0) { 
+				error.appendTo(element.parents('.radio-list').attr("data-error-container"));
+			} else if (element.parents('.radio-inline').size() > 0) { 
+				error.appendTo(element.parents('.radio-inline').attr("data-error-container"));
+			} else if (element.parents('.checkbox-list').size() > 0) {
+				error.appendTo(element.parents('.checkbox-list').attr("data-error-container"));
+			} else if (element.parents('.checkbox-inline').size() > 0) { 
+				error.appendTo(element.parents('.checkbox-inline').attr("data-error-container"));
+			} else {
+				error.insertAfter(element); // for other inputs, just perform default behavior
+			}
+		},
+
+		invalidHandler: function (event, validator) { //display error alert on form submit   
+			success3.hide();
+			error3.show();
+		},
+
+		highlight: function (element) { // hightlight error inputs
+		   $(element)
+				.closest('.form-group').addClass('has-error'); // set error class to the control group
+		},
+
+		unhighlight: function (element) { // revert the change done by hightlight
+			$(element)
+				.closest('.form-group').removeClass('has-error'); // set error class to the control group
+		},
+
+		success: function (label) {
+			label
+				.closest('.form-group').removeClass('has-error'); // set success class to the control group
+		},
+
+		submitHandler: function (form) {
+			$('#submitbtn').prop('disabled', true);
+			$('#submitbtn').text('Submitting.....');
+			
+			success3.show();
+			error3.hide();
+			form[0].submit(); // submit the form
+		}
+
+	});
 	
+	
+	///
 	$('select[name="account_category_id"]').on("change",function() {
 	$('#account_group_div').html('Loading...');
 	var accountCategoryId=$('select[name="account_category_id"] option:selected').val();

@@ -87,7 +87,7 @@ class EmployeesController extends AppController
             if (in_array($ext, $arr_ext)) {
                 move_uploaded_file($file['tmp_name'], WWW_ROOT . '/signatures/' . $setNewFileName . '.' . $ext);
             }
-
+			
             if ($this->Employees->save($employee)) {
 
 
@@ -266,14 +266,14 @@ class EmployeesController extends AppController
 		$this->viewBuilder()->layout('index_layout');
         $this->request->allowMethod(['post', 'delete']);
         $employees_ledger = $this->Employees->LedgerAccounts->find()->where(['source_model' => 'Employees', 'source_id' => $employee_id, 'company_id' => $company_id])->first();
-
+		
         $ledgerexist = $this->Employees->Ledgers->exists(['ledger_account_id' => $employees_ledger->id]);
-
         if (!$ledgerexist) {
             $customer_Company_dlt = $this->Employees->EmployeeCompanies->find()->where(['EmployeeCompanies.employee_id' => $employee_id, 'company_id' => $company_id])->first();
             $customer_ledger_dlt = $this->Employees->LedgerAccounts->find()->where(['source_model' => 'Employees', 'source_id' => $employee_id, 'company_id' => $company_id])->first();
+			
             $VoucherLedgerAccountsexist = $this->Employees->VoucherLedgerAccounts->exists(['ledger_account_id' => $employees_ledger->id]);
-			//pr($VoucherLedgerAccountsexist );exit;
+
             if ($VoucherLedgerAccountsexist) {
                 $Voucherref = $this->Employees->VouchersReferences->find()->contain(['VoucherLedgerAccounts'])->where(['VouchersReferences.company_id' => $company_id]);
                 foreach ($Voucherref as $Voucherref) {

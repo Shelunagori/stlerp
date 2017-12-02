@@ -159,20 +159,20 @@
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Spouse Name</label>
-							<?php echo $this->Form->input('spouse_name', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Spouse Name']); ?>
+							<?php echo $this->Form->input('spouse_name', ['label' => false,'class' => 'form-control input-sm spouse','placeholder'=>'Spouse Name']); ?>
 						</div>
 					</div>
 				
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Date Of Anniversary</label>
-							<?php echo $this->Form->input('date_of_anniversary', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Anniversary']); ?>
+							<?php echo $this->Form->input('date_of_anniversary', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker doba','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Anniversary']); ?>
 					</div>
 					</div>
 						<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Number Of Child</label>
-							<?php echo $this->Form->input('children', ['label' => false,'class' => 'form-control input-sm','placeholder' => 'Number Of Child']); ?>
+							<?php echo $this->Form->input('children', ['label' => false,'class' => 'form-control input-sm nochild','placeholder' => 'Number Of Child']); ?>
 					</div>
 					</div>
 					<div class="col-md-4">
@@ -504,6 +504,8 @@ $(document).ready(function() {
 				$("#row_error").show();
 				return false;
 			}else{
+				$('#submitbtn').prop('disables',true);
+				$('#submitbtn').text('submitting....');
 				success3.show();
 				error3.hide();
 				form[0].submit(); // submit the form
@@ -626,6 +628,9 @@ $('select[name="account_first_subgroup_id"]').die().live("change",function() {
                      $('#married_info').show('fast');
                 });
 				 $('#id_radio1').click(function () {
+					 $('.spouse').val('');
+					 $('.doba').val('');
+					 $('.nochild').val('');
                      $('#married_info').hide('fast');
                 });
 				 });

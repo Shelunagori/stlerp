@@ -27,7 +27,8 @@
 					<label class="control-label">Item <span class="required" aria-required="true">*</span></label>
 					<br/>
 					<label><?php echo $Items->name; ?></label>
-					<?php echo $this->Form->input('item_id', ['type' => 'hidden','value' =>$Items->id]); ?>
+					<?php echo $this->Form->input('item_id', ['type' => 'hidden','value' =>$Items->id,'class'=>'itemiddata']); ?>
+					<?php echo $this->Form->input('item_id', ['type' => 'hidden','value' =>$SerialNumberEnable[0]->serial_number_enable,'class'=>'itemids']); ?>
 					
 				</div>
 			</div>
@@ -50,7 +51,7 @@
 			<div class="col-md-2" id="hide_quantity">
 				<div class="form-group">
 					<label class="control-label">New Quantity <span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('new_quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm','value' => 0,'placeholder'=>'New Quantity']); ?>
+					<?php echo $this->Form->input('new_quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','value' => 0,'placeholder'=>'New Quantity']); ?>
 				</div>
 			</div>
 			<div class="col-md-2">
@@ -87,7 +88,9 @@
 					</tr>
 				</thead>
 				<tbody>
-				<?php $i=0; foreach($ItemSerialNumbers as $ItemSerialNumber){ $i++;?>
+				<?php $i=0; foreach($ItemSerialNumbers as $ItemSerialNumber){ $i++;
+				
+				?>
 				<tr>
 						<td><?= h($i) ?></td>
 						<td><?= h($ItemSerialNumber->name); ?></td>
@@ -111,12 +114,11 @@
 		</div>
 		
 		
-		
 		<button type="submit" class="btn blue-hoki">Submit</button>
 
 		<?php 
 		
-		if(empty($ItemSerialNumbers[0]->serial_no)){?>
+		if(sizeof($ItemSerialNumber) == 0){?>
 		
 		<?= $this->Html->link('Delete',
 							['action' => 'DeleteItemOpeningBalance', $ItemLedger->id], 
@@ -224,7 +226,7 @@ $(document).ready(function() {
 		var rate=parseFloat($('input[name="rate"]').val());
 		if(isNaN(rate)) { var rate = 0; }
 		var total=totalquantity*rate;
-		$('input[name="value"]').val(total.toFixed(2));
+		$('input[name="value"]').val(round(total,2));
 	}	
 	
 	calculate_value();
@@ -253,20 +255,32 @@ $(document).ready(function() {
 		
 		var total=value/totalquantity;
 	
-		$('input[name="rate"]').val(total.toFixed(6));
+		$('input[name="rate"]').val(round(total,6));
     });
 
-   $('input[name="quantity"]').die().live("keyup",function() {
-	  $('#itm_srl_num').find('input.sr_no').remove();
-		add_sr_textbox();
-	
-    });
+   
 	$('input[name="new_quantity"]').die().live("keyup",function() {
 	  $('#itm_srl_num').find('input.sr_no').remove();
 		add_sr_textbox();
 	
     });
-	
+	$('.quantity').die().live("keyup",function() { 
+		var item_id=$('.itemiddata').val();
+		
+		if(item_id > 0){ 
+			var serial_number_enable=$('.itemids').val();
+				if(serial_number_enable == '1'){
+					var quantity=$('.quantity').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							$('.quantity').val("");
+						}
+				 $('#itm_srl_num').find('input.sr_no').remove();
+					add_sr_textbox(); 
+				}
+		}	
+    });
 	
 	show_table();
 	
@@ -318,9 +332,9 @@ $(document).ready(function() {
 		});
 	});
 	
-	$('input[name="quantity"]').on("keyup",function() {
+	/* $('input[name="quantity"]').on("keyup",function() {
 		add_sr_textbox(); 
-	});	
+	}); */	
    function add_sr_textbox(){
 	   $('#itm_srl_num').show();
 	  // var serial_number=$('input[name=serial_number_enable]').val();

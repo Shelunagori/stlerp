@@ -235,7 +235,7 @@ $(document).ready(function() {
 	$('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
-		$(this).val(v.toFixed(2));
+		$(this).val(round(v,2));
 	});
 	
 	$('.mian_amount').live("keyup",function() {
@@ -286,11 +286,11 @@ $(document).ready(function() {
 			}
 			if(on_acc>=0){
 				on_acc=Math.abs(on_acc);
-				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(round(on_acc,2));
 				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc_cr_dr);
 			}else{
 				on_acc=Math.abs(on_acc);
-				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(round(on_acc,2));
 				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val('Cr');
 			}
 		}
@@ -313,12 +313,12 @@ $(document).ready(function() {
 			}
 			if(on_acc>=0){
 				on_acc=Math.abs(on_acc);
-				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(round(on_acc,2));
 				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc_cr_dr);
 				
 			}else{
 				on_acc=Math.abs(on_acc);
-				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(on_acc);
+				$("#main_table tfoot tr:nth-child(1) td:nth-child(2) input").val(round(on_acc,2));
 				$("#main_table tfoot tr:nth-child(1) td:nth-child(3) input").val('Dr');
 			}
 		}

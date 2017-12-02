@@ -25,7 +25,7 @@
 			<div class="col-md-4">
 				<div class="form-group">
 					<label class="control-label">Item <span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('Item_id', ['empty'=>'--select--','label' => false,'class' => 'form-control input-sm select2me','options'=>$Items,'required']); ?>
+					<?php echo $this->Form->input('Item_id', ['empty'=>'--select--','label' => false,'class' => 'form-control input-sm select2me itemids','options'=>$ItemsOptions,'required']); ?>
 				</div>
 			</div>
 
@@ -43,7 +43,7 @@
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">quantity <span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Quantity']); ?>
+					<?php echo $this->Form->input('quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity']); ?>
 				</div>
 			</div>
 			<div class="col-md-3">
@@ -168,7 +168,7 @@ $(document).ready(function() {
 		var rate=parseFloat($('input[name="rate"]').val());
 		if(isNaN(rate)) { var rate = 0; }
 		var total=quantity*rate;
-		$('input[name="value"]').val(total.toFixed(2));
+		$('input[name="value"]').val(round(total,2));
     });
 	$('input[name="value"]').die().live("blur",function() { 
 		var quantity=parseFloat($('input[name="quantity"]').val());
@@ -178,7 +178,7 @@ $(document).ready(function() {
 		
 		var total=value/quantity;
 	
-		$('input[name="rate"]').val(total.toFixed(6));
+		$('input[name="rate"]').val(round(total,2));
     });
 
 
@@ -198,10 +198,22 @@ $(document).ready(function() {
 		});
 	});
 	
-	$('input[name="quantity"]').on("keyup",function() {
-		add_sr_textbox(); 
-	});	
-		
+	$('.quantity').die().live("keyup",function() { 
+		var item_id=$('.itemids option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=$('.itemids option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=$('.quantity').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							$('.quantity').val("");
+						}
+				add_sr_textbox(); 
+				}
+		}	
+    });
+	
    function add_sr_textbox(){
 	    $('#itm_srl_num').show();
 	   var serial_number=$('input[name=serial_number_enable]').val(); 

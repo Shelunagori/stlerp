@@ -209,10 +209,19 @@ class ItemsController extends AppController
 		$financial_year = $this->Items->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		
 		$ItemLedger = $this->Items->ItemLedgers->newEntity();
-		$Items=$this->Items->find('list')->matching('ItemCompanies', function ($q) use($st_company_id) {
+		/* $Items=$this->Items->find()->matching('ItemCompanies', function ($q) use($st_company_id) {
 			return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 			 
 		});
+		*/
+		$Items=$this->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
+			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+		}]); 		
+				
+		$ItemsOptions=[];
+		foreach($Items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+		}
 		
 		if ($this->request->is('post')) {
 			$item_id=$this->request->data['Item_id'];
@@ -239,15 +248,6 @@ class ItemsController extends AppController
 			
 			if($this->request->data['serial_number_enable']==1){
 				
-				/* foreach($this->request->data['serial_numbers'] as $serial_number){
-					$ItemSerialNumber = $this->Items->ItemSerialNumbers->newEntity();
-					$ItemSerialNumber->item_id = $this->request->data['Item_id'];
-					$ItemSerialNumber->serial_no = $serial_number[0];
-					$ItemSerialNumber->status = 'In';
-					$ItemSerialNumber->master_item_id = $this->request->data['Item_id'];
-					$ItemSerialNumber->company_id = $st_company_id;
-					$this->Items->ItemSerialNumbers->save($ItemSerialNumber);
-				} */
 				foreach($this->request->data['serial_numbers'] as $serial_number)
 				{
 					$ItemSerialNumber = $this->Items->SerialNumbers->newEntity();
@@ -256,6 +256,7 @@ class ItemsController extends AppController
 					$ItemSerialNumber->status = 'In';
 					$ItemSerialNumber->company_id = $st_company_id;
 					$ItemSerialNumber->is_opening_balance = 'Yes';
+					$ItemSerialNumber->transaction_date = date('Y-m-d',strtotime($this->request->data['date']));
 					$this->Items->SerialNumbers->save($ItemSerialNumber);
 				}
 			}
@@ -263,7 +264,7 @@ class ItemsController extends AppController
 			return $this->redirect(['action' => 'Opening-Balance']);
 		}
 		
-		$this->set(compact('Items','ItemLedger','financial_year','ItemCompanies'));
+		$this->set(compact('Items','ItemLedger','financial_year','ItemCompanies','ItemsOptions'));
 		$this->set('_serialize', ['ItemLedger']);
 	}
 	
@@ -329,6 +330,7 @@ class ItemsController extends AppController
 					$ItemSerialNumber->status = 'In';
 					$ItemSerialNumber->company_id = $st_company_id;
 					$ItemSerialNumber->is_opening_balance = 'Yes';
+					$ItemSerialNumber->transaction_date = date("Y-m-d",strtotime($date));
 					$this->Items->SerialNumbers->save($ItemSerialNumber);
 				}
 			}	
@@ -533,7 +535,7 @@ class ItemsController extends AppController
 public function SerialNumberEnabled($company_id=null,$item_id=null,$item_serial_no=null)
 	{
 		if($item_serial_no == 0){
-			$ItemSerialNumbers = $this->Items->ItemSerialNumbers->exists(['item_id'=>$item_id,'company_id'=>$company_id]);
+			$ItemSerialNumbers = $this->Items->SerialNumbers->exists(['item_id'=>$item_id,'company_id'=>$company_id]);
 			if($ItemSerialNumbers){ 
 				$this->Flash->error(__('Item Can not Disabled.These Item has Serial Number , Firstly, you can delete serial number then you can disabled'));
 			}else{
@@ -633,7 +635,7 @@ public function CheckCompany($company_id=null,$item_id=null)
 				->where(['item_id'=>$Item->id,'company_id'=>$st_company_id,'in_out'=>'In'])
 				->group(['item_id']);
 				
-			$ItemSerialNumbers=$this->Items->ItemSerialNumbers->find()->where(['item_id'=>$Item->id,'company_id'=>$st_company_id]);
+			$ItemSerialNumbers=$this->Items->SerialNumbers->find()->where(['item_id'=>$Item->id,'company_id'=>$st_company_id]);
 			
 			$ItemLedgers= (Array)$ItemLedgers->toArray();
 			if($ItemSerialNumbers->count()!=@$ItemLedgers[0]->total_quantity){
@@ -649,14 +651,14 @@ public function CheckCompany($company_id=null,$item_id=null)
 		
 		$item = $this->Items->newEntity();
 		if ($this->request->is('post')) {
+			pr($this->request->is('post'));exit;
 			foreach($this->request->data['serial_numbers'] as $serial_number){
-				$query = $this->Items->ItemSerialNumbers->query();
+				$query = $this->Items->SerialNumbers->query();
 				$query->insert(['item_id', 'serial_no', 'status', 'master_item_id', 'company_id'])
 					->values([
 						'item_id' => $item_id,
 						'serial_no' => $serial_number,
 						'status' => 'In',
-						'master_item_id' => $item_id,
 						'company_id' => $company_id
 					]);
 				$query->execute();

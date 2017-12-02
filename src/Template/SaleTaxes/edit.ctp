@@ -23,8 +23,7 @@
 					
 				</div>
 				<div class="form-group">
-					<label class="control-label col-md-3">Description(Quote)  <span class="required" aria-required="true">
-					* </span>
+					<label class="control-label col-md-3">Description(Quotation) 
 					</label>
 					<div class="col-md-4">
 						<div class="input-icon right">
@@ -34,8 +33,7 @@
 					</div>
 				</div>
 				<div class="form-group">
-					<label class="control-label col-md-3">Description(Invoice)  <span class="required" aria-required="true">
-					* </span>
+					<label class="control-label col-md-3">Description(Invoice) 
 					</label>
 					<div class="col-md-4">
 						<div class="input-icon right">
@@ -51,7 +49,7 @@
 					<div class="col-md-4">
 						<div class="input-icon right">
 							<i class="fa"></i>
-							<?php echo $this->Form->input('account_category_id', ['options'=>$AccountCategories,'empty' => "--Select Account Category--",'label' => false,'class' => 'form-control input-sm select2me']); ?>
+							<?php echo $this->Form->input('account_category_id', ['options'=>$AccountCategories,'empty' => "--Select Account Category--",'label' => false,'class' => 'form-control input-sm select2me','required']); ?>
 						</div>
 					</div>
 				</div>
@@ -63,7 +61,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_group_div">
-							<?php echo $this->Form->input('account_group_id', ['options' => $AccountGroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Group--']); ?>
+							<?php echo $this->Form->input('account_group_id', ['options' => $AccountGroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -76,7 +74,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_first_subgroup_div">
-							<?php echo $this->Form->input('account_first_subgroup_id', ['options' => $AccountFirstSubgroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account First Sub Group--']); ?>
+							<?php echo $this->Form->input('account_first_subgroup_id', ['options' => $AccountFirstSubgroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account First Sub Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -89,7 +87,7 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							<div id="account_second_subgroup_div">
-							<?php echo $this->Form->input('account_second_subgroup_id', ['options' => $AccountSecondSubgroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Second Sub Group--']); ?>
+							<?php echo $this->Form->input('account_second_subgroup_id', ['options' => $AccountSecondSubgroups,'label' => false,'class' => 'form-control input-sm select2me','empty'=>'--Select Account Second Sub Group--','required']); ?>
 							</div>
 						</div>
 					</div>
@@ -146,7 +144,7 @@
 				</div>	
 				<div class="row">
 					<div class="col-md-offset-4 col-md-8">
-						<button type="submit" class="btn btn-primary">Edit Sale Tax</button>
+						<button type="submit" id='submitbtn' class="btn btn-primary">Edit Sale Tax</button>
 					</div>
 				</div>
 			</div>
@@ -274,6 +272,8 @@ $(document).ready(function() {
 				$("#row_error").show();
 				return false;
 			}else{
+				$('#submitbtn').prop('disabled', true);
+				$('#submitbtn').text('Submitting.....');
 				success3.show();
 				error3.hide();
 				form[0].submit(); // submit the form
