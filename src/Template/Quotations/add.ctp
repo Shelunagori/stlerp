@@ -881,7 +881,7 @@ $(document).ready(function() {
 							}
 						});
 					}else{
-						$('div[popup_ajax_id='+popup_id+']').html('');
+						$('div[popup_ajax_id='+popup_id+']').html(response.minimum_selling_price);
 						row_no.find('.rate').attr({ min:0}).rules('add', {
 								required:true,
 								min: 0
@@ -925,7 +925,7 @@ $(document).ready(function() {
 							}
 						});
 					}else{
-						$('div[popup_ajax_id='+popup_id+']').html('');
+						$('div[popup_ajax_id='+popup_id+']').html(response.minimum_selling_price);
 						row_no.find('.rate').attr({ min:0}).rules('add', {
 								required:true,
 								min: 0
