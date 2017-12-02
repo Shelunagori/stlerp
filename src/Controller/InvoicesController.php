@@ -1629,6 +1629,7 @@ class InvoicesController extends AppController
 					endforeach;
 					$html.='</tbody>
 				</table>';
+				die(json_encode(array("html"=>$html,"minimum_selling_price"=>$minimumSellingPrice)));
 			}else{
 				$html='<span style="font-size: 14px;">Minimum Selling Rate for Item <b>"'.$item->name.'"</b> : '. $Number->format(0,[ 'places' => 2]).'</span><br/><br/>
 				<div style="font-size: 14px;">'.$customer_text.'</div>
@@ -1645,8 +1646,9 @@ class InvoicesController extends AppController
 					
 					$html.='</tbody>
 				</table>';
+				die(json_encode(array("html"=>$html,"minimum_selling_price"=>0)));
 			}
-			die(json_encode(array("html"=>$html,"minimum_selling_price"=>$minimumSellingPrice)));
+			
 		}
 	}
 	
