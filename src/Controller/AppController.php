@@ -168,6 +168,26 @@ class AppController extends Controller
 			}
 			return $option;
 		}
+		
+		
+	public function StockValuationWithDate($date){
+		
+	}
+	
+	public function differenceInOpeningBalance(){
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$this->loadModel('Ledgers');
+		$Ledgers=$this->Ledgers->find()->where(['Ledgers.company_id'=>$st_company_id, 'Ledgers.voucher_source'=> 'Opening Balance']);
+		
+		$output=0;
+		foreach($Ledgers as $Ledger){
+			$output+=$Ledger->debit;
+			$output-=$Ledger->credit;
+		}
+		return $output;
+	}
 
     /**
      * Before render callback.

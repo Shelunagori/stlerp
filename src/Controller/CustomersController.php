@@ -154,8 +154,8 @@ class CustomersController extends AppController
 				$query = $this->Customers->LedgerAccounts->query();
 					$query->update()
 						->set(['bill_to_bill_account' => $customer->bill_to_bill_account])
-						->set(['account_second_subgroup_id' => $customer->account_second_subgroup_id])
-						->where(['id' => $customer->ledger_account_id])
+						->set(['account_second_subgroup_id' => $customer->account_second_subgroup_id,'name'=>$customer->customer_name,'alias'=>$customer->alias])
+						->where(['source_model' =>'Customers','source_id' => $customer->id])
 						->execute();
                 $this->Flash->success(__('The customer has been saved.'));
 
@@ -1104,4 +1104,54 @@ class CustomersController extends AppController
 		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
 	}
 	
+	public function CustomerExportExcel($url = null){
+		$to_send = json_decode($url, true);
+		$TillDate=date('Y-m-d', strtotime($to_send['tdate']));
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
+			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
+			->order(['LedgerAccounts.name'=>'ASC']);
+		$CustmerPaymentTerms=[]; $Outstanding=[];
+		foreach($LedgerAccounts as $LedgerAccount){
+			$Customer =$this->Customers->get($LedgerAccount->source_id);
+			$CustmerPaymentTerms[$LedgerAccount->id]=$Customer->payment_terms;
+			
+			$ReferenceDetails=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$LedgerAccount->id,'ReferenceDetails.transaction_date <='=>date('Y-m-d', strtotime($to_send['tdate']))]);
+			
+			
+			foreach($ReferenceDetails as $ReferenceDetail)
+			{
+				if($ReferenceDetail->reference_type=="On_account"){
+					@$Outstanding[$LedgerAccount->id]['OnAccount']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+				}else{
+					$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					$TransactionDateAfterPaymentTerms = date('Y-m-d', strtotime($transaction_date. ' + '.$Customer->payment_terms.' days'));
+					
+					$datediff = strtotime($TillDate) - strtotime($TransactionDateAfterPaymentTerms);
+					$Diff=floor($datediff / (60 * 60 * 24));
+					
+					if($Diff<=0){
+						@$Outstanding[$LedgerAccount->id]['NoDue']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range0']) and ($Diff<=$to_send['range1'])){
+						@$Outstanding[$LedgerAccount->id]['Slab1']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range2']) and ($Diff<=$to_send['range3'])){
+						@$Outstanding[$LedgerAccount->id]['Slab2']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range4']) and ($Diff<=$to_send['range5'])){
+						@$Outstanding[$LedgerAccount->id]['Slab3']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range6']) and ($Diff<=$to_send['range7'])){
+						@$Outstanding[$LedgerAccount->id]['Slab4']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}elseif(($Diff>$to_send['range7'])){
+						@$Outstanding[$LedgerAccount->id]['Slab5']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
+					}
+					
+				}
+			}
+		}
+		
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
+		$this->set('_serialize', ['LedgerAccounts']);
+	}
 }

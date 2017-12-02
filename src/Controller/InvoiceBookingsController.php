@@ -1301,6 +1301,13 @@ class InvoiceBookingsController extends AppController
 			$invoiceBooking->edited_by=$this->viewVars['s_employee_id'];
 			//pr($invoiceBooking); exit;
             if ($this->InvoiceBookings->save($invoiceBooking)) { 
+			
+			foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+				//pr($invoice_booking_row); 
+				$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+			}
+				exit;
+			
 				$ref_rows=@$this->request->data['ref_rows'];
 				$invoiceBookingId=$invoiceBooking->id;
 				$grn_id=$invoiceBooking->grn_id;
@@ -1499,6 +1506,27 @@ class InvoiceBookingsController extends AppController
         $this->set(compact('invoiceBooking','ReferenceDetails', 'grns','financial_year_data','ReferenceBalances','invoice_booking_id','v_LedgerAccount', 'ledger_account_details', 'ledger_account_vat','chkdate','fromdate1','tody1','GstTaxes','st_company_id'));
         $this->set('_serialize', ['invoiceBooking']);
     }
+	
+	public function weightedAvgCostIvs($item_id=null,$supplier_date=null){ 
+			$this->viewBuilder()->layout('');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'Out'])->where(['ItemLedgers.source_model IN'=>['Inventory Vouchers','Inventory Transfer Voucher']])->toArray();
+			
+			foreach($ItemLedgersOuts as $ItemLedgersOut){
+				
+				$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on < = '=>$supplier_date])->toArray();
+				foreach($ItemLedgersIns as $ItemLedgersIn){
+					pr($ItemLedgersIn->processed_on);
+				}
+			}
+			
+			exit;
+			
+			
+			pr($item_id); 
+			pr($st_company_id); 
+		}
 
 	public function GstInvoiceBookingView($id = null)
     {

@@ -42,7 +42,7 @@
 										<?php 
 											$options = [];
 											$options = [['text'=>'All','value'=>'All'],['text'=>'Negative','value'=>'Negative'],['text'=>'Zero','value'=>'Zero'],['text'=>'Close Stock','value'=>'Positive']];
-										echo $this->Form->input('stock', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$stock)]); ?></div>
+										echo $this->Form->input('stock', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$stock_status)]); ?></div>
 									</td>
 								<!--	<td width="15%">
 										<label class="control-label">From</label>
@@ -158,7 +158,7 @@
 						</tr>
 						
 						<?php } ?>
-						<?php if($to_date == date('d-m-Y') && !($stockstatus== "Positive")){ ?>
+						<?php if($to_date == date('d-m-Y') && !($stock_status== "All") ){ ?>
 						<?php $page_no1=$page_no; foreach($ItemDatas as $key=>$ItemData){ ?>
 						
 						<tr class="main_tr1" id="<?= h($key) ?>">

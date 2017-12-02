@@ -132,14 +132,14 @@ class GrnsController extends AppController
 			$where1['Grns.date_created <=']=$To;
 		}
       
-		$where=[];
+		/* $where=[];
 		if($status=='Pending'){
 			$where['status']='Pending';
 		}elseif($status=='Invoice-Booked'){
 			$where['status']='Invoice-Booked';
-		}
+		} */
 		
-		$grns = $this->Grns->find()->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC'])->contain(['PurchaseOrders', 'Companies','Vendors']);
+		$grns = $this->Grns->find()->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC'])->contain(['PurchaseOrders', 'Companies','Vendors']);
         $this->set(compact('grns','pull_request','status','grn_pull_request'));
         $this->set('_serialize', ['grns']);
 	}

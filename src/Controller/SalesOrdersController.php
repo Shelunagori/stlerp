@@ -174,8 +174,6 @@ class SalesOrdersController extends AppController
 				//	exit;
 		}
 		
-		//pr($Actionstatus); exit;
-		
 		$total_sales=[]; $total_qty=[];
 		foreach($salesOrders as $salesorder){
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
