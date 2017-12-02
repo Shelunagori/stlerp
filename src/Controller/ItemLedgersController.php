@@ -867,7 +867,7 @@ class ItemLedgersController extends AppController
 				if(@$ItemSerialNumber->is_opening_balance == "Yes"){
 				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
 					if($outExist == 0){  
-						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Items",'company_id'=>$st_company_id])->where($where1)->first();
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->where($where1)->first();
 						//pr($ItemLedgerData); 
 						if($ItemLedgerData){
 						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
