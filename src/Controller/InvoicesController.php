@@ -1643,7 +1643,14 @@ class InvoicesController extends AppController
 						</tr>
 					</thead>
 					<tbody>';
-					
+					$i=0; foreach($Invoices as $invoice):
+					$html.='<tr>
+							<td>'.h(++$i).'</td>
+							<td>'.$Html->link(($invoice->in1.'/IN'.str_pad($invoice->id, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4),'/Invoices/confirm/'.$invoice->id,array('target'=>'_blank')).'</td>
+							<td>'.h(date('d-m-Y',strtotime($invoice->date_created))).'</td>
+							<td>'.$Number->format($invoice->_matchingData['InvoiceRows']->rate,[ 'places' => 2]).'</td>
+						</tr>';
+					endforeach;
 					$html.='</tbody>
 				</table>';
 				die(json_encode(array("html"=>$html,"minimum_selling_price"=>0)));

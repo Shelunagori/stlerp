@@ -1062,7 +1062,7 @@ $(document).ready(function() {
 							}
 						});
 				}else{
-					$('div[popup_ajax_id='+popup_id+']').html('');
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 					row_no.find('.rate').attr({ min:0}).rules('add', {
 								required:true,
 								min: 0
@@ -1103,7 +1103,7 @@ $(document).ready(function() {
 							}
 						});
 					}else{
-					$('div[popup_ajax_id='+popup_id+']').html('');
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);
 					row_no.find('.rate').attr({ min:0}).rules('add', {
 								required:true,
 								min: 0
