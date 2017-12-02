@@ -1356,6 +1356,7 @@ class LedgersController extends AppController
 		}
 		
 		$openingValue= $this->StockValuationWithDate($from_date);
+		
 		$closingValue= $this->StockValuation();
 		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue'));
 		
@@ -1392,7 +1393,7 @@ class LedgersController extends AppController
 			}
 		}
 		
-		$GrossProfit= 0; //$this->GrossProfit($from_date,$to_date);
+		$GrossProfit= $this->GrossProfit($from_date,$to_date);
 		$closingValue= $this->StockValuation();
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		
