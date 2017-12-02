@@ -525,7 +525,8 @@ class ItemLedgersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		//$date=date('Y-m-d');
-		//pr($date); exit;
+		$date=$this->request->query('date');
+		pr($date); exit;
 		$Items =$this->ItemLedgers->Items->find()->contain(['ItemCompanies'=>function($p) use($st_company_id){
 		return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 		}]);
@@ -533,7 +534,7 @@ class ItemLedgersController extends AppController
 		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
 			if(@$Item->item_companies[0]->serial_number_enable==0){  
-				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
 				foreach($StockLedgers as $StockLedger){ 
 					if($StockLedger->in_out=='In'){ 
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
