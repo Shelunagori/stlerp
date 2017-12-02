@@ -375,6 +375,111 @@ class AppController extends Controller
 		return $sumValue;
 	}
 	
+	public function stockValuationWithDate2($date=null){ 
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		//$date=date('Y-m-d');
+		//pr($date);exit;
+		//$date=$this->request->query('date');
+		$date=date("Y-m-d",strtotime($date));
+	
+		$this->loadModel('ItemLedgers');
+		$Items =$this->ItemLedgers->Items->find()->contain(['ItemCompanies'=>function($p) use($st_company_id){
+		return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+		}]);
+		
+		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
+		foreach($Items as $Item){
+			if(@$Item->item_companies[0]->serial_number_enable==0){  
+				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+				foreach($StockLedgers as $StockLedger){ 
+					if($StockLedger->in_out=='In'){ 
+						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								$stock[$Item->id][]=$StockLedger->rate;
+							}
+						}
+					}
+				}
+				foreach($StockLedgers as $StockLedger){
+					if($StockLedger->in_out=='Out' and $StockLedger->processed_on<$date){
+						if(sizeof(@$stock[$Item->id])>0){
+							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+						}
+					}
+				}
+				if(sizeof(@$stock[$Item->id]) > 0){ 
+					foreach(@$stock[$Item->id] as $stockRate){
+						@$sumValue+=@$stockRate;
+					}
+				}
+			}else if(@$Item->item_companies[0]->serial_number_enable==1){
+				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+				foreach($ItemSerialNumbers as $ItemSerialNumber){		
+					if(@$ItemSerialNumber->grn_id > 0){ 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
+						if($outExist == 0){
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+						//	pr($ItemLedgerData); 
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
+					if(@$ItemSerialNumber->sale_return_id > 0){ 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
+						if($outExist == 0){
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+						//	pr($ItemLedgerData); 
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
+					if(@$ItemSerialNumber->itv_id > 0){
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
+						if($outExist == 0){  
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+							//pr($ItemLedgerData); 
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
+					if(@$ItemSerialNumber->iv_row_id > 0){
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
+						if($outExist == 0){  
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->itv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+							//pr($ItemLedgerData); 
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
+					if(@$ItemSerialNumber->is_opening_balance == "Yes"){
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
+						if($outExist == 0){ 
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
+							
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
+				}
+			
+		}
+		}
+		
+		
+		return $sumValue;
+	}
+	
 	public function differenceInOpeningBalance(){
 		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -388,14 +493,12 @@ class AppController extends Controller
 			$output-=$Ledger->credit;
 		}
 		
-		/* $this->loadModel('ItemLedgers');
+		$this->loadModel('ItemLedgers');
 		$ItemLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.company_id'=>$st_company_id, 'ItemLedgers.source_model'=> 'Items']);
 		
 		foreach($ItemLedgers as $ItemLedger){
-			
-		} */
-		$closingValue= $this->StockValuation();
-		$output+=$closingValue;
+			$output+=$ItemLedger->quantity*$ItemLedger->rate;
+		}
 		return $output;
 	}
 	
