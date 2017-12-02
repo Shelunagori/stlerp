@@ -259,7 +259,7 @@ class AppController extends Controller
 							//pr($ItemLedgerData); 
 							if($ItemLedgerData){
 							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-							@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+							@$sumValue+=@$ItemLedgerData['rate'];
 							}
 						}
 					}
