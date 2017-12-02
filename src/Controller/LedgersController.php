@@ -752,6 +752,60 @@ class LedgersController extends AppController
 	
 	}
 	
+	public function TrailBalance (){
+		$this->viewBuilder()->layout('index_layout');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+        $st_year_id = $session->read('st_year_id');
+		$ledger_account_id=$this->request->query('ledger_account_id');
+		$financial_year = $this->Ledgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		
+		$from_date = $this->request->query('From');
+		 $to_date   = $this->request->query('To');
+		 
+		  
+		if($from_date){ 
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date   = date("Y-m-d",strtotime($to_date));
+		$LedgerAccounts = $this->Ledgers->LedgerAccounts->find()->where(['LedgerAccounts.company_id'=>$st_company_id]);
+		$OpeningBalanceCredit=[];
+		$OpeningBalanceDebit=[];
+		$TransactionsDebit=[];
+		$TransactionsCredit=[];
+			foreach($LedgerAccounts as $LedgerAccount){
+				$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$LedgerAccount->id]);
+				foreach($Ledgers as $Ledger){ 
+					$Ledger->transaction_date = date("Y-m-d",strtotime($Ledger->transaction_date));
+					if($Ledger->transaction_date <= $from_date && $Ledger->debit > 0){ //pr($from_date);  pr($Ledger->transaction_date); 
+						@$OpeningBalanceDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+					}
+					if($Ledger->transaction_date <= $from_date && $Ledger->credit > 0){ 
+						@$OpeningBalanceCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+					}
+					if(($Ledger->transaction_date > $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->debit > 0){
+						@$TransactionsDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+					}
+					if(($Ledger->transaction_date > $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->credit > 0){
+						@$TransactionsCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+					}
+				}
+			}
+		
+		}
+		if(empty($from_date) || empty($to_date))
+		{
+			$from_date = date("Y-m-d",strtotime($financial_year->date_from));
+			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
+		} 
+		
+		//pr($TransactionsCredit); exit;
+		
+		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date'));
+		
+	}
+	
 	public function AccountStatement (){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
