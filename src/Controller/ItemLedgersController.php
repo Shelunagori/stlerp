@@ -517,7 +517,7 @@ class ItemLedgersController extends AppController
 			
 		}
 		}
-		pr($sumValue); exit;
+		return $sumValue;
 	}
 	
 	
