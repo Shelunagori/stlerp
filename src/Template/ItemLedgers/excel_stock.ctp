@@ -56,62 +56,90 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $total_inv=0; $page_no=0; 
-		foreach ($item_stocks as $key=> $item_stock){
-		if($item_stock!=0){
-			if(@$in_qty[$key]==0){ 
-				$per_unit=@$item_rate[$key];
-			}else{
-				$per_unit=@$item_rate[$key]/@$in_qty[$key];
-			}
-		}else{ 
-			if(@$in_qty[$key]==0){ 
-				$per_unit=@$item_rate[$key];
-			}else{
-				$per_unit=@$item_rate[$key]/@$in_qty[$key];
-			}
-			
-		}
-		
-		$amount=@$item_stock*abs($per_unit);
-		$total_inv+=$amount;
-		?>
+							<tbody>
+						<?php $total_inv=0; $totalColumn=0; $page_no=0;  $RowTotal=0;
+						foreach ($item_stocks as $key=> $item_stock){
+						if($item_stock!=0){
+							if(@$in_qty[$key]==0){ 
+								$per_unit=@$item_rate[$key];
+							}else{
+								$per_unit=@$item_rate[$key]/@$in_qty[$key];
+							}
+						}else{ 
+							if(@$in_qty[$key]==0){ 
+								$per_unit=@$item_rate[$key];
+							}else{
+								$per_unit=@$item_rate[$key]/@$in_qty[$key];
+							}
 							
-			<tr class="main_tr" id="<?= h($key) ?>">
-				<td><?= h(++$page_no) ?></td>
-				<td width="20%">
-					
-					<?= h($items_names[$key]) ?></td>
-				<td><?= h($item_stock) ?></td>
-				<td><?= h($items_unit_names[$key]) ?></td>
-				<td align="right">
-					<?php if($item_stock!=0){ ?>
-						<?= h($this->Number->format(@$per_unit,['places'=>2])) ?>
-					<?php } ?>
-				</td>
-				<td align="right"><?php if(abs($amount)==0){ $amount=abs($amount);  } ?><?= h($this->Number->format($amount,['places'=>2])) ?></td>
-			</tr>
-			
-			<?php } ?>
-			<?php if($to_date == date('d-m-Y')){ ?>
-			<?php $page_no1=$page_no; foreach($ItemDatas as $key=>$ItemData){ ?>
-			
-			<tr class="main_tr1" id="<?= h($key) ?>">
-				<td><?= h(++$page_no1) ?></td>
-				<td width="20%">
-					
-					<?= h($ItemData) ?></td>
-				
-				<td><?= h(0) ?></td>
-				
-				<td><?= h($ItemUnits[$key]) ?></td>
-				<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
-				<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
-			</tr>
-			<?php }} ?>
-			<tr>
-				<td colspan="5" align="right">Total</td>
-				<td align="right"><?= h($this->Number->format($total_inv,['places'=>2])) ?></td>
-			</tr>
+						}
+						
+						$amount=@$item_stock*abs($per_unit);
+						$total_inv+=$amount;
+						?>
+							
+						<tr class="main_tr" id="<?= h($key) ?>">
+							<td><?= h(++$page_no) ?></td>
+							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide show_data" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
+								<button type="button" class="btn btn-xs tooltips revision_show" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
+								&nbsp;&nbsp;<?= h($items_names[$key]) ?><div class="show_ledger"></div></td>
+							<td><?= h($item_stock) ?></td>
+							<td><?= h($items_unit_names[$key]) ?></td>
+							<td align="right">
+								<?php 
+								//pr($key);
+								//pr(@$itemSerialNumberStatus[$key]);
+								 if(@$itemSerialNumberStatus[$key]==1){
+									if($item_stock > 0){
+										//echo @$unitRate[$key]."yes";
+										echo $this->Number->format(@$unitRate[$key],['places'=>2]);
+										$RowTotal=@$unitRate[$key]*$item_stock;
+									}else{
+										echo '0';
+										$RowTotal=0;
+									}
+								}else{
+									if($item_stock > 0){
+										$UR=@$sumValue[$key]/$item_stock;
+										echo $this->Number->format($UR,['places'=>2]);
+										$RowTotal=$UR*@$item_stock;
+									}else{
+										echo '0';
+										$RowTotal=0;
+									}
+								} 
+								
+								?>
+							</td>
+							<td align="right">
+								<?php
+								    echo $this->Number->format($RowTotal,['places'=>2]);
+									$totalColumn+=$RowTotal;
+								?>
+							</td>
+						</tr>
+						
+						<?php } ?>
+						<?php if($to_date == date('d-m-Y') && !($stock_status== "All") ){ ?>
+						<?php $page_no1=$page_no; foreach($ItemDatas as $key=>$ItemData){ ?>
+						
+						<tr class="main_tr1" id="<?= h($key) ?>">
+							<td><?= h(++$page_no1) ?></td>
+							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide1 show_data1" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
+								<button type="button" class="btn btn-xs tooltips revision_show1" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
+								&nbsp;&nbsp;<?= h($ItemData) ?><div class="show_ledger1"></div></td>
+							
+							<td><?= h(0) ?></td>
+							
+							<td><?= h($ItemUnits[$key]) ?></td>
+							<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
+							<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
+						</tr>
+						<?php } } ?>
+						<tr>
+							<td colspan="5" align="right">Total</td>
+							<td align="right"><?= h($this->Number->format($totalColumn,['places'=>2])) ?></td>
+						</tr>
+					</tbody>
 		</tbody>
 </table>	

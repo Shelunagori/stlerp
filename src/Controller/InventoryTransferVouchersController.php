@@ -1246,10 +1246,11 @@ class InventoryTransferVouchersController extends AppController
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 					foreach($ItemSerialNumbers as $ItemSerialNumber){		
 						if(@$ItemSerialNumber->grn_id > 0){ 
-							$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
-					if($outExist == 0){
+							echo $outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
+							echo $ItemSerialNumber->id;
+					if($outExist != 1){
 						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
-					//	pr($ItemLedgerData); 
+						 pr($ItemSerialNumber); 
 						if($ItemLedgerData){
 							@$itemSerialQuantity=$itemSerialQuantity+1;
 							@$itemSerialRate+=@$ItemLedgerData['rate'];
@@ -1282,12 +1283,12 @@ class InventoryTransferVouchersController extends AppController
 				
 			}
 			
-			if($itemSerialRate > 0 && $itemSerialQuantity > 0){
+			if($itemSerialRate > 0 && $itemSerialQuantity > 0){ 
 					$unit_rate = @$itemSerialRate/@$itemSerialQuantity;
 				}
 		}	
 				
-				
+		//exit;	
 			return $unit_rate; 
 		//exit;	
 	}
