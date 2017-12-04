@@ -229,7 +229,7 @@ if(!empty($copy))
 								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['label' => false,'type' => 'hidden','value' => @$quotation_rows->item->id,'readonly','class'=>'itemsid']);?>
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease" >	
-								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
+								<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q]); ?>
 								</div>
 							<?php }else{			
 								?>
@@ -287,7 +287,7 @@ if(!empty($copy))
 							<td>
 							<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -882,13 +882,15 @@ $(document).ready(function() {
 					});
 			$(this).find("td:nth-child(5) input").attr({name:"sales_order_rows["+i+"][amount]", id:"sales_order_rows-"+i+"-amount"}).rules("add", "required");
 			$(this).find("td:nth-child(6) select").attr("name","sales_order_rows["+i+"][excise_duty]");
-			$(this).find("td:nth-child(7) select").select2().attr("name","sales_order_rows["+i+"][sale_tax_id]").rules('add', {required: true});
-			$(this).find("td:nth-child(7) input:eq( 0 )").attr("name","sales_order_rows["+i+"][sale_tax_description]");
-			var description=$(this).find("td:nth-child(7) select option:selected").attr("description");
-			$(this).find("td:nth-child(7) input:eq( 0 )").val(description);
-			$(this).find("td:nth-child(7) input:eq( 1 )").attr("name","sales_order_rows["+i+"][sale_tax_ledger_account_id]");
-			var ledger_account_id=$(this).find("td:nth-child(7) select option:selected").attr("ledger_account_id");
-			$(this).find("td:nth-child(7) input:eq( 1 )").val(ledger_account_id);
+			$(this).find("td:nth-child(7) select").attr("name","sales_order_rows["+i+"][sale_tax_id]").rules('add', {
+						required: true
+					});
+			/* $(this).find("td:nth-child(7) input:eq( 0 )").attr("name","sales_order_rows["+i+"][sale_tax_description]"); */
+			//var description=$(this).find("td:nth-child(7) select option:selected").attr("description");
+			//$(this).find("td:nth-child(7) input:eq( 0 )").val(description);
+			/* $(this).find("td:nth-child(7) input:eq( 1 )").attr("name","sales_order_rows["+i+"][sale_tax_ledger_account_id]"); */
+			/* var ledger_account_id=$(this).find("td:nth-child(7) select option:selected").attr("ledger_account_id");
+			$(this).find("td:nth-child(7) input:eq( 1 )").val(ledger_account_id); */
 		i++; });
 		
 		var i=0;
@@ -926,40 +928,40 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var qty=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
-			var Amount=qty*Rate;
+			var Amount=round(qty*Rate,2);
 			$(this).find("td:nth-child(5) input").val(round(Amount,2));
-			total=total+Amount;
+			total=round(total+Amount,2);
 		});
 		
 		
 		if($("#discount_per").is(':checked')){
 			var discount_per=parseFloat($('input[name="discount_per"]').val());
-			var discount_amount=(total*discount_per)/100;
+			var discount_amount=round((total*discount_per)/100,3);
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 			$('input[name="discount"]').val(round(discount_amount,2));
 		}else{
 			var discount_amount=parseFloat($('input[name="discount"]').val());
 			if(isNaN(discount_amount)) { var discount_amount = 0; }
 		}
-		total=total-discount_amount
+		total=round(total-discount_amount,2);
 		
 		$('input[name="total"]').val(round(total,2));
 		
 		if($("#pnfper").is(':checked')){
 			var pnf_per=parseFloat($('input[name="pnf_per"]').val());
-			var pnf_amount=(total*pnf_per)/100;
+			var pnf_amount=round((total*pnf_per)/100,3);
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 			$('input[name="pnf"]').val(round(pnf_amount,2));
 		}else{
 			var pnf_amount=parseFloat($('input[name="pnf"]').val());
 			if(isNaN(pnf_amount)) { var pnf_amount = 0; }
 		}
-		var total_after_pnf=total+pnf_amount;
+		var total_after_pnf=round(total+pnf_amount,2);
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
 		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
 		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
-		var sale_tax=(total_after_pnf*sale_tax_per)/100;
+		var sale_tax=round((total_after_pnf*sale_tax_per)/100,3);
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
 		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
 		

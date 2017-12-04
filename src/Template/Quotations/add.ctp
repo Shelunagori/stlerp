@@ -70,7 +70,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 								$options[]=['text' =>$merge, 'value' => $customer->id, 'employee_id' => $customer->employee_id,'file' => ($customer->filenames)];
 
 							}
-							echo $this->Form->input('customer_id', ['empty' => "--Select--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me','value' => @$quotation->customer_id]); ?>
+							echo $this->Form->input('customer_id', ['empty' => "--Select--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me customer_id','value' => @$quotation->customer_id]); ?>
 						</div>
 					</div>
 					<br/>
@@ -215,7 +215,7 @@ $end_date=$last.'-'.$financial_month_last->month;
 							<td>
 								<div class="row">
 									<div class="col-md-11 padding-right-decrease">
-										<?php echo $this->Form->input('quotation_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$quotation_rows->item->id,'popup_id'=>$q]); ?>
+										<?php echo $this->Form->input('quotation_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm item_box item_id','value' => @$quotation_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
 									<div class="col-md-1 padding-left-decrease">
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
@@ -801,9 +801,7 @@ $(document).ready(function() {
 	$('.popup_btn').live("click",function() {
 		var popup_id=$(this).attr('popup_id');
 		$("div[popup_div_id="+popup_id+"]").show();
-		
-		
-    });
+	});
 	
 	$("select.item_box").each(function(){
 		var popup_id=$(this).attr('popup_id');
@@ -817,7 +815,6 @@ $(document).ready(function() {
 			$.ajax({
 				url: url
 			}).done(function(response) {
-				
 				var values = parseFloat(response);
 					row_no.find('.rate').attr({ min:values}).rules('add', {
 							required:true,
@@ -861,7 +858,9 @@ $(document).ready(function() {
 	
 	function last_three_rates_onload(popup_id,item_id,row_no){
 		   // row_no.find('.rate').val('');
+		   
 			var customer_id=$('select[name="customer_id"]').val();
+			
 			//$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
 			if(customer_id){

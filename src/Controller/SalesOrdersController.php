@@ -623,20 +623,28 @@ class SalesOrdersController extends AppController
 		
         $companies = $this->SalesOrders->Companies->find('all');
 		$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
-		/* $items = $this->SalesOrders->Items->find('list')->matching(
+				
+		$items = $this->SalesOrders->Items->find()->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
 						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 					} 
-				)->order(['Items.name' => 'ASC']); */
-				
-		$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]);		
+				)->order(['Items.name' => 'ASC']);		
 				
 		$ItemsOptions=[];
-		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
-		}			
+		foreach($items as $item){ 
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+		}		
+
+		$Item_datas = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}	
 		$transporters = $this->SalesOrders->Carrier->find('list')->order(['Carrier.transporter_name' => 'ASC']);
 		//$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC']);
 		$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -681,7 +689,7 @@ class SalesOrdersController extends AppController
 		}
 		
 		//pr($totalSalesOrderQty);exit;
-        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','sales_orders_qty','MaxQty','ItemsOptions'));
+        $this->set(compact('salesOrder', 'customers', 'companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','sales_orders_qty','MaxQty','ItemsOptions','ItemsOptionsData'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
