@@ -141,6 +141,7 @@ class ReferenceDetailsController extends AppController
 			}else if($remider<0){
 				$bal=abs($remider).' Cr';
 			}
+			$bal= round($bal,2);
 			if($referenceDetail->total_debit!=$referenceDetail->total_credit){
 				$option[]=['text' =>$referenceDetail->reference_no.' ('.$bal.')', 'value' => $referenceDetail->reference_no, 'amt' => abs($remider)];
 			}
@@ -174,6 +175,7 @@ class ReferenceDetailsController extends AppController
 			else{
 				$bal=0;
 			}
+			$bal= round($bal,2);
 			if($referenceDetail->total_debit!=$referenceDetail->total_credit OR $referenceDetail->reference_no==$ref_name)
 			{
 				$option[]=['text' =>$referenceDetail->reference_no.' ('.$bal.')', 'value' => $referenceDetail->reference_no, 'amt' => abs($remider)];

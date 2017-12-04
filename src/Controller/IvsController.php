@@ -185,7 +185,7 @@ class IvsController extends AppController
 						if(!empty($serial_numbers_iv_row_item)){
 						$UnitRateSerialItem=0;
 						 foreach($serial_numbers_iv_row_item as $sr_nos_out){ 
-							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($iv_row_item->item_id); 
+							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($sr_nos_out); 
 							 $serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
 							 
 							 $query = $this->Ivs->IvRows->SerialNumbers->query();
