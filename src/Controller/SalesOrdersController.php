@@ -837,20 +837,31 @@ class SalesOrdersController extends AppController
 					);
 			$companies = $this->SalesOrders->Companies->find('all', ['limit' => 200]);
 			$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
-			/* $items = $this->SalesOrders->Items->find('list')->matching(
+			
+			$Items = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);		
+					
+					
+			
+				
+			$ItemsOptions=[];
+			foreach($Items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
+
+			$Item_datas = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
 						'ItemCompanies', function ($q) use($st_company_id) {
 							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 						}
-					)->order(['Items.name' => 'ASC']); */
+					);		
 					
-			$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]);		
-				
-		$ItemsOptions=[];
-		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
-		}			
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
 					
 			////start unique validation and procees qty
 			$SalesOrders = $this->SalesOrders->get($id, [
@@ -915,7 +926,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 			//pr($MaxQty);exit;
-			$this->set(compact('salesOrder', 'customers', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows','MaxQty','ItemsOptions'));
+			$this->set(compact('salesOrder', 'customers', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','sales_orders_qty','invoice_row_id','quotation_qty','current_so_rows','quotation_row_id','existing_quotation_rows','MaxQty','ItemsOptions','ItemsOptionsData'));
 			$this->set('_serialize', ['salesOrder']);
 			
 			
@@ -1144,14 +1155,30 @@ class SalesOrdersController extends AppController
 					} 
 				)->order(['Items.name' => 'ASC']); */
 				
-		$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]);		
+		$Items = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);		
+					
+					
+			
 				
-		$ItemsOptions=[];
-		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
-		}			
+			$ItemsOptions=[];
+			foreach($Items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
+
+			$Item_datas = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}					
 		$transporters = $this->SalesOrders->Carrier->find('list')->order(['Carrier.transporter_name' => 'ASC']);
 		//$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC']);
 		$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
@@ -1201,7 +1228,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty','ItemsOptions'));
+        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','Items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
@@ -1341,19 +1368,30 @@ class SalesOrdersController extends AppController
 					);
 			$companies = $this->SalesOrders->Companies->find('all', ['limit' => 200]);
 			$quotationlists = $this->SalesOrders->Quotations->find()->where(['status'=>'Pending'])->order(['Quotations.id' => 'DESC']);
-			/* $items = $this->SalesOrders->Items->find('list')->matching(
+			$Items = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);		
+					
+					
+			
+				
+			$ItemsOptions=[];
+			foreach($Items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
+
+			$Item_datas = $this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->matching(
 						'ItemCompanies', function ($q) use($st_company_id) {
 							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 						}
-					)->order(['Items.name' => 'ASC']); */
-			$Items=$this->SalesOrders->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]);		
-				
-		$ItemsOptions=[];
-		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
-		}		
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}			
 			$transporters = $this->SalesOrders->Carrier->find('list', ['limit' => 200])->order(['Carrier.transporter_name' => 'ASC']);
 			$employees = $this->SalesOrders->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 						'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -1413,7 +1451,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 			////end unique validation and procees qty
-			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions'));
+			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else

@@ -98,7 +98,8 @@
 						<th align="center" class="text-center"><label class="control-label">Consumption</label></th>
 					</thead>
 					<tbody id="maintbody">
-					<?php foreach($salesOrder->sales_order_rows as $sales_order_row){ ?>
+					<?php foreach($salesOrder->sales_order_rows as $sales_order_row){ 
+					if(!empty($sales_order_row->item->item_companies)){ ?>
 						<tr class="main_tr">
 							<td valign="top" class="text-center">
 							<?php echo $this->Form->input('sales_order_id', ['type'=>'text','empty'=>'--Select--','class' => 'form-control input-sm','label'=>false,'value'=>$sales_order_row->id,'type'=>'hidden']); ?>
@@ -108,7 +109,7 @@
 							</td>
 							<td></td>
 						</tr>
-					<?php } ?>
+					<?php }} ?>
 					</tbody>
 				</table>
 			</div>
@@ -341,7 +342,7 @@ $(document).ready(function() {
 			<td>
 			<?php echo $this->Form->input('sales_order_row_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
 			<?php echo $this->Form->input('sales_order_item_id',['class' => 'form-control input-sm','type'=>'hidden','label'=>false]); ?>
-			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptions,'class' => 'form-control input-sm ','label'=>false]); ?>
+			<?php echo $this->Form->input('item_id',['empty'=>'--Select--','options'=>$ItemsOptionsData,'class' => 'form-control input-sm ','label'=>false]); ?>
 			</td>
 			<td><?php echo $this->Form->input('quantity',['class' => 'form-control input-sm quantity','label'=>false,'placeholder'=>'Quantity','required']); ?></td>
 			<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>

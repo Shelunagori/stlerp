@@ -278,8 +278,10 @@ class JobCardsController extends AppController
 		$sales_order_id=@(int)$this->request->query('sales-order');
 		if(!empty($sales_order_id)){
 			$salesOrder = $this->JobCards->SalesOrders->get($sales_order_id, [
-				'contain' => ['Customers','SalesOrderRows'=>['Items'=>function ($q){
-					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
+				'contain' => ['Customers','SalesOrderRows'=>['Items'=>function ($q) use($st_company_id){
+					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed'])->contain(['ItemCompanies'=>function($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}]);
 				}]]
 			]);
 		}
@@ -321,18 +323,29 @@ class JobCardsController extends AppController
                 $this->Flash->error(__('The job card could not be saved. Please, try again.'));
             }
         }
-		$items = $this->JobCards->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
-					'ItemCompanies', function ($q) use($st_company_id) {
-						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
-					}
-				);
-		$ItemsOptions=[];
-		foreach($items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
-		}		
+			$items = $this->JobCards->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);
+			$ItemsOptions=[];
+			foreach($items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}
+		
+			$Item_datas = $this->JobCards->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
 			
         $companies = $this->JobCards->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('jobCard', 'salesOrder', 'companies','items','customers','last_jc_no','ItemsOptions'));
+        $this->set(compact('jobCard', 'salesOrder', 'companies','items','customers','last_jc_no','ItemsOptions','ItemsOptionsData'));
         $this->set('_serialize', ['jobCard']);
     }
 
@@ -390,15 +403,27 @@ class JobCardsController extends AppController
 			}
 			
 			$items = $this->JobCards->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
-					'ItemCompanies', function ($q) use($st_company_id) {
-						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
-					}
-				);
-		$ItemsOptions=[];
-		foreach($items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
-		}	
-			$this->set(compact('jobCard', 'salesOrders', 'companies','items','financial_year_data','ItemsOptions'));
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])
+							->orWhere(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);
+			$ItemsOptions=[];
+			foreach($items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}
+		
+			$Item_datas = $this->JobCards->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
+			$this->set(compact('jobCard', 'salesOrders', 'companies','items','financial_year_data','ItemsOptions','ItemsOptionsData'));
 			$this->set('_serialize', ['jobCard']);
 		}
 		else
@@ -496,10 +521,14 @@ class JobCardsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$sales_order_id=$this->request->query('sales-order');
 		$sales_order_id=$this->request->query('sales-order');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
 		$count_sales_item = 0;   
 		$jobCard = $this->JobCards->SalesOrders->get($sales_order_id, [
-            'contain' => ['Customers','SalesOrderRows'=>['Items'=>function ($q){
-					return $q->where(['Items.source' => 'Purchessed/Manufactured']);
+            'contain' => ['Customers','SalesOrderRows'=>['Items'=>function ($q) use($st_company_id){
+					return $q->where(['Items.source' => 'Purchessed/Manufactured'])->contain(['ItemCompanies'=>function($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}]);
 				}]]
         ]);
 		

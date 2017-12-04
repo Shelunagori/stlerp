@@ -446,7 +446,7 @@
 			<td width="460px;">
 				<div class="row">
 					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
-						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
+						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
 					<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
 						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>

@@ -264,9 +264,9 @@ if(!empty($copy))
 								?>	
 								<div class="row">
 									<div class="col-md-10 padding-right-decrease">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
-										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
+										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm  item_box item_id','placeholder'=>'Item','value' => @$quotation_rows->item->id ,'popup_id'=>$q,$disable_class]); ?>
 									</div>
 							<?php } ?>				
 									 <div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
@@ -320,13 +320,13 @@ if(!empty($copy))
 					if(!empty($salesOrder->sales_order_rows)){
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): ?>
 						<tr class="tr1 maintr" row_no='<?php echo @$sales_order_rows->id; ?>'>
-							<td rowspan="2"><?php echo ++$q; --$q; ?></td>
-							<td width="280Px">
+							<td rowspan="2" width="10"><?php echo ++$q; --$q; ?></td>
+							<td width="460px;">
 							<div class="row">
-									<div class="col-md-10 padding-right-decrease">
+									<div class="col-md-10 padding-right-decrease" style='padding-right: 1px;'>
 										<?php echo $this->Form->input('sales_order_rows.'.$q.'.item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm select2me item_box item_id','value' => @$sales_order_rows->item->id,'popup_id'=>$q]); ?>
 									</div>
-									<div class="col-md-1 padding-left-decrease">
+									<div class="col-md-1 padding-left-decrease" style='padding-left: 1px;'>
 										<a href="#" class="btn btn-default btn-sm popup_btn" role="button" popup_id="<?php echo $q; ?>"> <i class="fa fa-info-circle"></i> </a>
 										<div class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;" popup_div_id="<?php echo $q; ?>"><div class="modal-backdrop fade in" ></div>
 											<div class="modal-dialog">
@@ -344,12 +344,12 @@ if(!empty($copy))
 							</div>
 							
 							</td>
-							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity]); ?></td>
-							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'r_popup_id'=>$q]); ?></td>
-							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount]); ?></td>
-							<td width="110px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount Per','value'=>$sales_order_rows->discount_per]); ?></td>
+							<td width="100"><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity]); ?></td>
+							<td width="150Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'r_popup_id'=>$q]); ?></td>
+							<td width="100"><?php echo $this->Form->input('sales_order_rows.'.$q.'.amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Amount','value' => @$sales_order_rows->amount]); ?></td>
+							<td width="100;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount Per','value'=>$sales_order_rows->discount_per]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.discount', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Discount','value'=>$sales_order_rows->discount]); ?></td>
-							<td width="110px;><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf Per','value'=>$sales_order_rows->pnf_per]); ?></td>
+							<td width="100px;"><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf_per', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf Per','value'=>$sales_order_rows->pnf_per]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.pnf', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Pnf','value'=>$sales_order_rows->pnf]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.taxable_value', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Taxable Value','value'=>$sales_order_rows->taxable_value]); ?></td>
 							<td class="cgst_display" width="150px;"><?php 
@@ -603,7 +603,7 @@ if(!empty($copy))
 			<td width="460px;">
 				<div class="row">
 					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px;">
-						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
+						<?php echo $this->Form->input('item_id', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm item_box item_id','placeholder' => 'Item']); ?>
 					</div>
 					<div class="col-md-1 padding-left-decrease" style="padding-left: 1px;">
 						<a href="#" class="btn btn-default btn-sm popup_btn" role="button"> <i class="fa fa-info-circle"></i> </a>
