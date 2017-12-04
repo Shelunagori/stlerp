@@ -289,7 +289,6 @@ class AppController extends Controller
 				if(strtotime($date)==strtotime('2017-4-1')){
 					$StockLedgers=$this->ItemLedgers->find()
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
-					->orWhere(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date, 'ItemLedgers.source_model !='=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
 				}else{
 					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
@@ -323,15 +322,15 @@ class AppController extends Controller
 					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date < '=>$date])->toArray();
 				}
 				
-				foreach($ItemSerialNumbers as $ItemSerialNumber){		
+				foreach($ItemSerialNumbers as $ItemSerialNumber){ 		
 					if(@$ItemSerialNumber->grn_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]);
-						if($outExist == 0){
+						if($outExist == 0){ 
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-							@$sumValue+=@$ItemLedgerData['rate'];
+								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+								@$sumValue+=@$ItemLedgerData['rate'];
 							}
 						}
 					}
@@ -368,18 +367,18 @@ class AppController extends Controller
 							}
 						}
 					}
-					if(@$ItemSerialNumber->is_opening_balance == "Yes"){
+					if(@$ItemSerialNumber->is_opening_balance == "Yes"){ //pr($ItemSerialNumber->id);
 						if(strtotime($date)==strtotime('2017-4-1')){
 							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
 						}else{
 							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
 						}
 					
-						if($outExist == 0){ 
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
+						if($outExist == 0){
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
 							
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;//pr(@$ItemLedgerData['rate']);
 							@$sumValue+=@$ItemLedgerData['rate'];
 							}
 						}
@@ -388,8 +387,7 @@ class AppController extends Controller
 			
 		}
 		}
-		
-		
+		//pr($sumValue); exit;
 		return $sumValue;
 	}
 	
@@ -481,7 +479,7 @@ class AppController extends Controller
 					if(@$ItemSerialNumber->is_opening_balance == "Yes"){
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
 						if($outExist == 0){ 
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
 							
 							if($ItemLedgerData){
 							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
