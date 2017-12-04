@@ -201,7 +201,7 @@ class IvsController extends AppController
 										]);
 									$query->execute(); 
 									
-								$unit_rate+=$UnitRateSerialItem;
+								$unit_rate=$UnitRateSerialItem;
 							}
 						}else{
 							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
@@ -420,8 +420,8 @@ class IvsController extends AppController
             if ($this->Ivs->save($iv)) {  
 			
 			$this->Ivs->ItemLedgers->deleteAll(['ItemLedgers.source_id' => $id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.source_model'=>'Inventory Vouchers','ItemLedgers.in_out'=>'Out']);
+				
 				foreach($iv->iv_rows as $iv_row){ 
-					
 					$query = $this->Ivs->IvRows->SerialNumbers->query();
 					$query->update()
 						->set(['transaction_date' => $transaction_date])
@@ -434,11 +434,7 @@ class IvsController extends AppController
 						$this->Ivs->IvRows->SerialNumbers->deleteAll(['SerialNumbers.iv_row_items' => $iv_row_item['id'],'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);
 					}
 					
-						
-						//// For Out
-						// $unit_rate = $this->weightedAvgCostIvs($iv_row_item['item_id']); 
-						 
-						
+					
 						$serial_numbers_iv_row_item = @$iv_row_item['serial_numbers'];
 						if(!empty($serial_numbers_iv_row_item)){
 						$UnitRateSerialItem=0;
@@ -491,22 +487,7 @@ class IvsController extends AppController
 						->set(['rate' => $unit_rate_item_in])
 						->where(['iv_row_id' => $iv_row->id,'company_id'=>$st_company_id,'in_out'=>'In'])
 						->execute();
-					/* $unit_rate_item_in = $unit_rate_In/$iv_row->quantity; 
 					
-					$itemledgersIN = $this->Ivs->ItemLedgers->newEntity();
-										
-						$itemledgersIN->item_id= $iv_row->item_id;
-						$itemledgersIN->quantity= $iv_row->quantity;
-						$itemledgersIN->rate= round($unit_rate_item_in,3);
-						$itemledgersIN->source_model= 'Inventory Vouchers';
-						$itemledgersIN->source_id=$iv->id;
-						$itemledgersIN->in_out='In';
-						$itemledgersIN->processed_on=$iv->transaction_date;
-						$itemledgersIN->company_id=$st_company_id;
-						$itemledgersIN->iv_row_id=$iv_row->id;
-						$this->Ivs->ItemLedgers->save($itemledgersIN); */
-						
-						
 				}
 				
 				

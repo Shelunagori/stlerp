@@ -92,7 +92,7 @@ margin-bottom: 0;
 <div class="portlet-body form">
 <table class="table table-bordered table-condensed">
 	<thead> 
-		<th width="30%" colspan='2'><b>Production</b></th>
+		<th width="30%" colspan='1'><b>Production</b></th>
 		
 		<th>
 		<?php $status=0;$status1=0;

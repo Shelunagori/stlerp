@@ -217,14 +217,14 @@ class InventoryTransferVouchersController extends AppController
 
 	        //pr($inventory_transfer_voucher_rows);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
-				//pr($inventoryTransferVoucher);exit;
+				
 				foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $key => $inventory_transfer_voucher_row)
 				{
 					$inventory_transfer_voucher_rows[$key]['row_id'] = $inventory_transfer_voucher_row->id;
 				}
 				
 			    foreach($inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_data)
-				{
+				{ 
 				if($inventory_transfer_voucher_row_data['status'] == 'Out')
 				{
 					$serial_data=0;
@@ -233,29 +233,29 @@ class InventoryTransferVouchersController extends AppController
 					{
 						$serial_number_datas=$inventory_transfer_voucher_row_data['serial_number_data'];
 						foreach($serial_number_datas as $serial_number_data){
+							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
+							$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
 							
-						$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
-						
-						$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
-						$query2->insert(['item_id','name','status','company_id','itv_row_id','itv_id','parent_id','transaction_date'])
-							->values([
-										'item_id' =>$inventory_transfer_voucher_row_data['item_id'],
-										'name'=>$serial_data->name,
-										'status'=>'Out',
-										'company_id'=>$st_company_id,
-										'itv_row_id'=>$inventory_transfer_voucher_row_data['row_id'],
-										'itv_id'=>$inventoryTransferVoucher->id,
-										'parent_id'=>$serial_number_data,
-										'transaction_date'=>$inventoryTransferVoucher->transaction_date
-										])
-							->execute();	
-								
-								
+							$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
+									$query2->insert(['item_id','name','status','company_id','itv_id','itv_row_id','parent_id','transaction_date'])
+									->values([
+												'item_id' =>$inventory_transfer_voucher_row_data['item_id'],
+												'name'=>$serial_data->name,
+												'status'=>'Out',
+												'company_id'=>$st_company_id,
+												'itv_id'=>$inventoryTransferVoucher->id,
+												'itv_row_id'=>$inventory_transfer_voucher_row_data['row_id'],
+												'parent_id'=>$serial_number_data,
+												'transaction_date'=>$inventoryTransferVoucher->transaction_date
+												])
+									->execute();
+									$unit_rate=$UnitRateSerialItem;
 						}
+					}else{
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
 					
-					$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row_data['item_id']); 
-						 $unit_rate = round($unit_rate,2);
+					$unit_rate = round($unit_rate,2);
 						 
 					
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
@@ -479,50 +479,55 @@ class InventoryTransferVouchersController extends AppController
 					if($serial_data>0)
 					{
 						$serial_number_datas=$inventory_transfer_voucher_row_data['serial_number_data'];
-						foreach($serial_number_datas as $serial_number_data)
-						{
-							$serial_data=$this->InventoryTransferVouchers->Items->SerialNumbers->get($serial_number_data);	
-							$query_in = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
-								$query_in->insert(['item_id','name','status','company_id','itv_row_id','itv_id','parent_id','transaction_date'])
+						foreach($serial_number_datas as $serial_number_data){
+							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
+							$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
+							
+							$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
+									$query2->insert(['item_id','name','status','company_id','itv_id','itv_row_id','parent_id','transaction_date'])
 									->values([
 												'item_id' =>$inventory_transfer_voucher_row_data['item_id'],
 												'name'=>$serial_data->name,
 												'status'=>'Out',
 												'company_id'=>$st_company_id,
-												'itv_row_id'=>$inventory_transfer_voucher_row_data['row_id'],
 												'itv_id'=>$inventoryTransferVoucher->id,
+												'itv_row_id'=>$inventory_transfer_voucher_row_data['row_id'],
 												'parent_id'=>$serial_number_data,
 												'transaction_date'=>$inventoryTransferVoucher->transaction_date
 												])
 									->execute();
+									$unit_rate=$UnitRateSerialItem;
 						}
+					}else{
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
+						//	pr($unit_rate); exit;
 					}
 					
-				    $stock=[];  $sumValue=[];
 					
-					$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row_data['item_id']); 
-						 $unit_rate = round($unit_rate,2);			
+					$unit_rate = round($unit_rate,2);
 						 
-					$today_date =  Time::now();
-					$query= $this->InventoryTransferVouchers->InventoryTransferVoucherRows->ItemLedgers->query();
-							$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
-								  ->values([
-												'item_id' => $inventory_transfer_voucher_row_data['item_id'],
-												'quantity' => $inventory_transfer_voucher_row_data['quantity'],
-												'rate' => $unit_rate,
-												'source_model' => 'Inventory Transfer Voucher',
-												'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
-												'in_out'=>'Out',
-												'company_id'=>$st_company_id,
-												'source_id'=>$inventoryTransferVoucher->id,
-												'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']
-											])
-							->execute();
-						$qw=$unit_rate*$inventory_transfer_voucher_row_data['quantity'];
-						//pr($qw); exit;
+					
+					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
+						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
+							  ->values([
+											'item_id' => $inventory_transfer_voucher_row_data['item_id'],
+											'quantity' => $inventory_transfer_voucher_row_data['quantity'],
+											'rate' => $unit_rate,
+											'source_model' => 'Inventory Transfer Voucher',
+											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
+											'in_out'=>'Out',
+											'company_id'=>$st_company_id,
+											'source_id'=>$inventoryTransferVoucher->id,
+											'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']
+										])
+					    ->execute();
+						
+						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row_data['quantity'];
+						
+						
 						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
 						$query21->update()
-							->set(['amount' => $qw])
+							->set(['amount' => $avg_cost_data])
 							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'item_id' => $inventory_transfer_voucher_row_data['item_id'],'status' => 'Out'])
 							->execute();
 							
@@ -897,34 +902,11 @@ class InventoryTransferVouchersController extends AppController
 				
 			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
 				
-				
-				$stock=[];  $sumValue=[];
-					
-				$today_date =  Time::now();
-				$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
-						 $unit_rate = round($unit_rate,2);
-				$query= $this->InventoryTransferVouchers->ItemLedgers->query();
-						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
-							  ->values([
-											'item_id' => $inventory_transfer_voucher_row->item_id,
-											'quantity' => $inventory_transfer_voucher_row->quantity,
-											'rate' => $unit_rate,
-											'source_model' => 'Inventory Transfer Voucher',
-											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
-											'in_out'=>'Out',
-											'company_id'=>$st_company_id,
-											'source_id'=>$inventoryTransferVoucher->id,
-											'source_row_id'=>$inventory_transfer_voucher_row->id
-										])
-					    ->execute();
-						
-						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row->quantity;
-						
-					$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
+				$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
 					if($serial_data>0){
-						
 						foreach($inventory_transfer_voucher_row->serial_number_data as $serial_number_data){
 							
+						$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
 						$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
 						
 						$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
@@ -940,16 +922,36 @@ class InventoryTransferVouchersController extends AppController
 											'transaction_date'=>$inventoryTransferVoucher->transaction_date
 											])
 								->execute();
+								
+								$unit_rate=$UnitRateSerialItem;
 						}
 						
+					}else{
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
-					
-					
-					$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
+					$unit_rate = round($unit_rate,2);
+					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
+						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
+							  ->values([
+											'item_id' => $inventory_transfer_voucher_row->item_id,
+											'quantity' => $inventory_transfer_voucher_row->quantity,
+											'rate' => $unit_rate,
+											'source_model' => 'Inventory Transfer Voucher',
+											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
+											'in_out'=>'Out',
+											'company_id'=>$st_company_id,
+											'source_id'=>$inventoryTransferVoucher->id,
+											'source_row_id'=>$inventory_transfer_voucher_row->id
+										])
+					    ->execute();
+						
+						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row->quantity;
+						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
 						$query21->update()
 							->set(['amount' => $avg_cost_data,'status' => 'Out'])
 							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'item_id' => $inventory_transfer_voucher_row->item_id])
 							->execute();
+					
 					}
 					
 					$this->Flash->success(__('The Inventory Transfer Vouchers has been saved.'));
@@ -959,6 +961,83 @@ class InventoryTransferVouchersController extends AppController
 		
 		}
 		$this->set(compact('display_items','inventoryTransferVoucher','financial_month_first','financial_month_last'));
+	}
+	
+
+	public function weightedAvgCostForSerialWise($sr_no_out_id=null){ 
+		$this->viewBuilder()->layout('');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			
+			//pr($sr_no_out_id); exit;
+			$ItemData=$this->InventoryTransferVouchers->ItemLedgers->SerialNumbers->get($sr_no_out_id);
+			$Items = $this->InventoryTransferVouchers->ItemLedgers->Items->get($ItemData->item_id, [
+				'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
+					return $q->where(['company_id'=>$st_company_id]);
+				}]
+			]);
+			
+			$to_date = date('Y-m-d');
+			$unit_rate=0;
+	
+	
+	
+		if($Items->item_companies[0]->serial_number_enable == '1'){
+				$ItemSerialNumber=$this->InventoryTransferVouchers->ItemLedgers->SerialNumbers->get($sr_no_out_id);
+				
+				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
+							
+				if(@$ItemSerialNumber->grn_id > 0){ 
+							$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}
+				if(@$ItemSerialNumber->sale_return_id > 0){ 
+				$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+					if($outExist == 0){
+						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
+					//	pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}
+				
+				if(@$ItemSerialNumber->itv_id > 0){
+				$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
+					if($outExist == 0){  
+						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){
+							@$itemSerialQuantity=$itemSerialQuantity+1;
+							@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					}
+				}
+				if(@$ItemSerialNumber->is_opening_balance == "Yes"){  
+				 
+						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){
+						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+						@$itemSerialRate+=@$ItemLedgerData['rate'];
+						}
+					
+				}
+				
+			//pr($itemSerialRate); exit;
+			
+			
+				return $itemSerialRate; 
+		}	
+		
 	}
 	
  public function editInventoryOut($id = null)
@@ -1008,15 +1087,37 @@ class InventoryTransferVouchersController extends AppController
 				
 				$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->deleteAll(['SerialNumbers.itv_id'=>$inventoryTransferVoucher->id,'SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.status'=>'Out']);
 				
-			 foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
+			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
 				
-			    $stock=[];  $sumValue=[];
-					
-					$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
-						 $unit_rate = round($unit_rate,2);
-				$today_date =  Time::now();
-				
-				$query= $this->InventoryTransferVouchers->ItemLedgers ->query();
+				$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
+					if($serial_data>0){
+						foreach($inventory_transfer_voucher_row->serial_number_data as $serial_number_data){
+							
+						$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
+						$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
+						
+						$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
+								$query2->insert(['item_id','name','status','company_id','itv_id','itv_row_id','parent_id','transaction_date'])
+								->values([
+											'item_id' =>$inventory_transfer_voucher_row->item_id,
+											'name'=>$serial_data->name,
+											'status'=>'Out',
+											'company_id'=>$st_company_id,
+											'itv_id'=>$inventoryTransferVoucher->id,
+											'itv_row_id'=>$inventory_transfer_voucher_row->id,
+											'parent_id'=>$serial_number_data,
+											'transaction_date'=>$inventoryTransferVoucher->transaction_date
+											])
+								->execute();
+								
+								$unit_rate=$UnitRateSerialItem;
+						}
+						
+					}else{
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
+					}
+					$unit_rate = round($unit_rate,2);
+					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
 							  ->values([
 											'item_id' => $inventory_transfer_voucher_row->item_id,
@@ -1032,39 +1133,12 @@ class InventoryTransferVouchersController extends AppController
 					    ->execute();
 						
 						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row->quantity;
-						
-					$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
-					if($serial_data>0){
-						
-						foreach($inventory_transfer_voucher_row->serial_number_data as $serial_number_data){
-						
-						$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);	
-							
-						$query2 = $this->InventoryTransferVouchers->Items->SerialNumbers->query();
-						
-							$query2->insert(['item_id','name','status','company_id','itv_row_id','itv_id','parent_id','transaction_date'])
-								->values([
-											'item_id' =>$inventory_transfer_voucher_row->item_id,
-											'name'=>$serial_data->name,
-											'status'=>'Out',
-											'company_id'=>$st_company_id,
-											'itv_row_id'=>$inventory_transfer_voucher_row->id,
-											'itv_id'=>$inventoryTransferVoucher->id,
-											'parent_id'=>$serial_number_data,
-											'transaction_date'=>$inventoryTransferVoucher->transaction_date
-											])
-								->execute();
-						}
-						
-							
-					}
-					
-					
-					$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
+						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
 						$query21->update()
 							->set(['amount' => $avg_cost_data,'status' => 'Out'])
 							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'item_id' => $inventory_transfer_voucher_row->item_id])
 							->execute();
+					
 					}
 					
 					$this->Flash->success(__('The Inventory Transfer Vouchers has been saved.'));
@@ -1233,62 +1307,17 @@ class InventoryTransferVouchersController extends AppController
 							++$total_stock;
 						}
 					}
-				//pr($total_stock);
+			/* 	pr($total_stock);
+				pr($total_amt);   exit; */
 				
 				if($total_amt > 0 && $total_stock > 0){
 					 $unit_rate = $total_amt/$total_stock; 
 				}
 				
 				
-			}else{
-				
-				$ItemSerialNumbers=$this->InventoryTransferVouchers->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Items->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
-				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
-					foreach($ItemSerialNumbers as $ItemSerialNumber){		
-						if(@$ItemSerialNumber->grn_id > 0){ 
-							echo $outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
-							echo $ItemSerialNumber->id;
-					if($outExist != 1){
-						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
-						 pr($ItemSerialNumber); 
-						if($ItemLedgerData){
-							@$itemSerialQuantity=$itemSerialQuantity+1;
-							@$itemSerialRate+=@$ItemLedgerData['rate'];
-						}
-					}
-				}
-				if(@$ItemSerialNumber->sale_return_id > 0){ 
-				$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
-					if($outExist == 0){
-						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
-					//	pr($ItemLedgerData); 
-						if($ItemLedgerData){
-							@$itemSerialQuantity=$itemSerialQuantity+1;
-							@$itemSerialRate+=@$ItemLedgerData['rate'];
-						}
-					}
-				}
-				
-				if(@$ItemSerialNumber->itv_id > 0){
-				$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
-					if($outExist == 0){  
-						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
-						//pr($ItemLedgerData); 
-						if($ItemLedgerData){
-							@$itemSerialQuantity=$itemSerialQuantity+1;
-							@$itemSerialRate+=@$ItemLedgerData['rate'];
-						}
-					}
-				}
-				
 			}
-			
-			if($itemSerialRate > 0 && $itemSerialQuantity > 0){ 
-					$unit_rate = @$itemSerialRate/@$itemSerialQuantity;
-				}
-		}	
 				
-		//exit;	
+	//	pr($unit_rate);  exit;
 			return $unit_rate; 
 		//exit;	
 	}
