@@ -960,10 +960,10 @@ $(document).ready(function() {
 		if(isNaN(total_after_pnf)) { var total_after_pnf = 0; }
 		$('input[name="total_after_pnf"]').val(round(total_after_pnf,2));
 		
-		var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
+		/* var sale_tax_per=parseFloat($('input[name="sale_tax_per"]').val());
 		var sale_tax=round((total_after_pnf*sale_tax_per)/100,3);
 		if(isNaN(sale_tax)) { var sale_tax = 0; }
-		$('input[name="sale_tax_amount"]').val(round(sale_tax,2));
+		$('input[name="sale_tax_amount"]').val(round(sale_tax,2)) */;
 		
 
 		
