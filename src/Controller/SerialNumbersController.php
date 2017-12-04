@@ -164,7 +164,7 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['serialNumbers']);
 	}	
 	
-	public function getSerialNumberEditListItv(){
+	public function getSerialNumberEditListItv(){  
 		$item_id=$this->request->query('item_id');
 		$itv_row_id=$this->request->query('itv_row_id');
 		
@@ -175,10 +175,12 @@ class SerialNumbersController extends AppController
 		
 		$options=[];$values=[];
 		$serialnumbers = $this->SerialNumbers->find()->where(['company_id'=>$st_company_id,'item_id'=>$item_id,'status'=>'In']);
-		foreach($serialnumbers as $serialnumber){ 
-			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'itv_row_id'=>$itv_row_id]);
-			
-			if($outExist > 0){
+	//pr($serialnumbers->toArray());	exit;
+		foreach($serialnumbers as $serialnumber){   //pr($serialnumber);
+			$outExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' =>$serialnumber->id,'itv_row_id'=>$itv_row_id]);
+			//pr($itv_row_id);
+		//	pr($serialnumber);exit;
+			if($outExist > 0){ //pr($serialnumber);
 				$values[]=$serialnumber->id;
 			}
 			
@@ -189,7 +191,9 @@ class SerialNumbersController extends AppController
 			}
 			
 		}
-		//pr($in_row_id);
+		
+		//pr($options);
+		//exit;
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
 	}
