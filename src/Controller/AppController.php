@@ -285,10 +285,18 @@ class AppController extends Controller
 		
 		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
-			if(@$Item->item_companies[0]->serial_number_enable==0){  
-				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
-				foreach($StockLedgers as $StockLedger){ 
-					if($StockLedger->in_out=='In'){ 
+			if(@$Item->item_companies[0]->serial_number_enable==0){
+				if(strtotime($date)==strtotime('2017-4-1')){
+					$StockLedgers=$this->ItemLedgers->find()
+					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
+					->orWhere(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date, 'ItemLedgers.source_model !='=>'Items'])
+					->order(['ItemLedgers.processed_on'=>'ASC']);
+				}else{
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+				}
+				
+				foreach($StockLedgers as $StockLedger){
+					if($StockLedger->in_out=='In'){
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
 							for($inc=0;$inc<$StockLedger->quantity;$inc++){
 								$stock[$Item->id][]=$StockLedger->rate;
@@ -309,7 +317,12 @@ class AppController extends Controller
 					}
 				}
 			}else if(@$Item->item_companies[0]->serial_number_enable==1){
-				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+				if(strtotime($date)==strtotime('2017-4-1')){
+					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+				}else{
+					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date < '=>$date])->toArray();
+				}
+				
 				foreach($ItemSerialNumbers as $ItemSerialNumber){		
 					if(@$ItemSerialNumber->grn_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]);
@@ -356,7 +369,12 @@ class AppController extends Controller
 						}
 					}
 					if(@$ItemSerialNumber->is_opening_balance == "Yes"){
-					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+						if(strtotime($date)==strtotime('2017-4-1')){
+							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+						}else{
+							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+						}
+					
 						if($outExist == 0){ 
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
 							
@@ -517,7 +535,7 @@ class AppController extends Controller
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id])->first();
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id,    'Ledgers.transaction_date <='=>$to_date])->first();
 							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
 							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
 						}
@@ -535,8 +553,8 @@ class AppController extends Controller
 			}
 		}
 		
-		$openingValue= $this->StockValuationWithDate($from_date);
-		$closingValue= $this->StockValuation();
+		$openingValue= $this->StockValuationWithDate(date('Y-m-d',strtotime('2017-4-1')));
+		$closingValue= $this->StockValuationWithDate2($to_date);
 		
 		$totalDr+=$openingValue;
 		$totalCr+=$closingValue;

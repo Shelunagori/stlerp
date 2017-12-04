@@ -1385,7 +1385,7 @@ class LedgersController extends AppController
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id])->first();
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date])->first();
 							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
 							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
 						}
@@ -1396,6 +1396,7 @@ class LedgersController extends AppController
 		
 		$GrossProfit= $this->GrossProfit($from_date,$to_date);
 		$closingValue= $this->StockValuation();
+		$closingValue= $this->StockValuationWithDate2($to_date);
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		
 		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance'));
