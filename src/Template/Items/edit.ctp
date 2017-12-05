@@ -90,14 +90,14 @@ $min_qty=0; foreach($item->item_serial_numbers as $item_serial_number){
 					
 				</div>
 				
-				<div class="row">
+				<!--<div class="row">
 					<div class="col-md-4">
 						<label class="control-label">Source <span class="required" aria-required="true">*</span></label>
 						<div class="checkbox-list">
 							<?php echo $this->Form->radio('source',[['value' => 'Assembled', 'text' => 'Assembled'],['value' => 'Purchessed', 'text' => 'Purchessed'],['value' => 'Manufactured', 'text' => 'Manufactured'],['value' =>  'Purchessed/Manufactured', 'text' => 'Purchessed/Manufactured']]); ?>
 						</div>
 					</div>
-				</div>
+				</div>-->
 			</div>
 			
 			<div class="form-actions">

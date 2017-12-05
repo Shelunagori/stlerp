@@ -98,8 +98,7 @@
 						<th align="center" class="text-center"><label class="control-label">Consumption</label></th>
 					</thead>
 					<tbody id="maintbody">
-					<?php foreach($salesOrder->sales_order_rows as $sales_order_row){ 
-					if(!empty($sales_order_row->item->item_companies)){ ?>
+					<?php foreach($salesOrder->sales_order_rows as $sales_order_row){ ?>
 						<tr class="main_tr">
 							<td valign="top" class="text-center">
 							<?php echo $this->Form->input('sales_order_id', ['type'=>'text','empty'=>'--Select--','class' => 'form-control input-sm','label'=>false,'value'=>$sales_order_row->id,'type'=>'hidden']); ?>
@@ -109,7 +108,7 @@
 							</td>
 							<td></td>
 						</tr>
-					<?php }} ?>
+					<?php } ?>
 					</tbody>
 				</table>
 			</div>

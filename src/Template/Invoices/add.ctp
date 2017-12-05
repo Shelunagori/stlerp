@@ -218,7 +218,7 @@ $('.closetin').on("click",function() {
 							<td>
 							<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item->id,'readonly','class'=>'itemids']); 
 							
-							echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$sales_order_rows->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
+							echo $this->Form->input('item_id', ['type'=>'hidden','value'=>@$sales_order_rows->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
 							<?php echo $sales_order_rows->item->name; ?>
 							</td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'type' => 'text','class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id],'readonly','max'=>@$sales_order_rows->quantity-@$sales_orders_qty[@$sales_order_rows->id]]); ?></td>

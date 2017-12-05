@@ -95,9 +95,18 @@ class ItemsController extends AppController
         $item = $this->Items->newEntity();
         if ($this->request->is('post')) {
             $item = $this->Items->patchEntity($item, $this->request->data);
-			//pr($item);exit;
+			//pr($this->request->data['companies']['serial_number_enable']);exit;
 			if ($this->Items->save($item)) {
-				
+				foreach($this->request->data['companies']['serial_number_enable'] as $key=>$sr_nos){
+					if(!empty($sr_nos)){
+						$query = $this->Items->ItemCompanies->query();
+								$query->update()
+									->set(['serial_number_enable' => $sr_nos])
+									->where(['company_id' => $key,'item_id'=>$item->id])
+									->execute();
+					}
+					
+				}
 				 $this->Flash->success(__('The item has been saved.'));
 
                 return $this->redirect(['action' => 'Add']);
@@ -108,8 +117,9 @@ class ItemsController extends AppController
 		$ItemCategories = $this->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
         $units = $this->Items->Units->find('list')->order(['Units.name' => 'ASC']);
 		$Companies = $this->Items->Companies->find('list');
+		$Companiess = $this->Items->Companies->find();
 		//$sources = $this->Items->Sources->find('list', ['Sources' => 200]);
-        $this->set(compact('item','ItemCategories', 'units', 'Companies','sources'));
+        $this->set(compact('item','ItemCategories', 'units', 'Companies','sources','Companiess'));
         $this->set('_serialize', ['item']);
 
     }
@@ -214,13 +224,15 @@ class ItemsController extends AppController
 			 
 		});
 		*/
-		$Items=$this->Items->find()->order(['Items.name' => 'ASC'])->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]); 		
+		$Items=$this->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);	
 				
 		$ItemsOptions=[];
 		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
 		}
 		
 		if ($this->request->is('post')) {
@@ -651,7 +663,7 @@ public function CheckCompany($company_id=null,$item_id=null)
 		
 		$item = $this->Items->newEntity();
 		if ($this->request->is('post')) {
-			pr($this->request->is('post'));exit;
+			//pr($this->request->is('post'));exit;
 			foreach($this->request->data['serial_numbers'] as $serial_number){
 				$query = $this->Items->SerialNumbers->query();
 				$query->insert(['item_id', 'serial_no', 'status', 'master_item_id', 'company_id'])

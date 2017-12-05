@@ -404,7 +404,11 @@ class InventoryTransferVouchersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$display_items = $this->InventoryTransferVouchers->Items->find()->contain(['SerialNumbers'])->toArray();
+		$display_items = $this->InventoryTransferVouchers->Items->find()->contain([
+					'ItemCompanies'=> function ($q) use($st_company_id) {
+						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+					} 
+				]);
 	
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->InventoryTransferVouchers->FinancialYears->find()->where(['id'=>$st_year_id])->first();

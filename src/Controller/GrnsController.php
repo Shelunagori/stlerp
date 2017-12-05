@@ -201,12 +201,10 @@ class GrnsController extends AppController
 				'contain' => [
 						'PurchaseOrderRows.Items' => function ($q) {
 						   return $q
-								//->where(['PurchaseOrderRows.quantity > PurchaseOrderRows.processed_quantity'])
 								->contain(['ItemCompanies']);
 						},'Companies','Vendors'
 					]
 			]);
-			//pr($purchase_order); exit;
 		}
 		$this->set(compact('purchase_order'));
 		$session = $this->request->session();

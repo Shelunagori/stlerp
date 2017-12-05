@@ -89,7 +89,17 @@
 				<div class="row">
 					<div class="col-md-4">
 						<label class="control-label">Used By Companies</label>
-						<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
+						
+							<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
+					</div>
+					<div class="col-md-4">
+						<label class="control-label">Serial Number</label><br/>
+						<?php foreach($Companiess as $companies){ ?>
+							<div class="checkbox-inline">
+						<?php 
+echo $this->Form->radio('companies[serial_number_enable]['.$companies->id.']',[['value' => '0', 'text' => 'Disabled','class'=>'first'],['value' => '1', 'text' => 'Enabled']],['disabled'=>'disabled']); ?>
+							</div><br/>	
+						<?php }	?>
 					</div>
 					<div class="col-md-4">
 						<label class="control-label">Source</label>
@@ -98,6 +108,7 @@
 						</div>
 					</div>
 				</div>
+				
 			</div>
 			<div class="form-actions">
 				 <button type="submit" class="btn blue-hoki">Add Item</button>
@@ -216,6 +227,19 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
+	 $('input[name="companies[_ids]"]').each(function(){
+           $('input').on('click',function () {  
+			var i=$(this).val();
+				if ($(this).prop('checked')==true) { 
+					$('input[name="companies[serial_number_enable]['+i+']"]').closest('.radio').removeClass("disabled").find('input[type="radio"]').removeAttr('disabled').closest('span').first().addClass("checked");
+				} else { 
+					$('input[name="companies[serial_number_enable]['+i+']"]').closest('.radio').addClass("disabled").find('span').removeClass("checked");
+				}
+				
+			});
+        }); 
+		
+	////
 	$('input[name="ob_quantity"],input[name="ob_rate"]').die().live("blur",function() { 
 		var ob_quantity=parseFloat($('input[name="ob_quantity"]').val());
 		if(isNaN(ob_quantity)) { var ob_quantity = 0; }

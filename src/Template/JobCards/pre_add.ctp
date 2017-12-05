@@ -49,7 +49,7 @@
 							</thead>
 							<tbody id="main_tbody">
 								<?php $sn=1; $q=0; foreach ($jobCard->sales_order_rows as $sales_order_row): ?>
-								<?php if(!empty($sales_order_row->item->item_companies)){ ?>
+								
 								<tr>
 									<td><?php echo $sn; ?></td>
 									<td><?php echo $sales_order_row->item->name ?></td>
@@ -58,7 +58,7 @@
 										<?php echo $this->Form->radio('sales_order_rows.'.$q.'.source_type',[['value' => 'Purchessed', 'text' => 'Purchessed'],['value' => 'Manufactured', 'text' => 'Manufactured']]); ?>
 									</td>
 								</tr>
-								<?php }$sn++; $q++; endforeach; ?>
+								<?php $sn++; $q++; endforeach; ?>
 							</tbody>
 							
 						</table>

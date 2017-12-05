@@ -508,8 +508,10 @@ $(document).ready(function() {
 				<?php 
 				$item_option=[];
 				foreach($display_items as $Item){ 
-					$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
-				}
+					if(sizeof($Item->item_companies) > 0 ){
+						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
+					}
+				}	
 				echo $this->Form->input('q', ['empty'=>'Select','options' => $item_option,'label' => false,'style'=>'width: 200px; display: block;','class' => 'form-control input-sm select_item_out item_id']); ?>
 			</td>
 			<td>
@@ -530,7 +532,9 @@ $(document).ready(function() {
 				<?php 
 				$item_option=[];
 				foreach($display_items as $Item){ 
-					$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
+					if(sizeof($Item->item_companies) > 0 ){
+						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
+					}	
 				}
 				echo $this->Form->input('q', ['empty'=>'Select','options' => $item_option,'label' => false,'style'=>'width: 150px; display: block;','class' => 'form-control input-sm select_item_in item_id']); ?>
 			</td>

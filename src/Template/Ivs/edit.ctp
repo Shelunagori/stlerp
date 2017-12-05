@@ -76,7 +76,7 @@
 													<td>
 														<?php echo $this->Form->input('id',['type'=>'hidden','label'=>false,'class'=>'form-control ivrowitemsId','value'=>$iv_row_items->id])?>
 														
-														<?php echo $this->Form->input('item_id', ['options' => $ItemsOptions,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$iv_row_items->item_id]); ?>
+														<?php echo $this->Form->input('item_id', ['options' => $ItemsOptionss,'empty'=>'--select--','label' => false,'class' => 'form-control input-sm select_item','value'=>$iv_row_items->item_id]); ?>
 													</td>
 													<td>
 														<?php echo $this->Form->input('quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx','value'=>$iv_row_items->quantity]); ?>

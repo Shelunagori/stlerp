@@ -16,7 +16,7 @@
 						<th width="20%">Company Name</th>
 						<th width="10%">Action</th>
 						<th width="10%">Freeze</th>
-						<th width="10%">Serial Number</th>
+						<!--<th width="10%">Serial Number</th>-->
 						<th width='10%'>Min. Selling Factor</th>
 						<th width='10%'>Minimum Stock</th>
 					</tr>
@@ -78,7 +78,7 @@
 							) ?>
 							<?php }  ?>
 						</td>
-						<td class="actions">
+						<!--<td class="actions">
 						 	<?php if($item_serial_no ==0 && $Company_array=='Yes') { ?>
 							 <?= $this->Html->link('Disabled ',
 								['action' => 'askSerialNumber',$item_id,$key],
@@ -98,7 +98,7 @@
 								]
 							) ?>
 							<?php }  ?>
-						</td>	
+						</td>-->	
 						<td>
 						<?php if($Company_array=='Yes') {
 							 echo $this->Form->input('minimum_selling_price_factor', ['type' => 'text','style'=>'width:65%;','label' => false,'class' => 'form-control input-sm selling_factor','value'=>$selling_factor]); 

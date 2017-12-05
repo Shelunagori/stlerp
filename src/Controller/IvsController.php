@@ -248,13 +248,14 @@ class IvsController extends AppController
             }
         }
 		
-		$Items=$this->Ivs->IvRows->Items->find()->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id]);
-		}]);
-		
+		$Items=$this->Ivs->IvRows->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);	
 		$ItemsOptions=[];
 		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
 		}
 		
         $this->set(compact('iv', 'Invoice', 'ItemsOptions','item_display','invoice_id','job_card_status','jobcardrows'));
@@ -498,15 +499,33 @@ class IvsController extends AppController
                 $this->Flash->error(__('The iv could not be saved. Please, try again.'));
             }
         }
-		$Items=$this->Ivs->IvRows->Items->find()->contain(['ItemCompanies'=>function($q) use($st_company_id){
-			return $q->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
-		}]);
 		
+		$Itemss = $this->Ivs->IvRows->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 1]);
+						}
+					);		
+					
+					
+			
+				
+			$ItemsOptionss=[];
+			foreach($Itemss as $item){ 
+						$ItemsOptionss[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}
+		
+		
+		
+		$Items=$this->Ivs->IvRows->Items->find()->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);	
 		$ItemsOptions=[];
 		foreach($Items as $item){ 
-					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->item_companies[0]->serial_number_enable];
+					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
 		}			
-        $this->set(compact('iv', 'invoices', 'ItemsOptions'));
+        $this->set(compact('iv', 'invoices', 'ItemsOptions','ItemsOptionss'));
         $this->set('_serialize', ['iv']);
     }
 
