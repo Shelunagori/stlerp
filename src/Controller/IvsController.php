@@ -185,7 +185,7 @@ class IvsController extends AppController
 						if(!empty($serial_numbers_iv_row_item)){
 						$UnitRateSerialItem=0;
 						 foreach($serial_numbers_iv_row_item as $sr_nos_out){ 
-							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($iv_row_item->item_id); 
+							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($sr_nos_out); 
 							 $serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
 							 
 							 $query = $this->Ivs->IvRows->SerialNumbers->query();
@@ -320,6 +320,18 @@ class IvsController extends AppController
 						}
 					}
 				}
+				
+				if(@$ItemSerialNumber->iv_row_id > 0){
+					$outExist = $this->Ivs->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
+						if($outExist == 0){  
+							$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id])->first();
+							//pr($ItemLedgerData); 
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$sumValue+=@$ItemLedgerData['rate'];
+							}
+						}
+					}
 				if(@$ItemSerialNumber->is_opening_balance == "Yes"){  
 				 
 						$ItemLedgerData =$this->Ivs->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->first();

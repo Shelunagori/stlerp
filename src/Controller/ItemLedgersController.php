@@ -505,7 +505,7 @@ class ItemLedgersController extends AppController
 					if(@$ItemSerialNumber->iv_row_id > 0){
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
 						if($outExist == 0){  
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id])->first();
 							//pr($ItemLedgerData); 
 							if($ItemLedgerData){
 							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -609,7 +609,7 @@ class ItemLedgersController extends AppController
 					if(@$ItemSerialNumber->iv_row_id > 0){
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
 						if($outExist == 0){  
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->itv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 							//pr($ItemLedgerData); 
 							if($ItemLedgerData){
 							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -830,7 +830,7 @@ class ItemLedgersController extends AppController
 				}
 		}else if(@$Item->item_companies[0]->serial_number_enable==1){
 				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
-			foreach($ItemSerialNumbers as $ItemSerialNumber){		
+			foreach($ItemSerialNumbers as $ItemSerialNumber){	// pr($ItemSerialNumber); 	
 				if(@$ItemSerialNumber->grn_id > 0){ 
 				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 					if($outExist == 0){
@@ -864,12 +864,25 @@ class ItemLedgersController extends AppController
 						}
 					}
 				}
+				if(@$ItemSerialNumber->iv_row_id > 0){ //pr($ItemSerialNumber); 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
+						if($outExist == 0){  
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id])->where($where1)->first();
+							
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+							//@$sumValue+=@$ItemLedgerData->rate;
+							}
+						}
+					
+					}
 				if(@$ItemSerialNumber->is_opening_balance == "Yes"){
 				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
 					if($outExist == 0){  
 						$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->where($where1)->first();
 						//pr($ItemLedgerData); 
-						if($ItemLedgerData){
+						if($ItemLedgerData){ //pr($ItemSerialNumber); 
 						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 						@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
 						}
@@ -891,6 +904,8 @@ class ItemLedgersController extends AppController
 			$totalRate[$key]=$UR*$q;
 			}
 		}
+		//pr($itemSerialQuantity);
+		//pr(@$itemSerialRate); exit;
 
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
