@@ -99,9 +99,9 @@ With reference to your price list we are pleased to place an order for the follo
 										
 										<?php 
 										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$data['item_id'],'class'=>'item_id']);  ?>
-										<?php echo $this->Form->input('q', ['label' => false,'type'=>'hidden','value'=>$data['serial_number_enable']]);  ?>
 										
-										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'type'=>'hidden','value'=>'PULLED_FROM_MI']);  ?>
+										
+										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'type'=>'hidden','class'=>'pull_status','value'=>'PULLED_FROM_MI']);  ?>
 										<?php 
 										echo $this->Form->input('purchase_order_rows.'.$q.'.material_indent_row_id', ['label' => false,'type'=>'hidden','value'=>$key,'class'=>'material_indent_row_id']);  ?> 
 										<?php echo $data['item_name']; ?><br/>
@@ -488,11 +488,12 @@ $(document).ready(function() {
 							required: true
 						});
 				}else{
-					$(this).find("td:nth-child(2) input").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
-					
-					$(this).find("td:nth-child(2) input:eq(1)").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
+					$(this).find("td:nth-child(2) input.item_id").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
+				
+					$(this).find("td:nth-child(2) input.pull_status").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
 					
 					$(this).find("td:nth-child(2) .material_indent_row_id").attr({name:"purchase_order_rows["+i+"][material_indent_row_id]", id:"purchase_order_rows-"+i+"-material_indent_row_id"}).rules("add", "required");
+				
 					
 				}
 				
