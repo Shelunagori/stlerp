@@ -916,9 +916,7 @@ class ItemLedgersController extends AppController
     }
 	
 	public function excelStock(){
-		 
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
+		
 		$this->viewBuilder()->layout('');
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -963,7 +961,7 @@ class ItemLedgersController extends AppController
 			$where['Items.item_sub_group_id ']=$item_sub_group;
 		}
 		
-		//$this->set(compact('item_category','item_group','item_sub_group','stock','item_name'));
+		$this->set(compact('item_category','item_group','item_sub_group','stock','item_name'));
 
 		
 		//pr($results); exit;
@@ -1046,7 +1044,7 @@ class ItemLedgersController extends AppController
 				}
 			}
 		
-		
+		//pr($item_stocks); exit;
 		
 		$ItemLedgers = $this->ItemLedgers->find()->contain(['Items'=>function ($q) use($where){
 			return $q->where($where);
@@ -1109,9 +1107,9 @@ class ItemLedgersController extends AppController
 				}
 		}else if(@$Item->item_companies[0]->serial_number_enable==1){
 				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In'])->toArray();
-			foreach($ItemSerialNumbers as $ItemSerialNumber){		
+			foreach($ItemSerialNumbers as $ItemSerialNumber){	// pr($ItemSerialNumber); 	
 				if(@$ItemSerialNumber->grn_id > 0){ 
-				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 					if($outExist == 0){
 						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->where($where1)->first();
 					//	pr($ItemLedgerData); 
@@ -1122,7 +1120,7 @@ class ItemLedgersController extends AppController
 					}
 				}
 				if(@$ItemSerialNumber->sale_return_id > 0){ 
-				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 					if($outExist == 0){
 						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
 					//	pr($ItemLedgerData); 
@@ -1133,9 +1131,9 @@ class ItemLedgersController extends AppController
 					}
 				}
 				if(@$ItemSerialNumber->itv_id > 0){
-				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]); 
+				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
 					if($outExist == 0){  
-						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->first();
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id])->where($where1)->first();
 						//pr($ItemLedgerData); 
 						if($ItemLedgerData){
 						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -1143,10 +1141,35 @@ class ItemLedgersController extends AppController
 						}
 					}
 				}
+				if(@$ItemSerialNumber->iv_row_id > 0){ //pr($ItemSerialNumber); 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
+						if($outExist == 0){  
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id])->where($where1)->first();
+							
+							if($ItemLedgerData){
+							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+							@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+							//@$sumValue+=@$ItemLedgerData->rate;
+							}
+						}
+					
+					}
+				if(@$ItemSerialNumber->is_opening_balance == "Yes"){
+				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
+					if($outExist == 0){  
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->where($where1)->first();
+						//pr($ItemLedgerData); 
+						if($ItemLedgerData){ //pr($ItemSerialNumber); 
+						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+						@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
+						}
+					}
+				}
+				
 			}
 			
 		}
-	} 
+	}
 	
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
@@ -1158,8 +1181,7 @@ class ItemLedgersController extends AppController
 			$totalRate[$key]=$UR*$q;
 			}
 		}
-//pr($unitRate); exit;
-        $this->set(compact('itemLedgers', 'item_name','item_stocks','items_names','ItemCategories','ItemGroups','ItemSubGroups','item_rate','in_qty','Items','from_date','to_date','ItemDatas','items_unit_names','ItemUnits','url','stockstatus', 'stock_status', 'sumValue','itemSerialNumberStatus','unitRate','totalRate'));
+		$this->set(compact('itemLedgers', 'item_name','item_stocks','items_names','ItemCategories','ItemGroups','ItemSubGroups','item_rate','in_qty','Items','from_date','to_date','ItemDatas','items_unit_names','ItemUnits','url','stockstatus', 'stock_status', 'sumValue','itemSerialNumberStatus','unitRate','totalRate'));
 		$this->set('_serialize', ['itemLedgers']); 
     
 	}

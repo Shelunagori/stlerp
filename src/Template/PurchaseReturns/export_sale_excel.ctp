@@ -3,7 +3,7 @@
 	$date= date("d-m-Y"); 
 	$time=date('h:i:a',time());
 
-	$filename="Purchse_Return_report_".$date.'_'.$time;
+	$filename="Purchase_Return_report_".$date.'_'.$time;
 
 	header ("Expires: 0");
 	header ("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT");
@@ -18,7 +18,7 @@
 	<thead>
 		<tr>
 			<td colspan="10" align="center">
-				<b> Purchse Return Report
+				<b> Purchase Return Report
 				<?php if(!empty($From) || !empty($To)){ echo date('d-m-Y',strtotime($From)); ?> TO <?php echo date('d-m-Y',strtotime($To));} ?> </b>
 			</td>
 		</tr>	

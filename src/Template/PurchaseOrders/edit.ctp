@@ -112,7 +112,7 @@
 									<td>
 									
 									<?php 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $items,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
 									/* if($disable!="")
 									{
 										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['class' => 'itemId','value'=>$purchase_order_rows->item_id,'type'=>'hidden']);
@@ -129,17 +129,21 @@
 									<?php } else { ?>
 									<td>
 									<?php 
-									
 									echo $this->Form->input('purchase_order_rows.'.$q.'.id', ['value'=>$purchase_order_rows->id,'type'=>'hidden','class'=>'idd']);
 									
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item_id','type'=>'hidden','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm item_ids','type'=>'hidden','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
+									
+									echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm sr_nos','type'=>'hidden','value'=>$purchase_order_rows->item->item_companies[0]->serial_number_enable]);
+									
+									
 									echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'class'=>'pull_status','type'=>'hidden','value'=>'PULLED_FROM_MI']); 
+									
 									echo $this->Form->input('purchase_order_rows.'.$q.'.material_indent_row_id', ['label' => false,'type'=>'hidden','value'=>@$purchase_order_rows->material_indent_row_id,'class'=>'material_indent_row_id']); 
 									
 									echo $purchase_order_rows->item->name; ?><br/>
 									<span class="label label-sm label-warning ">Pulled from MI</span>
 									</td>
-									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity,'max'=>$purchase_order_rows->quantity+$max_item_qty[$purchase_order_rows->item_id]]); 
+									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity1','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity]); 
 										
 									?></td>
 									<?php }  ?>
@@ -171,7 +175,7 @@
 							</tr>
 							<tr>
 								<td colspan="4" align="right"><b>Discount</b></td>
-								<td><?php echo $this->Form->input('discount', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Discount']); ?>
+								<td><?php echo $this->Form->input('discount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Discount']); ?>
 								<?php echo $this->Form->radio('discount_type',[['value' => '%', 'text' => 'Percent(%)'],['value' => '', 'text' => 'Amount']]); ?>
 								</td>
 								
@@ -448,7 +452,43 @@ $(document).ready(function() {
     $('.addrow').die().live("click",function() { 
 		add_row();
     });
-	
+	/////
+	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows();
+				}
+		}	
+    });
+	/////
+	$('.quantity1').die().live("keyup",function() { 
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.sr_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input.quantity1').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input.quantity1').val("");
+						}
+					rename_rows(); 
+				}
+		} 
+    });
+	/////
 	
 	function add_row(){ 
 		var tr1=$("#sample_tb tbody tr.tr1").clone();
@@ -493,14 +533,14 @@ $(document).ready(function() {
 			var len=$(this).find("td:nth-child(2) select").length; 
 			if(len>0){
 				
-				$(this).find("td:nth-child(2) select").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules('add', {
+				$(this).find("td:nth-child(2) select.item_id").select2().attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules('add', {
 						required: true
 					});
 				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 			}else{
 				$(this).find("td:nth-child(2) input.idd").attr({name:"purchase_order_rows["+i+"][id]", id:"purchase_order_rows-"+i+"-id"});
 				
-				$(this).find("td:nth-child(2) input.item_id").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
+				$(this).find("td:nth-child(2) input.item_ids").attr({name:"purchase_order_rows["+i+"][item_id]", id:"purchase_order_rows-"+i+"-item_id"}).rules("add", "required");
 				
 				$(this).find("td:nth-child(2) input.pull_status").attr({name:"purchase_order_rows["+i+"][pull_status]", id:"purchase_order_rows-"+i+"-pull_status"}).rules("add", "required");
 				
@@ -537,9 +577,9 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var unit=$(this).find("td:nth-child(3) input").val();
 			var Rate=$(this).find("td:nth-child(4) input").val();
-			var Amount=unit*Rate;
+			var Amount=round(unit*Rate,2);
 			$(this).find("td:nth-child(5) input").val(round(Amount,2));
-			total=total+Amount;
+			total=round(total+Amount,2);
 		});
 		$('input[name="total"]').val(round(total,2));
 		
@@ -572,7 +612,7 @@ $(document).ready(function() {
 		<tr class="tr1 main_tr">
 			<td rowspan="2" width="10">0</td>
 			<td>
-				<?php echo $this->Form->input('q', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_id']);
+				<?php echo $this->Form->input('q', ['empty'=>'Select','options' => $ItemsOptionsData,'label' => false,'class' => 'form-control input-sm item_id']);
 				
 				echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value'=>0]); ?>
 			</td>

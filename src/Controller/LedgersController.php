@@ -683,13 +683,9 @@ class LedgersController extends AppController
 	}
 	
 	public function excelExportAccountRef(){
-		$status=$this->request->query('status');
-		$ledger_account_id=$this->request->query('ledgerid');
-		
 		
 		$this->viewBuilder()->layout('');
-		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
+		$ledger_account_id=$this->request->query('ledgerid');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $st_year_id = $session->read('st_year_id');

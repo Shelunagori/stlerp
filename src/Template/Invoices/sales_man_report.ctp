@@ -1,4 +1,4 @@
-
+<?php $url_excel="/?".$url; ?>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -6,7 +6,7 @@
 			<span class="caption-subject font-blue-steel uppercase">GST Sales Man Report</span>
 		</div>
 		<div class="actions">
-			
+			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Invoices/Sales-Man-Excel-Export/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 		</div>
 		
 	

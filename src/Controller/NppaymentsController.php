@@ -112,7 +112,7 @@ class NppaymentsController extends AppController
         }
        
         
-        $nppayments = $this->Nppayments->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['NppaymentRows'=>function($q){
+         $nppayments = $this->Nppayments->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['NppaymentRows'=>function($q){
             $NppaymentRows = $this->Nppayments->NppaymentRows->find();
             $totalCrCase = $NppaymentRows->newExpr()
                 ->addCase(
@@ -141,6 +141,62 @@ class NppaymentsController extends AppController
         $this->set('_serialize', ['nppayments']);
 	}
 
+	public function exportExcell(){
+		
+		$this->viewBuilder()->layout('');
+        
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+        
+        $where = [];
+        $vouch_no = $this->request->query('vouch_no');
+        $From = $this->request->query('From');
+        $To = $this->request->query('To');
+        
+        $this->set(compact('vouch_no','From','To'));
+        
+        if(!empty($vouch_no)){
+            $where['Nppayments.voucher_no LIKE']=$vouch_no;
+        }
+        
+        if(!empty($From)){
+            $From=date("Y-m-d",strtotime($this->request->query('From')));
+            $where['Nppayments.transaction_date >=']=$From;
+        }
+        if(!empty($To)){
+            $To=date("Y-m-d",strtotime($this->request->query('To')));
+            $where['Nppayments.transaction_date <=']=$To;
+        }
+       
+        
+         $nppayments = $this->Nppayments->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['NppaymentRows'=>function($q){
+            $NppaymentRows = $this->Nppayments->NppaymentRows->find();
+            $totalCrCase = $NppaymentRows->newExpr()
+                ->addCase(
+                    $NppaymentRows->newExpr()->add(['cr_dr' => 'Cr']),
+                    $NppaymentRows->newExpr()->add(['amount']),
+                    'integer'
+                );
+            $totalDrCase = $NppaymentRows->newExpr()
+                ->addCase(
+                    $NppaymentRows->newExpr()->add(['cr_dr' => 'Dr']),
+                    $NppaymentRows->newExpr()->add(['amount']),
+                    'integer'
+                );
+            return $NppaymentRows->select([
+                    'total_cr' => $NppaymentRows->func()->sum($totalCrCase),
+                    'total_dr' => $NppaymentRows->func()->sum($totalDrCase)
+                ])
+                ->group('nppayment_id')
+                
+                ->autoFields(true);
+            
+        }])->order(['voucher_no'=>'DESC']);
+        
+
+        $this->set(compact('nppayments','From','To'));
+        $this->set('_serialize', ['nppayments']);
+	}
     /**
      * View method
      *

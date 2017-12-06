@@ -17,7 +17,7 @@
 <table border='1'>
 		<thead>
 				<tr>
-					<td colspan="3" align="center">
+					<td colspan="6" align="center">
 					<b> Purchase Order Report
 					<?php if(!empty($From) || !empty($To)){ echo date('d-m-Y',strtotime($From)); ?> TO <?php echo date('d-m-Y',strtotime($To));  } ?> 
 					

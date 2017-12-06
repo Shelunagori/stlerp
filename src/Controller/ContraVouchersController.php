@@ -85,7 +85,7 @@ class ContraVouchersController extends AppController
         $this->set('_serialize', ['contravouchers']);
     }
 	
-	public function exportExcel(){
+	public function exportExcell(){
 		$this->viewBuilder()->layout('');
         
         $session = $this->request->session();

@@ -485,7 +485,7 @@ class PurchaseOrdersController extends AppController
 		$financial_month_last = $this->PurchaseOrders->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		
         $purchaseOrder = $this->PurchaseOrders->get($id, [
-            'contain' => ['PurchaseOrderRows'=>['Items','GrnRows']]
+            'contain' => ['PurchaseOrderRows'=>['Items'=>['ItemCompanies'],'GrnRows']]
         ]);
 		
 		$minItemQty    =[];
@@ -504,27 +504,10 @@ class PurchaseOrdersController extends AppController
 		}
 		
 		$purchaseOrder_old=$this->PurchaseOrders->get($id, [
-            'contain' => ['PurchaseOrderRows'=>['Items']]
+            'contain' => ['PurchaseOrderRows'=>['Items'=>['ItemCompanies']]]
         ]);
-		//pr($purchaseOrder_old); 
-		$max_item_qty=[];
-		foreach($purchaseOrder_old->purchase_order_rows as $purchaseOrder_old1){
-			$mir=$this->PurchaseOrders->MaterialIndents->find()
-			->contain(['MaterialIndentRows' => function ($q) use($purchaseOrder_old1) {
-						return $q->where(['MaterialIndentRows.item_id'=>$purchaseOrder_old1->item_id])->contain(['Items']);
-					}])
-			->where(['company_id'=>$st_company_id])->toArray();
-			
-			foreach($mir as $material_indent){
-				foreach($material_indent->material_indent_rows as $material_indent_row){
-					$due_qty=$material_indent_row['required_quantity']-$material_indent_row['processed_quantity'];
-				$max_item_qty[$material_indent_row->item_id]=@$max_item_qty[$material_indent_row->item_id]+$due_qty;
-				}
-			}
-		} 
 		
-		
-        $Em = new FinancialYearsController;
+		$Em = new FinancialYearsController;
         $financial_year_data = $Em->checkFinancialYear($purchaseOrder->date_created);
 
 
@@ -537,111 +520,6 @@ class PurchaseOrdersController extends AppController
 			$purchaseOrder->edited_on = date("Y-m-d"); 
 			$purchaseOrder->edited_by=$this->viewVars['s_employee_id'];
 			
-			//pr($purchaseOrder_old); exit;
-			foreach($purchaseOrder_old->purchase_order_rows as $purchase_order_row){
-				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
-					$query = $this->PurchaseOrders->MaterialIndentRows->find()
-					->where(['MaterialIndentRows.item_id'=>$purchase_order_row->item_id]);
-					$MaterialIndentRows=$query->matching('MaterialIndents', function ($q) use($st_company_id){
-						return $q->where(['MaterialIndents.company_id' => $st_company_id]);
-					})->order(['MaterialIndents.created_on'=>'ASC']);
-					$material_rows[$purchase_order_row->item_id]=[];
-					foreach($MaterialIndentRows as $MaterialIndentRow){
-						$material_rows[$purchase_order_row->item_id][]=['id'=>$MaterialIndentRow->id,'item_id'=>$MaterialIndentRow->item_id,'required_quantity'=>$MaterialIndentRow->required_quantity,'processed_quantity'=>$MaterialIndentRow->processed_quantity];
-					} 
-				}
-			}
-			
-			foreach($purchaseOrder_old->purchase_order_rows as $purchase_order_row){
-				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
-					$mi_rows=$material_rows[$purchase_order_row->item_id];
-					krsort($mi_rows);
-					
-					$purchase_order_qty=$purchase_order_row->quantity;
-					//pr($purchase_order_qty);
-					foreach($mi_rows as $mi_row){
-						$mi_remaining_qty=$mi_row['required_quantity']-$mi_row['processed_quantity'];
-						//pr($mi_remaining_qty);
-						if($mi_row['required_quantity']==$mi_remaining_qty){
-							
-						}else{
-							$reminder=$purchase_order_qty-$mi_row['processed_quantity'];
-							
-							if($reminder>=0){
-								$mi_row = $this->PurchaseOrders->MaterialIndentRows->get($mi_row['id']);
-								$mi_row->processed_quantity=0;
-								$mi_row->status='Open';
-								$this->PurchaseOrders->MaterialIndentRows->save($mi_row);
-								$purchase_order_qty=$reminder;
-								
-							}else{
-								$mi_row = $this->PurchaseOrders->MaterialIndentRows->get($mi_row['id']);
-								$mi_row->processed_quantity=abs($reminder);
-								//pr($mi_row); exit;
-								$mi_row->status='Open';
-								$this->PurchaseOrders->MaterialIndentRows->save($mi_row);
-								goto go;
-							}
-						}
-					}
-					go:
-				}
-			}
-			//pr($purchase_order_qty); exit;
-			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){
-
-				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
-					$query = $this->PurchaseOrders->MaterialIndentRows->find()
-					->where(['MaterialIndentRows.status'=>'Open','MaterialIndentRows.item_id'=>$purchase_order_row->item_id]);
-					$MaterialIndentRows=$query->matching('MaterialIndents', function ($q) use($st_company_id){
-						return $q->where(['MaterialIndents.company_id' => $st_company_id]);
-					})->order(['MaterialIndents.created_on'=>'ASC']);
-					$material_rows1[$purchase_order_row->item_id]=[];
-					foreach($MaterialIndentRows as $MaterialIndentRow){
-
-						$material_rows1[$purchase_order_row->item_id][]=['id'=>$MaterialIndentRow->id,'item_id'=>$MaterialIndentRow->item_id,'required_quantity'=>$MaterialIndentRow->required_quantity,'processed_quantity'=>$MaterialIndentRow->processed_quantity];
-					}
-				}
-			}
-
-			foreach($purchaseOrder->purchase_order_rows as $purchase_order_row){
-				
-				if($purchase_order_row->pull_status=="PULLED_FROM_MI"){
-					
-					$mi_rows=$material_rows1[$purchase_order_row->item_id];
-										
-					ksort($mi_rows);
-					//pr($mi_rows);
-					$purchase_order_qty=$purchase_order_row->quantity;
-					foreach($mi_rows as $mi_row){
-						$mi_remaining_qty=$mi_row['required_quantity']-$mi_row['processed_quantity'];
-						//pr($mi_remaining_qty);
-						$reminder=$mi_remaining_qty-$purchase_order_qty;
-						if($reminder>0){
-							$mi_row = $this->PurchaseOrders->MaterialIndentRows->get($mi_row['id']);
-							$mi_row->processed_quantity=$mi_row->processed_quantity+$purchase_order_qty;
-							$mi_row->status='Open';
-							$this->PurchaseOrders->MaterialIndentRows->save($mi_row);
-							goto send;
-						}else if($reminder==0){
-							$mi_row = $this->PurchaseOrders->MaterialIndentRows->get($mi_row['id']);
-							$mi_row->processed_quantity=$mi_row->processed_quantity+$purchase_order_qty;
-							$mi_row->status='Close';
-							$this->PurchaseOrders->MaterialIndentRows->save($mi_row);
-							goto send;
-						}
-						else{
-							$mi_row = $this->PurchaseOrders->MaterialIndentRows->get($mi_row['id']);
-							$mi_row->processed_quantity=$mi_row->processed_quantity+abs($mi_remaining_qty);
-							$mi_row->status='Close';
-							$this->PurchaseOrders->MaterialIndentRows->save($mi_row);
-						}
-						$purchase_order_qty=abs($reminder);
-					}
-					send:
-				}
-			}
-
 			if ($this->PurchaseOrders->save($purchaseOrder)) {
 			
                 $this->Flash->success(__('The purchase order has been saved.'));
@@ -659,8 +537,6 @@ class PurchaseOrdersController extends AppController
 			'keyField' => function ($row) {
 				return $row['file1'] . '-' . $row['file2'];
 			}])->where(['file1' => 'BE']);
-		//$vendor = $this->PurchaseOrders->Vendors->find()->order(['Vendors.company_name' => 'ASC']);
-		//$SaleTaxes = $this->PurchaseOrders->SaleTaxes->find('all')->where(['freeze'=>0]);
 		
 		$st_LedgerAccounts=$this->PurchaseOrders->LedgerAccounts->find()->where(['source_model'=>'SaleTaxes','company_id'=>$st_company_id]);	
 		$sale_tax_ledger_accounts=[];
@@ -684,16 +560,31 @@ class PurchaseOrdersController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-		$items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+		$items = $this->PurchaseOrders->PurchaseOrderRows->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
-						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0])->orWhere(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.freeze' => 1]);
 					}
 				);
-		//$customers = $this->PurchaseOrders->Customers->find('all')->order(['Customers.customer_name' => 'ASC']);
+				
+			$ItemsOptions=[];
+			foreach($items as $item){ 
+						$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}		
+
+			$Item_datas = $this->PurchaseOrders->PurchaseOrderRows->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+						'ItemCompanies', function ($q) use($st_company_id) {
+							return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						}
+					);		
+					
+			$ItemsOptionsData=[];
+			foreach($Item_datas as $item){ 
+						$ItemsOptionsData[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+			}	
 		
 		$transporters = $this->PurchaseOrders->Transporters->find('list')->order(['Transporters.transporter_name' => 'ASC']);
        
-        $this->set(compact('purchaseOrder', 'Company', 'vendor','filenames','customers','SaleTaxes','transporters','items','financial_year_data','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','financial_month_first','financial_month_last','max_item_qty','minItemQty'));
+        $this->set(compact('purchaseOrder','Company', 'vendor','filenames','customers','SaleTaxes','transporters','items','financial_year_data','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','financial_month_first','financial_month_last','max_item_qty','minItemQty','ItemsOptionsData','ItemsOptions'));
         $this->set('_serialize', ['purchaseOrder']);
     }
 

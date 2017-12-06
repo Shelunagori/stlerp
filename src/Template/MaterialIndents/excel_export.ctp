@@ -31,7 +31,7 @@
 				</tr>
 		</thead>
         <tbody>
-            <?php $i=1; foreach($materialIndents as $materialIndent):  ?>
+            <?php $i=1; foreach($mi_id as $materialIndent):  ?>
 			<tr>
 			   <td><?= h($i++) ?></td>
 			   <td>

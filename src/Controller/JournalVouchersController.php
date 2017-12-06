@@ -62,7 +62,7 @@ class JournalVouchersController extends AppController
 		$this->set('_serialize', ['journalVouchers']);
     }
 	
-	public function exportExcel(){
+	public function exportExcell(){
 		$this->viewBuilder()->layout('');
 		$this->paginate = [
             'contain' => ['JournalVoucherRows']
