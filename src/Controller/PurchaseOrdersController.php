@@ -272,9 +272,10 @@ class PurchaseOrdersController extends AppController
 			$to_be_send2=[];
 			foreach($to_be_send as $id=>$qty){
 				$PurchaseOrderRow=$this->PurchaseOrders->MaterialIndentRows->get($id, [
-					'contain' => ['Items']
+					'contain' => ['Items'=>['ItemCompanies']]
 				]);
-				$to_be_send2[$id]=['qty'=>$qty,'item_name'=>$PurchaseOrderRow->item->name,'item_id'=>$PurchaseOrderRow->item_id,'row_id'=>$PurchaseOrderRow->id];
+
+				$to_be_send2[$id]=['qty'=>$qty,'item_name'=>$PurchaseOrderRow->item->name,'item_id'=>$PurchaseOrderRow->item_id,'row_id'=>$PurchaseOrderRow->id,'serial_number_enable'=>$PurchaseOrderRow->item->item_companies[0]->serial_number_enable];
 			}
 		}
 		// pr($to_be_send2); exit;
@@ -427,11 +428,16 @@ class PurchaseOrdersController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-		$items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
+		$items = $this->PurchaseOrders->PurchaseOrderRows->Items->find()->where(['source IN'=>['Purchessed','Purchessed/Manufactured']])->order(['Items.name' => 'ASC'])->matching(
 					'ItemCompanies', function ($q) use($st_company_id) {
 						return $q->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 					}
 				);
+		$itemoptions=[];		
+		foreach($items as $item){
+			$itemoptions[]=['text'=>$item->name,'value'=>$item->id,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
+		}
+		
 			
 		$st_LedgerAccounts=$this->PurchaseOrders->SaleTaxes->SaleTaxCompanies->find('all')->where(['freeze'=>0,'company_id'=>$st_company_id]);
 
@@ -446,7 +452,7 @@ class PurchaseOrdersController extends AppController
 //pr($sale_tax_ledger_accounts); exit;
 
 		$transporters = $this->PurchaseOrders->Transporters->find('list')->order(['Transporters.transporter_name' => 'ASC']);
-        $this->set(compact('purchaseOrder', 'materialIndents','Company', 'vendor','filenames','items','SaleTaxes','transporters','customers','chkdate','to_be_send2','sale_tax_ledger_accounts','sale_tax_ledger_accounts1'));
+        $this->set(compact('purchaseOrder', 'materialIndents','Company', 'vendor','filenames','items','SaleTaxes','transporters','customers','chkdate','to_be_send2','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','itemoptions'));
         $this->set('_serialize', ['purchaseOrder']);
     }
 

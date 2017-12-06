@@ -195,9 +195,9 @@ class SaleReturnsController extends AppController
 			}
 			$saleReturn->sr3=$invoice->in3;
 			$saleReturn->sr4=$invoice->in4;
-			$saleReturn->sales_ledger_account = $invoice->sales_ledger_account;;
-			$saleReturn->fright_ledger_account = $invoice->fright_ledger_account;;
-			$saleReturn->transporter_id = $invoice->transporter_id;;
+			$saleReturn->sales_ledger_account = $invoice->sales_ledger_account;
+			$saleReturn->fright_ledger_account = $invoice->fright_ledger_account;
+			$saleReturn->transporter_id = $invoice->transporter_id;
 			$saleReturn->employee_id = $s_employee_id;
 			$saleReturn->st_ledger_account_id = $invoice->st_ledger_account_id;
 			

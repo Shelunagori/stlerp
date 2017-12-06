@@ -68,6 +68,44 @@ class IvsController extends AppController
      * @return \Cake\Network\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+	public function excelExport(){
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$st_company_id = $session->read('st_company_id');
+		
+		$iv_no=$this->request->query('iv_no');
+		$invoice_no=$this->request->query('invoice_no');
+		$customer=$this->request->query('customer');
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('iv_no','customer','invoice_no','From','To'));
+		$where=[];
+		if(!empty($invoice_no)){
+			$where['Invoices.in2 LIKE']=$invoice_no;
+		}
+		if(!empty($iv_no)){
+			$where['Ivs.voucher_no LIKE']=$iv_no;
+		}
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Ivs.transaction_date >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Ivs.transaction_date <=']=$To;
+		}
+        
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows','Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']);
+      
+        $this->set(compact('ivs','url','From','To'));
+	} 
+	 
+	 
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');

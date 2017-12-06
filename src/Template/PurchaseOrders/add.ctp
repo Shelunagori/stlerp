@@ -92,14 +92,14 @@ With reference to your price list we are pleased to place an order for the follo
 						</thead>
 						<tbody id="main_tbody">
 						<?php if(sizeof(@$to_be_send2)>0){
-							$q=0; foreach ($to_be_send2 as $key=>$data): ?>
+							$q=0; foreach ($to_be_send2 as $key=>$data):  ?>
 								<tr class="tr1" row_no='<?php echo @$item_id; ?>'>
 									<td rowspan="2"><?php echo ++$q; $q--; ?></td>
 									<td>
 										
 										<?php 
 										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$data['item_id'],'class'=>'item_id']);  ?>
-										
+										<?php echo $this->Form->input('q', ['label' => false,'type'=>'hidden','value'=>$data['serial_number_enable']]);  ?>
 										
 										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.pull_status', ['label' => false,'type'=>'hidden','value'=>'PULLED_FROM_MI']);  ?>
 										<?php 
@@ -108,7 +108,7 @@ With reference to your price list we are pleased to place an order for the follo
 										<span class="label label-sm label-warning ">Pulled from MI</span>
 									</td>
 									<td>
-										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['label' => false,'type'=>'text','value'=>$data['qty'],'class'=>'form-control input-sm','max'=>$data['qty']]); ?>
+										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['label' => false,'type'=>'text','value'=>$data['qty'],'class'=>'form-control input-sm quantity','max'=>$data['qty']]); ?>
 									</td>
 									<td>
 										<?php echo $this->Form->input('purchase_order_rows.'.$q.'.rate', ['label' => false,'type'=>'text','class'=>'form-control input-sm']); ?>
@@ -429,7 +429,24 @@ $(document).ready(function() {
     $('.addrow').die().live("click",function() { 
 		add_row();
     });
-	
+	//////
+		$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) select option:selected').val()
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) select option:selected').attr('serial_number_enable');
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+				rename_rows();
+				}
+		}	
+    });
+	//////
 	function add_row(){ 
 		var tr1=$("#sample_tb tbody tr.tr1").clone();
 		$("#main_tb tbody#main_tbody").append(tr1);
@@ -536,7 +553,7 @@ $(document).ready(function() {
 	<tbody>
 		<tr class="tr1 preimp maintr">
 			<td rowspan="2" width="10">0</td>
-			<td width="300"><?php echo $this->Form->input('q', ['empty'=>'Select','options' => $items,'label' => false,'class' => 'form-control input-sm item_id']); ?></td>
+			<td width="300"><?php echo $this->Form->input('q', ['empty'=>'Select','options' => $itemoptions,'label' => false,'class' => 'form-control input-sm item_id']); ?></td>
 			<td ><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity']); ?></td>
 			<td ><?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Rate']); ?></td>
 			<td><?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount']); ?></td>
