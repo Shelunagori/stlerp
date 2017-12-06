@@ -17,7 +17,7 @@
 <table border='1'>
 		<thead>
 				<tr>
-					<td colspan="3" align="center">
+					<td colspan="4" align="center">
 					<b> Material Indent Report
 					<?php if(!empty($From) || !empty($To)){ echo date('d-m-Y',strtotime($From)); ?> TO <?php echo date('d-m-Y',strtotime($To));  } ?> 
 					
@@ -28,6 +28,7 @@
 				<td style="font-size:120%;">Sr.No.</td>
 				<td style="font-size:120%;">Material Indent No</td>
 				<td style="font-size:120%;">Created on</td>
+				<td style="font-size:120%;">Status</td>
 				</tr>
 		</thead>
         <tbody>
@@ -38,6 +39,14 @@
 				<?= h('#'.str_pad($materialIndent->mi_number, 4, '0', STR_PAD_LEFT)) ?>
 			    </td>
 				<td><?php echo date("d-m-Y",strtotime($materialIndent->created_on)); ?></td>
+				<td>
+					<?php 
+					if(@$status == 'Close'){ 
+							echo "Close";
+					}else{
+						echo "Open";
+					}  ?>
+				</td>
 			</tr>
             <?php endforeach; ?>
         </tbody>

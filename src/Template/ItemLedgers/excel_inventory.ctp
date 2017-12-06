@@ -186,7 +186,7 @@
 											<td rowspan="">
 											<?php if($sr_size > 0){ ?>
 												<?php foreach($IVSr[@$key22] as $serial_number){ 
-													echo $serial_number->name; echo "</br>";
+													echo $serial_number->name; echo ",";
 												}?>
 												<?php }else{ 
 													echo "-";
@@ -211,7 +211,7 @@
 											<td rowspan="">
 												<?php if($voucher_row->serial_numbers){ ?>
 												<?php foreach($voucher_row->serial_numbers as $serial_number){ 
-													echo $serial_number->name; echo "</br>";
+													echo $serial_number->name; echo ",";
 												}?>
 												<?php }else{ 
 													echo "-";

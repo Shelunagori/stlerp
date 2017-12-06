@@ -21,7 +21,7 @@
 					</thead>
 					<tbody >
 					<?php foreach($MaterialIndentRows as $MaterialIndentRow){
-						$required_quantity=	$mi_qty[@$MaterialIndentRow->id]-$po_qty[@$MaterialIndentRow->id];
+						$required_quantity=	@$mi_qty[@$MaterialIndentRow->id]-@$po_qty[@$MaterialIndentRow->id];
 					if($required_quantity > 0){ ?>
 						<tr class="main_tr">
 							<td><?= h(++$page_no) ?></td>
@@ -34,6 +34,7 @@
 					<?php }} ?>
 					</tbody>
 				</table>
+				
 				<div align="right" class="form-actions">
 					<button type="submit" class="btn btn-primary">Pull & Create Purchase Order</button>
 					<?php echo $this->Html->link("Skip And Next", array('controller' => 'PurchaseOrders','action'=> 'Add'), array( 'class' => 'btn green')); ?>

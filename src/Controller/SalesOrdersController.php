@@ -82,12 +82,6 @@ class SalesOrdersController extends AppController
             'contain' => ['Customers']
         ];
 		//pr($status); exit;
-		if($status==null or $status=='Pending'){ 
-			$having=['total_sales >' => 0];
-		}elseif($status=='Converted Into Invoice'){ 
-			$having=['total_sales =' => 0];
-		}
-		
 		
 		
 		if(!empty($items) && empty($Actionstatus)){ 
@@ -285,8 +279,8 @@ class SalesOrdersController extends AppController
 				}
 			}
 		}
-		//pr($total_sales);
-		//pr($total_qty);exit;
+		//pr($total_qty);
+		
         $this->set(compact('salesOrders','status','From','To','total_sales','total_qty'));
         $this->set('_serialize', ['salesOrders']);
     }
