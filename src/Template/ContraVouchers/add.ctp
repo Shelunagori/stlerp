@@ -440,12 +440,15 @@ $(document).ready(function() {
                     onAcc_dr_cr="Dr";
                 }
                 if(onAcc>=0){
+					onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
                 $(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
                 
                 $(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
                 //total_ref_cr=total_ref_cr+on_acc;
                 }else{
-                    onAcc=Math.abs(onAcc);
+                   onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
                     $(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
                     $(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Cr");
                 }
@@ -475,11 +478,14 @@ $(document).ready(function() {
                 
                 //alert(onAcc);
                 if(onAcc>=0){
+					onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
                 $(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
                 $(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
                 //total_ref_cr=total_ref_cr+on_acc;
                 }else{
-                    //onAcc=Math.abs(onAcc);
+                   onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
                     $(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
                     $(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
                 }

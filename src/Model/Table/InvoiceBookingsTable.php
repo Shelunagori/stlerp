@@ -95,6 +95,8 @@ class InvoiceBookingsTable extends Table
 		$this->hasMany('ReferenceDetails', [
             'foreignKey' => 'invoice_booking_id'
         ]);
+		
+		$this->belongsTo('Ivs');
     }
 
     /**

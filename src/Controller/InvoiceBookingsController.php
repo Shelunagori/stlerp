@@ -1439,6 +1439,10 @@ class InvoiceBookingsController extends AppController
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
 					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
 				}
+				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->updateIvsInItemRate($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
 				//echo "hhhh";	exit;
 				
 				//pr($invoiceBooking); exit;
@@ -1511,6 +1515,34 @@ class InvoiceBookingsController extends AppController
         $this->set('_serialize', ['invoiceBooking']);
     }
 	
+	public function updateIvsInItemRate($item_id=null,$supplier_date=null){ 
+			$this->viewBuilder()->layout('');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			$ivs = $this->InvoiceBookings->Ivs->find()->contain(['IvRows'=>['Items','IvRowItems'=>['Items'=>['ItemCompanies']]]])->toArray();
+			
+			foreach($ivs as $iv){ 
+				
+				foreach($iv->iv_rows as $iv_row){ 
+					$InItemAmount=0;
+					$OutItemAmount=0;
+					foreach($iv_row->iv_row_items as $iv_row_item){
+						$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Inventory Vouchers','ItemLedgers.company_id'=>$st_company_id,'iv_row_item_id'=>$iv_row_item->id])->first();
+						$OutItemAmount+=$ItemLedgersOuts->rate*$ItemLedgersOuts->quantity;
+						
+					}
+					$InItemAmount=$OutItemAmount/$iv_row->quantity;
+					$query1 = $this->InvoiceBookings->ItemLedgers->query();
+					$query1->update()
+						->set(['rate' => $InItemAmount])
+						->where(['source_model'=>'Inventory Vouchers','company_id'=>$st_company_id,'iv_row_id'=>$iv_row->id])
+						->execute();
+					pr($InItemAmount);
+				}
+			}
+			
+		 exit;
+	}
 	public function weightedAvgCostIvs($item_id=null,$supplier_date=null){ 
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();

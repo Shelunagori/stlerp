@@ -458,7 +458,7 @@ class PettyCashVouchersController extends AppController
 				}
 
         
-        foreach($pettycashvoucher->petty_cash_voucher_rows as $petty_cash_voucher_row){
+        /* foreach($pettycashvoucher->petty_cash_voucher_rows as $petty_cash_voucher_row){
             $ReferenceDetails=$this->PettyCashVouchers->ReferenceDetails->find()->where(['ledger_account_id'=>$petty_cash_voucher_row->received_from_id,'petty_cash_voucher_id'=>$pettycashvoucher->id,'auto_inc'=>$petty_cash_voucher_row->auto_inc]);
           
 
@@ -468,7 +468,7 @@ class PettyCashVouchersController extends AppController
             $old_ref_rows[$petty_cash_voucher_row->auto_inc]=$ReferenceDetails->toArray();
             $old_received_from_ids[]=$petty_cash_voucher_row->received_from_id;
         }
-		//pr( $old_ref_rows); exit;
+		//pr( $o ld_ref_rows); exit;*/
         
         if ($this->request->is(['patch', 'post', 'put'])) {
 			foreach( $this->request->data['petty_cash_voucher_rows'] as $key =>  $pr)

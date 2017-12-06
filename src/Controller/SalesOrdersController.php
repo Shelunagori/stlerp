@@ -1077,7 +1077,7 @@ class SalesOrdersController extends AppController
 				{
 					$query = $this->SalesOrders->Quotations->query();
 					$query->update()
-						->set(['status' => 'Converted Into SalesOrder'])
+						->set(['status' => 'Converted into Sales Order'])
 						->where(['id' => $quotation_id])
 						->execute();
 				} 
@@ -1093,12 +1093,13 @@ class SalesOrdersController extends AppController
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$SalesOrders = $this->SalesOrders->find();
 					$SalesOrders->select(['id','total_sales_qty'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
-					->innerJoinWith('SalesOrderRows')
+					->innerJoinWith('SalesOrderRows')->where(['SalesOrderRows.quotation_row_id > '=> 0])
 					->group(['SalesOrders.quotation_id'])->where(['SalesOrders.quotation_id'=>$quotation_id]);
 					
 					$total_quotaion_qty=$Quotations->first()->total_quotaion_qty;
 					$total_sales_qty=$SalesOrders->first()->total_sales_qty;
 					
+				
 					if(@$total_quotaion_qty!=@$total_sales_qty)
 					{
 						$query_pending = $this->SalesOrders->Quotations->query();
@@ -1111,7 +1112,7 @@ class SalesOrdersController extends AppController
 					{
 						$query_pending = $this->SalesOrders->Quotations->query();
 						$query_pending->update()
-						->set(['status' => 'Converted into SalesOrder'])
+						->set(['status' => 'Converted into Sales Order'])
 						->where(['id' => $salesOrder->quotation_id])
 						->execute();
 					}
@@ -1320,19 +1321,38 @@ class SalesOrdersController extends AppController
 						->group(['Quotations.id'])->where(['Quotations.id'=>$so->quotation_id]);
 						
 						$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+						
 						$SalesOrders = $this->SalesOrders->find();
+						
 						$SalesOrders->select(['id','total_sales_qty'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
-						->innerJoinWith('SalesOrderRows')
-						->group(['SalesOrders.quotation_id'])->where(['SalesOrders.quotation_id'=>$so->quotation_id]);
+						->innerJoinWith('SalesOrderRows')->where(['SalesOrderRows.quotation_row_id > '=> 0])
+						->group(['SalesOrders.quotation_id'])
+						->where(['SalesOrders.quotation_id'=>$so->quotation_id]);
+						
+						
+						/* $pushNotifications = $this->PushNotifications->find()->contain(['PushNotificationCustomers' => function($q) {
+								$q->select([
+									 'PushNotificationCustomers.push_notification_id',
+									 'count_customer' => $q->func()->count('PushNotificationCustomers.push_notification_id')
+								])
+								->group(['PushNotificationCustomers.push_notification_id']);
+
+								return $q;
+							}]); */
 						
 						$total_quotaion_qty=$Quotations->first()->total_quotaion_qty;
 						$total_sales_qty=$SalesOrders->first()->total_sales_qty;
+					
+						/* pr($SalesOrderRows->toArray());
+						pr($SalesOrders->toArray());
+						pr($total_quotaion_qty);
+						pr($total_sales_qty); exit; */
 						
 						if(@$total_quotaion_qty!=@$total_sales_qty)
 						{
 							$query_pending = $this->SalesOrders->Quotations->query();
 							$query_pending->update()
-							->set(['Quotations.status' => 'Pending'])
+							->set(['status' => 'Pending'])
 							->where(['id' => $so->quotation_id])
 							->execute();
 						}
@@ -1340,10 +1360,11 @@ class SalesOrdersController extends AppController
 						{
 							$query_pending = $this->SalesOrders->Quotations->query();
 							$query_pending->update()
-							->set(['Quotations.status' => 'Converted into SalesOrder'])
+							->set(['status' => 'Converted into Sales Order'])
 							->where(['id' => $so->quotation_id])
 							->execute();
 						}
+							
 					}
 					$salesOrder->job_card_status='Pending';
 					$query2 = $this->SalesOrders->query();
