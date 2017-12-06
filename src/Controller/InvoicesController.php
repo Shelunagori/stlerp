@@ -2201,14 +2201,15 @@ class InvoicesController extends AppController
 					if(sizeof(@$ref_rows)== 0){
 						
 						$query = $this->Invoices->ReferenceDetails->query();
-							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type'])
+							$query->insert(['ledger_account_id', 'invoice_id', 'reference_no', 'credit', 'debit', 'reference_type','transaction_date'])
 							->values([
 								'ledger_account_id' => $c_LedgerAccount->id,
 								'invoice_id' => $invoice->id,
 								'reference_no' => 'i'.$invoice->in2,
 								'credit' => 0,
 								'debit' => $invoice->grand_total,
-								'reference_type' => 'New Reference'
+								'reference_type' => 'New Reference',
+								'transaction_date' => $invoice->date_created
 							]);
 							
 							$query->execute();

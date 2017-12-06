@@ -69,10 +69,15 @@ $url_excel="/?".$url;
 							$ClosingAmmountDebit=0;
 							foreach($LedgerAccounts as  $LedgerAccount)
 							{  
+							if($LedgerAccount->alias){
+								$ledger_name=@$LedgerAccount->name.'('.@$LedgerAccount->alias.')';
+							}else{
+								$ledger_name=@$LedgerAccount->name;
+							}
 								    
 							?>
 									<tr>
-										<td scope="col"><?php echo @$LedgerAccount->name;?></td>
+										<td scope="col"><?php echo $ledger_name;   ?></td>
 										<td scope="col" align="right">
 											<?php echo @$OpeningBalanceDebit[$LedgerAccount->id];?>
 											<?php @$TotalOpeningBalanceDebit+=$OpeningBalanceDebit[$LedgerAccount->id];?>

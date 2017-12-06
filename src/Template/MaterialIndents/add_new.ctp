@@ -20,16 +20,18 @@
 						<th>Action</th>
 					</thead>
 					<tbody >
-					<?php foreach($MaterialIndentRows as $MaterialIndentRow){ //pr($MaterialIndentRow);?>
+					<?php foreach($MaterialIndentRows as $MaterialIndentRow){
+						$required_quantity=	$mi_qty[@$MaterialIndentRow->id]-$po_qty[@$MaterialIndentRow->id];
+					if($required_quantity > 0){ ?>
 						<tr class="main_tr">
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h($MaterialIndentRow->item->name) ?></td>
-							<td><?= h($MaterialIndentRow->required_quantity) ?></td>
+							<td><?= h($required_quantity) ?></td>
 							<td>
-								<?php echo $this->Form->input('to_be_send['.$MaterialIndentRow->id.']', ['label' => false,'type'=>'checkbox','class'=>'rename_check qty','value' => @$MaterialIndentRow->required_quantity,'hiddenField'=>false]);  ?>
+								<?php echo $this->Form->input('to_be_send['.$MaterialIndentRow->id.']', ['label' => false,'type'=>'checkbox','class'=>'rename_check qty','value' => @$required_quantity,'hiddenField'=>false]);  ?>
 							</td>
 						</tr>
-					<?php } ?>
+					<?php }} ?>
 					</tbody>
 				</table>
 				<div align="right" class="form-actions">

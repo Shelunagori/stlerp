@@ -143,7 +143,9 @@
 									echo $purchase_order_rows->item->name; ?><br/>
 									<span class="label label-sm label-warning ">Pulled from MI</span>
 									</td>
-									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity1','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity]); 
+
+									
+									<td><?php echo $this->Form->input('purchase_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity1','placeholder' => 'Quantity','value'=>$purchase_order_rows->quantity,'max'=>$mi_qty[$purchase_order_rows->material_indent_row_id]-$po_qty[$purchase_order_rows->material_indent_row_id]+$purchase_order_rows->quantity]); 
 										
 									?></td>
 									<?php }  ?>

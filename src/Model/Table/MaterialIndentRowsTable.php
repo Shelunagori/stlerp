@@ -45,6 +45,11 @@ class MaterialIndentRowsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		
+		$this->hasMany('PurchaseOrderRows', [
+            'foreignKey' => 'material_indent_row_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**
