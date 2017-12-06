@@ -708,6 +708,10 @@ select
 						
 						<?php } ?>
 						<?php if(in_array(37,$allowed_pages)){?>
+						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Trial Balance','/ledgers/Trail-Balance',array('escape'=>false)); ?></li>
+						<?php } ?>
+						
+						<?php if(in_array(37,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Balance Sheet','/ledger-Accounts/Balance-Sheet',array('escape'=>false)); ?></li>
 						<?php } ?>
 						<?php if(in_array(38,$allowed_pages)){?>
