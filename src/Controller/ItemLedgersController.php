@@ -1305,12 +1305,12 @@ class ItemLedgersController extends AppController
 	$job_card_qty=[];
 	$job_id=[];
 	
+	if(!empty($JobCards)){
 	foreach($JobCards as $JobCard){
+		
 		foreach($JobCard->job_card_rows as $job_card_row){
 			$sales_order_row_id=$job_card_row->sales_order_row_id;
 			$SalesOrderRows = $this->ItemLedgers->SalesOrders->SalesOrderRows->get($job_card_row->sales_order_row_id);
-			//$SalesOrderRows->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
-			//$InvoiceRows = $this->ItemLedgers->InvoiceRows->find()->where(['InvoiceRows.sales_order_row_id'=>$job_card_row->sales_order_row_id]);
 			$Invoices = $this->ItemLedgers->SalesOrders->Invoices->find()->contain(['InvoiceRows' => function($q) use($sales_order_row_id) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id')->where(['InvoiceRows.sales_order_row_id'=>$sales_order_row_id]);
 					},'Ivs'])->toArray();
@@ -1336,14 +1336,9 @@ class ItemLedgersController extends AppController
 				@$job_id[$job_card_row->item_id].=@$job_card_row->job_card_id.',';
 			}
 		}
+		}
 	}
-	/* pr($job_card_qty);
-	pr($job_id);
- exit; */
- 
 
-
-		
 	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows','Invoices'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
 	}]])->where($where1);
@@ -1393,7 +1388,12 @@ class ItemLedgersController extends AppController
 				
 			}
 		}
-		
+	
+/* pr($purchase_order_qty); 
+pr($grn_qty); 
+pr($purchase_id); 
+
+//exit;	 */
 	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows','SalesOrders'=>['SalesOrderRows' => function($q) {
 				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
 	}]])->where($where5);
@@ -1517,10 +1517,11 @@ class ItemLedgersController extends AppController
 					$ItemMiniStock[$Item->item_id]=$Item->minimum_stock;
 				
 			}
+			//pr($ItemLedgers->toArray()); exit;
 		
-				$material_report=[];
+		$material_report=[];
 		foreach ($ItemLedgers as $itemLedger){ //pr($itemLedger->item->item_companies[0]->minimum_stock); exit;
-			
+			//pr($itemLedger->item->name);
 			$item_name=$itemLedger->item->name;
 			$item_id=$itemLedger->item->id;
 			$Current_Stock=$itemLedger->total_in-$itemLedger->total_out;
@@ -1528,7 +1529,7 @@ class ItemLedgersController extends AppController
 			
 		} 
 		
-//pr($ItemLedgers->toArray()); exit;
+//pr($material_report); exit;
 		
 		//exit;
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);

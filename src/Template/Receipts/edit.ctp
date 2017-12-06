@@ -261,9 +261,14 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
+	var payment_mode=$(this).val();
+		if(payment_mode=="Cheque"){
+			$("#chq_no").show();
+		}else{
+			$("#chq_no").hide();
+		}
 	$('input[name="payment_mode"]').die().live("click",function() {
 		var payment_mode=$(this).val();
-		
 		if(payment_mode=="Cheque"){
 			$("#chq_no").show();
 		}else{
@@ -448,6 +453,12 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
+	$('.mian_amount').live("keyup",function() {
+		//do_mian_amount_total();
+		do_ref_total();
+	});
+	
+	
 	do_ref_total();
 	function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -487,9 +498,15 @@ $(document).ready(function() {
 					onAcc_dr_cr="Dr";
 				}
 				if(onAcc>=0){
-					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+					
+					onAcc=round(onAcc,2);
+				
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(onAcc,2));
 					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
 				}else{
+					
+					onAcc=round(onAcc,2);
+					
 					onAcc=Math.abs(onAcc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
 					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Cr");
@@ -519,12 +536,13 @@ $(document).ready(function() {
 				}
 				
 				//alert(onAcc);
-				if(onAcc>=0){
+				if(onAcc>=0){ 
+				onAcc=round(onAcc,2);
 				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
 				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
 				//total_ref_cr=total_ref_cr+on_acc;
 				}else{
-					//onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(Math.abs(onAcc));
 					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val("Dr");
 				}

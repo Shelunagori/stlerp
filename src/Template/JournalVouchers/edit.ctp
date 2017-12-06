@@ -631,10 +631,13 @@ $(document).ready(function() {
 				
 				if(on_acc>=0){
 					on_acc=Math.abs(on_acc);
+					on_acc=round(on_acc,2);
+					
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 				}else{
 					on_acc=Math.abs(on_acc);
+					on_acc=round(on_acc,2);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 				}
@@ -658,11 +661,13 @@ $(document).ready(function() {
 				}
 				if(on_acc>=0){
 					on_acc=Math.abs(on_acc);
+					on_acc=round(on_acc,2);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 					
 				}else{
 					on_acc=Math.abs(on_acc);
+					on_acc=round(on_acc,2);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
 					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Dr');
 				}
