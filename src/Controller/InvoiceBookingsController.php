@@ -1165,6 +1165,10 @@ class InvoiceBookingsController extends AppController
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
 					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
 				}
+				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->updateIvsInItemRate($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
 				//Reference Number coding
 					if(sizeof(@$ref_rows)>0){
 						
@@ -1537,11 +1541,11 @@ class InvoiceBookingsController extends AppController
 						->set(['rate' => $InItemAmount])
 						->where(['source_model'=>'Inventory Vouchers','company_id'=>$st_company_id,'iv_row_id'=>$iv_row->id])
 						->execute();
-					pr($InItemAmount);
+					//pr($InItemAmount);
 				}
 			}
 			
-		 exit;
+		 
 	}
 	public function weightedAvgCostIvs($item_id=null,$supplier_date=null){ 
 			$this->viewBuilder()->layout('');
