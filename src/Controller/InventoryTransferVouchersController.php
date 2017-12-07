@@ -1306,6 +1306,7 @@ class InventoryTransferVouchersController extends AppController
 							}
 						}
 					}
+					//pr($stock);
 				
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){ 
@@ -1314,6 +1315,8 @@ class InventoryTransferVouchersController extends AppController
 							}
 						}
 					}
+					
+					///pr($stock);
 					$total_stock=0;
 					$total_amt=0;
 					if(sizeof(@$stock) > 0){ 
@@ -1332,7 +1335,7 @@ class InventoryTransferVouchersController extends AppController
 				
 			}
 				
-	//	pr($unit_rate);  exit;
+		//pr($unit_rate);  exit;
 			return $unit_rate; 
 		//exit;	
 	}
