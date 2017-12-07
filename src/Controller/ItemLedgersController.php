@@ -643,7 +643,7 @@ class ItemLedgersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
-		$stockstatus=$this->request->query('stockstatus');
+		$stockstatus=$this->request->query('stock');
 		$item_name=$this->request->query('item_name');
 		$item_category=$this->request->query('item_category');
 		$item_group=$this->request->query('item_group_id');
@@ -1170,6 +1170,8 @@ class ItemLedgersController extends AppController
 			
 		}
 	}
+	$to_date=date("d-m-Y",strtotime($to_date));
+	
 	
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
