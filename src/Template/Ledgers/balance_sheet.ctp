@@ -118,7 +118,7 @@ $this->set('title', 'Balance Sheet');
 												<td align="right">
 													<?php 
 													echo $GrossProfit;
-													$LeftTotal+=$GrossProfit;
+													$LeftTotal+=abs($GrossProfit);
 													?>
 												</td>
 											</tr>
@@ -135,7 +135,7 @@ $this->set('title', 'Balance Sheet');
 												<td align="right">
 													<?php 
 													echo abs($GrossProfit); 
-													$RightTotal+=$GrossProfit;
+													$RightTotal+=abs($GrossProfit);
 													?>
 												</td>
 											</tr>
