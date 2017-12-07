@@ -313,6 +313,7 @@ class ItemsController extends AppController
 		$ItemLedger = $this->Items->ItemLedgers->get($id);
 
 		$Items = $this->Items->find()->where(['id'=>$ItemLedger->item_id])->first();
+
 		$SerialNumberEnable = $this->Items->ItemCompanies->find()->where(['item_id'=>$ItemLedger->item_id
 		,'company_id'=>$st_company_id])->toArray();
 		$ItemSerialNumbers = $this->Items->SerialNumbers->find()->where(['item_id'=>$ItemLedger->item_id
@@ -325,7 +326,8 @@ class ItemsController extends AppController
 			$oldquantity = $this->request->data['quantity'];
 			$newquantity = $this->request->data['new_quantity'];
 			$totalquantity = $oldquantity + $newquantity ;
-			$ItemLedger=$this->Items->ItemLedgers->find()->where(['item_id'=>$item_id,'company_id'=>$st_company_id,'source_model'=>'Items'])->first();
+			$ItemLedger=$this->Items->ItemLedgers->find()->where(['item_id'=>$ItemLedger->item_id,'company_id'=>$st_company_id,'source_model'=>'Items'])->first();
+			
 			$ItemLedger=$this->Items->ItemLedgers->get($ItemLedger->id);
 			$ItemLedger->quantity=$totalquantity;
 			$ItemLedger->rate=$this->request->data['rate'];
