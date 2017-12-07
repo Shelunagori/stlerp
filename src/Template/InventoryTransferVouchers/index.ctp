@@ -59,20 +59,32 @@
 							<td><?= h(date("d-m-Y",strtotime($inventory_transfer_vouch_data->transaction_date)))?></td>
 							<td>
 							<?php if($inventory_transfer_vouch_data->in_out=='Out'){ ?>
-							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'outView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
-							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
-							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'inView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
-							<?php }else { ?>
-							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
-							<?php } ?>
+							<?php 
+							if(in_array(143,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'outView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
+							<?php }}else if($inventory_transfer_vouch_data->in_out=='In') { ?>
+							<?php 
+							if(in_array(144,$allowed_pages)){
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'inView', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
+							<?php }}else { ?>
+							<?php 
+							if(in_array(139,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $inventory_transfer_vouch_data->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
+							<?php }} ?>
 							
 							<?php if($inventory_transfer_vouch_data->in_out=='Out'){ ?>
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryOut', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));    ?>
-							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryIn', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));   ?>
-							<?php }else { ?>
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>
-							<?php } ?>
+							<?php 
+							if(in_array(147,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryOut', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));    ?>
+							<?php }}else if($inventory_transfer_vouch_data->in_out=='In') { ?>
+							<?php 
+							if(in_array(148,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'editInventoryIn', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));   ?>
+							<?php }}else { ?>
+							<?php 
+							if(in_array(138,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>
+							<?php }} ?>
 							</td>
 							
 						

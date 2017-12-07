@@ -94,7 +94,9 @@
 							<td><?= h($grn->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($grn->date_created)); ?></td>
 							<td class="actions"> 
-							<?php if($pull_request=="true"){
+							<?php 
+							
+							if($pull_request=="true"){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Book Invoice','/InvoiceBookings/Add?grn='.$grn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}else if($grn_pull_request=="true")
 								{

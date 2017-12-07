@@ -30,7 +30,7 @@
 				$balance_as_per_book_data = $this->Number->format('0',[ 'places' => 2]); 
 			}
 			
-		if(sizeof($Ledgers_Banks) > 0){
+		if(sizeof(@$Ledgers_Banks) > 0){
 			foreach($Ledgers_Banks as $Ledger)
 			{
 				@$balance_as_per_bank['debit']+=$Ledger->debit;
@@ -62,8 +62,11 @@
 			<span class="caption-subject font-blue-steel uppercase">Bank Reconciliation Add</span>
 		</div>
 		<div align="right">
-			<?php $today =date('d-m-Y');
-						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation View',array('controller'=>'Ledgers','action'=>'bankReconciliationView','From'=>$today,'To'=>$today),array('escape'=>false)); ?>
+			<?php 
+			if(in_array(127,$allowed_pages)){
+			$today =date('d-m-Y');
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation View',array('controller'=>'Ledgers','action'=>'bankReconciliationView','From'=>$today,'To'=>$today),array('escape'=>false)); 
+			} ?>
 		</div>
 	
 	
@@ -235,7 +238,7 @@
 			<div class="col-md-12">
 				<div class="col-md-4"></div>
 				<div class="col-md-4" align="left" style="background-color:#E7E2CB; font-size: 16px;">
-					<b>Balance as per Book : 
+					<b>Balance as per Books : 
 						<?php echo @$balance_as_per_book_data; ?>
 					</b>
 				</div>

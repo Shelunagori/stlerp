@@ -6,8 +6,12 @@
 			<span class="caption-subject font-blue-steel uppercase">Bank Reconciliation View</span>
 		</div>
 		<div align="right">
-			<?php $today =date('d-m-Y');
-						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation Add',array('controller'=>'Ledgers','action'=>'bankReconciliationAdd','From'=>$today,'To'=>$today),array('escape'=>false)); ?>
+		
+			<?php 
+			if(in_array(126,$allowed_pages)){
+			$today =date('d-m-Y');
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation Add',array('controller'=>'Ledgers','action'=>'bankReconciliationAdd','From'=>$today,'To'=>$today),array('escape'=>false)); 
+			} ?>
 		</div>
 	
 	

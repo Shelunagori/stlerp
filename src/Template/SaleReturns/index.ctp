@@ -53,16 +53,17 @@
 						
 						<td><?php echo date("d-m-Y",strtotime($saleReturn->date_created)); ?></td>
 						<td align="right"><?= h($this->Number->format($saleReturn->total_after_pnf,[ 'places' => 2])) ?></td>
+						
 						<td class="actions">
-							<?php if($saleReturn->sale_return_type=="GST"){
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesEdit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
-							}else{
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
-								
-							}
-							 ?>
+							<?php if(in_array(134,$allowed_pages)){
+								 if($saleReturn->sale_return_type=="GST"){
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesEdit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+								}else{
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+								}
+							} ?>
 							
-						</td>
+						</td>	
 					</tr>
 					<?php endforeach; ?>
 				</tbody>

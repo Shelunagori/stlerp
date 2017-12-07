@@ -125,10 +125,14 @@
 							<td align="right"><?= h($this->Number->format($invoice->total_after_pnf,['places'=>2])) ?></td>
 							<td class="actions">
 								<?php if($invoice->invoice_type=='GST'){ ?>
-									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstConfirm', $invoice->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
-								<?php } else {?>
-									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $invoice->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
-								<?php } ?>
+									<?php 
+									if(in_array(27,$allowed_pages)){
+									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstConfirm', $invoice->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+									<?php }} else {?>
+									<?php 
+									if(in_array(27,$allowed_pages)){
+										echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $invoice->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+									<?php }} ?>
 								<?php if($invoice->status !='Cancel' and $sales_return!="true" and $inventory_voucher!="true" and in_array(8,$allowed_pages)){
 									
 								if($invoice->invoice_type=='GST' and !in_array(date("m-Y",strtotime($invoice->date_created)),$closed_month))

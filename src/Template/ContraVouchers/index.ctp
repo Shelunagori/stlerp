@@ -60,10 +60,13 @@
                             <td><?= h('#'.str_pad($contravoucher->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
                             <td align="right"><?= h($this->Number->format($contravoucher->contra_voucher_rows[0]->total_dr - $contravoucher->contra_voucher_rows[0]->total_cr,[ 'places' => 2])) ?></td>
                             <td class="actions">
-                            <?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $contravoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
+							<?php if(in_array(104,$allowed_pages)){ ?>
+                            <?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $contravoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+							} ?>
 							<?php 
+							if(in_array(103,$allowed_pages)){
                               echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $contravoucher->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-							  						 ?>
+							} ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

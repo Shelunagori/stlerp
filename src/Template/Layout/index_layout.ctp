@@ -405,7 +405,7 @@ select
 						<?php if(in_array(9,$allowed_pages)){
 						echo '<li>'.$this->Html->link('Create', '/Invoices?inventory_voucher=true' ).'</li>';
 						} ?>
-						<?php if(in_array(10,$allowed_pages)){
+						<?php if(in_array(151,$allowed_pages)){
 						echo '<li>'.$this->Html->link('View', '/Ivs' ).'</li>';
 						} ?>
 						
@@ -492,12 +492,13 @@ select
 						<?php if(in_array(17,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Grns/index?pull-request=true',array('escape'=>false)).'</li>';
 						} ?>
-						<?php if(in_array(18,$allowed_pages) || in_array(123,$allowed_pages)){
-                        echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/InvoiceBookings/',array('escape'=>false)).'</li>';
-                        } ?>
 						<?php if(in_array(17,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create Gst Invoice Booking','/Grns/index?grn-pull-request=true',array('escape'=>false)).'</li>';
 						} ?>
+						<?php if(in_array(18,$allowed_pages) || in_array(123,$allowed_pages)){
+                        echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/InvoiceBookings/',array('escape'=>false)).'</li>';
+                        } ?>
+						
 						
 					</ul>
 				</li>
@@ -668,15 +669,15 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Overdue Report for Customers', '/Customers/Breakup-Range-Overdue?request=customer' ).'</li>';?>
+								<!--<?php echo '<li>'.$this->Html->link( 'Overdue Report for Customers', '/Customers/Breakup-Range-Overdue?request=customer' ).'</li>';?>
 								<?php echo '<li>'.$this->Html->link( 'Overdue Report for Supplier', '/Customers/Breakup-Range-Overdue?request=vendor' ).'</li>';?>
-								<hr/>
-								<?php echo '<li>'.$this->Html->link( 'Outstandings for Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>';?>
-								<?php echo '<li>'.$this->Html->link( 'Outstandings for Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>';?>
+								<hr/>-->
+								<?php echo '<li>'.$this->Html->link( 'Outstandings for Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Outstandings for Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>'; ?>
 							</ul>
 						</li>
 						<?php } ?>
-						<?php if(in_array(128,$allowed_pages)){?>
+						<?php if(in_array(128,$allowed_pages)){ ?>
 						
 						<li>
 							<a href="javascript:;">
@@ -707,18 +708,21 @@ select
 						<li><?php echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>$today),array('escape'=>false)); ?></li>	
 						
 						<?php } ?>
-						<?php if(in_array(37,$allowed_pages)){?>
+						<?php if(in_array(37,$allowed_pages)){ ?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Trial Balance','/ledgers/Trail-Balance',array('escape'=>false)); ?></li>
 						<?php } ?>
-						
+						<?php
+							$fromdate1 = date('d-m-Y',strtotime($fromdate1));
+							$todate1 = date('d-m-Y',strtotime($todate1));
+						?>
 						<?php if(in_array(37,$allowed_pages)){?>
-						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Balance Sheet','/ledger-Accounts/Balance-Sheet',array('escape'=>false)); ?></li>
+							<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Balance Sheet','/Ledgers/BalanceSheet?from_date='.$fromdate1.'&to_date='.$todate1,array('escape'=>false)); ?></li>
 						<?php } ?>
 						<?php if(in_array(38,$allowed_pages)){?>
-						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Profit & Loss Statement','/ledger-Accounts/Profit-Loss-Statement',array('escape'=>false)); ?></li>
+							<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Profit & Loss Statement','/Ledgers/ProfitLossStatement?from_date='.$fromdate1.'&to_date='.$todate1,array('escape'=>false)); ?></li>
 						<?php } ?>
 						<?php if(in_array(41,$allowed_pages)){?>
-						<li><?php $today =date('d-m-Y');
+							<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Daily Report',array('controller'=>'Ledgers','action'=>'index','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php } ?>
 						<?php if(in_array(39,$allowed_pages)){?>
@@ -732,7 +736,7 @@ select
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Account Statement Ref.','/Ledgers/AccountStatementRefrence',array('escape'=>false)); ?></li>	
 						<?php } ?>
 						<?php if(in_array(149,$allowed_pages)){ echo '<li>'.$this->Html->link( '<i class="fa fa-users"></i>User Logs Report', '/UserLogs/',array('escape'=>false) ).'</li>';}?>
-						<?php if(in_array(126,$allowed_pages)){?>
+						<?php if(in_array(126,$allowed_pages)){ ?>
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconciliation Add',array('controller'=>'Ledgers','action'=>'bankReconciliationAdd','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php } ?>

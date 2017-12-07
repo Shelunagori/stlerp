@@ -20,9 +20,18 @@
 		
 		<div class="actions">
 			
-			<?php  echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> In/Out',array('controller'=>'InventoryTransferVouchers','action'=>'add'),array('escape'=>false,'class'=>'btn btn-primary')); ?>
-			<?php echo $this->Html->link('In',array('controller'=>'InventoryTransferVouchers','action'=>'InventoryIn'),array('escape'=>false,'class'=>'btn btn-default')); ?>
-			<?php echo $this->Html->link('Out',array('controller'=>'InventoryTransferVouchers','action'=>'InventoryOut'),array('escape'=>false,'class'=>'btn btn-default')); ?>
+			<?php  
+			if(in_array(137,$allowed_pages)){
+			echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> In/Out',array('controller'=>'InventoryTransferVouchers','action'=>'add'),array('escape'=>false,'class'=>'btn btn-primary')); 
+			} ?>
+			<?php 
+			if(in_array(145,$allowed_pages)){
+				echo $this->Html->link('In',array('controller'=>'InventoryTransferVouchers','action'=>'InventoryIn'),array('escape'=>false,'class'=>'btn btn-default')); 
+			} ?>
+			<?php 
+			if(in_array(146,$allowed_pages)){
+			echo $this->Html->link('Out',array('controller'=>'InventoryTransferVouchers','action'=>'InventoryOut'),array('escape'=>false,'class'=>'btn btn-default')); 
+			} ?>
 			
 		</div>
 	</div>

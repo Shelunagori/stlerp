@@ -98,7 +98,9 @@
                                 }
 								?>
                                 <?php } ?>
-								<?php if($purchase_return=="true"  && $invoiceBooking->purchase_return_status=='No'){
+								<?php 
+								
+								if($purchase_return=="true"  && $invoiceBooking->purchase_return_status=='No'){
 								echo $this->Html->link('<i class="fa fa-repeat"></i>  Purchase Return','/PurchaseReturns/Add?invoiceBooking='.$invoiceBooking->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}elseif($purchase_return=="true" && $invoiceBooking->purchase_return_status=='Yes'){
 									echo $this->Html->link('<i class="fa fa-repeat"></i> Edit Purchase Return','/PurchaseReturns/Edit?invoice-booking='.$invoiceBooking->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
