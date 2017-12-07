@@ -9,22 +9,49 @@
 		}else{
 			$transaction_to_date=$transaction_to_date;
 		}
-	$opening_balance_ar1=[];
-	$closing_balance_ar=[];
+
+		$closing_balance_ar=[];
+		$balance_as_per_bank=[];
+
+		///start new concept of bank reconcilation 7dec2017
+		$balance_as_per_book_data=0;$balance_as_per_book_data1=0;
+	
+		if(!empty(@$balance_as_per_book_amt)){  
+			if(@$balance_as_per_book_amt['debit'] > @$balance_as_per_book_amt['credit']){ 
+				$balance_as_per_book_data1=@$balance_as_per_book_amt['debit'] - @$balance_as_per_book_amt['credit'];
+				$balance_as_per_book_data = $this->Number->format(@$balance_as_per_book_data1.'Dr',[ 'places' => 2])." Dr";
+			}
+			else { 
+				$balance_as_per_book_data1=@$balance_as_per_book_amt['credit'] - @$balance_as_per_book_amt['debit'];
+				$balance_as_per_book_data = $this->Number->format(@$balance_as_per_book_data1.'Cr',[ 'places' => 2])." Cr";
+			}					
+		}
+		else {   
+				$balance_as_per_book_data = $this->Number->format('0',[ 'places' => 2]); 
+			}
+			
+		if(sizeof($Ledgers_Banks) > 0){
+			foreach($Ledgers_Banks as $Ledger)
+			{
+				@$balance_as_per_bank['debit']+=$Ledger->debit;
+				@$balance_as_per_bank['credit']+=$Ledger->credit;
+			}
+		}	
+		
+		
+		
+			
+		///////
+				
+	///end new concept of bank reconcilation 7dec2017
+	
 	if(!empty(@$Ledgers))
 	{
 		foreach($Ledgers as $Ledger)
 		{
-			
-				@$opening_balance_total['debit']+=$Ledger->debit;
-				@$opening_balance_total['credit']+=$Ledger->credit;			
-			
-			
 			@$closing_balance_ar['debit']+=$Ledger->debit;
 			@$closing_balance_ar['credit']+=$Ledger->credit;
-			//pr($closing_balance_ar);
 		}	
-		
 	}
 
 ?>
@@ -115,7 +142,7 @@
 				<?php
 				
 				$total_balance_acc=0; $total_debit=0; $total_credit=0;
-				//pr($Bank_Ledgers->toArray()); exit;
+				$balance_as_per_total_debit=0; $balance_as_per_total_credit=0;
 				foreach($Bank_Ledgers as $ledger): 
 				?>
 				<tr class="main_tr">
@@ -204,6 +231,76 @@
 				?>
 				</div>
 			</div>
+			<div class="col-md-12"><br/></div>
+			<div class="col-md-12">
+				<div class="col-md-4"></div>
+				<div class="col-md-4" align="left" style="background-color:#E7E2CB; font-size: 16px;">
+					<b>Balance as per Book : 
+						<?php echo @$balance_as_per_book_data; ?>
+					</b>
+				</div>
+				<div class="col-md-4" align="left" style="background-color:#E3F2EE; font-size: 16px;">
+					<b>Balance as per Bank : </b>
+					
+					<?php 
+				/////
+				$close_dr=0;$close_cr=0;
+				
+						if((@$opening_balance_ar['debit'] > 0) || (@$opening_balance_ar['credit'] > 0)){  
+							if(@$opening_balance_ar['debit'] > @$opening_balance_ar['credit']){
+								
+									 $close_dr=@$opening_balance_data-@$total_debit;
+									 $close_cr=@$total_credit;
+								
+							}
+							else if(@$opening_balance_ar['credit'] > @$opening_balance_ar['debit']){ 
+							
+								$close_cr=@$opening_balance_data-@$total_credit;
+								$close_dr=@$total_debit;
+							 
+							}else if($opening_balance_ar['debit']== $opening_balance_ar['credit']){ 
+								if(@$closing_balance_ar['debit'] > @$closing_balance_ar['credit']){   
+								$close_dr=@$closing_balance_ar['debit'];
+								$close_cr=@$closing_balance_ar['credit'];
+								}else{
+									$close_dr=@$closing_balance_ar['debit'];
+									$close_cr=@$closing_balance_ar['credit'];
+								}
+							}
+							}else if((@$opening_balance_ar['debit']== 0) && (@$opening_balance_ar['credit']== 0)){ 
+								$close_dr=@$total_debit;
+								$close_cr=@$total_credit;
+								
+							}else if($opening_balance_ar['debit']== $opening_balance_ar['credit']){ 
+								if(@$closing_balance_ar['debit'] > @$closing_balance_ar['credit']){ 
+								$close_dr=@$closing_balance_ar['debit'];
+								$close_cr=@$closing_balance_ar['credit'];
+								}else{
+									$close_dr=@$closing_balance_ar['debit'];
+									$close_cr=@$closing_balance_ar['credit'];
+								}
+							}
+			
+				///////
+				
+				$closing_balance=@$close_dr+@$close_cr;
+					
+						echo $this->Number->format(abs($closing_balance),['places'=>2]);
+						if($closing_balance>0){
+							echo 'Dr';
+						}else if($closing_balance <0){
+							echo 'Cr';
+						}
+						
+				?>
+				</div>
+			</div>
+			<!--<div class="col-md-12">
+				<div class="col-md-8"></div>
+				<div class="col-md-4" align="left" style="font-size: 16px;">
+					<b>Balance as per Bank : </b>
+				</div>
+			</div>	-->
 		</div>
 <?php } ?>
 </div></div>

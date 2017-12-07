@@ -928,18 +928,22 @@ class LedgersController extends AppController
 		$from=$this->request->query['From'];
 		$To=$this->request->query['To'];
 		$bankReconciliationAdd = $this->Ledgers->newEntity();
+		
 		if(@$ledger_account_id)
 		{
 			$transaction_from_date= date('Y-m-d', strtotime($this->request->query['From']));
 			$transaction_to_date= date('Y-m-d', strtotime($this->request->query['To']));
+			
 			$Bank_Ledgers = $this->Ledgers->find()
 				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id,'voucher_source NOT IN'=>'Opening Balance'
 				])
+				->where(['transaction_date <='=>$transaction_to_date])
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					$between = clone $exp;
-					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date')
-					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'));
-				})->order('transaction_date','ASC');
+					return $exp
+					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'))
+					;
+				})->order('transaction_date','ASC');	
 		}
 		
 		
@@ -961,7 +965,7 @@ class LedgersController extends AppController
 			
 			$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <='=>$transaction_to_date]);
 					
-				$opening_balance_ar=[];
+			$opening_balance_ar=[];
 			foreach($OB as $Ledger)
 				{
 					
@@ -969,41 +973,35 @@ class LedgersController extends AppController
 						@$opening_balance_ar['credit']+=$Ledger->credit;
 					
 				}	
-				//pr($opening_balance_ar);exit;
-				//pr($opening_balance_ar);exit;
-			//pr($from); exit;
-			/* if($from == '01-04-2017'){
-				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
-				$opening_balance_ar=[];
-			foreach($OB as $Ledger)
-				{
-					if($Ledger->voucher_source== "Opening Balance"){
-						@$opening_balance_ar['debit']+=$Ledger->debit;
-						@$opening_balance_ar['credit']+=$Ledger->credit;
-					}
-				}	
-			}else{
-				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <'=>$transaction_from_date]);
-		
-				$opening_balance_ar=[];
-				foreach($OB as $Ledger)
-					{
+				
+			////Start New Concept of Bank Reconcilation Report 7Dec2017	
+				$balanceAsPerBooks = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <='=>$transaction_to_date]);
 						
-							@$opening_balance_ar['debit']+=$Ledger->debit;
-							@$opening_balance_ar['credit']+=$Ledger->credit;
-					}	
-			} */
+				$balance_as_per_book_amt=[];
+				foreach($balanceAsPerBooks as $Ledger)
+					{
+						@$balance_as_per_book_amt['debit']+=$Ledger->debit;
+						@$balance_as_per_book_amt['credit']+=$Ledger->credit;
+					}
+					
+				$Ledgers_Banks = $this->Ledgers->find()
+				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id])
+				->where(['transaction_date <=' => $transaction_to_date])
+				->where(function($exp) use($transaction_from_date,$transaction_to_date){
+					$between = clone $exp;
+					return $exp
+					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'));
+				})->order('transaction_date','ASC');		
+			////End New Concept of Bank Reconcilation Report 7Dec2017	
 			
-			$Ledgers = $this->Ledgers->find()
+			 $Ledgers = $this->Ledgers->find()
 				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id])
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					$between = clone $exp;
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date')
 					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'));
-				})->order('transaction_date','ASC');
+				})->order('transaction_date','ASC'); 
 				//pr($Ledgers->toArray()); exit;
-		
-			
 		}	
 		
 		
@@ -1039,7 +1037,7 @@ class LedgersController extends AppController
 		{
 		$bank_ledger_data=$this->Ledgers->LedgerAccounts->get($ledger_account_id);
 		}
-		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','Ledgers','ledger','ledger_account_id','Ledger_Account_data','url_link','transaction_from_date','transaction_to_date','financial_year','from','To','opening_balance_ar'));
+		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','Ledgers','ledger','ledger_account_id','Ledger_Account_data','url_link','transaction_from_date','transaction_to_date','financial_year','from','To','opening_balance_ar','Ledgers_Banks','balance_as_per_book_amt'));
 	}
 	public function dateUpdate($ledger_id=null,$reconciliation_date=null){
 		$this->viewBuilder()->layout('');
