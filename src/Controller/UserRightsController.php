@@ -83,7 +83,14 @@ class UserRightsController extends AppController
 				}
 			} 
 			//exit;
-			if($user_rights[149]['page_id']>0){ 
+			if($user_rights[3]['page_id']>0){ 
+				$query = $this->UserRights->query();
+					$query->insert(['login_id', 'page_id'])
+						->values([
+							'login_id' => $login_id,
+							'page_id' => 149
+						])
+						->execute();
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
 						->values([
@@ -112,6 +119,14 @@ class UserRightsController extends AppController
 							'page_id' => 25
 						])
 						->execute();
+				$query = $this->UserRights->query();
+					$query->insert(['login_id', 'page_id'])
+						->values([
+							'login_id' => $login_id,
+							'page_id' => 151
+						])
+						->execute();
+						
 			}
 			if($user_rights[22]['page_id']>0){
 				$query = $this->UserRights->query();
@@ -119,6 +134,13 @@ class UserRightsController extends AppController
 						->values([
 							'login_id' => $login_id,
 							'page_id' => 26
+						])
+						->execute();
+				$query = $this->UserRights->query();
+					$query->insert(['login_id', 'page_id'])
+						->values([
+							'login_id' => $login_id,
+							'page_id' => 152
 						])
 						->execute();
 			}
@@ -146,6 +168,15 @@ class UserRightsController extends AppController
 						->values([
 							'login_id' => $login_id,
 							'page_id' => 32
+						])
+						->execute();
+			}
+			if($user_rights[34]['page_id']>0){
+				$query = $this->UserRights->query();
+					$query->insert(['login_id', 'page_id'])
+						->values([
+							'login_id' => $login_id,
+							'page_id' => 153
 						])
 						->execute();
 			}
@@ -203,7 +234,7 @@ class UserRightsController extends AppController
 						])
 						->execute();
 			}
-			if($user_rights[84]['page_id']>0){
+			/* if($user_rights[84]['page_id']>0){
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
 						->values([
@@ -211,7 +242,7 @@ class UserRightsController extends AppController
 							'page_id' => 85
 						])
 						->execute();
-			}
+			} */
 			if($user_rights[141]['page_id']>0){
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
