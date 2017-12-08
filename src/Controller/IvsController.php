@@ -218,10 +218,10 @@ class IvsController extends AppController
 						//// For Out
 						 
 
-						 
+						// $UnitRateSerialItem1=0;
 						@$serial_numbers_iv_row_item = @$iv_row_item->serial_numbers;
 						if(!empty($serial_numbers_iv_row_item)){
-						$UnitRateSerialItem=0;
+						$UnitRateSerialItem1=0;
 						 foreach($serial_numbers_iv_row_item as $sr_nos_out){ 
 							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($sr_nos_out); 
 							 $serial_data=$this->Ivs->IvRows->SerialNumbers->get($sr_nos_out);
@@ -239,8 +239,10 @@ class IvsController extends AppController
 										]);
 									$query->execute(); 
 									
-								$unit_rate=$UnitRateSerialItem;
+								$UnitRateSerialItem1+=$UnitRateSerialItem;
+									$unit_rate=$UnitRateSerialItem1;
 							}
+							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
 							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
 						}
@@ -488,7 +490,6 @@ class IvsController extends AppController
 					
 						$serial_numbers_iv_row_item = @$iv_row_item['serial_numbers'];
 						if(!empty($serial_numbers_iv_row_item)){
-						$UnitRateSerialItem=0;
 						$UnitRateSerialItem1=0;
 						 foreach($serial_numbers_iv_row_item as $sr_nos_out){ 
 							$UnitRateSerialItem= $this->weightedAvgCostForSerialWise($sr_nos_out); 
@@ -507,8 +508,9 @@ class IvsController extends AppController
 											]);
 										$query->execute();  
 									$UnitRateSerialItem1+=$UnitRateSerialItem;
-								$unit_rate=$UnitRateSerialItem;
+									$unit_rate=$UnitRateSerialItem1;
 							}
+							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
 							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
 						}
