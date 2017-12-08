@@ -241,12 +241,12 @@ $(document).ready(function() {
 						});
 					}
 				}
-			$(this).find("td:eq(1) input").attr({name:"journal_voucher_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"journal_voucher_rows["+i+"][amount]", id:"journal_voucher_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,
 					});
-			$(this).find("td:eq(1) select").attr({name:"journal_voucher_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
-			$(this).find("td:nth-child(4) textarea").attr({name:"journal_voucher_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
+			$(this).find("td:eq(1) select").attr({name:"journal_voucher_rows["+i+"][cr_dr]", id:"journal_voucher_rows-"+i+"-cr_dr"});
+			$(this).find("td:nth-child(4) textarea").attr({name:"journal_voucher_rows["+i+"][narration]", id:"journal_voucher_rows-"+i+"-narration"}).rules("add", "required");
 			i++;
 		});
 	}
@@ -519,7 +519,7 @@ $(document).ready(function() {
 	$('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
-		$(this).val(v.toFixed(2));
+		$(this).val(round(v,2));
 	});
 	
 	$('.mian_amount').live("keyup",function() {
@@ -542,9 +542,9 @@ $(document).ready(function() {
 			}
 			
 			mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-			$('#receipt_amount').text(mian_amount_total.toFixed(2));
-			$('#debitamount').val(mian_amount_total_dr.toFixed(2));
-			$('#creditamount').val(mian_amount_total_cr.toFixed(2));
+			$('#receipt_amount').text(round(mian_amount_total,2));
+			$('#debitamount').val(round(mian_amount_total_dr,2));
+			$('#creditamount').val(round(mian_amount_total_cr,2));
 		});
 	}
 	$('.cr_dr_amount').live("change",function() {

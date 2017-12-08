@@ -88,7 +88,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 			<tfoot>
 				<td><a class="btn btn-xs btn-default addrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
 				<td id="receipt_amount" style="font-size: 14px;font-weight: bold;"></td>
-				<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration']); ?></td>
+				<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration','required']); ?></td>
 				<td style="vertical-align: bottom !important;"></td>
 				<td></td>
 			</tfoot>
@@ -193,15 +193,15 @@ $(document).ready(function() {
 	function rename_rows(){
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
+			$(this).find("td:eq(0) select.received_from").select2().attr({name:"receipt_rows["+i+"][received_from_id]", id:"receipt_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true
 					});
 			$(this).find("td:eq(0) .row_id").val(i);
-			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"receipt_rows["+i+"][amount]", id:"receipt_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01
 					});
-			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(1) select").attr({name:"receipt_rows["+i+"][cr_dr]", id:"receipt_rows-"+i+"-cr_dr"});
 			i++;
 		});
 	}
@@ -401,7 +401,7 @@ $(document).ready(function() {
 				}else{
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
 				
 			}else{
 				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
@@ -449,7 +449,7 @@ $(document).ready(function() {
 	$('.mian_amount').live("blur",function() {
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
-		$(this).val(v.toFixed(2));
+		$(this).val(round(v,2));
 	});
 	
 	$('.mian_amount').live("keyup",function() {
@@ -470,7 +470,7 @@ $(document).ready(function() {
 			}
 			
 			mian_amount_total=mian_amount_total_cr-mian_amount_total_dr;
-			$('#receipt_amount').text(mian_amount_total.toFixed(2));
+			$('#receipt_amount').text(round(mian_amount_total,2));
 		});
 	}
 	

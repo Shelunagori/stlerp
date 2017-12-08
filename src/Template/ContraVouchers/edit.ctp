@@ -43,7 +43,7 @@ if($transaction_date <  $start_date ) {
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($contravoucher->transaction_date)),'data-date-start-date' => $start_date,'data-date-end-date' => $end_date]); ?>
+                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($contravoucher->transaction_date)),'data-date-start-date' => $start_date,'data-date-end-date' => $end_date,'required']); ?>
                 </div>
 					<span style="color: red;">
 						<?php if($chkdate == 'Not Found'){  ?>
@@ -311,7 +311,9 @@ $(document).ready(function() {
 						min: 0.01
 					});
 			$(this).find("td:eq(1) select").attr({name:"contra_voucher_rows["+i+"][cr_dr]", id:"contra_voucher_rows-"+i+"-cr_dr"});
-			$(this).find("td:eq(3) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"});
+			$(this).find("td:eq(3) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"}).rules('add', {
+						required: true
+					});
 			i++;
 		});
 	}
@@ -509,7 +511,7 @@ $(document).ready(function() {
 				}else{
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
 				
 			}else{
 				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
@@ -550,18 +552,23 @@ $(document).ready(function() {
 	$('.mian_amount').live("blur",function() {
         var v=parseFloat($(this).val());
         if(!v){ v=0; }
-        $(this).val(v.toFixed(2));
+        $(this).val(round(v,2));
     });
     
     $('.mian_amount').live("keyup",function() {
-     //   do_mian_amount_total();
+        do_mian_amount_total();
         do_ref_total();
     });
-    
-/*     function do_mian_amount_total(){
+	$('.cr_dr').live("change",function() {
+        do_mian_amount_total();
+        do_ref_total();
+    });
+    do_mian_amount_total();
+     function do_mian_amount_total(){
         var mian_amount_total_cr=0; var mian_amount_total_dr=0;
         $("#main_table tbody#main_tbody tr.main_tr").each(function(){
-            var v=parseFloat($(this).find("td:nth-child(2) input").val());
+            var v=parseFloat($(this).find("td:nth-child(2) input.mian_amount").val());
+			
             var cr_dr=($(this).find("td:nth-child(2) select").val());
             if(!v){ v=0; }
             if(cr_dr=="Cr"){
@@ -571,9 +578,9 @@ $(document).ready(function() {
             }
             
             mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-            $('#receipt_amount').text(mian_amount_total.toFixed(2));
+            $('#receipt_amount').text(round(mian_amount_total,2));
         });
-    } */   
+    }   
   
 });
 </script>

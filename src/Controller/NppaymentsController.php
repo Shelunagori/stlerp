@@ -755,23 +755,17 @@ class NppaymentsController extends AppController
         foreach($vouchersReferences->voucher_ledger_accounts as $data){
             $where[]=$data->ledger_account_id;
         }
-        $ReceivedFroms_selected='yes';
-        if(sizeof($where)>0){
-            $receivedFroms = $this->Nppayments->ReceivedFroms->find('list',
-                ['keyField' => function ($row) {
-                    return $row['id'];
-                },
-                'valueField' => function ($row) {
-                    if(!empty($row['alias'])){
-                        return  $row['name'] . ' (' . $row['alias'] . ')';
-                    }else{
-                        return $row['name'];
-                    }
-                    
-                }])->where(['ReceivedFroms.id IN' => $where]);
-        }else{
-            $ReceivedFroms_selected='no';
-        }
+       $receivedFroms=[];
+		
+		$ReceivedFroms_selected='yes';
+		if(sizeof($where)>0){
+			$receivedDatas = $this->Nppayments->ReceivedFroms->find()->where(['ReceivedFroms.id IN' => $where]);
+			foreach($receivedDatas as $receivedData){
+				$receivedFroms[$receivedData->id]=['text'=>$receivedData->name,'value'=>$receivedData->id,'thelatype'=>$receivedData->grn_invoice];
+			}
+		}else{
+			$ReceivedFroms_selected='no';
+		}	
         $session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn=$this->Nppayments->Grns->find()->where(['company_id' => $st_company_id]);

@@ -98,7 +98,7 @@ if($transaction_date <  $start_date ) {
                     <td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','value'=>$petty_cash_voucher_row->received_from_id]); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					<div class="show_result">
-							<?php if($petty_cash_voucher_row->ledger_account->expense_tracking=='yes' && $petty_cash_voucher_row->ledger_account->grn_invoice=='GRN'){
+							<?php if(sizeof($petty_cash_voucher_row->grn_ids) > 0){
 							$option=[];
 							foreach($grn as $grn1)
 							{ 
@@ -118,9 +118,9 @@ if($transaction_date <  $start_date ) {
 								} 
 
 							}
-							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.grn_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns select2','style'=>'width:100%']);
+							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.grn_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns select2me','style'=>'width:100%']);
 							}
-							elseif($petty_cash_voucher_row->ledger_account->expense_tracking=='yes' && $petty_cash_voucher_row->ledger_account->grn_invoice=='INVOICE')
+							elseif(sizeof($petty_cash_voucher_row->invoice_ids) > 0)
 							{
 							$option=[];
 							foreach($invoice as $invoice1)
@@ -141,7 +141,7 @@ if($transaction_date <  $start_date ) {
 								} 
 
 							}
-							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.invoice_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices select2','style'=>'width:100%']);
+							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.invoice_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices select2me','style'=>'width:100%']);
 							}
 
 							?>
@@ -400,7 +400,7 @@ $(document).ready(function() {
 					$(this).find("td:eq(0) .row_id").val(i);
 			//var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length; 
 			
-				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				var thela_type = $(this).find("td:nth-child(1) select.received_from option:selected").attr('thelatype'); 
 				if(thela_type)
 				{
 					if(thela_type=='grn')
@@ -431,7 +431,7 @@ $(document).ready(function() {
                     });
             $(this).find("td:eq(1) select").attr({name:"petty_cash_voucher_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
             $(this).find("td:nth-child(4) textarea").attr({name:"petty_cash_voucher_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
-			$(this).find("td:eq(0) select.received_from").attr('auto_inc',i)
+			
             i++;
         });
     }
@@ -722,14 +722,14 @@ $(document).ready(function() {
 		$('.mian_amount').live("blur",function() { 
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
-		$(this).val(v.toFixed(2));
+		$(this).val(round(v,2));
 		});
 	}
 	
 	$('.mian_amount').live("blur",function() { 
 		var v=parseFloat($(this).val());
 		if(!v){ v=0; }
-		$(this).val(v.toFixed(2));
+		$(this).val(round(v,2));
 	});
 	
 	$('.mian_amount').live("keyup",function() {
@@ -754,7 +754,7 @@ $(document).ready(function() {
 				mian_amount_total_dr=mian_amount_total_dr+v;
 			}
 			mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-			$('#receipt_amount').text(mian_amount_total.toFixed(2));
+			$('#receipt_amount').text(round(mian_amount_total,2));
 		});
 	}
 	
@@ -832,7 +832,7 @@ $(document).ready(function() {
 <table id="sample_table" style="display:none;">
 	<tbody>
 		<tr class="main_tr">
-			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from','auto_inc'=>0]); ?><?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?><div class="show_result"></div></td>
+			<td><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?><?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?><div class="show_result"></div></td>
 			<td>
 			<div class="row">
 				<div class="col-md-7" style="padding-right: 0;">

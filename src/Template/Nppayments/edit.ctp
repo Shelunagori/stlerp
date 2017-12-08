@@ -339,7 +339,7 @@ $(document).ready(function() {
 						required: true
 					});
 
-				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				var thela_type=$(this).find('td:nth-child(1) select.received_from  option:selected').attr('thelatype');
 				if(thela_type)
 				{
 					if(thela_type=='grn')
@@ -637,7 +637,7 @@ $(document).ready(function() {
 				}else{
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
 				
 			}else{
 				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
@@ -677,7 +677,7 @@ $(document).ready(function() {
 					
 				}
 				
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
 			}
 		});
 	}
@@ -686,7 +686,11 @@ $(document).ready(function() {
     $('.mian_amount').live("blur",function() {
         var v=parseFloat($(this).val());
         if(!v){ v=0; }
-        $(this).val(v.toFixed(2));
+        $(this).val(round(v,2));
+    });
+	$('.cr_dr').live("change",function() {
+        do_mian_amount_total();
+        do_ref_total();
     });
     
     $('.mian_amount').live("keyup",function() {
@@ -707,7 +711,7 @@ $(document).ready(function() {
             }
             
             mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-            $('#receipt_amount').text(mian_amount_total.toFixed(2));
+            $('#receipt_amount').text(round(mian_amount_total,2));
         });
     }
     

@@ -630,7 +630,7 @@ $(document).ready(function() {
             }
             
             mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-            $('#receipt_amount').text(mian_amount_total.toFixed(2));
+            $('#receipt_amount').text(round(mian_amount_total,2));
         });
 	}	
 });

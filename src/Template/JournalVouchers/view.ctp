@@ -86,6 +86,9 @@ margin-bottom: 0;
 		
 			<tr>
 				<th><?= __('Ledger A/C') ?></th>
+				<?php if($aval==1){ ?>
+            <th><?= __('Grn/Invoice') ?></th>
+			<?php } ?>
 				<th><?= __('Narration') ?></th>
 				<th><?= __('Dr') ?></th>
 				<th><?= __('Cr') ?></th>
@@ -101,6 +104,22 @@ margin-bottom: 0;
 					 echo $journal_voucher_row->ReceivedFrom->name.'('; echo $journal_voucher_row->ReceivedFrom->alias.')'; 
 				}?>
 				</td>
+				<?php if($aval==1){ ?>
+			<td style="white-space: nowrap;">
+			<?php  if(!empty($journal_voucher_row->grn_ids)){ 
+			 foreach($journalVoucher_grn_data[@$journal_voucher_row->id] as $petty_cash_voucher_row1){
+				echo $petty_cash_voucher_row1->grn1.'/GRN-'.str_pad($petty_cash_voucher_row1->grn2, 3, '0', STR_PAD_LEFT).'/'.$petty_cash_voucher_row1->grn3.'/'.$petty_cash_voucher_row1->grn4;
+				echo "<br/>"; 
+				}
+			 } 
+			 if(!empty($journal_voucher_row->invoice_ids)){ 
+			 foreach($journalVoucher_invoice_data[@$journal_voucher_row->id] as $petty_cash_voucher_row2){
+				echo $petty_cash_voucher_row2->in1.'/IN-'.str_pad($petty_cash_voucher_row2->in2, 3, '0', STR_PAD_LEFT).'/'.$petty_cash_voucher_row2->in3.'/'.$petty_cash_voucher_row2->in4;
+				echo "<br/>"; 
+				}
+			 }
+			 ?></td>
+			 <?php } ?>
 				<td><?=$this->Text->autoParagraph(h($journal_voucher_row->narration)) ?></td>
 				<td>
 				<?php if($journal_voucher_row->cr_dr=="Dr")
@@ -122,6 +141,7 @@ margin-bottom: 0;
 			
 			<?php if(!empty($ref_bal[$journal_voucher_row->received_from_id])):?>
 			<tr>
+			
 			<td colspan="3" style="border-top:none !important;">
 			<table width="100%">
 			
@@ -146,6 +166,9 @@ margin-bottom: 0;
 			
 			<tr>
 			<td></td>
+			<?php if($aval==1){ ?>
+			<td></td>
+			<?php } ?>
 			<td align="right"><b>Total</b></td>
 			
 			<td > <?php echo number_format($dr,2,'.',',');?></td>

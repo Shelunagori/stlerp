@@ -72,7 +72,7 @@ if($transaction_date <  $start_date ) {
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					
 					<div class="show_grns">
-										<?php if($journal_voucher_rows->ledger_account->expense_tracking=='yes' && $journal_voucher_rows->ledger_account->grn_invoice=='GRN'){
+										<?php if(sizeof($journal_voucher_rows->grn_ids)>0){
 											$option=[];
 											foreach($grn as $grn1)
 											{ 
@@ -92,9 +92,9 @@ if($transaction_date <  $start_date ) {
 												} 
 
 											}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns','style'=>'width:266px']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns select2me','style'=>'width:266px']);
 											}
-											elseif($journal_voucher_rows->ledger_account->expense_tracking=='yes' && $journal_voucher_rows->ledger_account->grn_invoice=='INVOICE')
+											elseif(sizeof($journal_voucher_rows->invoice_ids) > 0)
 											{
 											    $option=[];
 												foreach($invoice as $invoice1)
@@ -115,7 +115,7 @@ if($transaction_date <  $start_date ) {
 												    } 
 
 												}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices','style'=>'width:266px']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices select2me','style'=>'width:266px']);
 											}
 
 										?>
@@ -344,14 +344,7 @@ $(document).ready(function() {
 	}
 	rename_rows();
 	
-/* 	function function2(){
-		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
-			var sel=$(this);
-			var received_from_id=$(this).find('td:nth-child(1) select').val();
-			rename_ref_rows(sel,received_from_id);
-		});
-	} */
-	//$.when(rename_rows()).then(function2());
+
 	function add_row(){
 		var tr=$("#sample_table tbody tr").clone();
 		$("#main_table tbody#main_tbody").append(tr);
@@ -369,7 +362,7 @@ $(document).ready(function() {
 					});
 			$(this).find("td:eq(0) .row_id").val(i);
 			
-				var thela_type = $(this).find("td:eq(0) input.check").val(); 
+				var thela_type = $(this).find("td:nth-child(1) select.received_from option:selected").attr('thelatype'); 
 				if(thela_type)
 				{
 					if(thela_type=='grn')
@@ -453,7 +446,7 @@ $(document).ready(function() {
 		
 	}
 	
-	
+
 	
 	
 	$('.received_from').live("change",function() {

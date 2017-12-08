@@ -241,7 +241,9 @@ $(document).ready(function() {
             $(this).find("td:eq(1) select").attr({name:"contra_voucher_rows["+i+"][cr_dr]", id:"contra_voucher_rows-"+i+"-cr_dr"});
             
             
-            $(this).find("td:eq(3) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"});
+            $(this).find("td:eq(3) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"}).rules('add', {
+                        required: true
+                    });
             
             
             i++;
@@ -514,7 +516,10 @@ $(document).ready(function() {
         do_mian_amount_total();
         do_ref_total();
     });
-    
+    $('.cr_dr').live("change",function() {
+        do_mian_amount_total();
+        do_ref_total();
+    });
     function do_mian_amount_total(){
         var mian_amount_total_cr=0; var mian_amount_total_dr=0;
         $("#main_table tbody#main_tbody tr.main_tr").each(function(){

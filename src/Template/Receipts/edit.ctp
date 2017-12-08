@@ -179,7 +179,7 @@ if($transaction_date <  $start_date ) {
 			<tfoot>
 				<td><a class="btn btn-xs btn-default addrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
 				<td id="receipt_amount" style="font-size: 14px;font-weight: bold;"></td>
-				<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration']); ?></td>
+				<td><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration','required']); ?></td>
 				<td></td>
 			</tfoot>
 		</table>
@@ -261,7 +261,8 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
-	var payment_mode=$(this).val();
+	var payment_mode=$('input[name="payment_mode"]:checked').val();
+	
 		if(payment_mode=="Cheque"){
 			$("#chq_no").show();
 		}else{
@@ -518,7 +519,7 @@ $(document).ready(function() {
 				}else{
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
 				
 			}else{
 				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());

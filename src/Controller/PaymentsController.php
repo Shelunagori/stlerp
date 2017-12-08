@@ -526,7 +526,6 @@ class PaymentsController extends AppController
 			$grnIds=[];$invoiceIds=[];
 			foreach( $this->request->data['payment_rows'] as $key =>  $pr)
 			{
-				
 				$grnstring="";$invoiceString="";	
 				if(!empty($pr['grn_ids']))
 				{
