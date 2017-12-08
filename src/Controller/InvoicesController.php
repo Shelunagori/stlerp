@@ -2358,16 +2358,27 @@ class InvoicesController extends AppController
 		//pr(['ledger_account_id'=>$c_LedgerAccount->id,'invoice_id'=>$invoice_id]); exit;
 		$ReferenceDetails = $this->Invoices->ReferenceDetails->find()->where(['ledger_account_id'=>$c_LedgerAccount->id,'invoice_id'=>$invoice_id])->toArray();
 		
-		/* if(!empty($ReferenceDetails))
-		{
-			foreach($ReferenceDetails as $ReferenceDetail)
-			{
-				$ReferenceBalances[] = $this->Invoices->ReferenceBalances->find()->where(['ledger_account_id'=>$ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no])->toArray();
+		$SaleReturns = $this->Invoices->SaleReturns->find()->contain(['SaleReturnRows'=>['InvoiceRows']])->where(['SaleReturns.company_id'=>$st_company_id]);
+	
+	
+		//pr($MaterialIndents->toArray()); exit;
+		$sr_qty=[];
+		$in_qty=[];
+			foreach($SaleReturns as $SaleReturn){ $sales_qty=[]; //pr($SaleReturn); exit;
+				foreach($SaleReturn->sale_return_rows as $sale_return_row){ //pr($sale_return_row->invoice_row); exit; 
+					
+							@$in_qty[@$sale_return_row->invoice_row->id]+=$sale_return_row->invoice_row['quantity'];
+					
+					
+				}
+				foreach(@$SaleReturn->sale_return_rows as $sale_return_row){ // pr($sale_return_row); exit; 
+					@$sr_qty[$sale_return_row['invoice_row_id']]+=$sale_return_row['quantity'];
+					@$sales_qty[$sale_return_row['invoice_row_id']]+=$sale_return_row['quantity'];
+				}
+				
 			}
-		}
-		else{
-			$ReferenceBalances='';
-		} */
+//pr($sr_qty);
+//pr($in_qty); exit;
 		
 		 if ($this->request->is(['patch', 'post', 'put'])){ 
 			 $ref_rows=@$this->request->data['ref_rows'];
@@ -2854,9 +2865,9 @@ class InvoicesController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-				
+		//	pr($sr_qty)	; exit;
 		$employees = $this->Invoices->Employees->find('list');
-        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','GstTaxes','current_invoice_rows','sales_order_qty','existing_invoice_rows','invoice_row_id','cur_invoice_id'));
+        $this->set(compact('invoice_id','ReferenceDetails','ReferenceBalances','invoice', 'customers', 'companies', 'salesOrders','old_due_payment','items','transporters','termsConditions','serviceTaxs','exciseDuty','SaleTaxes','employees','dueInvoices','serial_no','ItemSerialNumber','SelectItemSerialNumber','ItemSerialNumber2','financial_year_data','ledger_account_details','ledger_account_details_for_fright','sale_tax_ledger_accounts','c_LedgerAccount','chkdate','GstTaxes','current_invoice_rows','sales_order_qty','existing_invoice_rows','invoice_row_id','cur_invoice_id','sr_qty','in_qty'));
         $this->set('_serialize', ['invoice']);
 		
 		

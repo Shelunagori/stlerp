@@ -86,7 +86,7 @@
 							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $iv->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); 
 							} ?>
 							</td>
-							<?php } ?>
+							<?php  ?>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>

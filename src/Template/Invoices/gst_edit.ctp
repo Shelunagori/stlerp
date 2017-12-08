@@ -268,14 +268,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						$current_igst[$current_invoice_row->sales_order_row_id]=$current_invoice_row->igst_percentage;
 						$descriptions[$current_invoice_row->sales_order_row_id]=$current_invoice_row->description;
 						$sr_nos=$current_invoice_row->serial_number;
+						$invoice_sales_return[$current_invoice_row->sales_order_row_id]=$current_invoice_row->id;
 					}
-					
+					//pr($invoice_sales_return); exit;
 					$q=0; 
 					
 
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
 						 if($sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id] > 0){
-						 
+						 $in_row_id=@$invoice_sales_return[@$sales_order_row->id];
 						 ?>
 
 						<tr class="tr1" row_no="<?= h($q) ?>">
@@ -294,7 +295,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity row_textbox','placeholder' => 'Quantity','value' => @$current_invoice_rows[$sales_order_row->id],'max'=>@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id]]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity row_textbox','placeholder' => 'Quantity','value' => @$current_invoice_rows[$sales_order_row->id],'max'=>@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id],'min'=>@$sr_qty[$in_row_id]]); 
 								?>
 								<span>Max: <?= h(@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id]) ?></span>
 							</td>
@@ -314,16 +315,25 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage','placeholder'=>'%','step'=>0.01,'value'=>@$current_igst[$sales_order_row->id]]); ?></td>
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01]); ?></td>
+							<?php?>
 							<td><label><?php 
+									
+								$disable='';
 								if(in_array($sales_order_row->id,$current_rows)){
 
 									$check='checked';
 								}else{
 									$check='';
 								}
-								echo $this->Form->input('q', ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$sales_order_row->id,$check]);
+								 if(@$sr_qty[$in_row_id] > 0) { 
+									$disable = 'disabled';
+								}else{
+									$disable='';
+								} //pr(@$in_row_id);
+								echo $this->Form->input('q', ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$sales_order_row->id,$check,@$disable]);
 								?></label>
 							</td>
+						<?php  ?>
 						</tr>
 						<tr class="tr2  secondtr" row_no="<?= h($q) ?>">
 							<td colspan="<?php echo $tr2_colspan; ?>">

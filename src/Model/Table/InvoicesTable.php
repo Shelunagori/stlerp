@@ -115,6 +115,7 @@ class InvoicesTable extends Table
             'joinType' => 'INNER'
         ]);
 		
+		
     }
 
     /**

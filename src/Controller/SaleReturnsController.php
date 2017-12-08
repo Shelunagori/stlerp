@@ -1123,6 +1123,7 @@ class SaleReturnsController extends AppController
 			foreach($saleReturn->sale_return_rows as $sale_return_row){
 				if($sale_return_row->cgst_amount > 0){
 					$cg_LedgerAccount=$this->SaleReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$sale_return_row->cgst_percentage])->first();
+					//pr($sale_return_row->cgst_percentage); exit;
 					$ledger = $this->SaleReturns->Ledgers->newEntity();
 					$ledger->ledger_account_id = $cg_LedgerAccount->id;
 					$ledger->credit = 0;
@@ -1205,7 +1206,7 @@ class SaleReturnsController extends AppController
 			foreach($saleReturn->sale_return_rows as $sale_return_row){
 				$saleReturn->check=array_filter($saleReturn->check);
 					foreach($saleReturn->check as $invoice_row_id){
-						//pr($invoice_row_id); 
+						//pr($saleReturn); 
 						$item_id=$sale_return_row['item_id'];
 						$qty=$sale_return_row['quantity'];
 						$rate=$sale_return_row['rate'];
@@ -1323,7 +1324,7 @@ class SaleReturnsController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'Index']);
-            } else { 
+            } else {  pr($saleReturn); exit;
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }
