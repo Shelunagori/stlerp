@@ -97,13 +97,12 @@ class AppController extends Controller
 			////// Financial Year Or Month Closed /////////////
 			$this->loadModel('FinancialYears');
 			$this->loadModel('FinancialMonths');
-			$session = $this->request->session();
-			$st_year_id = $session->read('st_year_id');
-			$SessionCheckDate = $this->FinancialYears->get($st_year_id);
-			$fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
-			$todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to));
+			if($st_year_id){
+				$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+				$fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+				$todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to));
 			
-			
+			}
 			$FinancialClose = $this->FinancialYears->find()->where(['company_id'=>$st_company_id])->contain(['FinancialMonths' => function($q){
 				return $q->where(['status' => 'Closed']);
 			}
