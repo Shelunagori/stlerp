@@ -234,7 +234,7 @@ $(document).ready(function() {
 				$(this).find("td:eq(0) .row_id").val(i);	
 				var thela_type = $(this).find("td:eq(0) input.check").val(); 
 				if(thela_type)
-				{
+				{ alert(thela_type);
 					if(thela_type=='grn')
 					{				
 						$(this).find("td:eq(0) select.grns").select2().attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {

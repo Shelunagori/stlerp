@@ -206,11 +206,11 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 							$item_discount=$dis/$grn->purchase_order->purchase_order_rows[$q]->quantity;
 							
 							$item_rate=$grn->purchase_order->purchase_order_rows[$q]->amount-$dis;
-							$total_sale=($tot_sale_tax*$item_rate)/$item_total_rate;
+							@$total_sale=(@$tot_sale_tax*@$item_rate)/@$item_total_rate;
 							$item_sale=$total_sale/$grn->purchase_order->purchase_order_rows[$q]->quantity;
 							
 						
-							$excise_duty_discount=($excise_duty*$item_rate)/$item_total_rate;
+							@$excise_duty_discount=(@$excise_duty*@$item_rate)/@$item_total_rate;
 							$total_exicese_duty=$excise_duty_discount/$grn->purchase_order->purchase_order_rows[$q]->quantity;
 							
 							?>

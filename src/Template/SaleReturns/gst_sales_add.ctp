@@ -277,11 +277,21 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox pnf_percentage','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->pnf_percentage]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01,'value' => @$invoice_row->pnf_amount]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Taxable Value','readonly','step'=>0.01,'value' => @$invoice_row->taxable_value]); ?></td>
-							<td style="<?php echo $gst_hide; ?>" ><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm row_textbox cgst_percentage','readonly','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->cgst_percentage]); ?></td>
+							<td style="<?php echo $gst_hide; ?>" >
+								<?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm row_textbox cgst_percentage_show','readonly','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->cgst_percentage]); ?>
+								<?php echo $this->Form->input('q', ['type'=>'hidden','label' => false,'empty'=>'Select','options'=>'','class' => 'form-control input-sm row_textbox cgst_percentage','readonly','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->cgst_percentage]); ?>
+							</td>
 							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01,'value' => @$invoice_row->cgst_amount]); ?></td>
-							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox sgst_percentage','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->sgst_percentage]); ?></td>
+							<td style="<?php echo $gst_hide; ?>">
+								<?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox sgst_percentage_show','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->sgst_percentage]); ?>
+	
+								<?php echo $this->Form->input('q', ['type'=>'hidden','label' => false,'empty'=>'Select','options'=>'','class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox sgst_percentage','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->sgst_percentage]); ?>
+							</td>
 							<td style="<?php echo $gst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01,'value' => @$invoice_row->sgst_amount]); ?></td>
-							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->igst_percentage]); ?></td>
+							<td style="<?php echo $igst_hide; ?>">
+								<?php echo $this->Form->input('q', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage_show','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->igst_percentage]); ?>
+								<?php echo $this->Form->input('q', ['type'=>'hidden','label' => false,'empty'=>'Select','options'=>'','class' => 'form-control input-sm ','class' => 'form-control input-sm row_textbox igst_percentage','placeholder'=>'%','step'=>0.01,'value' => @$invoice_row->igst_percentage]); ?>
+							</td>
 							<td style="<?php echo $igst_hide; ?>"><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Amount','readonly','step'=>0.01,'value' => @$invoice_row->igst_amount]); ?></td>
 							<td><?php echo $this->Form->input('q', ['label' => false,'class' => 'form-control input-sm row_textbox','placeholder'=>'Total','readonly','step'=>0.01,'value' => @$invoice_row->total]); ?></td>
 							<td><label><?php echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$invoice_row->id]); ?></label>
@@ -695,6 +705,9 @@ $(document).ready(function() {
 	$('.rename_check').die().live("click",function() { 
 		rename_rows();   calculate_total();
     });
+	$('.quantity ').die().live("keyup",function() { 
+		rename_rows();   calculate_total();
+    });
 	
 	rename_rows();
 	function rename_rows(){
@@ -717,11 +730,11 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(8) input').attr("name","sale_return_rows["+val+"][pnf_percentage]").attr("id","q"+val).attr("id","	sale_return_rows-"+val+"-pnf_percentage");
 				$(this).find('td:nth-child(9) input').attr("name","sale_return_rows["+val+"][pnf_amount]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-pnf_amount").rules("add", "required");
 				$(this).find('td:nth-child(10) input').attr("name","sale_return_rows["+val+"][taxable_value]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-taxable_value").rules("add", "required");
-				$(this).find('td:nth-child(11) select').attr("name","sale_return_rows["+val+"][cgst_percentage]").attr("id","q"+val).attr({readonly:"readonly"}).attr("id","sale_return_rows-"+val+"-cgst_percentage").rules("add", "required");
+				$(this).find('td:nth-child(11) .cgst_percentage').attr("name","sale_return_rows["+val+"][cgst_percentage]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-cgst_percentage").rules("add", "required");
 				$(this).find('td:nth-child(12) input').attr("name","sale_return_rows["+val+"][cgst_amount]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-cgst_amount").rules("add", "required");
-				$(this).find('td:nth-child(13) select').attr("name","sale_return_rows["+val+"][sgst_percentage]").attr("id","q"+val).attr({readonly:"readonly"}).attr("id","sale_return_rows-"+val+"-sgst_percentage").rules("add", "required");
+				$(this).find('td:nth-child(13) .sgst_percentage').attr("name","sale_return_rows["+val+"][sgst_percentage]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-sgst_percentage").rules("add", "required");
 				$(this).find('td:nth-child(14) input').attr("name","sale_return_rows["+val+"][sgst_amount]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-sgst_amount").rules("add", "required");
-				$(this).find('td:nth-child(15) select').attr("name","sale_return_rows["+val+"][igst_percentage]").attr("id","q"+val).attr({readonly:"readonly"}).attr("id","sale_return_rows-"+val+"-igst_percentage").rules("add", "required");
+				$(this).find('td:nth-child(15) .igst_percentage').attr("name","sale_return_rows["+val+"][igst_percentage]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-igst_percentage").rules("add", "required");
 				$(this).find('td:nth-child(16) input').attr("name","sale_return_rows["+val+"][igst_amount]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-igst_amount").rules("add", "required");
 				$(this).find('td:nth-child(17) input').attr("name","sale_return_rows["+val+"][row_total]").attr("id","q"+val).attr("id","sale_return_rows-"+val+"-row_total").rules("add", "required");
 				
@@ -755,6 +768,7 @@ $(document).ready(function() {
 				p++;
 			}			
 			else{ 
+				$(this).find('td:nth-child(1) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(2) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(3) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"});
@@ -764,11 +778,14 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(8) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(9) input').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(10) input').attr({ name:"q", readonly:"readonly"});
-				$(this).find('td:nth-child(11) select').attr({ name:"q", readonly:"readonly"});
+				$(this).find('td:nth-child(11) select.cgst_percentage_show').attr("disabled", true);
+				$(this).find('td:nth-child(11) .cgst_percentage').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(12) input').attr({ name:"q", readonly:"readonly"});
-				$(this).find('td:nth-child(13) select').attr({ name:"q", readonly:"readonly"});
+				$(this).find('td:nth-child(13) select.sgst_percentage_show').attr("disabled", true);
+				$(this).find('td:nth-child(13) .sgst_percentage').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(14) input').attr({ name:"q", readonly:"readonly"});
-				$(this).find('td:nth-child(15) select').attr({ name:"q", readonly:"readonly"});
+				$(this).find('td:nth-child(15) select.igst_percentage_show').attr("disabled", true);
+				$(this).find('td:nth-child(15) .igst_percentage').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(16) input').attr({ name:"q", readonly:"readonly"});
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');

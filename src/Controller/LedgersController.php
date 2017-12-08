@@ -772,8 +772,9 @@ class LedgersController extends AppController
 			$from_date = date("Y-m-d",strtotime($financial_year->date_from));
 			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
 		} 
+		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		
-		//pr($TransactionsCredit); exit;
+		//pr($differenceInOpeningBalance); exit;
 		
 		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date'));
 		

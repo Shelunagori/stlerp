@@ -503,6 +503,7 @@ class NppaymentsController extends AppController
         }else{
             $ReceivedFroms_selected='no';
         }
+		//pr($receivedFroms->toArray()); exit;
         $this->set(compact('nppayment', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['nppayment']);
     }
@@ -556,6 +557,7 @@ class NppaymentsController extends AppController
         //pr( $nppayment); exit;
         if ($this->request->is(['patch', 'post', 'put'])) {
 			$grnIds=[];$invoiceIds=[];
+			//pr($this->request->data['nppayment_rows']); exit;
 			foreach( $this->request->data['nppayment_rows'] as $key =>  $pr)
 			{
 				$grnstring="";$invoiceString="";

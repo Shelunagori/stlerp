@@ -107,25 +107,21 @@ if($transaction_date <  $start_date ) {
 					<div class="show_result">
 					<?php if($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='grn'){
 							 $option=[];
-							foreach($grn as $grn1)
+							foreach($grn as $grn1) 
 								{ 
-									$grnIds = explode(',',$nppayment_row->grn_ids);
+									$grnIds = explode(',',$nppayment_row->grn_ids);  
 									if(in_array($grn1->id, $grnIds))
 									{   
 										$grn_no=$grn1->grn1.'/GRN-'.str_pad($grn1->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn1->grn3.'/'.$grn1->grn4;
-										$option[]=['text' =>$grn_no, 'value' => $grn1->id, 'selected'];
-									}
-									else
-									{
-										if($grn1->purchase_thela_bhada_status=='no')
-										{
-											$grn_no=$grn1->grn1.'/GRN-'.str_pad($grn1->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn1->grn3.'/'.$grn1->grn4;
-											$option[]=['text' =>$grn_no, 'value' => $grn1->id];
-										}
-									} 
 
+										$value[]=$grn1->id;  //pr($value);
+									}
+									
+									$grn_no=$grn1->grn1.'/GRN-'.str_pad($grn1->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn1->grn3.'/'.$grn1->grn4;
+									$option[]=['text' =>$grn_no, 'value' => $grn1->id];
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns select2me','style'=>'width:100%']);
+
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns select2me','style'=>'width:100%','value'=>$value]);
 					}
 					elseif($nppayment_row->ledger_account->expense_tracking=='yes' && $nppayment_row->ledger_account->grn_invoice=='invoice'){
 							 $option=[];
@@ -313,6 +309,15 @@ $(document).ready(function() {
     });
     //--     END OF VALIDATION
     
+	var nppayment_mode= $('input[name="payment_mode"]').val();
+        
+        if(nppayment_mode=="Cheque"){
+            $("#chq_no").show();
+        }else{
+            $("#chq_no").hide();
+        }
+	
+	
     $('input[name="payment_mode"]').die().live("click",function() {
         var nppayment_mode=$(this).val();
         
@@ -340,8 +345,9 @@ $(document).ready(function() {
 					});
 
 				var thela_type=$(this).find('td:nth-child(1) select.received_from  option:selected').attr('thelatype');
+
 				if(thela_type)
-				{
+				{ 
 					if(thela_type=='grn')
 					{				
 						$(this).find("td:eq(0) select.grns").attr({name:"nppayment_rows["+i+"][grn_ids][]", id:"nppayment_rows-"+i+"-grn_ids"}).rules('add', {
@@ -488,45 +494,11 @@ $(document).ready(function() {
 			type: 'GET',
 			dataType: 'text'
 		}).done(function(response) { 
-			$(sel).closest('tr.main_tr').find('.show_result').html(response);
+			$(sel).closest('tr.main_tr').find('.show_result').html(response); alert(response);
 			//$(sel).closest('tr.main_tr').find('select.grns').select2();
 			rename_rows();
 		});
-		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
-		url=url+'/'+received_from_id;
-		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
-		{ 
-	       $.ajax({
-				url: url,
-				type: 'GET',
-				dataType: 'text'
-			}).done(function(response) {
-				$(sel).closest('tr.main_tr').find('.show_result').html(response);
-				rename_rows();
-			});
-		}
-		else
-		{
-			$(sel).closest('tr.main_tr').find('.show_result').html('');
-		}
 		
-		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadInvoices']); ?>";
-		url=url+'/'+received_from_id;
-		if(received_from_id=='105' || received_from_id=='168' || received_from_id=='316')
-		{
-	       $.ajax({
-				url: url,
-				type: 'GET',
-				dataType: 'text'
-			}).done(function(response) {  
-				$(sel).closest('tr.main_tr').find('.show_result').html(response);
-				rename_rows(); 
-			});
-		}
-		else
-		{
-			$(sel).closest('tr.main_tr').find('.show_result').html('');
-		} */
     }
     
     

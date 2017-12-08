@@ -30,7 +30,7 @@ if(!empty($status)){
 			
 			
 			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
-			if($status=='Converted Into Sales Order'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
+			if($status=='Converted into Sales Order'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
 			if($status=='Closed'){ $class3='btn btn-primary'; }else{ $class3='btn btn-default'; }
 			?>
 			<?php if($pull_request!="true" and $gst_pull_request!="true" and $copy_request!="copy"){ ?>
