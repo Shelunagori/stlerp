@@ -1549,13 +1549,13 @@ pr($purchase_id);
 			$item_name=$itemLedger->item->name;
 			$item_id=$itemLedger->item->id;
 			$Current_Stock=$itemLedger->total_in-$itemLedger->total_out;
-			$material_report[]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'minimum_stock'=>@$itemLedger->item->item_companies[0]->minimum_stock);
+			$material_report[$item_id]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'minimum_stock'=>@$itemLedger->item->item_companies[0]->minimum_stock);
 			
 		} 
-		
-//pr($material_report); exit;
-		
-		//exit;
+		$Items = $this->ItemLedgers->Items->find();
+		// pr($Items->toArray()); exit;
+		// pr($material_report); exit;
+			
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
@@ -1666,7 +1666,7 @@ pr($purchase_id);
 			$material_report[]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'sales_order'=>@$sales[$item_id],'job_card_qty'=>@$job_card_items[$item_id]);
 			}
 		} 
-			
+		
 		$this->set(compact('material_report','mit'));
 			
 	}
