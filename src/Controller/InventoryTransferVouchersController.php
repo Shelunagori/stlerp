@@ -231,6 +231,7 @@ class InventoryTransferVouchersController extends AppController
 					$serial_data=sizeof(@$inventory_transfer_voucher_row_data['serial_number_data']);
 					if($serial_data>0)
 					{
+						$UnitRateSerialItem1=0;
 						$serial_number_datas=$inventory_transfer_voucher_row_data['serial_number_data'];
 						foreach($serial_number_datas as $serial_number_data){
 							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
@@ -249,8 +250,10 @@ class InventoryTransferVouchersController extends AppController
 												'transaction_date'=>$inventoryTransferVoucher->transaction_date
 												])
 									->execute();
-									$unit_rate=$UnitRateSerialItem;
+									$UnitRateSerialItem1+=$UnitRateSerialItem;
+									$unit_rate=$UnitRateSerialItem1;
 						}
+						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row_data['quantity'];
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
@@ -483,6 +486,7 @@ class InventoryTransferVouchersController extends AppController
 					if($serial_data>0)
 					{
 						$serial_number_datas=$inventory_transfer_voucher_row_data['serial_number_data'];
+						$UnitRateSerialItem1=0;
 						foreach($serial_number_datas as $serial_number_data){
 							$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
 							$serial_data=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->get($serial_number_data);
@@ -500,16 +504,20 @@ class InventoryTransferVouchersController extends AppController
 												'transaction_date'=>$inventoryTransferVoucher->transaction_date
 												])
 									->execute();
-									$unit_rate=$UnitRateSerialItem;
+									
+									$UnitRateSerialItem1+=$UnitRateSerialItem;
+									$unit_rate=$UnitRateSerialItem1;
 						}
+						
+						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row_data['quantity'];
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 						//	pr($unit_rate); exit;
 					}
-					
+						
 					
 					$unit_rate = round($unit_rate,2);
-						 
+						
 					
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
@@ -527,8 +535,8 @@ class InventoryTransferVouchersController extends AppController
 					    ->execute();
 						
 						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row_data['quantity'];
-						
-						
+						$avg_cost_data = round($avg_cost_data,2);
+						//pr($avg_cost_data); exit;
 						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
 						$query21->update()
 							->set(['amount' => $avg_cost_data])
@@ -908,6 +916,7 @@ class InventoryTransferVouchersController extends AppController
 				
 				$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
 					if($serial_data>0){
+						$UnitRateSerialItem1=0;
 						foreach($inventory_transfer_voucher_row->serial_number_data as $serial_number_data){
 							
 						$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($serial_number_data); 
@@ -927,12 +936,14 @@ class InventoryTransferVouchersController extends AppController
 											])
 								->execute();
 								
-								$unit_rate=$UnitRateSerialItem;
+								$UnitRateSerialItem1+=$UnitRateSerialItem;
+								$unit_rate=$UnitRateSerialItem1;
 						}
-						
+						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row->quantity;
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
+					
 					$unit_rate = round($unit_rate,2);
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
@@ -985,14 +996,14 @@ class InventoryTransferVouchersController extends AppController
 			$unit_rate=0;
 	
 	
-	
+	//
 		if($Items->item_companies[0]->serial_number_enable == '1'){
 				$ItemSerialNumber=$this->InventoryTransferVouchers->ItemLedgers->SerialNumbers->get($sr_no_out_id);
 				
 				$itemSerialRate=0; $itemSerialQuantity=0; $i=1;
 							
-				if(@$ItemSerialNumber->grn_id > 0){ 
-							$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
+				if(@$ItemSerialNumber->grn_id > 0){ //pr($sr_no_out_id); exit;
+				$outExist = $this->InventoryTransferVouchers->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
 					if($outExist == 0){
 						$ItemLedgerData =$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id])->first();
 					//	pr($ItemLedgerData); 
@@ -1047,7 +1058,7 @@ class InventoryTransferVouchersController extends AppController
 					
 				}
 				
-			//pr($itemSerialRate); exit;
+			//pr($itemSerialRate); 
 			
 			
 				return $itemSerialRate; 
@@ -1103,7 +1114,7 @@ class InventoryTransferVouchersController extends AppController
 				$this->InventoryTransferVouchers->InventoryTransferVoucherRows->SerialNumbers->deleteAll(['SerialNumbers.itv_id'=>$inventoryTransferVoucher->id,'SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.status'=>'Out']);
 				
 			foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
-				
+				$UnitRateSerialItem1=0;
 				$serial_data=sizeof($inventory_transfer_voucher_row->serial_number_data);
 					if($serial_data>0){
 						foreach($inventory_transfer_voucher_row->serial_number_data as $serial_number_data){
@@ -1125,9 +1136,10 @@ class InventoryTransferVouchersController extends AppController
 											])
 								->execute();
 								
-								$unit_rate=$UnitRateSerialItem;
+								$UnitRateSerialItem1+=$UnitRateSerialItem;
+								$unit_rate=$UnitRateSerialItem1;
 						}
-						
+						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row->quantity;
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
