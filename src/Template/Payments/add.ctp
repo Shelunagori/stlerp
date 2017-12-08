@@ -262,12 +262,13 @@ $(document).ready(function() {
 						});
 					}
 				}
-			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"payment_rows["+i+"][amount]", id:"payment_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01,
 					});
-			$(this).find("td:eq(1) select").attr({name:"payment_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
-			$(this).find("td:nth-child(4) textarea").attr({name:"payment_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
+			$(this).find("td:eq(1) select").attr({name:"payment_rows["+i+"][cr_dr]", id:"payment_rows-"+i+"-cr_dr"});
+			
+			$(this).find("td:nth-child(4) textarea").attr({name:"payment_rows["+i+"][narration]", id:"payment_rows-"+i+"-narration"}).rules("add", "required");
 			i++;
 		});
 	}

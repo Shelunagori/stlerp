@@ -231,7 +231,7 @@ $(document).ready(function() {
 			$(this).find("td:eq(0) select.received_from").select2().attr({name:"nppayment_rows["+i+"][received_from_id]", id:"nppayment_rows-"+i+"-received_from_id"}).rules('add', {
 						required: true
 					});
-					
+				$(this).find("td:eq(0) .row_id").val(i);	
 				var thela_type = $(this).find("td:eq(0) input.check").val(); 
 				if(thela_type)
 				{
@@ -258,17 +258,14 @@ $(document).ready(function() {
 				}				
 					
 					
-			$(this).find("td:eq(0) .row_id").val(i);
-			$(this).find("td:eq(1) input").attr({name:"nppayment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			
+			$(this).find("td:eq(1) input").attr({name:"nppayment_rows["+i+"][amount]", id:"nppayment_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01
 					});
-			$(this).find("td:eq(1) select").attr({name:"nppayment_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(1) select").attr({name:"nppayment_rows["+i+"][cr_dr]", id:"nppayment_rows-"+i+"-cr_dr"});
 			
-			
-			$(this).find("td:eq(3) textarea").attr({name:"nppayment_rows["+i+"][narration]", id:"nppayment_rows-"+i+"-narration"});
-			
-			
+			$(this).find("td:nth-child(4) textarea").attr({name:"nppayment_rows["+i+"][narration]", id:"nppayment_rows-"+i+"-narration"}).rules("add", "required");
 			i++;
 		});
 	}

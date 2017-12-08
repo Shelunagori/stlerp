@@ -755,9 +755,10 @@ class PaymentsController extends AppController
 		} */
 		
 		$receivedFroms=[];
-		$receivedDatas = $this->Payments->ReceivedFroms->find();
+		
 		$ReceivedFroms_selected='yes';
 		if(sizeof($where)>0){
+			$receivedDatas = $this->Payments->ReceivedFroms->find()->where(['ReceivedFroms.id IN' => $where]);
 			foreach($receivedDatas as $receivedData){
 				$receivedFroms[$receivedData->id]=['text'=>$receivedData->name,'value'=>$receivedData->id,'thelatype'=>$receivedData->grn_invoice];
 			}

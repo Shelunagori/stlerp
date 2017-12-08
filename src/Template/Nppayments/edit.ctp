@@ -366,11 +366,11 @@ $(document).ready(function() {
 
 
     		$(this).find("td:eq(0) .row_id").val(i);
-			$(this).find("td:eq(1) input").attr({name:"nppayment_rows["+i+"][amount]", id:"quotation_rows-"+i+"-amount"}).rules('add', {
+			$(this).find("td:eq(1) input").attr({name:"nppayment_rows["+i+"][amount]", id:"nppayment_rows-"+i+"-amount"}).rules('add', {
 						required: true,
 						min: 0.01
 					});
-			$(this).find("td:eq(1) select").attr({name:"nppayment_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
+			$(this).find("td:eq(1) select").attr({name:"nppayment_rows["+i+"][cr_dr]", id:"nppayment_rows-"+i+"-cr_dr"});
 			
 			
 			$(this).find("td:eq(3) textarea").attr({name:"nppayment_rows["+i+"][narration]", id:"nppayment_rows-"+i+"-narration"});
