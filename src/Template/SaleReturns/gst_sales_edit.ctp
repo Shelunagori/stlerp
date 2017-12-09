@@ -920,7 +920,7 @@ $(document).ready(function() {
 				var fright_igst_amount = (fright_amount*fright_igst_percent)/100;
 				$('input[name="fright_igst_amount"]').val(round(fright_igst_amount,2));
 			}
-			var total_fright=fright_amount+fright_cgst_amount+fright_igst_amount+fright_sgst_amount;
+			var total_fright=round(fright_amount,2)+round(fright_cgst_amount,2)+round(fright_igst_amount,2)+round(fright_sgst_amount,2);
 			if(isNaN(total_fright)){
 				 var total_fright = 0; 
 				 $('input[name="total_fright_amount"]').val(round(total_fright,2));
@@ -935,7 +935,7 @@ $(document).ready(function() {
 		$("#main_tb tbody tr.tr1").each(function(){
 			var val=$(this).find('td:nth-child(18) input[type="checkbox"]:checked').val();
 			if(val){
-				var qty=parseInt($(this).find("td:nth-child(3) input").val());
+				var qty=parseFloat($(this).find("td:nth-child(3) input").val());
 				var Rate=parseFloat($(this).find("td:nth-child(4) input").val());
 				var Amount=round(qty,2)*Rate;
 				$(this).find("td:nth-child(5) input").val(round(Amount,2));

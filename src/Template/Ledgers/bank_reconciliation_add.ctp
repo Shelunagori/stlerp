@@ -159,9 +159,9 @@
 						<td>
 						<?php if(empty($ledger->reconciliation_date)){  ?>
 						
-							<?php echo $this->Form->input('reconciliation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker reconciliation_date','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to)),'placeholder' => 'Reconcilation Date','ledger_id'=>$ledger->id,'required']); 
+							<?php echo $this->Form->input('reconciliation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker reconciliation_date','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => date("d-m-Y",strtotime($ledger->transaction_date)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to)),'placeholder' => 'Reconcilation Date','ledger_id'=>$ledger->id,'required']); 
 						}else{  ?>
-							<?php echo $this->Form->input('reconciliation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker reconciliation_date','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to)),'placeholder' => 'Reconcilation Date','ledger_id'=>$ledger->id,'required','value'=>date('d-m-Y',strtotime($ledger->reconciliation_date))]); ?>
+							<?php echo $this->Form->input('reconciliation_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker reconciliation_date','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => date("d-m-Y",strtotime($ledger->transaction_date)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to)),'placeholder' => 'Reconcilation Date','ledger_id'=>$ledger->id,'required','value'=>date('d-m-Y',strtotime($ledger->reconciliation_date))]); ?>
 						<?php } ?></td>
 						<td>
 							<button type="button" ledger_id=<?php echo $ledger->id ?> class="btn btn-primary btn-sm subdate"><i class="fa fa-arrow-right" ></i></button>	
