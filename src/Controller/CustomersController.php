@@ -995,6 +995,7 @@ class CustomersController extends AppController
 				
 		if(!$ledgerexist){
 			$customer_Company_dlt= $this->Customers->CustomerCompanies->find()->where(['CustomerCompanies.customer_id'=>$customer_id,'company_id'=>$company_id])->first();
+			
 			$customer_ledger_dlt= $this->Customers->LedgerAccounts->find()->where(['source_model' => 'Customers','source_id'=>$customer_id,'company_id'=>$company_id])->first();
 			
 			$VoucherLedgerAccountsexist = $this->Customers->VoucherLedgerAccounts->exists(['ledger_account_id' => $customer_ledger->id]);
@@ -1065,7 +1066,9 @@ class CustomersController extends AppController
 		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
 			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
 			->order(['LedgerAccounts.name'=>'ASC']);
+			
 		$CustmerPaymentTerms=[]; $Outstanding=[];
+		
 		foreach($LedgerAccounts as $LedgerAccount){
 			$Customer =$this->Customers->get($LedgerAccount->source_id);
 			$CustmerPaymentTerms[$LedgerAccount->id]=$Customer->payment_terms;

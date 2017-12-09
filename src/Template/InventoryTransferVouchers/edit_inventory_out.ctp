@@ -283,6 +283,7 @@ $(document).ready(function() {
 			
 			i++; 
 		});
+		validate_serial();
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {
@@ -299,13 +300,15 @@ $(document).ready(function() {
 						}
 					validate_serial();
 				}
+		}else{
+			validate_serial();
 		}	
     });
 	 
+	 
 	function validate_serial(){
 		$("#main_table tbody#maintbody tr.main").each(function(){
-			var OriginalQty=$(this).find('td:nth-child(2) input').val();
-			Quantity = OriginalQty.split('.'); qty=Quantity[0];
+			var qty=$(this).find('td:nth-child(2) input').val();
 			if($(this).find('td:nth-child(3) select').length>0){
 				$(this).find('td:nth-child(3) select').attr('test',qty).rules('add', {
 							required: true,

@@ -236,8 +236,11 @@ class VendorsController extends AppController
 
 		if(!$ledgerexist){
 			$customer_Company_dlt= $this->Vendors->VendorCompanies->find()->where(['VendorCompanies.vendor_id'=>$vendor_id,'company_id'=>$company_id])->first();
+			
 			$customer_ledger_dlt= $this->Vendors->LedgerAccounts->find()->where(['source_model' => 'Vendors','source_id'=>$vendor_id,'company_id'=>$company_id])->first();
+			
 			$VoucherLedgerAccountsexist = $this->Vendors->VoucherLedgerAccounts->exists(['ledger_account_id' => $employees_ledger->id]);
+			
 			if($VoucherLedgerAccountsexist){
 				$Voucherref = $this->Vendors->VouchersReferences->find()->contain(['VoucherLedgerAccounts'])->where(['VouchersReferences.company_id'=>$company_id]);
 				foreach($Voucherref as $Voucherref){

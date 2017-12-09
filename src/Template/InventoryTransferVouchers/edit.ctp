@@ -472,6 +472,7 @@ $(document).ready(function() {
 			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows[out]["+i+"][narration]", id:"inventory_transfer_voucher_rows-"+i+"-narration"}).rules("add", "required");
 			i++; 
 		});
+		validate_serial();
 	}
 	
 	$('.qty_bx').die().live("keyup",function() {

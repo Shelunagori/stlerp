@@ -11,20 +11,38 @@ table td, table th{
 	<div class="portlet-title">
 		<div class="caption">Outstandings for Vendor for <?php echo $to_send['tdate']; ?></div>
 	</div>
+	
 	<div class="portlet-body">
+	<form method="GET" >
+		<table width="100%">
+			<tbody>
+				<tr>
+					<td width="15%">
+							<?php 
+								$options = [];
+								$options = [['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
+							echo $this->Form->input('total', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me stock','placeholder'=>'Sub-Group','value'=> h(@$stock)]); ?>
+						</td>
+						<td></td>
+					   <td align="right" width="10%"><input type="text" class="form-control input-sm pull-right" placeholder="Search..." id="search3"  style="width: 100%;"></td>
+					   <td align="right" width="8%">
+							<?php $url=json_encode($to_send,true);
+							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Vendors/Vendor-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+					   </td>
+				</tr>
+			</tbody>
+		</table>
+	</form>
 		<div class="table-toolbar">
 			<div class="row">
 				<div class="col-md-6"></div>
 				<div class="col-md-6" >
-					<div class="btn-group" style="float:right;">
-						<?php $url=json_encode($to_send, true);
-							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Vendors/Vendor-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
-					</div>
+					
 				</div>
 			</div>
 		</div>
 		<div class="table-responsive" >
-			<table class="table table-bordered">
+			<table class="table table-bordered" id="main_tble">
 			<thead>
 			<tr>
 				<th>#</th>
@@ -114,6 +132,8 @@ table td, table th{
 				<?php $ClosingBalance=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
 				<?php if($ClosingBalance!=0){
 					echo $ClosingBalance;
+				}else{
+					echo "0";
 				} ?>
 				<?php
 					@$ColumnClosingBalance+=$ClosingBalance;
@@ -122,16 +142,68 @@ table td, table th{
 			</tr>
 			<?php } ?>
 			</tbody>
-			<tfoot>
+			<tfoot id='tf'>
 				<tr>
 					<th colspan="8"><div  align="right">TOTAL</div></th>
-					<th><?php echo $ColumnOnAccount; ?></th>
-					<th><?php echo $ColumnOutStanding; ?></th>
-					<th><?php echo $ColumnNoDue; ?></th>
-					<th><?php echo $ColumnClosingBalance; ?></th>
+					<th class="oa"><?php echo $ColumnOnAccount; ?></th>
+					<th class="os"><?php echo $ColumnOutStanding; ?></th>
+					<th class="nd"><?php echo $ColumnNoDue; ?></th>
+					<th class="cb"><?php echo $ColumnClosingBalance; ?></th>
 				</tr>
 			</tfoot>
 			</table>
 		</div>
 	</div>
 </div>
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<script>
+$(document).ready(function() {
+var $rows = $('#main_tble tbody tr');
+	$('#search3').on('keyup',function() {
+	
+			var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+    		var v = $(this).val();
+    		if(v){ 
+    			$rows.show().filter(function() {
+    				var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+		
+    				return !~text.indexOf(val);
+    			}).hide();
+    		}else{
+    			$rows.show();
+    		}
+    	});
+	/////
+	$('.stock').die().live("change",function(){
+		var stock = $(this).val();
+			var total_closing_bal=0;
+			$("#main_tble tbody tr").each(function(){
+				var closing_bal = $(this).find("td:nth-child(12)").html();
+				
+				if(stock =='Positive' && closing_bal > 0){
+					$(this).show();
+					total_closing_bal=parseFloat(total_closing_bal)+parseFloat(closing_bal);
+					$("#main_tble #tf tr th.os").html('');
+					$("#main_tble #tf tr th.cb").html('');
+					$("#main_tble #tf tr th.os").html(total_closing_bal);
+					$("#main_tble #tf tr th.cb").html(total_closing_bal);
+				}else if(stock =='Negative' && closing_bal < 0){
+					$(this).show(); 
+					
+				}else if(stock =='Zero' && closing_bal == 0){
+					$(this).show();
+					$("#main_tble #tf tr th.os").html(0);
+					$("#main_tble #tf tr th.cb").html(0);
+					$("#main_tble #tf tr th.oa").html(0);
+					$("#main_tble #tf tr th.nd").html(0);
+				}else{
+					$(this).hide();
+				}
+				
+				
+			});
+		
+	});	
+});
+		
+</script>
