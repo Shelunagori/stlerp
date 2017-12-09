@@ -405,7 +405,7 @@ select
 						<?php if(in_array(9,$allowed_pages)){
 						echo '<li>'.$this->Html->link('Create', '/Invoices?inventory_voucher=true' ).'</li>';
 						} ?>
-						<?php if(in_array(151,$allowed_pages)){
+						<?php if(in_array(154,$allowed_pages)){
 						echo '<li>'.$this->Html->link('View', '/Ivs' ).'</li>';
 						} ?>
 						
