@@ -97,7 +97,6 @@ class LoginsController extends AppController
         if ($this->request->is('post')) {
             $login = $this->Logins->patchEntity($login, $this->request->data);
 			$emp_id=$login->employee_id;
-			
 			$EmployeeIdExist = $this->Logins->exists(['employee_id' => $emp_id]);
 		
 			if(!$EmployeeIdExist)
@@ -112,9 +111,7 @@ class LoginsController extends AppController
 				$this->Flash->error(__('This user have already login.'));
 				}
         }
-		$employees = $this->Logins->Employees->find('list')->contain(['EmployeeCompanies'=> function ($q) use($st_company_id) {
-						return $q->where(['EmployeeCompanies.freeze'=>0,'EmployeeCompanies.company_id'=>$st_company_id]);
-					}]);
+		$employees = $this->Logins->Employees->find('list');
 		
 		$Logins = $this->paginate($this->Logins->find()->contain(['Employees'])->matching(
 					'Employees.EmployeeCompanies', function ($q) use($st_company_id) {
