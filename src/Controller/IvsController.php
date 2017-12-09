@@ -113,7 +113,7 @@ class IvsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		$iv = $this->Ivs->get($id, [
-            'contain' => ['Invoices'=>['InvoiceRows'=>['Items'],'Customers'],'IvRows'=>['Items'=>['SerialNumbers','ItemCompanies'],'IvRowItems'=>['Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Invoices'=>['Customers'],'IvRows'=>['Items'=>['SerialNumbers','ItemCompanies'],'IvRowItems'=>['Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]],'Creator','Companies']
         ]);

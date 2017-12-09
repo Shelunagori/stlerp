@@ -1,3 +1,4 @@
+
 <style>
 @media print{
 	.maindiv{
@@ -93,26 +94,41 @@ margin-bottom: 0;
 <table class="table table-bordered table-condensed">
 	<thead> 
 		<th width="30%" colspan='1'><b>Production</b></th>
-		
-		<th>
-		<?php $status=0;$status1=0;
+		<?php $status=0;
 					foreach($iv->iv_rows as $iv_row ){
-						if( $iv_row->item->item_companies[0]->serial_number_enable == 1) {
+						
+						if( $iv_row->item->item_companies[0]->	serial_number_enable == 1) {
 						$status=1;
+						}
+					} ?>
+		<?php if($status==1){ ?>
+						<th width="10%"></th>
+					<?php } ?>
+		<th>
+		<?php $status1=0;
+					
+					foreach($iv->iv_rows as $iv_row ){
+						foreach($iv_row->iv_row_items as $iv_row_item ){ 
+							if( $iv_row_item->item->item_companies[0]->serial_number_enable == 1) {
+							$status1=1;
+							}
 						}
 					}
 					
 					?>
+					
 			<table width="97%" align="center">
 				<tr>
-					<td width="7%">Item</td>
-					<?php if($status==1) { ?>
+					<th width="7%">Item</th>
+					
+					<?php if($status1==1) { ?>
 					<th width="10%">Item Serial No</th>
 					<?php } ?>
 					<td width="1%">Quantity</td>
 				</tr>
 			</table>
 		</th>
+		
 	</thead>
 	
 	<tbody>
@@ -145,7 +161,9 @@ margin-bottom: 0;
 						<td width="30%">
 							<?= $iv_row_item->item->name?>
 						</td>
-						<?php if(!empty($iv_row_item->item->item_companies[0]->serial_number_enable)){
+						<?php 
+						if($status1==1) {
+						if(!empty($iv_row_item->item->item_companies[0]->serial_number_enable)){
 							if($iv_row_item->item->item_companies[0]->serial_number_enable == 1) { ?>
 								<td width="50%">
 									<table>
@@ -163,7 +181,7 @@ margin-bottom: 0;
 								<td >-</td>
 								<?php }}  else{ ?> 
 								<td>-</td>
-								<?php } ?>
+						<?php }} ?>
 						<td width="8%" ><?= $iv_row_item->quantity?></td>
 					</tr>
 					<?php  endforeach; ?>

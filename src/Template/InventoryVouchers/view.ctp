@@ -116,7 +116,6 @@ margin-bottom: 0;
 	
 	<tbody>
 		<?php foreach ($inventoryVoucher->invoice->invoice_rows as $invoice_row): 
-       if($invoice_row->inventory_voucher_applicable=="Yes"){
        ?>
 		<tr>
 			<td valign="top">
@@ -157,7 +156,7 @@ margin-bottom: 0;
 				</table>
 			</td>
 		</tr>
-		<?php } endforeach; ?>
+		<?php  endforeach; ?>
 	</tbody>
 	
 </table>
