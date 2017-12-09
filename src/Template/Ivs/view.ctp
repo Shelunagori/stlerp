@@ -155,7 +155,7 @@ margin-bottom: 0;
 			
 			</td>
 			<td>
-				<table width="100%">
+				<table class="table table-bordered" width='100%'>
 					<?php foreach($iv_row->iv_row_items as $iv_row_item): ?> 
 					<tr>
 						<td width="30%">
