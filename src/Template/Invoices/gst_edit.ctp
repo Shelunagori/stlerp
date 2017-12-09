@@ -270,13 +270,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						$sr_nos=$current_invoice_row->serial_number;
 						$invoice_sales_return[$current_invoice_row->sales_order_row_id]=$current_invoice_row->id;
 					}
-					//pr($invoice_sales_return); exit;
+					
 					$q=0; 
 					
 
 					foreach ($invoice->sales_order->sales_order_rows as $sales_order_row){ 
 						 if($sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id] > 0){
 						 $in_row_id=@$invoice_sales_return[@$sales_order_row->id];
+//pr($sr_qty[$in_row_id]); 
 						 ?>
 
 						<tr class="tr1" row_no="<?= h($q) ?>">

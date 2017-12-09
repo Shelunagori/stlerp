@@ -1708,7 +1708,7 @@ class SaleReturnsController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'Index']);
-            } else { 
+            } else {  pr($saleReturn); exit;
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }

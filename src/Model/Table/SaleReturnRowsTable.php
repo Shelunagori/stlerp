@@ -68,10 +68,7 @@ class SaleReturnRowsTable extends Table
             ->allowEmpty('id', 'create');
 
        
-        $validator
-            ->integer('quantity')
-            ->requirePresence('quantity', 'create')
-            ->notEmpty('quantity');
+        
 
         $validator
             ->decimal('rate')
