@@ -37,7 +37,7 @@
 				
 				<div align="right" class="form-actions">
 					<button type="submit" class="btn btn-primary">Pull & Create Purchase Order</button>
-					<?php echo $this->Html->link("Skip And Next", array('controller' => 'PurchaseOrders','action'=> 'Add'), array( 'class' => 'btn green')); ?>
+					<?php echo $this->Html->link("Skip And Next", array('controller' => 'PurchaseOrders','action'=> 'Add'), array( 'class' => 'btn green','id'=>'materialindent')); ?>
 					
 				</div>
 			</div>

@@ -32,10 +32,10 @@ class CustomersController extends AppController
 			$where['customer_name LIKE']='%'.$customer.'%';
 		}
 		if(!empty($district)){
-			$where['districts.district LIKE']='%'.$district.'%';
+			$where['Districts.district LIKE']='%'.$district.'%';
 		}
 		if(!empty($customer_seg)){
-			$where['customerSegs.name LIKE']='%'.$customer_seg.'%';
+			$where['CustomerSegs.name LIKE']='%'.$customer_seg.'%';
 		}
         $this->paginate = [
             'contain' => ['Districts', 'CustomerSegs']

@@ -14,7 +14,11 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="col-md-6 control-label">Ledger Accounts</label><br/>
-						<?= h($ledger->ledger_account->name.'('.$ledger->ledger_account->alias.')') ?>
+						<?php if(!empty($ledger->ledger_account->alias)){ ?>
+						<?= h($ledger->ledger_account->name.'('.$ledger->ledger_account->alias.')') 
+						}else{ ?>
+							<?= h($ledger->ledger_account->name;
+						} ?>
 						<?= $this->Form->hidden('ledger_account_id',['type'=>'text','class'=>'form-control input-sm mian_amount','label'=>false,'value'=>$ledger->ledger_account->id]) ?>
 						</div>
 				</div>

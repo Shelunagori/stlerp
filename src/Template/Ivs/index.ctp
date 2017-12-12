@@ -82,7 +82,7 @@
 							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit/'.$iv->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 							} ?>
 							<?php 
-							if(in_array(151,$allowed_pages)){
+							if(in_array(154,$allowed_pages)){
 							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $iv->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); 
 							} ?>
 							</td>

@@ -114,9 +114,9 @@ table td, table th{
 				<?php $TotalOutStanding=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
 				<?php 
 				if($TotalOutStanding>0){
-					echo '<span class="clrRed"><b>'.@$TotalOutStanding.'</b></span>';
+					echo '<span class="clrRed" id="outstnd">'.@$TotalOutStanding.'</span>';
 				}elseif($TotalOutStanding<0){
-					echo '<span>'.@$TotalOutStanding.'</span>';
+					echo '<span id="outstnd">'.@$TotalOutStanding.'</span>';
 				} ?>
 				<?php
 					@$ColumnOutStanding+=@$TotalOutStanding;
@@ -177,19 +177,86 @@ var $rows = $('#main_tble tbody tr');
 	$('.stock').die().live("change",function(){
 		var stock = $(this).val();
 			var total_closing_bal=0;
+			var total_nodue=0;
+			var total_out=0;
+			var total_on_acc=0;
 			$("#main_tble tbody tr").each(function(){
 				var closing_bal = $(this).find("td:nth-child(12)").html();
+				var no_due = $(this).find("td:nth-child(11)").html();
+				var total_outstanding = 
+				$(this).find("td:nth-child(10) #outstnd").html();
+				
+				var on_acc = $(this).find("td:nth-child(9)").html();
 				
 				if(stock =='Positive' && closing_bal > 0){
 					$(this).show();
 					total_closing_bal=parseFloat(total_closing_bal)+parseFloat(closing_bal);
+					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
+					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
+					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
+					$("#main_tble #tf tr th.oa").html('');
 					$("#main_tble #tf tr th.os").html('');
+					$("#main_tble #tf tr th.nd").html('');
 					$("#main_tble #tf tr th.cb").html('');
-					$("#main_tble #tf tr th.os").html(total_closing_bal);
-					$("#main_tble #tf tr th.cb").html(total_closing_bal);
+					if(total_on_acc == 0){
+						$("#main_tble #tf tr th.oa").html(0);
+					}else{
+						$("#main_tble #tf tr th.oa").html('');
+						$("#main_tble #tf tr th.oa").html(total_on_acc);
+					}
+					if(total_out == 0){
+						$("#main_tble #tf tr th.os").html(0);
+					}else{
+						$("#main_tble #tf tr th.os").html('');
+						$("#main_tble #tf tr th.os").html(total_out);
+					}
+					if(total_nodue==0){
+						$("#main_tble #tf tr th.nd").html(0);
+					}else{
+						$("#main_tble #tf tr th.nd").html('');
+						$("#main_tble #tf tr th.nd").html(total_nodue);
+					}	
+					if(total_closing_bal==0){
+						$("#main_tble #tf tr th.cb").html(0);
+					}else{
+						$("#main_tble #tf tr th.cb").html('');
+						$("#main_tble #tf tr th.cb").html(total_closing_bal);
+					}	
+					
 				}else if(stock =='Negative' && closing_bal < 0){
 					$(this).show(); 
+					total_closing_bal=parseFloat(total_closing_bal)+parseFloat(closing_bal);
+					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
+					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
+					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
 					
+					
+					
+				
+					if(total_on_acc == 0){
+						$("#main_tble #tf tr th.oa").html(0);
+					}else{
+						$("#main_tble #tf tr th.oa").html('');
+						$("#main_tble #tf tr th.oa").html(total_on_acc);
+					}
+					if(total_out == 0){
+						$("#main_tble #tf tr th.os").html(0);
+					}else{
+						$("#main_tble #tf tr th.os").html('');
+						$("#main_tble #tf tr th.os").html(total_out);
+					}
+					if(total_nodue==0){
+						$("#main_tble #tf tr th.nd").html(0);
+					}else{
+						$("#main_tble #tf tr th.nd").html('');
+						$("#main_tble #tf tr th.nd").html(total_nodue);
+					}	
+					if(total_closing_bal==0){
+						$("#main_tble #tf tr th.cb").html(0);
+					}else{
+							$("#main_tble #tf tr th.cb").html('');
+						$("#main_tble #tf tr th.cb").html(total_closing_bal);
+					}	
 				}else if(stock =='Zero' && closing_bal == 0){
 					$(this).show();
 					$("#main_tble #tf tr th.os").html(0);
@@ -199,7 +266,6 @@ var $rows = $('#main_tble tbody tr');
 				}else{
 					$(this).hide();
 				}
-				
 				
 			});
 		

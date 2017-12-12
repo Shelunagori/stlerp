@@ -63,7 +63,6 @@ class LoginsController extends AppController
 		$session = $this->request->session();
 		$st_login_id = $session->read('st_login_id');
 		$login=$this->Logins->get($st_login_id);
-		//pr($login->employee_id);exit;
 		$query_1 = $this->Logins->Employees->query();
 					$query_1->update()
 						->set(['status' => 0])
@@ -112,7 +111,11 @@ class LoginsController extends AppController
 				}
         }
 		$employees = $this->Logins->Employees->find('list');
-		
+
+				/* $employees=[];
+		foreach($employeees as $emp){
+			$employees[] = ['text'=>$emp->name,'value'=>$emp->id];
+		} */
 		$Logins = $this->paginate($this->Logins->find()->contain(['Employees'])->matching(
 					'Employees.EmployeeCompanies', function ($q) use($st_company_id) {
 						return $q->where(['EmployeeCompanies.freeze'=>0,'EmployeeCompanies.company_id'=>$st_company_id]);
@@ -130,12 +133,19 @@ class LoginsController extends AppController
 		$st_login_id = $session->read('st_login_id');
 		
 		$login=$this->Logins->get($st_login_id);
-		
-		if(!empty($company_id)){ 
+		$Employee=$this->Logins->Employees->get($login->employee_id, [
+					'contain' => ['Companies']
+				]);
+		if($Employee->status == '1' || $Employee->id == 23){
+			if(!empty($company_id)){ 
 			$this->request->allowMethod(['post', 'delete']);
 			
 			$this->request->session()->write('st_company_id',$company_id);
-			
+			$query_1 = $this->Logins->Employees->query();
+					$query_1->update()
+						->set(['status' => 1])
+						->where(['id' => $login->employee_id])
+						->execute();
 			return $this->redirect(['controller'=>'FinancialYears','action' => 'selectCompanyYear']);
 			
 		}
@@ -145,6 +155,10 @@ class LoginsController extends AppController
 		$Employee=$this->Logins->Employees->EmployeeCompanies->find()->where(['EmployeeCompanies.freeze'=>'0','EmployeeCompanies.employee_id'=>$login->employee_id])->contain(['Companies']);
 		//pr($Employee->toArray()); exit;
 		$this->set(compact('st_login_id','Employee'));
+		}else{
+			return $this->redirect(['controller'=>'Logins', 'action' => 'generateOtp',$login->employee_id,$login->id]);
+		}
+		
 	}
 	
 	function otpCodeConfirm($employee_id=null,$login_id=null)
@@ -164,31 +178,24 @@ class LoginsController extends AppController
 						->where(['id' => $employee_id])
 						->execute();
 						
-		
-		 $sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
-          $working_key='A7a76ea72525fc05bbe9963267b48dd96';
-        $sms_sender='MOGRAG';
-        $ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
+			$sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
+			$working_key='A7a76ea72525fc05bbe9963267b48dd96';
+			
+			$sms_sender='MOGRAG';
+			
+			$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
 		  
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 
-		$response2=curl_exec($ch);
-		//$response2=1;
-		
-		if(!empty($response2)){
-		
-		}else if(empty($response2)){
-			return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
-		}
-		curl_close($ch);
-		$query_1 = $this->Logins->Employees->query();
-					$query_1->update()
-						->set(['status' => 1])
-						->where(['id' => $employee_id])
-						->execute();
+			$response2=curl_exec($ch);
+			if(!empty($response2)){
+			
+			}else if(empty($response2)){
+				return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
+			}
+			curl_close($ch);
 		}
 		return $this->redirect(['controller'=>'Logins', 'action' => 'generateOtp',$employee_id,$login_id]);
-
 	}
 	
 	
@@ -198,34 +205,43 @@ class LoginsController extends AppController
 		$Employee=$this->Logins->Employees->get($employee_id, [
 					'contain' => ['Companies']
 				]);
-						
+			
 			if ($this->request->is('put')) 
 			{ 
 				$otp_no=$this->request->data["otp_no"];
 			
+				if($Employee['status'] == '0' && $Employee['otp_no'] == $otp_no){
 				
-				if($Employee['otp_no'] == $otp_no){
 					$time = Time::now();
 					$user_logs = $this->Logins->UserLogs->newEntity();
 					$user_logs->login_id = $login_id;
 					$user_logs->datetime = $time;
 					$this->Logins->UserLogs->save($user_logs);
+					
 					$count=0;
 						
 					foreach($Employee->companies as $company){
 						$count++;
 					}
-					if($count==1){
-					foreach($Employee->companies as $company){
-						$this->request->session()->write('st_company_id',$company->id);
-						break;
+					if($count==1){ 
+						foreach($Employee->companies as $company){
+							$this->request->session()->write('st_company_id',$company->id);
+							break;
+						}
+						$query_1 = $this->Logins->Employees->query();
+						
+						return $this->redirect(['controller'=>'Financial-Years','action' => 'selectCompanyYear']);
 					}
-					return $this->redirect(['controller'=>'Financial-Years','action' => 'selectCompanyYear']);
-				}
-				else
-				{
-					return $this->redirect(['action' => 'Switch-Company']);
-				}
+					else
+					{
+						$query_1 = $this->Logins->Employees->query();
+						$query_1->update()
+						->set(['status' => 1])
+						->where(['id' => $employee_id])
+						->execute();
+						
+						return $this->redirect(['action' => 'Switch-Company']);
+					}
 					
 				}else{
 					
@@ -246,6 +262,8 @@ class LoginsController extends AppController
 		
 		$Emp_name = $Employee->name;		
 		$mobile_no = $Employee->mobile;	
+		$mobile_no = $Employee->mobile;	
+		$status = $Employee->status;	
 		$randomString = rand(1000, 9999);
 				$query = $this->Logins->Employees->query();
 					$query->update()
@@ -253,21 +271,22 @@ class LoginsController extends AppController
 						->where(['id' => $employee_id])
 						->execute();
 						
-		
-		 $sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
-          $working_key='A7a76ea72525fc05bbe9963267b48dd96';
-        $sms_sender='MOGRAG';
-        $ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
-		  
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		if($status == '0'){
+			 $sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
+			  $working_key='A7a76ea72525fc05bbe9963267b48dd96';
+			$sms_sender='MOGRAG';
+			$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
+			  
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-		$response2=curl_exec($ch);
-		if(!empty($response2)){
-		
-		}else if(empty($response2)){
-			return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
-		}
-		curl_close($ch);
+			$response2=curl_exec($ch);
+			if(!empty($response2)){
+			
+			}else if(empty($response2)){
+				return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
+			}
+			curl_close($ch);
+		}	
 		$this->set(compact('st_login_id','Employee'));
 		$this->set('_serialize', ['Employee']);
 	}
