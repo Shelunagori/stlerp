@@ -391,7 +391,7 @@ class ItemsController extends AppController
 		$ItemLedger = $this->Items->ItemLedgers->get($id);
 		$ItemSerialexists = $this->Items->ItemSerialNumbers->exists(['status'=>'In','item_id' => $ItemLedger->item_id]);
 		if($ItemSerialexists){
-			$this->Items->ItemSerialNumbers->deleteAll(['item_id' => $ItemLedger->item_id,'status'=>'In','company_id'=>$st_company_id]); 
+			$this->Items->SerialNumbers->deleteAll(['item_id' => $ItemLedger->item_id,'status'=>'In','company_id'=>$st_company_id]); 
 		} 
 		if ($this->Items->ItemLedgers->delete($ItemLedger)) {
 			$this->Flash->success(__('The Opening Balance has been deleted.'));

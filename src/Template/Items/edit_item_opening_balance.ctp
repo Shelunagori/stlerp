@@ -118,7 +118,7 @@
 
 		<?php 
 		
-		if(sizeof($ItemSerialNumber) == 0){?>
+		if(sizeof(@$ItemSerialNumber) == 0){?>
 		
 		<?= $this->Html->link('Delete',
 							['action' => 'DeleteItemOpeningBalance', $ItemLedger->id], 

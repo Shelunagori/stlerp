@@ -139,7 +139,7 @@ class MaterialIndentsController extends AppController
 		
 	//pr($MaterialIndents->toArray()); exit;
 	
-	$mi_qty=[];
+	 $mi_qty=[];
 	$po_qty=[];
 	$mi_id=[];
 	 if($status==null or $status=='Open' ){
@@ -158,7 +158,7 @@ class MaterialIndentsController extends AppController
 			foreach(@$sales_qty as $key=>$sales_order_qt){
 				if(@$sales_order_qt > @$po_qty[$key] ){
 				$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
-				@$mi_id[]=@$materialIn;
+				@$mi_id[$MaterialIndent->id]=@$materialIn;
 				}
 			}
 		}
