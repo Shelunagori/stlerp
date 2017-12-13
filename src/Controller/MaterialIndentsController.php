@@ -74,7 +74,7 @@ class MaterialIndentsController extends AppController
 			foreach(@$sales_qty as $key=>$sales_order_qt){
 				if(@$sales_order_qt > @$po_qty[$key] ){
 				$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
-				@$mi_id[]=@$materialIn;
+				@$mi_id[$MaterialIndent->id]=@$materialIn;
 				}
 			}
 		}
@@ -99,7 +99,7 @@ class MaterialIndentsController extends AppController
 				}
 			}
 		}
-	
+	//pr($mi_id)
 	
         $this->set(compact('materialIndents','url','status','mi_id'));
         $this->set('_serialize', ['materialIndents']);
@@ -230,11 +230,11 @@ class MaterialIndentsController extends AppController
 				return $q->select(['purchase_order_id','material_indent_row_id','item_id','total_qty' => $q->func()->sum('PurchaseOrderRows.quantity')])->group('PurchaseOrderRows.material_indent_row_id');
 		}]])->where(['MaterialIndents.company_id'=>$st_company_id]); */
 		
-		$MaterialIndents = $this->MaterialIndents->find()->contain(['MaterialIndentRows'=>['PurchaseOrderRows']])->where(['MaterialIndents.company_id'=>$st_company_id]);
+		$MaterialIndents = $this->MaterialIndents->find()->contain(['MaterialIndentRows'=>['Items','PurchaseOrderRows']])->where(['MaterialIndents.company_id'=>$st_company_id]);
 		//pr($MaterialIndents->toArray()); exit;
-	$mi_qty=[];
-	$po_qty=[];
-	$mi_id=[];
+		$mi_qty=[];
+		$po_qty=[];
+		$mi_id=[];
 		foreach($MaterialIndents as $MaterialIndent){ $sales_qty=[];
 			foreach($MaterialIndent->material_indent_rows as $purchase_order){ 
 				foreach($purchase_order->purchase_order_rows as $purchase_order_row){ 
@@ -264,7 +264,7 @@ class MaterialIndentsController extends AppController
 			//pr($to_be_send); exit;
 			$this->redirect(['controller'=>'PurchaseOrders','action' => 'add/'.json_encode($to_be_send).'']);
 		}
-        $this->set(compact('MaterialIndentRows','pull_request','mireport','mi_qty','po_qty'));
+        $this->set(compact('MaterialIndentRows','pull_request','mireport','mi_qty','po_qty','MaterialIndents'));
         $this->set('_serialize', ['materialIndents']);
 	}
     public function add($material=null)

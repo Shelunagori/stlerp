@@ -20,7 +20,10 @@
 						<th>Action</th>
 					</thead>
 					<tbody >
-					<?php foreach($MaterialIndentRows as $MaterialIndentRow){
+					<?php 
+					
+					foreach($MaterialIndents as $MaterialIndent){
+					foreach($MaterialIndent->material_indent_rows as $MaterialIndentRow){
 						$required_quantity=	@$mi_qty[@$MaterialIndentRow->id]-@$po_qty[@$MaterialIndentRow->id];
 					if($required_quantity > 0){ ?>
 						<tr class="main_tr">
@@ -31,7 +34,7 @@
 								<?php echo $this->Form->input('to_be_send['.$MaterialIndentRow->id.']', ['label' => false,'type'=>'checkbox','class'=>'rename_check qty','value' => @$required_quantity,'hiddenField'=>false]);  ?>
 							</td>
 						</tr>
-					<?php }} ?>
+					<?php }} }?>
 					</tbody>
 				</table>
 				
