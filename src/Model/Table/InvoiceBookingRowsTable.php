@@ -65,7 +65,7 @@ class InvoiceBookingRowsTable extends Table
     {
 
         $validator
-            ->integer('quantity')
+            ->decimal('quantity')
             ->requirePresence('quantity', 'create')
             ->notEmpty('quantity');
 

@@ -5667,4 +5667,52 @@ class InvoicesController extends AppController
 	exit;
 	
 	}
+
+	public function HsnWiseReport(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('From','To'));
+		
+		$where=[];
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+		}
+	//exit;
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units','ItemCategories']]])->where($where)->where(['company_id'=>$st_company_id,'invoice_type'=>'GST']);
+	//	pr($Invoices->toArray()); exit;
+		$hsn=[];
+		$quantity=[];
+		$taxable_value=[];
+		$item_category=[];
+		$total_value=[];
+		$unit=[];
+		$cgst=[];
+		$sgst=[];
+		$igst=[];
+		foreach($Invoices as $Invoice){ //pr($Invoice);
+			foreach($Invoice->invoice_rows as $invoice_row){  //pr($invoice_row->item); exit;
+				$hsn[$invoice_row->item->hsn_code]=$invoice_row->item->hsn_code;
+				$item_category[$invoice_row->item->hsn_code]=$invoice_row->item->item_category->name;
+				$unit[$invoice_row->item->hsn_code]=$invoice_row->item->unit->name;
+				@$quantity[@$invoice_row->item->hsn_code]+=@$invoice_row->quantity;
+				@$total_value[@$invoice_row->item->hsn_code]+=@$invoice_row->row_total;
+				@$taxable_value[@$invoice_row->item->hsn_code]+=@$invoice_row->taxable_value;
+				@$cgst[@$invoice_row->item->hsn_code]+=@$invoice_row->cgst_amount;
+				@$sgst[@$invoice_row->item->hsn_code]+=@$invoice_row->sgst_amount;
+				@$igst[@$invoice_row->item->hsn_code]+=@$invoice_row->igst_amount;
+			}
+		}
+	$this->set(compact('hsn','item_category','quantity','total_value','taxable_value','cgst','sgst','igst','unit'));	
+//pr($cgst);
+// exit;
+	}
 }
