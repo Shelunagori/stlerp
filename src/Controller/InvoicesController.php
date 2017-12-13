@@ -1537,39 +1537,50 @@ class InvoicesController extends AppController
 				
 					$StockLedgers=$this->Invoices->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
 					
-					
+					//pr($StockLedgers->toArray()); exit;
 					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc+=$inc+0.01){
-									$stock[$item_id][]=$StockLedger->rate;
+								for($inc=0;$inc<($StockLedger->quantity-0.01);$inc+=0.01){
+									$stock[]=$StockLedger->rate.'-'.$inc;
+									$inc = number_format($inc, 2, '.', '');
 								}
+								pr($stock);
+								unset($stock);
 							}
 						}
 					}
+					 exit;
 						foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
-							if(sizeof(@$stock[$item_id])>0){
-								$stock[$item_id] = array_slice($stock[$item_id], $StockLedger->quantity*100); 
+							if(sizeof(@$stock) > 0){// pr($stock); 
+								$stock = array_slice($stock, $StockLedger->quantity*100); 
 							}
 						}
 					}
 					
-					if(sizeof(@$stock[$item_id]) > 0){ 
-						foreach(@$stock[$item_id] as $stockRate){ 
-							@$sumValue=@$sumValue+@$stockRate;
-							$qtySum++;
-							
+					$sumValue=0;
+					$qtySum=0;
+					if(sizeof(@$stock) > 0){ 
+						foreach($stock as $key=>$stockRate){ //pr($stockRate/100); 
+							$stockRate=$stockRate/100;
+							$sumValue=$sumValue+$stockRate;
+							++$qtySum;
 						}
 					}
-				pr($sumValue);
-				pr($qtySum); exit;
+					
+			
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){
 					$rate=0;
 				}else{
+					$qtySum=$qtySum/100;
 					@$rate=$sumValue/$qtySum;
 					$minimumSellingPrice=$rate*$item->item_companies[0]->minimum_selling_price_factor;
+					
+					pr($qtySum);
+					pr($rate);
+					pr($minimumSellingPrice); exit;
 				}
 					
 				
@@ -1589,7 +1600,7 @@ class InvoicesController extends AppController
 								}
 							}
 					}
-					if(@$ItemSerialNumber->sale_return_id > 0){ 
+			if(@$ItemSerialNumber->sale_return_id > 0){ 
 				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'SerialNumbers.transaction_date <=' => $to_date]);
 					if($outExist == 0){
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
@@ -1624,6 +1635,8 @@ class InvoicesController extends AppController
 						}
 					}
 				if(@$ItemSerialNumber->is_opening_balance == "Yes"){  
+				$outExist = $this->Invoices->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]); 
+					if($outExist == 0){  
 				 
 						$ItemLedgerData =$this->Invoices->ItemLedgers->find()->where(['ItemLedgers.source_model'=>"Items",'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $ItemSerialNumber->item_id])->first();
 						//pr($ItemLedgerData); 
@@ -1631,6 +1644,7 @@ class InvoicesController extends AppController
 							@$itemSerialQuantity=$itemSerialQuantity+1;
 							@$itemSerialRate+=@$ItemLedgerData['rate'];
 						}
+					}
 					
 				}
 			}
