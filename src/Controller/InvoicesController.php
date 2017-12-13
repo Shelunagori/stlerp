@@ -1536,12 +1536,12 @@ class InvoicesController extends AppController
 				$stock=[];  $sumValue=0; $qtySum=0;
 				
 					$StockLedgers=$this->Invoices->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
-						
+					
 					
 					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								for($inc=0;$inc<$StockLedger->quantity;$inc+=$inc+0.01){
 									$stock[$item_id][]=$StockLedger->rate;
 								}
 							}
@@ -1550,7 +1550,7 @@ class InvoicesController extends AppController
 						foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
 							if(sizeof(@$stock[$item_id])>0){
-								$stock[$item_id] = array_slice($stock[$item_id], $StockLedger->quantity); 
+								$stock[$item_id] = array_slice($stock[$item_id], $StockLedger->quantity*100); 
 							}
 						}
 					}
@@ -1562,7 +1562,8 @@ class InvoicesController extends AppController
 							
 						}
 					}
-				
+				pr($sumValue);
+				pr($qtySum); exit;
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){
 					$rate=0;
