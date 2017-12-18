@@ -93,35 +93,221 @@ class InvoiceBookingsController extends AppController
 		
 		$Grns=$this->InvoiceBookings->Grns->GrnRows->find();
 		foreach($Grns as $Grn){
-		$InvoiceBookings=$this->InvoiceBookings->find()->contain(['InvoiceBookingRows'])->where(['InvoiceBookings.grn_id'=>$Grn->grn_id,'gst'=>'yes'])->toArray();
+		$InvoiceBookings=$this->InvoiceBookings->find()->contain(['InvoiceBookingRows'])->where(['InvoiceBookings.grn_id'=>$Grn->grn_id])->toArray();
 				//pr($InvoiceBookings); exit;
 			if($InvoiceBookings){
 				if(sizeof($InvoiceBookings) > 0){ 
 					foreach($InvoiceBookings as $InvoiceBooking){
 						foreach($InvoiceBooking->invoice_booking_rows as $invoice_booking_row){
-							$query = $this->InvoiceBookings->InvoiceBookingRows->query();
-							/* $query->update()
+							/*$query = $this->InvoiceBookings->InvoiceBookingRows->query();
+							 $query->update()
 								->set(['grn_row_id' => $Grn->id])
 								->where(['item_id' => $Grn->item_id,'invoice_booking_id'=>$InvoiceBooking->id])
 								->execute(); */
-							pr($invoice_booking_row); exit;
+							
 							$query1 = $this->InvoiceBookings->ItemLedgers->query();
 							$query1->update()
-								->set(['grn_row_id' => $Grn->id])
-								->where(['item_id' => $Grn->item_id,'invoice_booking_id'=>$InvoiceBooking->id])
+								->set(['rate' => $invoice_booking_row->rate,'rate_updated' => 'Yes'])
+								->where(['source_row_id' => $invoice_booking_row->grn_row_id,'source_model'=>'Grns'])
 								->execute();
-								
-							
+								//pr($invoice_booking_row->grn_row_id); exit;
 							}
 					}
 				}
 			}
 		}
 		
+	echo "done"; exit;
+	}
+	
+	public function LedgerEntry()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$InvoiceBookings=$this->InvoiceBookings->find()->contain(['InvoiceBookingRows']);
 		
-		
-		
-		
+		foreach($InvoiceBookings as $invoiceBooking){ 
+			$invoice_ledget_amt=0;
+			$invoice_other_charges=0;
+			
+			if($invoiceBooking->gst=='no'){
+				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$invoice_ledget_amt+=$invoice_booking_row->rate; 
+					$invoice_other_charges+=$invoice_booking_row->other_charges; 
+				}
+				
+				$accountReferences = $this->InvoiceBookings->AccountReferences->get(2);
+				if($invoiceBooking->cst_vat=='CST'){ //echo "CST"; pr($invoiceBooking); exit;
+					//ledger posting for PURCHASE ACCOUNT
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $invoiceBooking->purchase_ledger_account;
+					$ledger->debit = $invoiceBooking->total;
+					$ledger->credit = 0;
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					$this->InvoiceBookings->Ledgers->save($ledger);
+				}else{ //echo "VAT"; 
+					
+					//ledger posting for PURCHASE ACCOUNT
+					if($invoice_other_charges < 0){
+						$ledger_amount=$invoice_ledget_amt+abs($invoice_other_charges);
+					}else if($invoice_other_charges > 0){
+						$ledger_amount=$invoice_ledget_amt-$invoice_other_charges;
+					}else{
+						$ledger_amount=$invoice_ledget_amt;
+					}
+					
+					
+					
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $invoiceBooking->purchase_ledger_account;
+					$ledger->debit = $ledger_amount;
+					$ledger->credit = 0;
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					$this->InvoiceBookings->Ledgers->save($ledger);
+					
+					//ledger posting for VAT ACCOUNT
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $invoiceBooking->ledger_account_for_vat;
+					$ledger->debit = $invoiceBooking->total_saletax;
+					$ledger->credit = 0;
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					if($invoiceBooking->total_saletax > 0){
+						$this->InvoiceBookings->Ledgers->save($ledger);
+					}
+					
+					//ledger posting for DISCOUNT ACCOUNT
+					$ledger_account_for_discount=$this->InvoiceBookings->LedgerAccounts->find()->where(['invoice_booking_other_charge_post'=>1,'name'=>'Discount','company_id'=>$st_company_id])->first();
+					
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $ledger_account_for_discount['id'];
+					
+					if($invoice_other_charges < 0){
+						$ledger->credit = abs($invoice_other_charges);
+						$ledger->debit = 0;
+					}else if($invoice_other_charges > 0){
+						$ledger->debit = $invoice_other_charges;
+						$ledger->credit = 0;	
+					}
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					if($invoice_other_charges != 0){
+					$this->InvoiceBookings->Ledgers->save($ledger);
+					}
+				}
+				
+				$c_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();
+				$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+				$ledger->ledger_account_id = $c_LedgerAccount->id;
+				$ledger->debit = 0;
+				$ledger->credit =$invoiceBooking->total;
+				$ledger->voucher_id = $invoiceBooking->id;
+				$ledger->company_id = $invoiceBooking->company_id;
+				$ledger->transaction_date = $invoiceBooking->supplier_date;
+				$ledger->voucher_source = 'Invoice Booking';
+				$this->InvoiceBookings->Ledgers->save($ledger);
+				
+			}else{  
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){ 
+					if($invoice_booking_row->cgst > 0){
+						$cg_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_booking_row->cgst_per])->first(); 
+						$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $invoice_booking_row->cgst;
+						$ledger->credit = 0;
+						$ledger->voucher_id = $invoiceBooking->id;
+						$ledger->voucher_source = 'Invoice Booking';
+						$ledger->company_id = $invoiceBooking->company_id;
+						$ledger->transaction_date = $invoiceBooking->supplier_date; 
+						$this->InvoiceBookings->Ledgers->save($ledger); 
+					}
+					if($invoice_booking_row->sgst > 0){
+						$s_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_booking_row->sgst_per])->first();
+						$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+						$ledger->ledger_account_id = $s_LedgerAccount->id;
+						$ledger->debit = $invoice_booking_row->sgst;
+						$ledger->credit = 0;
+						$ledger->voucher_id = $invoiceBooking->id;
+						$ledger->voucher_source = 'Invoice Booking';
+						$ledger->company_id = $invoiceBooking->company_id;
+						$ledger->transaction_date = $invoiceBooking->supplier_date;
+						$this->InvoiceBookings->Ledgers->save($ledger); 
+					}
+					if($invoice_booking_row->igst > 0){
+						$i_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_booking_row->igst_per])->first();
+						$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+						$ledger->ledger_account_id = $i_LedgerAccount->id;
+						$ledger->debit = $invoice_booking_row->igst;
+						$ledger->credit = 0;
+						$ledger->voucher_id = $invoiceBooking->id;
+						$ledger->voucher_source = 'Invoice Booking';
+						$ledger->company_id = $invoiceBooking->company_id;
+						$ledger->transaction_date = $invoiceBooking->supplier_date;
+						$this->InvoiceBookings->Ledgers->save($ledger); 
+					}
+				}
+						//pr($invoiceBooking->purchase_ledger_account); exit;
+						//ledger posting for PURCHASE ACCOUNT
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $invoiceBooking->purchase_ledger_account;
+					$ledger->debit = $invoiceBooking->taxable_value;
+					$ledger->credit = 0;
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					$this->InvoiceBookings->Ledgers->save($ledger);
+					
+					$ledger_account_for_discount=$this->InvoiceBookings->LedgerAccounts->find()->where(['invoice_booking_other_charge_post'=>1,'name'=>'Discount','company_id'=>$st_company_id])->first();
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					
+					$ledger->ledger_account_id = $ledger_account_for_discount['id'];
+					
+					if($invoiceBooking->total_other_charge < 0){
+						$ledger->credit = abs($invoiceBooking->total_other_charge);
+						$ledger->debit = 0;
+					}else if($invoiceBooking->total_other_charge > 0){ 
+						$ledger->debit = abs($invoiceBooking->total_other_charge);
+						$ledger->credit = 0;	
+					}
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					if($invoiceBooking->total_other_charge != 0){
+						$this->InvoiceBookings->Ledgers->save($ledger);
+					}
+				
+				
+				
+					//Ledger posting for SUPPLIER
+					$v_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$invoiceBooking->vendor_id])->first();
+					
+					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
+					$ledger->ledger_account_id = $v_LedgerAccount->id;
+					$ledger->debit = 0;
+					$ledger->credit =$invoiceBooking->total;
+					$ledger->voucher_id = $invoiceBooking->id;
+					$ledger->transaction_date = $invoiceBooking->supplier_date;
+					$ledger->company_id = $invoiceBooking->company_id;
+					$ledger->voucher_source = 'Invoice Booking';
+					$this->InvoiceBookings->Ledgers->save($ledger);
+				
+			}
+			
+		}
 		
 		echo "done"; exit;
 	}
