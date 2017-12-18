@@ -97,13 +97,14 @@
 						</thead>
 						<tbody id="main_tbody">
 							<?php $q=0; foreach ($purchaseOrder->purchase_order_rows as $purchase_order_rows): 
-							if(@$minItemQty[@$purchase_order_rows->id]==$purchase_order_rows->quantity)
+							if(@$minItemQty[@$purchase_order_rows->id]>0)
 							{   
-								$disable= "disabled='true'";
+								$disable= "disabled";
+								$disable_class_item="disabledbutton";
 							}
 							else
 							{
-								$disable= "";
+								$disable= "";$disable_class_item=""; 
 							}
 							?>
 							<tr class="tr1 main_tr" row_no='<?php echo @$purchase_order_rows->id; ?>'>
@@ -112,7 +113,7 @@
 									<td>
 									
 									<?php 
-									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id]);
+									echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['options' => $ItemsOptions,'label' => false,'class' => 'form-control input-sm item_id','placeholder' => 'Item','value'=>$purchase_order_rows->item_id,$disable]);
 									/* if($disable!="")
 									{
 										echo $this->Form->input('purchase_order_rows.'.$q.'.item_id', ['class' => 'itemId','value'=>$purchase_order_rows->item_id,'type'=>'hidden']);

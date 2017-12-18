@@ -412,7 +412,7 @@ select
 					</ul>
 				</li>
 				<?php } ?>
-				<?php if(in_array(11,$allowed_pages) || in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){ ?>
+				<!--<?php if(in_array(11,$allowed_pages) || in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-puzzle-piece"></i>
@@ -429,7 +429,7 @@ select
 						<li><?php echo $this->Html->link('<i class="icon-home"></i> Pending Challan','/Challans/PendingChallanForCreditNote',array('escape'=>false)); ?></li>
 					</ul>
 				</li>
-				<?php } ?>
+				<?php } ?>-->
 				<?php if(in_array(124,$allowed_pages) || in_array(125,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
@@ -598,7 +598,7 @@ select
 							</ul>
 						</li>
 						<?php } ?>
-						<?php if(in_array(106,$allowed_pages)||in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
+						<!--<?php if(in_array(106,$allowed_pages)||in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">
 							<i class="icon-basket"></i>
@@ -631,7 +631,7 @@ select
 							<?php } ?>
 							</ul>
 						</li>
-						<?php } ?>
+						<?php } ?>-->
 						<?php if(in_array(114,$allowed_pages)||in_array(115,$allowed_pages)|| in_array(116,$allowed_pages) ||in_array(117,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">
@@ -788,8 +788,8 @@ select
 					</a>
 					<ul class="sub-menu">
 						<?php 
-						 if(in_array(129,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
+						if(in_array(129,$allowed_pages)){
+						//echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
 						echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Gst','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';
 						 }
 						 ?>

@@ -101,7 +101,9 @@ if($transaction_date <  $start_date ) {
 					<?php echo $this->Form->input('id', ['type' => 'hidden','class' => 'form-control input-sm nppayment_row_id','value'=>$nppayment_row->id]); ?>
 					<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
 					
-					<?php echo $this->Form->input('bill_to_bill_account', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm bill_to_bill_account','value'=>$nppayment_row->ReceivedFrom->bill_to_bill_account]); ?>
+					<?php 
+					
+					echo $this->Form->input('bill_to_bill_account', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm bill_to_bill_account','value'=>$nppayment_row->ReceivedFrom->bill_to_bill_account]); ?>
 					
 					<?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm  received_from','value'=>$nppayment_row->received_from_id,'style'=>'width: 266px; display: block;']); ?>
 					<div class="show_result">
@@ -210,7 +212,7 @@ if($transaction_date <  $start_date ) {
                                 </tr>
                                 <tr>
                                     <td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-                                    <td><input type="text" class="form-control input-sm" placeholder="total" readonly></td>
+                                    <td></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -219,7 +221,7 @@ if($transaction_date <  $start_date ) {
                         </div>
                        <?php } ?>  
                     </td>
-                    <td width="5%"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm','placeholder'=>'Narration','value'=>$nppayment_row->narration]); ?></td>
+                    <td width="5%"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration','placeholder'=>'Narration','value'=>$nppayment_row->narration]); ?></td>
                     <td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
                 </tr>
             <?php } ?>
@@ -307,10 +309,10 @@ $(document).ready(function() {
         }
 
     });
-    //--     END OF VALIDATION
-    
-	var nppayment_mode= $('input[name="payment_mode"]').val();
-        
+	
+	
+		var nppayment_mode= $('input[name="payment_mode"]:checked').val();
+        //alert(nppayment_mode);
         if(nppayment_mode=="Cheque"){
             $("#chq_no").show();
         }else{
@@ -327,17 +329,40 @@ $(document).ready(function() {
             $("#chq_no").hide();
         }
     });
-    
-   // add_row();
-    function add_row(){
+	
+	$('.addrow').live("click",function() {
+        add_row();
+    });
+	
+	    function add_row(){
         var tr=$("#sample_table tbody tr").clone();
         $("#main_table tbody#main_tbody").append(tr);
         rename_rows();
     }
+	
+	
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
+		var sel2=$(this);
+		var received_from_id=$(this).find("td:nth-child(1) select").find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'checkBillToBillAccountingStatus']); ?>";
+		url=url+'/'+received_from_id,
+		$.ajax({
+			url: url,
+			type: 'GET',
+			dataType: 'text'
+		}).done(function(response) {
+			if(response.trim()=="Yes"){
+				
+			}else{
+				$(sel2).find("td:nth-child(3)").html("");
+			}
+			rename_ref_rows(sel2,received_from_id);
+		});
+	});
     rename_rows();
 	function rename_rows(){
 		var i=0;
-		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+		$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
 			$(this).find("td:eq(0) .nppayment_row_id").attr({name:"nppayment_rows["+i+"][id]", id:"nppayment_rows-"+i+"-id"});
 		
 			$(this).find("td:eq(0) select.received_from").select2().attr({name:"nppayment_rows["+i+"][received_from_id]", id:"quotation_rows-"+i+"-received_from_id"}).rules('add', {
@@ -377,18 +402,15 @@ $(document).ready(function() {
 						min: 0.01
 					});
 			$(this).find("td:eq(1) select").attr({name:"nppayment_rows["+i+"][cr_dr]", id:"nppayment_rows-"+i+"-cr_dr"});
-			
-			
-			$(this).find("td:eq(3) textarea").attr({name:"nppayment_rows["+i+"][narration]", id:"nppayment_rows-"+i+"-narration"});
-			
+			$(this).find("td:nth-child(4) textarea").attr({name:"nppayment_rows["+i+"][narration]", id:"nppayment_rows-"+i+"-narration"}).rules('add', {
+						required: true
+					});
 			
 			i++;
 		});
 	}
-    
-    $('.addrow').live("click",function() {
-        add_row();
-    });
+	
+	
     $('.deleterow').live("click",function() {
         $(this).closest("tr").remove();
     });
@@ -396,24 +418,18 @@ $(document).ready(function() {
     $('.addrefrow').live("click",function() {
         var sel=$(this).closest('tr.main_tr');
         var received_from_id=$(this).closest('tr.main_tr').find('td:nth-child(1) select').val();
-        add_ref_row(sel);
+        add_ref_row(sel,received_from_id);
     });
     
-    function add_ref_row(sel){
+    function add_ref_row(sel,received_from_id){
         var tr=$("#sample_ref table.ref_table tbody tr").clone();
         sel.find("table.ref_table tbody").append(tr);
-        rename_ref_rows(sel);
+        rename_ref_rows(sel,received_from_id);
     }
 	
- 	$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-		var bill_to_bill_account=$(this).find('.bill_to_bill_account').val(); 
-		if(bill_to_bill_account=="Yes"){ 
-			var sel=$(this);
-			rename_ref_rows(sel);
-		}
-	});
+
 	
-	function rename_ref_rows(sel){
+	function rename_ref_rows(sel,received_from_id){  //alert(sel);alert(received_from_id);
 		var i=0;
 		var row_id=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){ 
@@ -437,15 +453,11 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").attr({name:"nppayment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"nppayment_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").attr({name:"nppayment_rows["+row_id+"][on_acc_dr_cr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 	}
     
-    /* $('.deleterefrow').live("click",function() {
-        $(this).closest("tr").remove();
-        do_ref_total();
-    }); */
 	
 	$('.deleterefrow').live("click",function() {
 		var l=$(this).closest("table.ref_table tbody").find("tr").length;
@@ -457,7 +469,7 @@ $(document).ready(function() {
     
     $('.received_from').live("change",function() {
         var sel=$(this); 
-		$(this).closest('div.select').css("width","266px");
+		$(this).closest('div.select').css("width","235px");
         load_ref_section(sel);
     });
     
@@ -477,7 +489,7 @@ $(document).ready(function() {
             url: url,
             type: 'GET',
             dataType: 'text'
-        }).done(function(response) { 
+        }).done(function(response) {
             if(response.trim()=="Yes"){
                 var ref_table=$("#sample_ref div.ref").clone();
                 $(sel).closest("tr").find("td:nth-child(3)").html(ref_table);
@@ -494,17 +506,55 @@ $(document).ready(function() {
 			type: 'GET',
 			dataType: 'text'
 		}).done(function(response) { 
-			$(sel).closest('tr.main_tr').find('.show_result').html(response); alert(response);
+			$(sel).closest('tr.main_tr').find('.show_result').html(response);
 			//$(sel).closest('tr.main_tr').find('select.grns').select2();
 			rename_rows();
 		});
 		
+		/* var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadGrns']); ?>";
+		url=url+'/'+received_from_id;
+		
+		if(received_from_id=='101' || received_from_id=='165' || received_from_id=='313')
+		{  
+	       $.ajax({
+				url: url,
+				type: 'GET',
+				dataType: 'text'
+			}).done(function(response) { 
+				$(sel).closest('tr.main_tr').find('.show_result').html(response);
+				$(sel).closest('tr.main_tr').find('select.grns').select2();
+				rename_rows();
+			});
+		}
+		else
+		{
+			$(sel).closest('tr.main_tr').find('.show_result').html('');
+		}
+		
+		var url="<?php echo $this->Url->build(['controller'=>'LedgerAccounts','action'=>'loadInvoices']); ?>";
+		url=url+'/'+received_from_id;
+		if(received_from_id=='105' || received_from_id=='168' || received_from_id=='316')
+		{
+	       $.ajax({
+				url: url,
+				type: 'GET',
+				dataType: 'text'
+			}).done(function(response) {  
+				$(sel).closest('tr.main_tr').find('.show_result').html(response);
+				rename_rows(); 
+			});
+		}
+		else
+		{
+			$(sel).closest('tr.main_tr').find('.show_result').html('');
+		} */
     }
     
     
     
     $('.ref_type').live("change",function() {
         var current_obj=$(this);
+        
         var sel3=$(this).closest('tr.main_tr');
         var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
         var ref_type=$(this).find('option:selected').val();
@@ -552,9 +602,8 @@ $(document).ready(function() {
 	$('.drcrChange').live("change",function() { 
 		do_ref_total();
 	});
-    
-	do_ref_total();
-	function do_ref_total(){  
+    do_ref_total();
+function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
 			var total_ref_cr=0;
@@ -571,6 +620,8 @@ $(document).ready(function() {
 					total_ref_cr=total_ref_cr+am;
 				}
 			});
+			
+			
 			var main_dr_cr=$(this).closest("#main_table tbody#main_tbody tr.main_tr").find('.cr_dr').val();
 			var onAcc_dr_cr="";
 			var onAcc=0;
@@ -590,8 +641,8 @@ $(document).ready(function() {
 					onAcc_dr_cr="Dr";
 				}
 				if(onAcc>=0){
-				onAcc=Math.abs(onAcc);
-				onAcc=round(onAcc,2);
+					onAcc=Math.abs(onAcc);
+					onAcc=round(onAcc,2);
 				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
 				
 				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
@@ -609,7 +660,7 @@ $(document).ready(function() {
 				}else{
 					var total_amt_ref=(onAcc+total_ref_cr)-total_ref_dr;
 				}
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
+				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 				
 			}else{
 				var main_amt=parseFloat($(this).closest("#main_table tbody#main_tbody tr.main_tr").find('td:nth-child(2) input').val());
@@ -630,9 +681,8 @@ $(document).ready(function() {
 				if(onAcc>=0){
 					onAcc=Math.abs(onAcc);
 					onAcc=round(onAcc,2);
-				$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
-				$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
-				//total_ref_cr=total_ref_cr+on_acc;
+					$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(onAcc);
+					$(this).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").val(onAcc_dr_cr);
 				}else{
 					//onAcc=Math.abs(onAcc);
 					onAcc=round(onAcc,2);
@@ -649,7 +699,7 @@ $(document).ready(function() {
 					
 				}
 				
-				$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(round(total_amt_ref,2));
+				//$(this).find("table.ref_table tfoot tr:nth-child(2) td:nth-child(2) input").val(total_amt_ref.toFixed(2));
 			}
 		});
 	}
@@ -658,11 +708,7 @@ $(document).ready(function() {
     $('.mian_amount').live("blur",function() {
         var v=parseFloat($(this).val());
         if(!v){ v=0; }
-        $(this).val(round(v,2));
-    });
-	$('.cr_dr').live("change",function() {
-        do_mian_amount_total();
-        do_ref_total();
+        $(this).val(v.toFixed(2));
     });
     
     $('.mian_amount').live("keyup",function() {
@@ -683,15 +729,14 @@ $(document).ready(function() {
             }
             
             mian_amount_total=mian_amount_total_dr-mian_amount_total_cr;
-            $('#receipt_amount').text(round(mian_amount_total,2));
+            $('#receipt_amount').text(mian_amount_total.toFixed(2));
         });
     }
     
-    
+	
     
 });
 </script>
-
 
 
 <table id="sample_table" style="display:none;">
@@ -754,7 +799,7 @@ $(document).ready(function() {
 			</tr>
 			<tr>
 				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
-				<td colspan="2"></td>
+				
 				
 			</tr>
 		</tfoot>

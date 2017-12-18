@@ -63,18 +63,19 @@ margin-bottom: 0;
 					<tr>
 						<td><b>Date</b></td>
 						<td width="20" align="center">:</td>
-						<td></td>
+						<td><?= h(date('d-m-Y',strtotime($purchaseReturn->transaction_date))) ?></td>
 					</tr>
 				</table>
 			</td>
 		</tr>
+		
 		<tr>
 			<td width="50%" valign="top" align="left">
 				<table>
 					<tr>
 						<td><b>Supplier Invoice No</b></td>
 						<td width="20" align="center">:</td>
-						<td></td>
+						<td><?= h($purchaseReturn->invoice_booking->invoice_no) ?></td>
 					</tr>
 				</table>
 			</td>
@@ -83,7 +84,7 @@ margin-bottom: 0;
 					<tr>
 						<td><b>Supplier Invoice Date</b></td>
 						<td width="20" align="center">:</td>
-						<td></td>
+						<td><?= h(date("d-m-Y",strtotime($purchaseReturn->invoice_booking->supplier_date))) ?></td>
 					</tr>
 				</table>
 			</td>

@@ -251,7 +251,7 @@ $(document).ready(function() {
     }
     
     $('.addrow').live("click",function() {
-        add_row();
+        add_row();rename_rows();
     });
     $('.deleterow').live("click",function() {
         $(this).closest("tr").remove();

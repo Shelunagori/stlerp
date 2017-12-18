@@ -170,13 +170,13 @@
 							<td><?= h(0) ?></td>
 							
 							<td><?= h($ItemUnits[$key]) ?></td>
-							<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
-							<td align="right"><?= h($this->Number->format(0,['places'=>2])) ?></td>
+							<td align="right"><?php echo $this->Number->format(0,['places'=>2]); ?></td>
+							<td align="right"><?php echo $this->Number->format(0,['places'=>2]); ?></td>
 						</tr>
 						<?php } } ?>
 						<tr>
 							<td colspan="5" align="right">Total</td>
-							<td align="right"><?= h($this->Number->format($totalColumn,['places'=>2])) ?></td>
+							<td align="right"><?php echo $this->Number->format($totalColumn,['places'=>2]); ?></td>
 						</tr>
 					</tbody>
 				</table>

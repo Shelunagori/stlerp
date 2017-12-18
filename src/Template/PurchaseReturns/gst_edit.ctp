@@ -63,6 +63,7 @@
 							<label class="control-label">Purchase Account </label><br/>
 							<?php echo $ledger_account_details['name']; ?>
 							<?php echo $this->Form->input('purchase_ledger_account', ['label' => false,'type'=>'hidden','class' => 'form-control input-sm','readonly','value'=>$ledger_account_details['id']]); ?>
+							<?php echo $this->Form->input('q', ['label' => false,'type'=>'hidden','class' => 'form-control input-sm gst_type','readonly','value'=>$ledger_account_details->gst_type]); ?>
 						</div>
 					</div>
 				</div><br/>
@@ -207,7 +208,8 @@
 							
 							<td style="white-space: nowrap;">
 							<?php echo $this->Form->input('purchase_return_rows.'.$q.'.item_id', ['label' => false,'class' => 'form-control input-sm cal item','type'=>'hidden','value' => @$invoice_booking_row->item->id]);
-							 echo @$invoice_booking_row->item->name; ?>
+							 echo $this->Form->input('item_id', ['type'=>'hidden','value'=>@$invoice_booking_row->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
+							<?php  echo @$invoice_booking_row->item->name; ?>
 							
 							<?php echo $this->Form->input('invoice_booking_rows.'.$q.'id', ['class' => 'invoice','type'=>'hidden','value' => @$invoice_booking_row->id]); ?>
 
@@ -296,13 +298,13 @@
 							</td>
 							<td></td>
 						</tr>
-						<?php if(@$invoiceBooking->grn->grn_rows[0]->item->item_companies[0]->serial_number_enable==1){  ?>
+						<?php if(@$invoice_booking_row->item->item_companies[0]->serial_number_enable==1){  ?>
 						
 						<tr class="tr3" row_no="<?= h($q) ?>">
 							<td></td>
 							<td colspan='7'>
 								<?php 
-									echo $this->Form->input('sr_nos', ['label'=>false,'options' =>@$options[@$invoice_booking_row->id],'multiple' => 'multiple','class'=>'form-control select2me','style'=>'width:100%','value'=>@$values[@$invoice_booking_row->id]]); ?>
+									echo $this->Form->input('sr_nos', ['label'=>false,'options' =>@$options[@$invoice_booking_row->id],'multiple' => 'multiple','class'=>'form-control','style'=>'width:100%','value'=>@$values[@$invoice_booking_row->id]]); ?>
 							</td>
 						</tr>
 					<?php } ?>
@@ -755,7 +757,7 @@ $(document).ready(function() {
 			}else{	
 				if(qty!=0)
 					{
-					  $(this).find("td:nth-child(20) input").val(last_value);
+					  $(this).find("td:nth-child(20) input").val(round(last_value,2));
 					}
 			}	
 			total_rate_to_post = total_rate_to_post+parseFloat(round((taxable_amount/qty),5));
@@ -774,16 +776,15 @@ $(document).ready(function() {
 		if(isNaN(total_rate_to_post)){
 			$('input[name="total_rate_to_post"]').val(0);
 		}else{
-			$('input[name="total_rate_to_post"]').val(total_rate_to_post);
+			$('input[name="total_rate_to_post"]').val(round(total_rate_to_post,2));
 		}
 		do_ref_total();
 	}
 	
 
 	
-	var purchase_ledger_account=$('input[name="purchase_ledger_account"]').val();
-	var gst_ledger_id=$('input[name="purchase_ledger_account"]').val();
-		if(gst_ledger_id=="799" || gst_ledger_id=="800" )
+	var gst_type=$('.gst_type').val();
+		if(gst_type=='GST') {
 		{  
 				$('.igst_display').css("display", "none");
 				$('.cgst_display').css("display", "");
@@ -806,10 +807,29 @@ $(document).ready(function() {
 		rename_rows();   calculate_total();
     });
 	
-	$('.qty_bx').die().live('keyup',function(){
-		rename_rows();
-	});
+	
 	////////
+	$('.qty_bx').die().live("keyup",function() { 
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.item').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
+		
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(4) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(4) input').val("");
+						}
+					rename_rows(); 
+					calculate_total();
+				}
+		}
+		
+    });	
+	
 	rename_rows();
 	function rename_rows(){
 		var i=0;
@@ -849,7 +869,7 @@ $(document).ready(function() {
 				
 				var serial_l=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length;
 				if(serial_l>0){
-					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").attr("id","purchase_return_rows-"+row_no+"-item_serial_no").rules('add', {
+					$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').removeAttr("readonly").attr("name","purchase_return_rows["+row_no+"][serial_numbers][]").select2().attr("id","purchase_return_rows-"+row_no+"-item_serial_no").rules('add', {
 						    required: true,
 							minlength: qty,
 							maxlength: qty,
@@ -1021,11 +1041,11 @@ $(document).ready(function() {
 		
 		if(on_acc>=0){
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val(on_acc_cr_dr);
 		}else{
 			on_acc=Math.abs(on_acc);
-			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(on_acc);
+			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val(round(on_acc,2));
 			$("table.main_ref_table tfoot tr:nth-child(1) td:nth-child(4) input").val('Cr');
 		}
 	}
@@ -1035,9 +1055,9 @@ $(document).ready(function() {
 	function validate_serial(){
 		$("#main_tb tbody tr.tr1").each(function(){  
 			var row_no=$(this).attr('row_no');
-			var OriginalQty=$(this).find('td:nth-child(4) input').val();
-				Quantities = OriginalQty.split('.'); 
-				qty=Quantities[0];
+			var qty=$(this).find('td:nth-child(4) input').val();
+				//Quantities = OriginalQty.split('.'); 
+				//qty=Quantities[0];
 				
 			if($(this).find('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').length>0){
 				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td:nth-child(2) select').attr('test',qty).rules('add', {

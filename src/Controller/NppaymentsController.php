@@ -403,7 +403,7 @@ class NppaymentsController extends AppController
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $nppayment_row->received_from_id;
-						if($nppayment_row->on_acc_dr_cr=="Dr"){
+						if($nppayment_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $nppayment_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
@@ -676,7 +676,7 @@ class NppaymentsController extends AppController
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $nppayment_row->received_from_id;
-						if($nppayment_row->on_acc_dr_cr=="Dr"){
+						if($nppayment_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $nppayment_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{

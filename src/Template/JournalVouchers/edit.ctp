@@ -92,7 +92,7 @@ if($transaction_date <  $start_date ) {
 												} 
 
 											}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns select2me','style'=>'width:266px']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns','style'=>'width:266px']);
 											}
 											elseif(sizeof($journal_voucher_rows->invoice_ids) > 0)
 											{
@@ -115,7 +115,7 @@ if($transaction_date <  $start_date ) {
 												    } 
 
 												}
-											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices select2me','style'=>'width:266px']);
+											echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control invoices','style'=>'width:266px']);
 											}
 
 										?>

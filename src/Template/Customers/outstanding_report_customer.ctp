@@ -151,10 +151,10 @@ table td, table th{
 			<tfoot id='tf'>
 				<tr>
 					<th colspan="8"><div  align="right">TOTAL</div></th>
-					<th class="oa"><?php echo $ColumnOnAccount; ?></th>
-					<th class="os"><?php echo $ColumnOutStanding; ?></th>
-					<th class="nd"><?php echo $ColumnNoDue; ?></th>
-					<th class="cb"><?php echo $ColumnClosingBalance; ?></th>
+					<th class="oa"><?php echo $this->Number->format($ColumnOnAccount,['places'=>2]); ?></th>
+					<th class="os"><?php echo $this->Number->format($ColumnOutStanding,['places'=>2]); ?></th>
+					<th class="nd"><?php echo $this->Number->format($ColumnNoDue,['places'=>2]); ?></th>
+					<th class="cb"><?php echo $this->Number->format($ColumnClosingBalance,['places'=>2]); ?></th>
 				</tr>
 			</tfoot>
 			</table>

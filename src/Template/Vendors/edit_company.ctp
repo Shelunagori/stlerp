@@ -15,8 +15,7 @@
 						<th width="15%">Sr. No.</th>
 						<th width="20%">Company Name</th>
 						<th width="10%">Action</th>
-						<!--<th width="15%">Bill To Bill Account</th>-->
-
+						<th width="15%">Bill To Bill Account</th>
 						
 					</tr>
 				</thead>
@@ -50,7 +49,7 @@
 							) ?>
 							<?php }  ?>
 						</td>
-						<!--<td class="actions">
+						<td class="actions">
 						 	<?php if($bill_to_bill =='No' && $Company_array=='Yes') { ?>
 							 <?= $this->Form->postLink('No ',
 								['action' => 'BillToBill', $key,$vendor_id,$bill_to_bill="Yes"],
@@ -69,7 +68,7 @@
 									
 								]
 							) ?>
-							<?php }  ?>-->
+							<?php }  ?>
 						</td>
 					</tr>
 				<?php  } ?>

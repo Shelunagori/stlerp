@@ -604,7 +604,7 @@ class PettyCashVouchersController extends AppController
 					$this->PettyCashVouchers->Ledgers->save($ledger);
 					if(!empty($petty_cash_voucher_row->ref_rows))
 					{
-					foreach($petty_cash_voucher_row->ref_rows as $ref_rows){
+					foreach($petty_cash_voucher_row->ref_rows as $ref_rows){ 
 						$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
@@ -622,13 +622,13 @@ class PettyCashVouchersController extends AppController
 						$ReferenceDetail->transaction_date = $pettycashvoucher->transaction_date;
 						$this->PettyCashVouchers->ReferenceDetails->save($ReferenceDetail);
 					} 
-					}
+					} //pr($petty_cash_voucher_row->on_acc_cr_dr);
 					
 						$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $petty_cash_voucher_row->received_from_id;
-						if($petty_cash_voucher_row->on_acc_dr_cr=="Dr"){
+						if($petty_cash_voucher_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $petty_cash_voucher_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
@@ -642,10 +642,10 @@ class PettyCashVouchersController extends AppController
 							$this->PettyCashVouchers->ReferenceDetails->save($ReferenceDetail);
 						} 
                 }
-
+ //exit;
 				
 					$bankAmt=$total_dr-$total_cr;
-					//pr($bankAmt); exit;
+					//pr($bankAmt);
 					//Ledger posting for bankcash
 					$ledger = $this->PettyCashVouchers->Ledgers->newEntity();
 					$ledger->company_id=$st_company_id;

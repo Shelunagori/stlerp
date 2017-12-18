@@ -36,20 +36,19 @@
 					
 					$q=0;
 					//pr($materialIndent); exit;
-					foreach ($materialIndent->material_indent_rows as $material_item):
-					if($material_item->required_quantity==$material_item->processed_quantity){
-					$disable_class="disabledbutton";
-					}else{ $disable_class=""; } ?>
-					<tr class="tr1 <?php echo $disable_class; ?> "  >
+					foreach ($materialIndent->material_indent_rows as $material_item): 
+				 ?>
+					<tr class="tr1"  >
 							<td>
 								<?php echo ++$q; $q--;?>
 							</td>
 							<td>
 								<?php echo $this->Form->input('material_indent_rows.'.$q.'.id', ['label' => false,'type'=>'hidden','value'=>$material_item->id]); ?>
-								<?php echo $this->Form->input('material_indent_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$material_item->item_id]); ?>
+								<?php echo $this->Form->input('material_indent_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$material_item->item_id,'class'=>'itemids']); ?>
+								<?php echo $this->Form->input('q', ['label' => false,'type'=>'hidden','value'=>$material_item->item->item_companies[0]->serial_number_enable,'class'=>'sr_nos']); ?>
 								<?php echo $material_item->item->name; ?></td>
 							<td>
-								<?php echo $this->Form->input('material_indent_rows.'.$q.'.required_quantity', ['label' => false,'type'=>'text','value'=>$material_item->required_quantity]); ?>
+								<?php echo $this->Form->input('material_indent_rows.'.$q.'.required_quantity', ['label' => false,'type'=>'text','value'=>$material_item->required_quantity,'class'=>'quantity']); ?>
 							</td>
 					</tr>
 					<?php $q++; endforeach;  ?>
@@ -104,22 +103,24 @@ $(document).ready(function() {
 	});
 	
 	$('.quantity').die().live("keyup",function() {
-			var asc=$(this).val();
-			var numbers =  /^[0-9]*\.?[0-9]*$/;
-			if(asc==0)
-			{
-				$(this).val('');
-				return false; 
-			}
-			else if(asc.match(numbers))  
-			{  
-			} 
-			else  
-			{  
-				$(this).val('');
-				return false;  
-			}
-	});
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.itemids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.sr_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(3) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(3) input').val("");
+						}
+					
+				}
+		}
+		
+    });	
 
 });
 </script>	

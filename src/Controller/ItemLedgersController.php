@@ -414,7 +414,7 @@ class ItemLedgersController extends AppController
 		 $ItemUnits=[];
 		if(!$stock){
 		$Items =$this->ItemLedgers->Items->find()->contain(['Units','ItemCompanies'=>function($p) use($st_company_id){
-						return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						return $p->where(['ItemCompanies.company_id' => $st_company_id]);
 		}])->where($where);
 		
 		

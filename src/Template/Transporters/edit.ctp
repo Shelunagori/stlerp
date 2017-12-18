@@ -76,7 +76,6 @@ $(document).ready(function() {
 		rules: {
 			transporter_name:{
 				required: true,
-				alphabetsAndSpacesOnly: true,
 			},
 			mobile:{
 				required: true,

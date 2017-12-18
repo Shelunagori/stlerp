@@ -287,12 +287,25 @@ margin-bottom: 0;
 			    <tr>
 					<td colspan="2"><b>Reference Numbers:</b></td>
 				</tr>
-				<?php foreach($ReferenceDetails as $ReferenceDetail){ ?>
+				<?php foreach($ReferenceDetails as $ReferenceDetail){
+				
+				?>
 				<tr>
 				    <td width="22%"></td>
-				    <td width="18%">Ref No - <?php echo $ReferenceDetail->reference_no; ?></td>
+					<?php if($ReferenceDetail->reference_type=='On_account'){ ?>
+					 <td width="18%">On-Account <?php echo $ReferenceDetail->reference_no; ?></td>
+					<?php }else{ ?>
+					<td width="18%">Ref No - <?php echo $ReferenceDetail->reference_no; ?></td>
+					<?php } ?>
+				   
 				    <td width="5%"align="left">:</td>
-					<td align="left" style="padding-left:10px;"><?php echo $ReferenceDetail->credit; ?> Cr</td>
+					<td align="left" style="padding-left:10px;">
+					<?php 
+					if(!empty($ReferenceDetail->credit)){
+					echo $ReferenceDetail->credit; ?> Cr
+					<?php }else if(!empty($ReferenceDetail->debit)){ 
+						echo $ReferenceDetail->debit; ?> Dr
+					<?php } ?></td>
 				</tr>
 				<?php } ?>
 			</table>

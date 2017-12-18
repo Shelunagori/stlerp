@@ -118,7 +118,7 @@ if($transaction_date <  $start_date ) {
 								} 
 
 							}
-							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.grn_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns select2me','style'=>'width:100%']);
+							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.grn_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control grns ','style'=>'width:100%']);
 							}
 							elseif(sizeof($petty_cash_voucher_row->invoice_ids) > 0)
 							{
@@ -141,7 +141,7 @@ if($transaction_date <  $start_date ) {
 								} 
 
 							}
-							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.invoice_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices select2me','style'=>'width:100%']);
+							echo $this->Form->input('petty_cash_voucher_rows.'.$ii.'.invoice_ids[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices ','style'=>'width:100%']);
 							}
 
 							?>

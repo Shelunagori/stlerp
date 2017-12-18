@@ -123,7 +123,7 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns select2me','style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  grns','style'=>'width:100%']);
 					}
 					elseif($payment_row->invoice_ids){
 							 $option=[];
@@ -145,7 +145,7 @@ if($transaction_date <  $start_date ) {
 									} 
 
 								}
-					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices select2me' ,'style'=>'width:100%']);
+					echo $this->Form->input('q[]', ['label'=>false,'options' => $option,'multiple' => 'multiple','class'=>'form-control  invoices' ,'style'=>'width:100%']);
 					}
 					
 					?>
@@ -402,7 +402,7 @@ $(document).ready(function() {
 				{
 					if(thela_type=='grn')
 					{				
-						$(this).find("td:eq(0) select.grns").attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.grns").select2().attr({name:"payment_rows["+i+"][grn_ids][]", id:"payment_rows-"+i+"-grn_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.grns'],
 							messages: {
@@ -412,7 +412,7 @@ $(document).ready(function() {
 					}
 					else if(thela_type=='invoice')
 					{		 		
-						$(this).find("td:eq(0) select.invoices").attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
+						$(this).find("td:eq(0) select.invoices").select2().attr({name:"payment_rows["+i+"][invoice_ids][]", id:"payment_rows-"+i+"-invoice_ids"}).rules('add', {
 							required: true,
 							notEqualToGroup: ['.invoices'],
 							messages: {

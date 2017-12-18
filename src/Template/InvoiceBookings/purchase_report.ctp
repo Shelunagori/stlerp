@@ -69,7 +69,7 @@
 					<tr>
 						<td><?= h(++$page_no) ?></td>
 							<td><?= h(($InvoiceBooking->ib1.'/IB-'.str_pad($InvoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$InvoiceBooking->ib3.'/'.$InvoiceBooking->ib4)) ?></td>
-							<td><?php echo date("d-m-Y",strtotime($InvoiceBooking->created_on)); ?></td>
+							<td><?php echo date("d-m-Y",strtotime($InvoiceBooking->supplier_date)); ?></td>
 							<td><?= h($InvoiceBooking->vendor->company_name) ?></td>
 							<?php  $vat5=0;  $vat14=0; $vat2=0;  $purchase5=0;   $purchase14=0; $purchase2=0;  ?>
 							<?php foreach($InvoiceBooking->invoice_booking_rows as $invoice_booking_row ) {?>

@@ -318,8 +318,17 @@ class ItemsController extends AppController
 		,'company_id'=>$st_company_id])->toArray();
 		$ItemSerialNumbers = $this->Items->SerialNumbers->find()->where(['item_id'=>$ItemLedger->item_id
 		,'company_id'=>$st_company_id,'is_opening_balance'=>'Yes'])->toArray();
-		//pr($ItemSerialNumbers);exit;
 		
+		$itmsr=[];
+		foreach($ItemSerialNumbers as $itmsrnos){
+			$outExist = $this->Items->ItemLedgers->SerialNumbers->exists(['SerialNumbers.parent_id' => $itmsrnos->id]);
+			if($outExist){
+				$itmsr[$itmsrnos->id]="Yes";	
+			}else{
+				$itmsr[$itmsrnos->id]="No";	
+			}
+		}
+		//pr($itmsr); exit;
 		if ($this->request->is(['patch', 'post', 'put'])) {
 			$item_id=$this->request->data['item_id'];
 			$serial_number_enable=$this->request->data['serial_number_enable'];
@@ -365,7 +374,7 @@ class ItemsController extends AppController
 		
 		
 		$this->set(compact('Items','ItemLedger','financial_year','ItemSerialNumbers',
-		'SerialNumberEnable'));
+		'SerialNumberEnable','itmsr'));
 		$this->set('_serialize', ['ItemLedger']);
 	}	
 	
@@ -389,7 +398,7 @@ class ItemsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$ItemLedger = $this->Items->ItemLedgers->get($id);
-		$ItemSerialexists = $this->Items->ItemSerialNumbers->exists(['status'=>'In','item_id' => $ItemLedger->item_id]);
+		$ItemSerialexists = $this->Items->SerialNumbers->exists(['status'=>'In','item_id' => $ItemLedger->item_id]);
 		if($ItemSerialexists){
 			$this->Items->SerialNumbers->deleteAll(['item_id' => $ItemLedger->item_id,'status'=>'In','company_id'=>$st_company_id]); 
 		} 
@@ -408,11 +417,7 @@ class ItemsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$ItemLedger=$this->Items->ItemLedgers->find()->where(['item_id'=>$item_id,'source_model'=>'Items'])->first();
 		$ItemSerialNumber = $this->Items->SerialNumbers->get($id);
-		/* $ItemSerialNumber_invoice_id= $this->Items->SerialNumbers->Invoices->find()->where(['id'=>$ItemSerialNumber->invoice_id])->first();
-		$ItemSerialNumber_inventory_vouch__id= $this->Items->SerialNumbers->InventoryVouchers->find()->where(['id'=>$ItemSerialNumber->in_inventory_voucher_id])->first();
-		$ItemSerialNumber_inventory_transfer_vouch= $this->Items->SerialNumbers->InventoryTransferVouchers->find()->where(['id'=>$ItemSerialNumber->inventory_transfer_voucher_id])->first();
-		
-		$ItemSerialNumber_purchase_return= $this->Items->SerialNumbers->PurchaseReturns->find()->where(['id'=>$ItemSerialNumber->purchase_return_id])->first(); */
+		//pr($ItemSerialNumber);exit;
 		
 		if($ItemSerialNumber->status=='In'){
 			$ItemQuantity = $ItemLedger->quantity-1;
@@ -600,13 +605,51 @@ public function CheckCompany($company_id=null,$item_id=null)
 		
 		$ledgerexist = $this->Items->ItemLedgers->exists(['item_id' => $item_id,'company_id' => $company_id]);
 		
-		if(!$ledgerexist){
+		$soexist = $this->Items->SalesOrders->find()->contain(['SalesOrderRows'=>function ($q) use($item_id){
+			return $q->where(['item_id'=>$item_id]);
+		}])->where(['company_id'=>$company_id]);
+	
+		$inSalesOrder="No";
+		foreach($soexist as $so){
+			if(sizeof($so->sales_order_rows) > 0){
+				$inSalesOrder="Yes"; 
+				goto dm; 
+			};
+		} dm:
+		
+		$qoexist = $this->Items->Quotations->find()->contain(['QuotationRows'=>function ($q) use($item_id){
+			return $q->where(['item_id'=>$item_id]);
+		}])->where(['company_id'=>$company_id]);
+	
+		$inQuoatation="No";
+		foreach($qoexist as $qo){
+			if(sizeof($qo->quotation_rows) > 0){
+				$inQuoatation="Yes"; 
+				goto gp; 
+			};
+		} gp:
+		
+		$poexist = $this->Items->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>function ($q) use($item_id){
+			return $q->where(['item_id'=>$item_id]);
+		}])->where(['company_id'=>$company_id]);
+	
+		$inPurchaseOrders="No";
+		foreach($poexist as $po){
+			if(sizeof($po->purchase_order_rows) > 0){
+				$inPurchaseOrders="Yes"; 
+				goto dp; 
+			};
+		} dp:
+		
+		if(!$ledgerexist && $inSalesOrder=="No" && $inQuoatation=="No" && $inPurchaseOrders=="No"){
 			$item_Company_dlt= $this->Items->ItemCompanies->find()->where(['ItemCompanies.item_id'=>$item_id,'company_id'=>$company_id])->first();
 			$this->Items->ItemCompanies->delete($item_Company_dlt);
 			$this->Flash->success(__('Company Deleted Successfully'));
 			return $this->redirect(['action' => 'EditCompany/'.$item_id]);
-		}else{
-			$this->Flash->error(__('Company Can not Deleted'));
+		}
+		
+		else{
+			$this->Flash->error(__('Item Can not Deleted'));
 			return $this->redirect(['action' => 'EditCompany/'.$item_id]);
 		}
 	}

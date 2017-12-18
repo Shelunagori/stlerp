@@ -506,7 +506,7 @@ class InvoiceBookingsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-							$ReferenceDetail->transaction_date = date("d-m-Y");
+							$ReferenceDetail->transaction_date =$invoiceBooking->supplier_date;
 							
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 							
@@ -523,7 +523,7 @@ class InvoiceBookingsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-						$ReferenceDetail->transaction_date = date("d-m-Y");
+						$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 						if($invoiceBooking->on_account > 0){
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 						}
@@ -787,7 +787,7 @@ class InvoiceBookingsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-							$ReferenceDetail->transaction_date = date("d-m-Y");
+							$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 							
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 							
@@ -804,7 +804,7 @@ class InvoiceBookingsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->invoice_booking_id = $invoiceBooking->id;
-						$ReferenceDetail->transaction_date = date("d-m-Y");
+						$ReferenceDetail->transaction_date = $invoiceBooking->supplier_date;
 						if($invoiceBooking->on_account > 0){
 							$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
 						}
@@ -826,10 +826,20 @@ class InvoiceBookingsController extends AppController
 		}]])->order(['LedgerAccounts.name' => 'ASC'])->where(['LedgerAccounts.company_id'=>$st_company_id]);
 		
 		$AccountReference= $this->InvoiceBookings->AccountReferences->get(4);
-		$ledger_account_vat = $this->InvoiceBookings->LedgerAccounts->find('list')->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
+		$ledger_account_vat = $this->InvoiceBookings->LedgerAccounts->find('list'
+				,['keyField' => 		function ($row) {
+					return $row['id'];
+				},
+				'valueField' => function ($row) {
+					if(!empty($row['alias'])){
+						return  $row['name'] . ' (' . $row['alias'] . ')';
+					}else{
+						return $row['name'];
+					}
+					
+				}])->contain(['AccountSecondSubgroups'=>['AccountFirstSubgroups' => function($q) use($AccountReference){
 			return $q->where(['AccountFirstSubgroups.id'=>$AccountReference->account_first_subgroup_id]);
 		}]])->order(['LedgerAccounts.name' => 'ASC'])->where(['LedgerAccounts.company_id'=>$st_company_id]);
-		
         $this->set(compact('invoiceBooking','ReferenceDetails', 'grns','financial_year_data','invoice_booking_id','v_LedgerAccount', 'ledger_account_details', 'ledger_account_vat','chkdate','fromdate1','tody1','st_company_id'));
         $this->set('_serialize', ['invoiceBooking']);
     }

@@ -60,7 +60,7 @@ if($transaction_date <  $start_date ) {
 						<div class="form-group">
 							<label class="control-label">Transaction Date</label>
 							<br/>
-							<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => $start_date,'data-date-end-date' => $end_date,'value' => date("d-m-Y",strtotime($grn->transaction_date))]); ?>
+							<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','data-date-start-date' => $start_date,'data-date-end-date' => $end_date,'value' => date("d-m-Y",strtotime($grn->transaction_date)),'required']); ?>
 						</div>
 						<span style="color: red;"><?php if($chkdate == 'Not Found'){  ?>
 					You are not in Current Financial Year
@@ -263,9 +263,9 @@ if($transaction_date <  $start_date ) {
 									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>
-							<?php  }
+							<?php  $q++; }
 							?>
-						<?php $q++; endforeach; ?>
+						<?php  endforeach; ?>
 					</tbody>
 				</table>
 			</div>

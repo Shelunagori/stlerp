@@ -95,7 +95,7 @@
 						<td><?= h($i) ?></td>
 						<td><?= h($ItemSerialNumber->name); ?></td>
 						<td>
-						 	
+						 	<?php if($itmsr[$ItemSerialNumber->id]=="No"){?>
 							<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 									['action' => 'DeleteSerialNumbers', $ItemSerialNumber->id, $ItemSerialNumber->item_id,$ItemLedger->id], 
 									[
@@ -104,6 +104,7 @@
 										'confirm' => __('Are you sure, you want to delete {0}?', $ItemSerialNumber->id)
 									]
 								) ?>
+						<?php } ?>
 							
 						</td>
 					</tr>

@@ -190,8 +190,17 @@ margin-bottom: 0;
 				</tr>
 				<?php foreach($ReferenceDetails as $ReferenceDetail){ ?>
 				<tr>
-					<td><?php echo $ReferenceDetail->reference_no; ?></td>
-					<td>:<?php echo $ReferenceDetail->credit; ?></td>
+					<?php if($ReferenceDetail->reference_type=='On_account'){ ?>
+					 <td width="18%">On-Account <?php echo $ReferenceDetail->reference_no; ?></td>
+					<?php }else{ ?>
+					<td width="18%">Ref No - <?php echo $ReferenceDetail->reference_no; ?></td>
+					<?php } ?>
+					<td>:<?php 
+					if(!empty($ReferenceDetail->credit)){
+					echo $ReferenceDetail->credit; ?> Cr
+					<?php }else if(!empty($ReferenceDetail->debit)){ 
+						echo $ReferenceDetail->debit; ?> Dr
+					<?php } ?></td></td>
 				</tr>
 				<?php } ?>
 			</table>

@@ -39,7 +39,7 @@
 				</table>
 				
 				<div align="right" class="form-actions">
-					<button type="submit" class="btn btn-primary">Pull & Create Purchase Order</button>
+					<button type="submit" class="btn btn-primary btns" >Pull & Create Purchase Order</button>
 					<?php echo $this->Html->link("Skip And Next", array('controller' => 'PurchaseOrders','action'=> 'Add'), array( 'class' => 'btn green','id'=>'materialindent')); ?>
 					
 				</div>
@@ -55,27 +55,38 @@
 <script>
 
 $(document).ready(function() {
+	$('.btns').attr('disabled','disabled');
+	rename_rows();
 	$('.rename_check').die().live("click",function() {  
  		rename_rows();
     })
 	var p=0;
 	function rename_rows(){  //alert();
 		var i=0;
+		var val='';
 		$("#main_tb tbody tr.main_tr").each(function(){
-			var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
+			
+			$(this).find('td:nth-child(4) input[type="checkbox"]').each(function(e)
+			{
+				if($(this).is(':checked'))
+				{
+					val=$(this).val();
+				}
+			});
 			var mi=$(this).find('td:nth-child(1) input[type="hidden"]').val();
-			//alert(val);
 			if(val){
-				$(this).css('background-color','#fffcda');
 				
+				$(this).css('background-color','#fffcda');
+				$('.btns').removeAttr('disabled');
 				//$(this).find('td:nth-child(1) input').attr("name","prepo["+mi+"]["+val+"][item_id]").attr("id","prepo-"+val+"-item_id");
 				//$(this).find('td:nth-child(2) input').attr("name","prepo["+mi+"]["+val+"][quantity]").attr("id","prepo-"+val+"-quantity");
 				
 				
  			}else{
  				$(this).css('background-color','#FFF');
-				
+				$('.btns').attr('disabled','disabled');
 			}
+			//var val='';
 		});
 	}	
 		

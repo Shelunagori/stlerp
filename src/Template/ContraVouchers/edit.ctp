@@ -311,7 +311,7 @@ $(document).ready(function() {
 						min: 0.01
 					});
 			$(this).find("td:eq(1) select").attr({name:"contra_voucher_rows["+i+"][cr_dr]", id:"contra_voucher_rows-"+i+"-cr_dr"});
-			$(this).find("td:eq(3) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"}).rules('add', {
+			$(this).find("td:nth-child(4) textarea").attr({name:"contra_voucher_rows["+i+"][narration]", id:"contra_voucher_rows-"+i+"-narration"}).rules('add', {
 						required: true
 					});
 			i++;

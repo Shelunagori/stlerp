@@ -94,7 +94,7 @@ class MaterialIndentsController extends AppController
 				foreach(@$sales_qty as $key=>$sales_order_qt){
 					if(@$sales_order_qt <= @$po_qty[$key] ){
 					$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
-					@$mi_id[]=@$materialIn;
+					@$mi_id[$MaterialIndent->id]=@$materialIn;
 					}
 				}
 			}
@@ -178,7 +178,7 @@ class MaterialIndentsController extends AppController
 				foreach(@$sales_qty as $key=>$sales_order_qt){
 					if(@$sales_order_qt <= @$po_qty[$key] ){
 					$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
-					@$mi_id[]=@$materialIn;
+					@$mi_id[$MaterialIndent->id]=@$materialIn;
 					}
 				}
 			}
@@ -369,7 +369,9 @@ class MaterialIndentsController extends AppController
         }
 		
 	
-		$ItemBuckets = $this->MaterialIndents->ItemBuckets->find()->contain(['Items'])->toArray();
+		$ItemBuckets = $this->MaterialIndents->ItemBuckets->find()->contain(['Items'=>['ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}]])->toArray();
 		
 		$this->set(compact('ItemBuckets','materialIndent','total_indent'));
 	}
@@ -382,7 +384,9 @@ class MaterialIndentsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
         $materialIndent = $this->MaterialIndents->get($id, [
-            'contain' => ['MaterialIndentRows'=>['Items']]
+            'contain' => ['MaterialIndentRows'=>['Items'=>['ItemCompanies'=>function($q) use($st_company_id){
+									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
+								}]]]
         ]); 
         if ($this->request->is(['patch', 'post', 'put'])) {
             $materialIndent = $this->MaterialIndents->patchEntity($materialIndent, $this->request->data);

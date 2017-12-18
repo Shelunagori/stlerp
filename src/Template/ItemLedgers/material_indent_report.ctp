@@ -119,8 +119,8 @@
 									<td style="text-align:center"><?php if($open_so_qty > 0){ 
 										echo $this->Html->link(@$open_so_qty ,'/ItemLedgers/material_indent?status=salesorder&id='.@$sales_id[$item_id],['target' => '_blank']); 
 									 }else{ echo "-"; } ?></td>
-									<td style="text-align:center"><?php if($total_jc_qty > 0){ 
-										echo $$total_jc_qty; 
+									<td style="text-align:center"><?php if($open_jc_qty > 0){ 
+										echo $this->Html->link(@$open_jc_qty ,'/ItemLedgers/material_indent?status=jobcard&id='.@$job_id[$item_id],['target' => '_blank']);
 									 }else{ echo "-"; } ?></td>
 									<td style="text-align:center"><?php if($open_po_qty > 0){ 
 										echo $this->Html->link(@$open_po_qty ,'/ItemLedgers/material_indent?status=purchaseorder&id='.@$purchase_id[$item_id],['target' => '_blank']); 

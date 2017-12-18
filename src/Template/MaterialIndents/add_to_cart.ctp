@@ -28,17 +28,17 @@
 					$q=0;
 					
 					foreach ($ItemBuckets as $ItemBucket){
-						//pr($ItemBucket); exit;
 					 ?>
 					
 					
 					<tr class="tr1" > 
 							<td><?php echo ++$q;?></td>
 							
-							<td><?php echo $this->Form->input('material_indent_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$ItemBucket['item_id']]); ?>
+							<td><?php echo $this->Form->input('material_indent_rows.'.$q.'.item_id', ['label' => false,'type'=>'hidden','value'=>$ItemBucket['item_id'],'class'=>'itemids']); ?>
+							<?php echo $this->Form->input('q', ['label' => false,'type'=>'hidden','value'=>$ItemBucket['item']['item_companies'][0]['serial_number_enable'],'class'=>'sr_nos']); ?>
 							<?php echo $ItemBucket['item']['name']; ?></td>
 							<td><?php echo abs(@$ItemBucket['quantity']); ?></td>
-							<td><?php echo $this->Form->input('material_indent_rows.'.$q.'.required_quantity', ['label' => false,'type'=>'text','required']); ?></td>
+							<td><?php echo $this->Form->input('material_indent_rows.'.$q.'.required_quantity', ['label' => false,'type'=>'text','required','class'=>'quantity']); ?></td>
 							<td>
 							<?= $this->Html->link('Delete ',
 									['action' => 'delete', $ItemBucket->id], 
@@ -90,6 +90,27 @@ $(document).ready(function() {
 	});
 	
 	$('.quantity').die().live("keyup",function() {
+		var tr_obj=$(this).closest('tr');  
+		var item_id=tr_obj.find('td:nth-child(2) input.itemids').val()
+		
+		if(item_id > 0){ 
+			var serial_number_enable=tr_obj.find('td:nth-child(2) input.sr_nos').val();
+			
+				if(serial_number_enable == '1'){
+					var quantity=tr_obj.find('td:nth-child(4) input').val();
+					 if(quantity.search(/[^0-9]/) != -1)
+						{
+							alert("Item serial number is enabled !!! Please Enter Only Digits")
+							tr_obj.find('td:nth-child(4) input').val("");
+						}
+					
+				}
+		}
+		
+    });	
+	
+	
+	/* $('.quantity').die().live("keyup",function() {
 			var asc=$(this).val();
 			var numbers =  /^[0-9]*\.?[0-9]*$/;
 			if(asc==0)
@@ -105,7 +126,7 @@ $(document).ready(function() {
 				$(this).val('');
 				return false;  
 			}
-	});
+	}); */
 
 });
 </script>	
