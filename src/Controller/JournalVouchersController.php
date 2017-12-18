@@ -308,7 +308,7 @@ class JournalVouchersController extends AppController
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $journal_voucher_row->received_from_id;
-						if($journal_voucher_row->on_acc_dr_cr=="Dr"){
+						if($journal_voucher_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $journal_voucher_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
@@ -556,7 +556,7 @@ class JournalVouchersController extends AppController
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type="On_account";
 						$ReferenceDetail->ledger_account_id = $journal_voucher_row->received_from_id;
-						if($journal_voucher_row->on_acc_dr_cr=="Dr"){
+						if($journal_voucher_row->on_acc_cr_dr=="Dr"){
 							$ReferenceDetail->debit = $journal_voucher_row->on_acc;
 							$ReferenceDetail->credit = 0;
 						}else{
