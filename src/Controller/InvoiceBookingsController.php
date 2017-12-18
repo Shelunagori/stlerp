@@ -85,6 +85,47 @@ class InvoiceBookingsController extends AppController
 		$this->set(compact('url'));
     }
 	
+	public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Grns=$this->InvoiceBookings->Grns->GrnRows->find();
+		foreach($Grns as $Grn){
+		$InvoiceBookings=$this->InvoiceBookings->find()->contain(['InvoiceBookingRows'])->where(['InvoiceBookings.grn_id'=>$Grn->grn_id,'gst'=>'yes'])->toArray();
+				//pr($InvoiceBookings); exit;
+			if($InvoiceBookings){
+				if(sizeof($InvoiceBookings) > 0){ 
+					foreach($InvoiceBookings as $InvoiceBooking){
+						foreach($InvoiceBooking->invoice_booking_rows as $invoice_booking_row){
+							$query = $this->InvoiceBookings->InvoiceBookingRows->query();
+							/* $query->update()
+								->set(['grn_row_id' => $Grn->id])
+								->where(['item_id' => $Grn->item_id,'invoice_booking_id'=>$InvoiceBooking->id])
+								->execute(); */
+							pr($invoice_booking_row); exit;
+							$query1 = $this->InvoiceBookings->ItemLedgers->query();
+							$query1->update()
+								->set(['grn_row_id' => $Grn->id])
+								->where(['item_id' => $Grn->item_id,'invoice_booking_id'=>$InvoiceBooking->id])
+								->execute();
+								
+							
+							}
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		
+		echo "done"; exit;
+	}
+	
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -1450,10 +1491,11 @@ class InvoiceBookingsController extends AppController
 				$ledger->voucher_source = 'Invoice Booking';
 				$this->InvoiceBookings->Ledgers->save($ledger);
 				
+				
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
 					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
 				}
-				
+			//	pr($unit_rate); exit;
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
 					$unit_rate = $this->updateIvsInItemRate($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
 				}
@@ -1529,7 +1571,7 @@ class InvoiceBookingsController extends AppController
         $this->set('_serialize', ['invoiceBooking']);
     }
 	
-	public function updateIvsInItemRate($item_id=null,$supplier_date=null){ 
+	public function updateIvsInItemRate($item_id=null,$supplier_date=null){ //pr($item_id); exit;
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
@@ -1542,9 +1584,10 @@ class InvoiceBookingsController extends AppController
 					$OutItemAmount=0;
 					foreach($iv_row->iv_row_items as $iv_row_item){
 						$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Inventory Vouchers','ItemLedgers.company_id'=>$st_company_id,'iv_row_item_id'=>$iv_row_item->id])->first();
+						
 						$OutItemAmount+=$ItemLedgersOuts->rate*$ItemLedgersOuts->quantity;
 						
-					}
+					}  
 					$InItemAmount=$OutItemAmount/$iv_row->quantity;
 					$query1 = $this->InvoiceBookings->ItemLedgers->query();
 					$query1->update()
@@ -1564,7 +1607,7 @@ class InvoiceBookingsController extends AppController
 			$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'Out'])->where(['ItemLedgers.source_model IN'=>['Inventory Vouchers','Inventory Transfer Voucher']])->toArray();
 
 			$ItemSerialNo=$this->InvoiceBookings->Items->ItemCompanies->find()->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.item_id'=>$item_id])->first();
-			//pr($ItemSerialNo); exit;
+			
 			$serial_number_enable=$ItemSerialNo->serial_number_enable;
 
 			if($serial_number_enable==1){ 
@@ -1579,7 +1622,7 @@ class InvoiceBookingsController extends AppController
 					$ItemAmt=0;
 					$Itemqty=0;
 
-					foreach($ItemSerialOuts as $ItemSerialOut){
+					foreach($ItemSerialOuts as $ItemSerialOut){ 
 						$ItemSerialParent=$this->InvoiceBookings->ItemLedgers->Items->SerialNumbers->get($ItemSerialOut->parent_id);
 						if(@$ItemSerialParent->grn_id > 0){ 
 							$ItemLedgerData =$this->InvoiceBookings->ItemLedgers->find()->where(['source_id'=>$ItemSerialParent->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialParent->grn_row_id])->first();
@@ -1621,7 +1664,7 @@ class InvoiceBookingsController extends AppController
 				}
 			}else{
 				foreach($ItemLedgersOuts as $ItemLedgersOut){
-					$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on <= '=>$ItemLedgersOut->processed_on])->toArray();
+					$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on <= '=>$ItemLedgersOut->processed_on])->toArray(); //pr($ItemLedgersOut->processed_on); exit;
 					$ItemAmt=0;
 					$Itemqty=0;
 					foreach($ItemLedgersIns as $ItemLedgersIn){

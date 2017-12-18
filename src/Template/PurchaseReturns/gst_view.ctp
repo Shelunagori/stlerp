@@ -256,7 +256,7 @@ margin-bottom: 0;
 			<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="<?php echo $col_span; ?>"> Total</td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($purchase_return_row->total, 2, '.', '');
+			number_format($Total, 2, '.', '');
 			 ?></td>
 		</tr>
 		

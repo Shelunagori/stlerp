@@ -78,6 +78,8 @@ class ItemLedgersTable extends Table
 		$this->belongsTo('NewItems');
 		$this->belongsTo('Ivs');
 		$this->belongsTo('SerialNumbers');
+		$this->belongsTo('NewSerialNumbers');
+		//$this->belongsTo('ItemLegderOnes');
 		
     }
 

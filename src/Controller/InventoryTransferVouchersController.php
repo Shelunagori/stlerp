@@ -253,12 +253,12 @@ class InventoryTransferVouchersController extends AppController
 									$UnitRateSerialItem1+=$UnitRateSerialItem;
 									$unit_rate=$UnitRateSerialItem1;
 						}
-						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row_data['quantity'];
+						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row_data['quantity'];
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
 					
-					$unit_rate = round($unit_rate,2);
+					$unit_rate = round($unit_rate,3);
 						 
 					
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
@@ -509,14 +509,14 @@ class InventoryTransferVouchersController extends AppController
 									$unit_rate=$UnitRateSerialItem1;
 						}
 						
-						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row_data['quantity'];
+						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row_data['quantity'];
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 						//	pr($unit_rate); exit;
 					}
 						
 					
-					$unit_rate = round($unit_rate,2);
+					$unit_rate = round($unit_rate,3);
 						
 					
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
@@ -939,12 +939,12 @@ class InventoryTransferVouchersController extends AppController
 								$UnitRateSerialItem1+=$UnitRateSerialItem;
 								$unit_rate=$UnitRateSerialItem1;
 						}
-						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row->quantity;
+						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row->quantity;
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
 					
-					$unit_rate = round($unit_rate,2);
+					$unit_rate = round($unit_rate,3);
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
 							  ->values([
@@ -1139,11 +1139,11 @@ class InventoryTransferVouchersController extends AppController
 								$UnitRateSerialItem1+=$UnitRateSerialItem;
 								$unit_rate=$UnitRateSerialItem1;
 						}
-						$unit_rate = round($unit_rate,2)/@$inventory_transfer_voucher_row->quantity;
+						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row->quantity;
 					}else{
 							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
 					}
-					$unit_rate = round($unit_rate,2);
+					$unit_rate = round($unit_rate,3);
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','processed_on','company_id','source_id','source_row_id'])
 							  ->values([
@@ -1312,42 +1312,41 @@ class InventoryTransferVouchersController extends AppController
 					foreach($StockLedgers as $StockLedger){  
 						if($StockLedger->in_out=='In'){ 
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
 									$stock[]=$StockLedger->rate;
 								}
 							}
 						}
 					}
-					//pr($stock);
+
 				
 					foreach($StockLedgers as $StockLedger){
-						if($StockLedger->in_out=='Out'){ 
-							if(sizeof(@$stock) > 0){// pr($stock); 
-								$stock= array_slice($stock, $StockLedger->quantity); 	
+						if($StockLedger->in_out=='Out'){	
+							if(sizeof(@$stock) > 0){
+								$stock= array_slice($stock, $StockLedger->quantity*100); 	
 							}
 						}
 					}
-					
-					///pr($stock);
+
 					$total_stock=0;
 					$total_amt=0;
 					if(sizeof(@$stock) > 0){ 
 						foreach($stock as $data){
-							$total_amt+=$data;
+							$total_amt+=$data/100;
 							++$total_stock;
 						}
 					}
-			/* 	pr($total_stock);
-				pr($total_amt);   exit; */
-				
+				$total_stock=$total_stock/100;
 				if($total_amt > 0 && $total_stock > 0){
 					 $unit_rate = $total_amt/$total_stock; 
 				}
 				
 				
 			}
+			
+
 				
-		//pr($unit_rate);  exit;
+		$unit_rate=round($unit_rate,3);
 			return $unit_rate; 
 		//exit;	
 	}

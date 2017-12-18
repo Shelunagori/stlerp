@@ -121,21 +121,34 @@ class JobCardsController extends AppController
 		$SalesOrderQty=[];
 		$InvoiceQty=[];
 		$InventoryVoucherQty=[];
-		$JCs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['Ivs'],'SalesOrderRows',]])->toArray();
+		$JCs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['Ivs'],'SalesOrderRows']])->toArray();
+		
 		foreach($JCs as $jc ){ 
 			foreach($jc->sales_order->sales_order_rows as $sales_order_row){ 
-					@$SalesOrderQty[@$sales_order_row['sales_order_id']]+=@$sales_order_row['quantity'];
-			}
+					$Item_data=$this->JobCards->SalesOrders->SalesOrderRows->Items->get($sales_order_row->item_id);
+					if($Item_data->source=="Purchessed/Manufactured" or $Item_data->source=="Manufactured"){
+						if($sales_order_row->source_type=="Manufactured" or$sales_order_row->source_type==""){
+							@$SalesOrderQty[@$sales_order_row['sales_order_id']]+=@$sales_order_row['quantity'];
+						}	
+					}
+				
+					
+			} // exit;
 		}
 		$Jobs=$this->JobCards->find()->contain(['SalesOrders'=>['Invoices'=>['InvoiceRows'=>['IvRows']]]])->toArray();
 		foreach($Jobs as $jc ){ //pr($jc->sales_order->invoices); exit;
 			foreach($jc->sales_order->invoices as $invoice){   //pr($invoice); 
-				foreach($invoice->invoice_rows as $invoice_row){ 
-					@$InvoiceQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
-						$outExist = $this->JobCards->SalesOrders->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
-						if($outExist > 0){
-							@$InventoryVoucherQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
+				foreach($invoice->invoice_rows as $invoice_row){
+					$Item_details=$this->JobCards->SalesOrders->SalesOrderRows->Items->get($invoice_row->item_id);	
+						if($Item_details->source=="Purchessed/Manufactured" or $Item_details->source=="Manufactured" or $Item_details->source=="Assembled"){
+						if($sales_order_row->source_type=="Manufactured" or$sales_order_row->source_type==""){					
+							@$InvoiceQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
+							$outExist = $this->JobCards->SalesOrders->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
+							if($outExist > 0){
+								@$InventoryVoucherQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
+							}
 						}
+					}
 				}
 			}
 		}
@@ -227,6 +240,37 @@ class JobCardsController extends AppController
      * @return \Cake\Network\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+	 
+	 public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$SalesOrders=$this->JobCards->SalesOrders->SalesOrderRows->find();
+		
+		foreach($SalesOrders as $SalesOrder){ //pr($SalesOrder); exit;
+			$JobCard=$this->JobCards->find()->contain(['JobCardRows'])->where(['JobCards.sales_order_id'=>$SalesOrder->sales_order_id])->toArray();
+			
+			if($JobCard){ pr($JobCard); exit;
+				if(sizeof($Invoices) > 0){ //echo "exist"; echo "<br>";
+					foreach($Invoices as $Invoice){
+						foreach($Invoice->invoice_rows as $invoice_row){ //pr($invoice_row->item_id); exit;
+							$query = $this->Invoices->InvoiceRows->query();
+							$query->update()
+								->set(['sales_order_row_id' => $SalesOrder->id])
+								->where(['item_id' => $SalesOrder->item_id,'invoice_id'=>$Invoice->id])
+								->execute();
+							}
+					}
+				}
+			}
+		}
+		echo "done"; exit;
+	} 
+	 
+	 
+	 
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -368,6 +412,7 @@ class JobCardsController extends AppController
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
 				},'JobCardRows'=>['Items']]],'Creator', 'Companies','Customers']
         ]);
+	//	pr($jobCard); exit;
 		$closed_month=$this->viewVars['closed_month'];
 		
 		if(!in_array(date("m-Y",strtotime($jobCard->created_on)),$closed_month))

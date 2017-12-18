@@ -410,7 +410,7 @@ class IvsController extends AppController
 					foreach($StockLedgers as $StockLedger){  
 						if($StockLedger->in_out=='In'){ 
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
 									$stock[]=$StockLedger->rate;
 								}
 							}
@@ -420,7 +420,8 @@ class IvsController extends AppController
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){ 
 							if(sizeof(@$stock) > 0){// pr($stock); 
-								$stock= array_slice($stock, $StockLedger->quantity); 	
+								//$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
+								$stock= array_slice($stock, $StockLedger->quantity*100); 	
 							}
 						}
 					}
@@ -428,11 +429,11 @@ class IvsController extends AppController
 					$total_amt=0;
 					if(sizeof(@$stock) > 0){ 
 						foreach($stock as $data){
-							$total_amt+=$data;
+							$total_amt+=$data/100;
 							++$total_stock;
 						}
 					}
-				//pr($total_stock);
+				$total_stock=$total_stock/100;
 				
 				if($total_amt > 0 && $total_stock > 0){
 					 $unit_rate = $total_amt/$total_stock; 

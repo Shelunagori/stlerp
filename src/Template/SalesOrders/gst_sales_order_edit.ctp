@@ -1269,9 +1269,8 @@ $(document).ready(function() {
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
-var a ="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
-var url = a+'/'+item_id+'/'+customer_id;
-alert(url);
+			var a ="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
+			var url = a+'/'+item_id+'/'+customer_id;
 			if(customer_id){
 				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,
