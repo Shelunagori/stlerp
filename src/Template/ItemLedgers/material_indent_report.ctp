@@ -13,7 +13,7 @@
 		</div>
 		<div class="actions">
 		<?php 
-			if(sizeof($company_name)==1){
+			if(sizeof($company_name)==1 && in_array(166,$allowed_pages)){
 			foreach($company_name as $names){			
 						if(@$names == @$st_company_id){ ?>
 			<?= $this->Html->link(

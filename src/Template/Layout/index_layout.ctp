@@ -430,7 +430,7 @@ select
 					</ul>
 				</li>
 				<?php } ?>-->
-				<?php if(in_array(124,$allowed_pages) || in_array(125,$allowed_pages)){ ?>
+				<?php if(in_array(124,$allowed_pages) || in_array(161,$allowed_pages) || in_array(165,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-puzzle-piece"></i>
@@ -441,7 +441,7 @@ select
 						<!--<?php if(in_array(124,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/MaterialIndents/AddNew',array('escape'=>false)).'</li>';
 						} ?>-->
-						<?php if(in_array(125,$allowed_pages) || in_array(31,$allowed_pages)){
+						<?php if(in_array(161,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/MaterialIndents/',array('escape'=>false)).'</li>';
 						} ?>
 					</ul>
@@ -760,7 +760,7 @@ select
 						 }
 						 ?>
 						<?php 
-						if(in_array(135,$allowed_pages)){
+						if(in_array(136,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/SaleReturns/',array('escape'=>false)).'</li>';
 						}
 						?>
@@ -796,7 +796,7 @@ select
 						 }
 						 ?>
 						<?php 
-						if(in_array(131,$allowed_pages)){
+						if(in_array(132,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="fa fa-file-text"></i> View','/PurchaseReturns/',array('escape'=>false)).'</li>';
 						}
 						?>

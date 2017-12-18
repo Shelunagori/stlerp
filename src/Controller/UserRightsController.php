@@ -63,11 +63,11 @@ class UserRightsController extends AppController
 		
 		$userRight = $this->UserRights->newEntity();
         if ($this->request->is('post')) {
-			$query = $this->UserRights->query();
+			 $query = $this->UserRights->query();
 			$query->delete()
 				->where(['login_id' => $login_id])
 				->execute();
-	
+	 
 			$user_rights=$this->request->data["user_rights"];
 			//pr($user_rights); exit;
 			foreach($user_rights as	$data){
@@ -109,7 +109,15 @@ class UserRightsController extends AppController
 						->execute();
 			}
 			
-			
+			if($user_rights[124]['page_id']>0){ 
+				$query = $this->UserRights->query();
+					$query->insert(['login_id', 'page_id'])
+						->values([
+							'login_id' => $login_id,
+							'page_id' => 166
+						])
+						->execute();
+			}
 			
 			if($user_rights[21]['page_id']>0){
 				$query = $this->UserRights->query();
@@ -188,7 +196,7 @@ class UserRightsController extends AppController
 						])
 						->execute();
 			}
-			if($user_rights[28]['page_id']>0){
+			/*if($user_rights[28]['page_id']>0){
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
 						->values([
@@ -203,7 +211,7 @@ class UserRightsController extends AppController
 							'page_id' => 160
 						])
 						->execute();
-			}
+			}*/
 			if($user_rights[31]['page_id']>0){
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
