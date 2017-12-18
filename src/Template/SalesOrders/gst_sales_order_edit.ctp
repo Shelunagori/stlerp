@@ -180,7 +180,7 @@
 					}
 					//pr($item_ar); exit;
 					$q=0; foreach ($salesOrder->sales_order_rows as $sales_order_rows): 
-					//pr($sales_order_rows->id);
+					//pr($sales_order_rows->quotation_row_id);
 					if(@$sales_orders_qty[$sales_order_rows->id] > 0){
 						
 						$disable_class=" disabled='true'";
@@ -228,7 +228,7 @@
 							$job_card_row_ids=[];
 							$inventory_voucher_row_ids=[];
 							foreach($sales_order_rows->job_card_rows as $job_card_row){
-								$job_card_row_ids[]=$job_card_row->id;
+								$job_card_row_ids[]=@$job_card_row->id;
 							}
 							
 							$job_card_row_ids=implode(',',$job_card_row_ids); 
@@ -244,8 +244,13 @@
 						
 						<td width="80px;">
 						
+						<?php if($sales_order_rows->quotation_row_id == 0){ ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
+						<?php } else {  ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'max'=>@$MaxQty[@$sales_order_rows->quotation_row_id],'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
+						<?php } ?>
+
 						
-						<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'max'=>@$MaxQty[@$sales_order_rows->quotation_row_id],'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
 						<?php 
 						 echo $this->Form->input('sales_order_rows.'.$q.'.old_quantity', ['type' => 'hidden','value'=>$sales_order_rows->quantity]);
 						?>
@@ -795,7 +800,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(2) a.popup_btn").attr("popup_id",i);
 			$(this).find("td:nth-child(2) div.modal").attr("popup_div_id",i);
 			$(this).find("td:nth-child(2) div.modal-body").attr("popup_ajax_id",i);
-			$(this).find("td:nth-child(2) input[type=hidden]:eq(2) .quotationId").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
+			$(this).find("td:nth-child(2) input.quotationId").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
 			$(this).find("td:nth-child(3) input").attr({name:"sales_order_rows["+i+"][quantity]", id:"sales_order_rows-"+i+"-quantity"}).rules('add', {
 						required: true
 					});
@@ -1264,6 +1269,9 @@ $(document).ready(function() {
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+var a ="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
+var url = a+'/'+item_id+'/'+customer_id;
+alert(url);
 			if(customer_id){
 				var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'RecentRecords']); ?>";
 				url=url+'/'+item_id+'/'+customer_id,

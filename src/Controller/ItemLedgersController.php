@@ -808,21 +808,25 @@ class ItemLedgersController extends AppController
 			if(@$Item->item_companies[0]->serial_number_enable==0){ 
 				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC'])->where($where1);
 				foreach($StockLedgers as $StockLedger){ 
-					if($StockLedger->in_out=='In'){
-						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-							for($inc=0;$inc<$StockLedger->quantity;$inc++){
-								$stock[$Item->id][]=$StockLedger->rate;
+						if($StockLedger->in_out=='In'){
+							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+								for($inc=0;$inc<$StockLedger->quantity;$inc+=$inc+0.01){ echo $inc;
+									$stock[$Item->id][]=$StockLedger->rate;
+								}
 							}
 						}
 					}
-				}
-				foreach($StockLedgers as $StockLedger){
-					if($StockLedger->in_out=='Out'){
-						if(sizeof(@$stock[$Item->id])>0){
-							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+if($Item->id==1829){
+pr($stock); exit;
+
+}
+					foreach($StockLedgers as $StockLedger){
+						if($StockLedger->in_out=='Out'){
+							if(sizeof(@$stock[$Item->id])>0){
+								$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
+							}
 						}
 					}
-				}
 				if(sizeof(@$stock[$Item->id]) > 0){ 
 					foreach(@$stock[$Item->id] as $stockRate){
 						@$sumValue[$Item->id]+=@$stockRate;
@@ -1959,16 +1963,17 @@ pr($purchase_id);
 					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								for($inc=0;$inc<$StockLedger->quantity;$inc+=$inc+0.01){
 									$stock[$Item->id][]=$StockLedger->rate;
 								}
 							}
 						}
 					}
+//pr($stock); exit;
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
 							if(sizeof(@$stock[$Item->id])>0){
-								$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+								$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
 							}
 						}
 					}

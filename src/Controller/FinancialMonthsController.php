@@ -150,15 +150,36 @@ class FinancialMonthsController extends AppController
 					return $exp->between('date_created', $start_date, $end_date, 'date');
 		})->toArray();
 		
+	 		$invoices2=[];
+			$invoice1=$this->FinancialMonths->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+				return $q->where(['source !='=>'Purchessed']);
+				},'SalesOrderRows'=>function ($q) {
+				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
+				}
+				]])
+				->where(['Invoices.company_id'=>$st_company_id])
+				->where(function($exp) use($start_date,$end_date){
+					return $exp->between('date_created', $start_date, $end_date, 'date');
+					});
+				
+				foreach($invoice1 as $invoice){
+					foreach($invoice->invoice_rows as $invoice_row){
+						$AccountGroupsexists = $this->FinancialMonths->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice_row->invoice_id]);
+						if(!$AccountGroupsexists){ 
+							$invoices2[]=$invoice;
+						}
+					}
+				} 
+		
 		$Invoices = $this->FinancialMonths->Invoices->find()
 		->where(['inventory_voucher_status'=>'Pending','inventory_voucher_create'=>'Yes','company_id'=>$st_company_id])
 		->where(function($exp) use($start_date,$end_date){
 					return $exp->between('date_created', $start_date, $end_date, 'date');
 		})->toArray();
 	 
-		pr($grns);
 		
-		if(sizeof($grns) == 0 && sizeof($Invoices) == 0 ){  
+		
+		if(sizeof($grns) == 0 && sizeof($invoices2) == 0 ){  
 			$financialMonth->status='Closed';
 			$this->FinancialMonths->save($financialMonth);
 				$this->Flash->success(__('The Financial Month has been Closed.'));
@@ -167,7 +188,7 @@ class FinancialMonthsController extends AppController
 			if(sizeof($grns) > 0 ){
 				$this->Flash->error(__('The Financial Month could not be Closed. Grn Are open.'));
 			}
-			if(sizeof($Invoices) > 0 ){
+			if(sizeof($invoices2) > 0 ){ 
 				$this->Flash->error(__('The Financial Month could not be Closed. Invoice Are open.'));
 			}
 				return $this->redirect(['action' => 'index']);

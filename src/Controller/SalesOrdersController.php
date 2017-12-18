@@ -1303,7 +1303,7 @@ class SalesOrdersController extends AppController
 				$salesOrder->edited_by=$s_employee_id;
 				$salesOrder->edited_on=date("Y-m-d");
 				$salesOrder->edited_on_time= date("Y-m-d h:i:sA");
-				
+				//pr($salesOrder); exit;
 				if ($this->SalesOrders->save($salesOrder)) {
 					
 					if($so->quotation_id>0)
@@ -1335,7 +1335,7 @@ class SalesOrdersController extends AppController
 							}]); */
 						
 						$total_quotaion_qty=$Quotations->first()->total_quotaion_qty;
-						$total_sales_qty=$SalesOrders->first()->total_sales_qty;
+						@$total_sales_qty=$SalesOrders->first()->total_sales_qty;
 					
 						/* pr($SalesOrderRows->toArray());
 						pr($SalesOrders->toArray());

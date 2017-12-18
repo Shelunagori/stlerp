@@ -1536,12 +1536,12 @@ class InvoicesController extends AppController
 				$stock=[];  $sumValue=0; $qtySum=0;
 				
 					$StockLedgers=$this->Invoices->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
-						
+					
 					
 					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<$StockLedger->quantity;$inc++){
+								for($inc=0;$inc<$StockLedger->quantity;$inc+=$inc+0.01){
 									$stock[$item_id][]=$StockLedger->rate;
 								}
 							}
@@ -1550,7 +1550,7 @@ class InvoicesController extends AppController
 						foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
 							if(sizeof(@$stock[$item_id])>0){
-								$stock[$item_id] = array_slice($stock[$item_id], $StockLedger->quantity); 
+								$stock[$item_id] = array_slice($stock[$item_id], $StockLedger->quantity*100); 
 							}
 						}
 					}
@@ -1562,7 +1562,8 @@ class InvoicesController extends AppController
 							
 						}
 					}
-				
+				pr($sumValue);
+				pr($qtySum); exit;
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){
 					$rate=0;
@@ -5666,5 +5667,53 @@ class InvoicesController extends AppController
 	pr($data1);
 	exit;
 	
+	}
+
+	public function HsnWiseReport(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('From','To'));
+		
+		$where=[];
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+		}
+	//exit;
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units','ItemCategories']]])->where($where)->where(['company_id'=>$st_company_id,'invoice_type'=>'GST']);
+	//	pr($Invoices->toArray()); exit;
+		$hsn=[];
+		$quantity=[];
+		$taxable_value=[];
+		$item_category=[];
+		$total_value=[];
+		$unit=[];
+		$cgst=[];
+		$sgst=[];
+		$igst=[];
+		foreach($Invoices as $Invoice){ //pr($Invoice);
+			foreach($Invoice->invoice_rows as $invoice_row){  //pr($invoice_row->item); exit;
+				$hsn[$invoice_row->item->hsn_code]=$invoice_row->item->hsn_code;
+				$item_category[$invoice_row->item->hsn_code]=$invoice_row->item->item_category->name;
+				$unit[$invoice_row->item->hsn_code]=$invoice_row->item->unit->name;
+				@$quantity[@$invoice_row->item->hsn_code]+=@$invoice_row->quantity;
+				@$total_value[@$invoice_row->item->hsn_code]+=@$invoice_row->row_total;
+				@$taxable_value[@$invoice_row->item->hsn_code]+=@$invoice_row->taxable_value;
+				@$cgst[@$invoice_row->item->hsn_code]+=@$invoice_row->cgst_amount;
+				@$sgst[@$invoice_row->item->hsn_code]+=@$invoice_row->sgst_amount;
+				@$igst[@$invoice_row->item->hsn_code]+=@$invoice_row->igst_amount;
+			}
+		}
+	$this->set(compact('hsn','item_category','quantity','total_value','taxable_value','cgst','sgst','igst','unit'));	
+//pr($cgst);
+// exit;
 	}
 }
