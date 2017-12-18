@@ -188,6 +188,135 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
 	}
 	
+	public function ItemLedgerEntry()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$Invoices=$this->Invoices->find()->contain(['InvoiceRows'])->where(['invoice_type'=>'GST','company_id'=>$st_company_id]);
+		foreach($Invoices as $invoice){
+			//pr($invoice);exit;
+			
+			$c_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Customers','source_id'=>$invoice->customer_id])->first();
+				//$ledger_grand=$invoice->grand_total;
+				//pr($c_LedgerAccount->id);
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $c_LedgerAccount->id;
+				$ledger->debit = $invoice->grand_total;
+				$ledger->credit = 0;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->voucher_source = 'Invoice';
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				//$this->Invoices->Ledgers->save($ledger); 
+				
+				foreach($invoice->invoice_rows as $invoice_row){ pr($invoice_row->item_serial_number);
+					if($invoice_row->cgst_amount > 0){
+						$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->cgst_percentage])->first();
+						$ledger = $this->Invoices->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $invoice_row->cgst_amount;
+						$ledger->debit = 0;
+						$ledger->voucher_id = $invoice->id;
+						$ledger->voucher_source = 'Invoice';
+						$ledger->company_id = $invoice->company_id;
+						$ledger->transaction_date = $invoice->date_created;
+						//$this->Invoices->Ledgers->save($ledger); 
+					}
+					if($invoice_row->sgst_amount > 0){
+						$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->sgst_percentage])->first();
+						$ledger = $this->Invoices->Ledgers->newEntity();
+						$ledger->ledger_account_id = $s_LedgerAccount->id;
+						$ledger->credit = $invoice_row->sgst_amount;
+						$ledger->debit = 0;
+						$ledger->voucher_id = $invoice->id;
+						$ledger->voucher_source = 'Invoice';
+						$ledger->company_id = $invoice->company_id;
+						$ledger->transaction_date = $invoice->date_created;
+						//$this->Invoices->Ledgers->save($ledger); 
+					}
+					if($invoice_row->igst_amount > 0){
+						$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->igst_percentage])->first();  //pr($i_LedgerAccount);exit;
+						$ledger = $this->Invoices->Ledgers->newEntity();
+						$ledger->ledger_account_id = $i_LedgerAccount->id;
+						$ledger->credit = $invoice_row->igst_amount;
+						$ledger->debit = 0;
+						$ledger->voucher_id = $invoice->id;
+						$ledger->voucher_source = 'Invoice';
+						$ledger->company_id = $invoice->company_id;
+						$ledger->transaction_date = $invoice->date_created;
+						//$this->Invoices->Ledgers->save($ledger); 
+					}
+					//pr($invoice->date_created);exit;
+						$itemLedger = $this->Invoices->ItemLedgers->newEntity();
+						$itemLedger->item_id = $invoice_row->item_id;
+						$itemLedger->quantity = $invoice_row->quantity;
+						$itemLedger->source_model = 'Invoices';
+						$itemLedger->source_id = $invoice->id;
+						$itemLedger->in_out = 'Out';
+						$itemLedger->rate = $invoice_row->taxable_value/$invoice_row->quantity;
+						$itemLedger->company_id = $invoice->company_id;
+						$itemLedger->source_row_id = $invoice_row->id;
+						$itemLedger->processed_on =$invoice->date_created;
+						//$this->Invoices->ItemLedgers->save($itemLedger);
+						
+						
+						
+				}
+				
+				$ledger_fright=@(int)$invoice->fright_amount;
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $invoice->sales_ledger_account;
+				$ledger->debit = 0;
+				$ledger->credit = $invoice->total+$ledger_fright;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				$ledger->voucher_source = 'Invoice';
+				//$this->Invoices->Ledgers->save($ledger); 
+				
+				if($invoice->fright_cgst_amount > 0){ 
+					$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_cgst_percent])->first(); //pr($invoice->fright_cgst_amount);exit;
+					$ledger = $this->Invoices->Ledgers->newEntity();
+					$ledger->ledger_account_id = $cg_LedgerAccount->id;
+					$ledger->credit = $invoice->fright_cgst_amount;
+					$ledger->debit = 0;
+					$ledger->voucher_id = $invoice->id;
+					$ledger->voucher_source = 'Invoice';
+					$ledger->company_id = $invoice->company_id;
+					$ledger->transaction_date = $invoice->date_created;
+				//	$this->Invoices->Ledgers->save($ledger); 
+				}
+				if($invoice->fright_sgst_amount > 0){
+					$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_sgst_percent])->first();
+					$ledger = $this->Invoices->Ledgers->newEntity();
+					$ledger->ledger_account_id = $s_LedgerAccount->id;
+					$ledger->credit = $invoice->fright_sgst_amount;
+					$ledger->debit = 0;
+					$ledger->voucher_id = $invoice->id;
+					$ledger->voucher_source = 'Invoice';
+					$ledger->company_id = $invoice->company_id;
+					$ledger->transaction_date = $invoice->date_created;
+					//$this->Invoices->Ledgers->save($ledger); 
+				}
+				if($invoice->fright_igst_amount > 0){
+					$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_igst_percent])->first();
+					$ledger = $this->Invoices->Ledgers->newEntity();
+					$ledger->ledger_account_id = $i_LedgerAccount->id;
+					$ledger->credit = $invoice->fright_igst_amount;
+					$ledger->debit = 0;
+					$ledger->voucher_id = $invoice->id;
+					$ledger->voucher_source = 'Invoice';
+					$ledger->company_id = $invoice->company_id;
+					$ledger->transaction_date = $invoice->date_created;
+				//	$this->Invoices->Ledgers->save($ledger); 
+				}
+			
+		} 
+		
+		exit;
+	}
+	
 	
  	
 	public function DataMigrate()
@@ -196,24 +325,26 @@ class InvoicesController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
-		$Quotations=$this->Invoices->SalesOrders->SalesOrderRows->find();
-		//pr($Quotation->toArray()); exit;
-		foreach($Quotations as $Quotation){
-			$Invoices=$this->Invoices->find()->contain(['InvoiceRows'])->where(['Invoices.sales_order_id'=>$Quotation->sales_order_id])->toArray();
-			
-			if(sizeof($Invoices) > 0){
-				foreach($Invoices as $Invoice){
-					foreach($Invoice->invoice_rows as $invoice_row){ //pr($invoice_row->item_id); exit;
-						$query = $this->Invoices->InvoiceRows->query();
-						$query->update()
-							->set(['sales_order_row_id' => $Quotation->id])
-							->where(['item_id' => $Quotation->item_id,'invoice_id'=>$Invoice->id])
-							->execute();
-						}
+		$SalesOrders=$this->Invoices->SalesOrders->SalesOrderRows->find();
+		
+		foreach($SalesOrders as $SalesOrder){
+			$Invoices=$this->Invoices->find()->contain(['InvoiceRows'])->where(['Invoices.sales_order_id'=>$SalesOrder->sales_order_id])->toArray();
+		//	pr($Invoices); exit;
+			if($Invoices){
+				if(sizeof($Invoices) > 0){ //echo "exist"; echo "<br>";
+					foreach($Invoices as $Invoice){
+						foreach($Invoice->invoice_rows as $invoice_row){ //pr($invoice_row->item_id); exit;
+							$query = $this->Invoices->InvoiceRows->query();
+							$query->update()
+								->set(['sales_order_row_id' => $SalesOrder->id])
+								->where(['item_id' => $SalesOrder->item_id,'invoice_id'=>$Invoice->id])
+								->execute();
+							}
+					}
 				}
 			}
 		}
-		exit;
+		echo "done"; exit;
 	} 
 	
 	
@@ -231,6 +362,9 @@ class InvoicesController extends AppController
         $this->set('_serialize', ['invoices']);
 		$this->set(compact('url'));
     }
+	
+	
+
 
 	public function excelExport($status=null)
 	{
@@ -1541,16 +1675,13 @@ class InvoicesController extends AppController
 					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0;$inc<($StockLedger->quantity-0.01);$inc+=0.01){
-									$stock[]=$StockLedger->rate.'-'.$inc;
-									$inc = number_format($inc, 2, '.', '');
+								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
+									$stock[]=$StockLedger->rate;
 								}
-								pr($stock);
-								unset($stock);
 							}
 						}
 					}
-					 exit;
+					
 						foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
 							if(sizeof(@$stock) > 0){// pr($stock); 
@@ -1569,7 +1700,7 @@ class InvoicesController extends AppController
 						}
 					}
 					
-			
+			//	pr($total_amt); exit;
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){
 					$rate=0;
@@ -1578,9 +1709,9 @@ class InvoicesController extends AppController
 					@$rate=$sumValue/$qtySum;
 					$minimumSellingPrice=$rate*$item->item_companies[0]->minimum_selling_price_factor;
 					
-					pr($qtySum);
-					pr($rate);
-					pr($minimumSellingPrice); exit;
+					//pr($qtySum);
+					//pr($rate);
+				//	pr($minimumSellingPrice); exit;
 				}
 					
 				

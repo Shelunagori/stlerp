@@ -96,6 +96,78 @@ class GrnsController extends AppController
         $this->set('_serialize', ['grns']);
     }
 	
+	public function ItemLedgerEntry()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); //pr($st_company_id); exit;
+		$Grns=$this->Grns->find()->contain(['GrnRows']);
+		//pr($Grns->toArray()); exit;
+		/* foreach($Grns as $grn){ 
+			foreach($grn->grn_rows as $grn_row){ //pr($grn); exit;
+				$itemLedger = $this->Grns->ItemLedgers->newEntity();
+				$itemLedger->item_id = $grn_row->item_id;
+				$itemLedger->quantity = $grn_row->quantity;
+				$itemLedger->company_id = $grn->company_id;
+				$itemLedger->source_model = 'Grns';
+				$itemLedger->source_id = $grn->id;
+				$itemLedger->in_out = 'In';
+				$itemLedger->processed_on = $grn->transaction_date;
+				$itemLedger->source_row_id = $grn_row->id;
+				$this->Grns->ItemLedgers->save($itemLedger);
+			}
+		} */
+		
+		foreach($Grns as $grn){ 
+			$NewSerialNumbers=$this->Grns->ItemLedgers->NewSerialNumbers->find()->where(['grn_id'=>$grn->id]);
+			//pr($NewSerialNumbers->toArray()); exit;
+			foreach($NewSerialNumbers as $NewItem){
+				$grn_row=$this->Grns->GrnRows->find()->where(['grn_id'=>$NewItem->grn_id,'item_id'=>$NewItem->item_id])->first();
+				// pr($NewItem->serial_no); exit;
+				$SerialNumber = $this->Grns->ItemLedgers->SerialNumbers->newEntity();
+				$SerialNumber->name = $NewItem->serial_no;
+				$SerialNumber->item_id = $grn_row->item_id;
+				$SerialNumber->status = 'In';
+				$SerialNumber->grn_id = $grn_row->grn_id;
+				$SerialNumber->grn_row_id = $grn_row->id;
+				$SerialNumber->source_model = 'Grns';
+				$SerialNumber->transaction_date = $grn->transaction_date;
+				$SerialNumber->company_id = $grn->company_id; //pr($SerialNumber); exit;
+				//$this->Grns->ItemLedgers->SerialNumbers->save($SerialNumber);
+			}
+		} 
+		
+		echo "done"; exit;
+	}
+	
+	public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$PurchaseOrders=$this->Grns->PurchaseOrders->PurchaseOrderRows->find();
+		//	pr($PurchaseOrders->toArray()); exit;
+		foreach($PurchaseOrders as $PurchaseOrder){
+			$Grns=$this->Grns->find()->contain(['GrnRows'])->where(['Grns.purchase_order_id'=>$PurchaseOrder->purchase_order_id])->toArray();
+			
+			if($Grns){
+				if(sizeof($Grns) > 0){ 
+					foreach($Grns as $Grn){
+						foreach($Grn->grn_rows as $grn_row){ //pr($grn_row); exit;
+							$query = $this->Grns->GrnRows->query();
+							$query->update()
+								->set(['purchase_order_row_id' => $PurchaseOrder->id])
+								->where(['item_id' => $PurchaseOrder->item_id,'grn_id'=>$Grn->id])
+								->execute();
+							}
+					}
+				}
+			}
+		}
+		echo "done"; exit;
+	} 
+	
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');
 		

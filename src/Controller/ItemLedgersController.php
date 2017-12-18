@@ -43,6 +43,46 @@ class ItemLedgersController extends AppController
         $this->set('_serialize', ['itemLedgers']);
     }
 	
+	 public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$this->loadModel('NewItems');
+/* 		$NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Items']);
+		
+		foreach($NewItems as $NewItem){
+			$itemLedger = $this->ItemLedgers->newEntity();
+			$itemLedger->item_id = $NewItem->item_id;
+			$itemLedger->quantity = $NewItem->quantity;
+			$itemLedger->rate = $NewItem->rate;
+			$itemLedger->source_model = 'Items';
+			$itemLedger->source_id = $NewItem->item_id;
+			$itemLedger->in_out = 'In';
+			$itemLedger->company_id = $NewItem->company_id;
+			$itemLedger->processed_on ="2017-04-01";
+			$this->ItemLedgers->save($itemLedger);
+		} */
+		/* $NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Grns']);
+		foreach($NewItems as $NewItem){ pr($NewItem);exit;
+			$itemLedger = $this->ItemLedgers->newEntity();
+			$itemLedger->item_id = $NewItem->item_id;
+			$itemLedger->quantity = $NewItem->quantity;
+			$itemLedger->rate = $NewItem->rate;
+			$itemLedger->source_model = 'Grns';
+			$itemLedger->source_id = $NewItem->item_id;
+			$itemLedger->in_out = 'In';
+			$itemLedger->company_id = $NewItem->company_id;
+			$itemLedger->processed_on =$NewItem->company_id;
+			$this->ItemLedgers->save($itemLedger);
+		} */
+		
+		pr($NewItems->toArray()); exit;
+	
+		 exit;
+	} 
+	
 	public function GetVoucherParty($source_model=null,$source_id=null)
     {
 		
