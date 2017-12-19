@@ -130,10 +130,38 @@ class IvsController extends AppController
     public function add($invoice_id=null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		
+		$financial_year = $this->Ivs->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->Ivs->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->Ivs->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 
+		/////
+		 $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		   $tody1 = date("Y-m-d");
+
+		   $fromdate = strtotime($fromdate1);
+		   $todate = strtotime($todate1); 
+	       $tody = strtotime($tody1);
+
+		  if($fromdate < $tody || $todate > $tody)
+		   {
+			 if($SessionCheckDate['status'] == 'Open')
+			 { $chkdate = 'Found'; }
+			 else
+			 { $chkdate = 'Not Found'; }
+
+		   }
+		   else
+			{
+				$chkdate = 'Not Found';	
+			}
+		/////
 		
 		$Invoice=$this->Ivs->Invoices->get($invoice_id, [
 			'contain' => ['InvoiceRows'=>['Items'=>function($p) use($st_company_id){
@@ -298,7 +326,7 @@ class IvsController extends AppController
 					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
 		}
 		
-        $this->set(compact('iv', 'Invoice', 'ItemsOptions','item_display','invoice_id','job_card_status','jobcardrows'));
+        $this->set(compact('iv', 'Invoice', 'ItemsOptions','item_display','invoice_id','job_card_status','jobcardrows','chkdate','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['iv']);
     }
 
@@ -456,9 +484,37 @@ class IvsController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		
+		$financial_year = $this->Ivs->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->Ivs->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->Ivs->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+
+		/////
+		 $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		   $tody1 = date("Y-m-d");
+
+		   $fromdate = strtotime($fromdate1);
+		   $todate = strtotime($todate1); 
+	       $tody = strtotime($tody1);
+
+		  if($fromdate < $tody || $todate > $tody)
+		   {
+			 if($SessionCheckDate['status'] == 'Open')
+			 { $chkdate = 'Found'; }
+			 else
+			 { $chkdate = 'Not Found'; }
+
+		   }
+		   else
+			{
+				$chkdate = 'Not Found';	
+			}
         $iv = $this->Ivs->get($id, [
             'contain' => ['IvRows'=>['Items'=>['ItemCompanies'],'IvRowItems'=>['Items'=>['ItemCompanies']]],'Invoices'=>['InvoiceRows']]
         ]);
@@ -578,7 +634,7 @@ class IvsController extends AppController
 		foreach($Items as $item){ 
 					$ItemsOptions[]=['value'=>$item->id,'text'=>$item->name,'serial_number_enable'=>@$item->_matchingData['ItemCompanies']->serial_number_enable];
 		}			
-        $this->set(compact('iv', 'invoices', 'ItemsOptions','ItemsOptionss'));
+        $this->set(compact('iv', 'invoices', 'ItemsOptions','ItemsOptionss','chkdate','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['iv']);
     }
 
