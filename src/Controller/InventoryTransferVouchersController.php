@@ -58,6 +58,13 @@ class InventoryTransferVouchersController extends AppController
         $this->set(compact('inventoryTransferVouchers','inventory_transfer_vouchs','url'));
         $this->set('_serialize', ['inventoryTransferVouchers']);
     }
+	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+	}
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');

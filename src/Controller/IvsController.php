@@ -104,6 +104,167 @@ class IvsController extends AppController
       
         $this->set(compact('ivs','url','From','To'));
 	} 
+	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$InventoryVouchers = $this->Ivs->InventoryVouchers->find()->contain(['InventoryVoucherRows'])->toArray();
+		
+		foreach($InventoryVouchers as $InventoryVoucher){
+				$Iv = $this->Ivs->newEntity();
+				$Iv->invoice_id = $InventoryVoucher->invoice_id;
+				$Iv->voucher_no = $InventoryVoucher->iv_number;
+				$Iv->created_by = $InventoryVoucher->created_by;
+				$Iv->transaction_date = $InventoryVoucher->transaction_date;
+				$Iv->narration = $InventoryVoucher->narration;
+				$Iv->company_id = $InventoryVoucher->company_id;
+				$this->Ivs->save($Iv);
+				
+				$iv_row_items=[];
+				foreach($InventoryVoucher->inventory_voucher_rows as $inventory_voucher_row){ 
+					$iv_row_items[$inventory_voucher_row->invoice_id][$inventory_voucher_row->left_item_id]=[$inventory_voucher_row->left_item_id];
+				}
+				
+				foreach($iv_row_items[$inventory_voucher_row->invoice_id] as $key=>$iv_row_item ){ 
+					$InvoiceRow = $this->Ivs->Invoices->InvoiceRows->find()->where(['invoice_id'=>$inventory_voucher_row->invoice_id,'item_id'=>$key])->first();
+					$IvRow = $this->Ivs->IvRows->newEntity();
+					$IvRow->iv_id = $Iv->id;
+					$IvRow->invoice_row_id =$InvoiceRow->id;
+					$IvRow->item_id =$key;
+					$IvRow->quantity =$InvoiceRow->quantity;
+					$this->Ivs->IvRows->save($IvRow);
+					
+					$InventoryVoucherRows = $this->Ivs->InventoryVouchers->InventoryVoucherRows->find()->where(['invoice_id'=>$inventory_voucher_row->invoice_id,'left_item_id'=>$key])->toArray();
+					
+					foreach($InventoryVoucherRows as $InventoryVoucherRow ){ 
+						$IvRowItem = $this->Ivs->IvRows->IvRowItems->newEntity();
+						$IvRowItem->iv_row_id = $IvRow->id;
+						$IvRowItem->item_id =$InventoryVoucherRow->item_id;
+						$IvRowItem->quantity =$InventoryVoucherRow->quantity;
+						$this->Ivs->IvRows->IvRowItems->save($IvRowItem);
+					}
+				}
+		}
+		
+		echo "Done";
+		exit;
+	}
+	
+	public function ItemLedgerEntry()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$Ivs = $this->Ivs->find()->contain(['IvRows'=>['IvRowItems']])->toArray();
+		
+		foreach($Ivs as $iv){   
+			foreach($iv->iv_rows as $iv_row){   
+			
+				/* $InSrNo = $this->Ivs->ItemLedgers->NewSerialNumbers->find()->where(['invoice_id'=>$iv->invoice_id,'q_item_id'=>$iv_row->item_id	])->toArray();
+				 pr($InSrNo); exit;
+					/////For In
+					if(!empty($InSrNo)){
+						
+						$serial_numbers_iv_row = array_filter(@$iv_row->serial_numbers);
+						
+						 if(!empty($serial_numbers_iv_row)){
+							 
+							 foreach($serial_numbers_iv_row as $sr_nos){
+								 
+							$query = $this->Ivs->IvRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id','transaction_date'])
+										->values([
+										'name' => $sr_nos,
+										'item_id' => $iv_row->item_id,
+										'status' => 'In',
+										'iv_row_id' => $iv_row->id,
+										'company_id'=>$st_company_id,
+										'transaction_date'=>$transaction_date
+										]);
+									$query->execute(); 
+							} 
+						} 
+					} */
+					
+					$unit_rate_In=0;$unit_rate=0;
+					
+				 	foreach($iv_row->iv_row_items as $iv_row_item){  
+					
+						$OutSerialNos=$this->Ivs->ItemLedgers->NewSerialNumbers->find()->where(['iv_invoice_id'=>$iv->invoice_id,'q_item_id'=>$iv_row->item_id,'item_id'=>$iv_row_item->item_id])->toArray();
+						
+				
+						//// For Out
+						
+						if(!empty($OutSerialNos)){ 
+						$UnitRateSerialItem1=0;
+						 foreach($OutSerialNos as $OutSerialNo){
+							//
+							
+							$SerialNumberData = $this->Ivs->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$OutSerialNo->item_id,'name'=>$OutSerialNo->serial_no,'status'=>'In','company_id'=>$OutSerialNo->company_id])->first(); 
+							if($SerialNumberData){
+								$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($SerialNumberData->id); 
+								
+								$SerialNumber = $this->Ivs->ItemLedgers->SerialNumbers->newEntity();
+								$SerialNumber->item_id = $SerialNumberData->item_id;
+								$SerialNumber->name = $SerialNumberData->name;
+								$SerialNumber->status = 'Out';
+								$SerialNumber->company_id = $OutSerialNo->company_id;
+								$SerialNumber->parent_id = $SerialNumberData->id;
+								$SerialNumber->iv_row_items = $iv_row_item->id;
+								$SerialNumber->transaction_date =$iv->transaction_date;  
+								$this->Ivs->ItemLedgers->SerialNumbers->save($SerialNumber);
+								$UnitRateSerialItem1+=$UnitRateSerialItem;
+								$unit_rate=$UnitRateSerialItem1;
+							}else{
+								pr($OutSerialNo->serial_no);
+							}
+							}
+							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
+						}else{
+							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
+						}
+							
+						$unit_rate = round($unit_rate,2); //pr($unit_rate); 
+						 $out_rate=$iv_row_item->quantity*$unit_rate;
+						 $unit_rate_In+=$out_rate; 
+						  
+						$itemledgers = $this->Ivs->ItemLedgers->newEntity();
+						$itemledgers->item_id = $iv_row_item->item_id;
+						$itemledgers->quantity=$iv_row_item->quantity;
+						$itemledgers->source_model='Inventory Vouchers';
+						$itemledgers->source_id=$iv->id;
+						$itemledgers->in_out='Out';
+						$itemledgers->rate=$unit_rate;
+						$itemledgers->processed_on=$iv->transaction_date;
+						$itemledgers->company_id=$st_company_id;
+						$itemledgers->iv_row_item_id=$iv_row_item->id; 
+						//$this->Ivs->ItemLedgers->save($itemledgers);				
+					} 
+					
+					$unit_rate_item_in = $unit_rate_In/$iv_row->quantity; 
+					
+					$itemledgersIN = $this->Ivs->ItemLedgers->newEntity();
+						$itemledgersIN->item_id= $iv_row->item_id;
+						$itemledgersIN->quantity= $iv_row->quantity;
+						$itemledgersIN->rate= round($unit_rate_item_in,3);
+						$itemledgersIN->source_model= 'Inventory Vouchers';
+						$itemledgersIN->source_id=$iv->id;
+						$itemledgersIN->in_out='In';
+						$itemledgersIN->processed_on=$iv->transaction_date;
+						$itemledgersIN->company_id=$st_company_id;
+						$itemledgersIN->iv_row_id=$iv_row->id;
+						//$this->Ivs->ItemLedgers->save($itemledgersIN);				
+				}
+		}
+		
+		
+		
+		//pr($Ivs); exit;
+		echo "Done";
+		exit;
+	}
 	 
 	 
     public function view($id = null)

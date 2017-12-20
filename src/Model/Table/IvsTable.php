@@ -43,6 +43,7 @@ class IvsTable extends Table
             'foreignKey' => 'invoice_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('InventoryVouchers');
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('JobCards');
         $this->belongsTo('Companies', [

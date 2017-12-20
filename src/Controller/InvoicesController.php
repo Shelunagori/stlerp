@@ -188,16 +188,16 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
 	}
 	
-	public function ItemLedgerEntry()
+	public function LedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$Invoices=$this->Invoices->find()->contain(['InvoiceRows'])->where(['invoice_type'=>'GST','company_id'=>$st_company_id]);
+		$Invoices=$this->Invoices->find()->contain(['InvoiceRows']);
 		foreach($Invoices as $invoice){
 			//pr($invoice);exit;
-			
-			$c_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Customers','source_id'=>$invoice->customer_id])->first();
+			if($invoice->invoice_type=='GST'){
+			$c_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'Customers','source_id'=>$invoice->customer_id])->first();
 				//$ledger_grand=$invoice->grand_total;
 				//pr($c_LedgerAccount->id);
 				$ledger = $this->Invoices->Ledgers->newEntity();
@@ -208,11 +208,11 @@ class InvoicesController extends AppController
 				$ledger->voucher_source = 'Invoice';
 				$ledger->company_id = $invoice->company_id;
 				$ledger->transaction_date = $invoice->date_created;
-				//$this->Invoices->Ledgers->save($ledger); 
+				$this->Invoices->Ledgers->save($ledger); 
 				
-				foreach($invoice->invoice_rows as $invoice_row){ pr($invoice_row->item_serial_number);
+				foreach($invoice->invoice_rows as $invoice_row){ 
 					if($invoice_row->cgst_amount > 0){
-						$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->cgst_percentage])->first();
+						$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->cgst_percentage])->first();
 						$ledger = $this->Invoices->Ledgers->newEntity();
 						$ledger->ledger_account_id = $cg_LedgerAccount->id;
 						$ledger->credit = $invoice_row->cgst_amount;
@@ -221,10 +221,10 @@ class InvoicesController extends AppController
 						$ledger->voucher_source = 'Invoice';
 						$ledger->company_id = $invoice->company_id;
 						$ledger->transaction_date = $invoice->date_created;
-						//$this->Invoices->Ledgers->save($ledger); 
+						$this->Invoices->Ledgers->save($ledger); 
 					}
 					if($invoice_row->sgst_amount > 0){
-						$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->sgst_percentage])->first();
+						$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->sgst_percentage])->first();
 						$ledger = $this->Invoices->Ledgers->newEntity();
 						$ledger->ledger_account_id = $s_LedgerAccount->id;
 						$ledger->credit = $invoice_row->sgst_amount;
@@ -233,10 +233,10 @@ class InvoicesController extends AppController
 						$ledger->voucher_source = 'Invoice';
 						$ledger->company_id = $invoice->company_id;
 						$ledger->transaction_date = $invoice->date_created;
-						//$this->Invoices->Ledgers->save($ledger); 
+						$this->Invoices->Ledgers->save($ledger); 
 					}
 					if($invoice_row->igst_amount > 0){
-						$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->igst_percentage])->first();  //pr($i_LedgerAccount);exit;
+						$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_row->igst_percentage])->first();  //pr($i_LedgerAccount);exit;
 						$ledger = $this->Invoices->Ledgers->newEntity();
 						$ledger->ledger_account_id = $i_LedgerAccount->id;
 						$ledger->credit = $invoice_row->igst_amount;
@@ -245,7 +245,7 @@ class InvoicesController extends AppController
 						$ledger->voucher_source = 'Invoice';
 						$ledger->company_id = $invoice->company_id;
 						$ledger->transaction_date = $invoice->date_created;
-						//$this->Invoices->Ledgers->save($ledger); 
+						$this->Invoices->Ledgers->save($ledger); 
 					}
 					//pr($invoice->date_created);exit;
 						$itemLedger = $this->Invoices->ItemLedgers->newEntity();
@@ -258,7 +258,7 @@ class InvoicesController extends AppController
 						$itemLedger->company_id = $invoice->company_id;
 						$itemLedger->source_row_id = $invoice_row->id;
 						$itemLedger->processed_on =$invoice->date_created;
-						//$this->Invoices->ItemLedgers->save($itemLedger);
+						$this->Invoices->ItemLedgers->save($itemLedger);
 						
 						
 						
@@ -273,10 +273,10 @@ class InvoicesController extends AppController
 				$ledger->company_id = $invoice->company_id;
 				$ledger->transaction_date = $invoice->date_created;
 				$ledger->voucher_source = 'Invoice';
-				//$this->Invoices->Ledgers->save($ledger); 
+				$this->Invoices->Ledgers->save($ledger); 
 				
 				if($invoice->fright_cgst_amount > 0){ 
-					$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_cgst_percent])->first(); //pr($invoice->fright_cgst_amount);exit;
+					$cg_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_cgst_percent])->first(); //pr($invoice->fright_cgst_amount);exit;
 					$ledger = $this->Invoices->Ledgers->newEntity();
 					$ledger->ledger_account_id = $cg_LedgerAccount->id;
 					$ledger->credit = $invoice->fright_cgst_amount;
@@ -285,10 +285,10 @@ class InvoicesController extends AppController
 					$ledger->voucher_source = 'Invoice';
 					$ledger->company_id = $invoice->company_id;
 					$ledger->transaction_date = $invoice->date_created;
-				//	$this->Invoices->Ledgers->save($ledger); 
+					$this->Invoices->Ledgers->save($ledger); 
 				}
 				if($invoice->fright_sgst_amount > 0){
-					$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_sgst_percent])->first();
+					$s_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_sgst_percent])->first();
 					$ledger = $this->Invoices->Ledgers->newEntity();
 					$ledger->ledger_account_id = $s_LedgerAccount->id;
 					$ledger->credit = $invoice->fright_sgst_amount;
@@ -297,10 +297,10 @@ class InvoicesController extends AppController
 					$ledger->voucher_source = 'Invoice';
 					$ledger->company_id = $invoice->company_id;
 					$ledger->transaction_date = $invoice->date_created;
-					//$this->Invoices->Ledgers->save($ledger); 
+					$this->Invoices->Ledgers->save($ledger); 
 				}
 				if($invoice->fright_igst_amount > 0){
-					$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_igst_percent])->first();
+					$i_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice->fright_igst_percent])->first();
 					$ledger = $this->Invoices->Ledgers->newEntity();
 					$ledger->ledger_account_id = $i_LedgerAccount->id;
 					$ledger->credit = $invoice->fright_igst_amount;
@@ -309,15 +309,206 @@ class InvoicesController extends AppController
 					$ledger->voucher_source = 'Invoice';
 					$ledger->company_id = $invoice->company_id;
 					$ledger->transaction_date = $invoice->date_created;
-				//	$this->Invoices->Ledgers->save($ledger); 
+					$this->Invoices->Ledgers->save($ledger); 
 				}
-			
+			}else{
+				
+				//GET CUSTOMER LEDGER-ACCOUNT-ID
+				$c_LedgerAccount=$this->Invoices->LedgerAccounts->find()->where(['company_id'=>$invoice->company_id,'source_model'=>'Customers','source_id'=>$invoice->customer_id])->first();
+				//pr($invoice->grand_total); exit;
+				$ledger_grand=$invoice->grand_total;
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $c_LedgerAccount->id;
+				$ledger->debit = $invoice->grand_total;
+				$ledger->credit = 0;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->voucher_source = 'Invoice';
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				
+				if($ledger_grand>0)
+				{
+					$this->Invoices->Ledgers->save($ledger); 
+				}
+				
+				//Ledger posting for Account Reference
+				$ledger_pnf=$invoice->total_after_pnf;
+				//$accountReferences=$this->Invoices->AccountReferences->get(1);
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $invoice->sales_ledger_account;
+				$ledger->debit = 0;
+				$ledger->credit = $invoice->total_after_pnf;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				$ledger->voucher_source = 'Invoice';
+				
+				if($ledger_pnf>0)
+				{
+					$this->Invoices->Ledgers->save($ledger); 
+				}
+				
+				//Ledger posting for Sale Tax
+				
+				
+				
+				$ledger_saletax=$invoice->sale_tax_amount;
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $invoice->st_ledger_account_id;
+				$ledger->debit = 0;
+				$ledger->credit = $invoice->sale_tax_amount;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				$ledger->voucher_source = 'Invoice';
+				
+				if($ledger_saletax>0)
+				{
+					$this->Invoices->Ledgers->save($ledger); 
+				}
+				
+				
+				//Ledger posting for Fright Amount
+				
+				$ledger_fright= $invoice->fright_amount;
+				//$accountReferences=$this->Invoices->AccountReferences->get(3);
+				$ledger = $this->Invoices->Ledgers->newEntity();
+				$ledger->ledger_account_id = $invoice->fright_ledger_account;
+				$ledger->debit = 0;
+				$ledger->credit = $invoice->fright_amount;
+				$ledger->voucher_id = $invoice->id;
+				$ledger->company_id = $invoice->company_id;
+				$ledger->transaction_date = $invoice->date_created;
+				$ledger->voucher_source = 'Invoice';
+				
+				if($ledger_fright>0)
+				{
+					$this->Invoices->Ledgers->save($ledger); 
+				}
+				
+				
+			}
 		} 
-		
+		echo "Done";
 		exit;
 	}
 	
-	
+	public function ItemLedgerEntry()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Invoices=$this->Invoices->find()->contain(['InvoiceRows']);
+		foreach($Invoices as $invoice){
+			
+			if($invoice->invoice_type=='GST'){
+				
+				foreach($invoice->invoice_rows as $invoice_row){
+						$itemLedger = $this->Invoices->ItemLedgers->newEntity();
+						$itemLedger->item_id = $invoice_row->item_id;
+						$itemLedger->quantity = $invoice_row->quantity;
+						$itemLedger->source_model = 'Invoices';
+						$itemLedger->source_id = $invoice->id;
+						$itemLedger->in_out = 'Out';
+						$itemLedger->rate = $invoice_row->taxable_value/$invoice_row->quantity;
+						$itemLedger->company_id = $invoice->company_id;
+						$itemLedger->source_row_id = $invoice_row->id;
+						$itemLedger->processed_on = $invoice->date_created;
+						//pr($itemLedger); exit;
+						//$this->Invoices->ItemLedgers->save($itemLedger);
+						
+						
+					@$NewSerialNumbers=$this->Invoices->ItemLedgers->NewSerialNumbers->find()->where(['invoice_id'=>$invoice->id,'item_id'=>$invoice_row->item_id])->toArray();
+					if($NewSerialNumbers){
+						foreach(@$NewSerialNumbers as $NewSerialNumber){
+							$SerialNumberData = $this->Invoices->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$NewSerialNumber->item_id,'name'=>$NewSerialNumber->serial_no,'status'=>'In','company_id'=>$invoice->company_id])->first();
+							
+							
+							//pr($SerialNumberData); exit;
+							$SerialNumber = $this->Invoices->ItemLedgers->SerialNumbers->newEntity();
+							$SerialNumber->item_id = $SerialNumberData->item_id;
+							$SerialNumber->name = $SerialNumberData->name;
+							$SerialNumber->status = 'Out';
+							$SerialNumber->company_id = $NewSerialNumber->company_id;
+							$SerialNumber->parent_id = $SerialNumberData->id;
+							$SerialNumber->invoice_id = $invoice->id;
+							$SerialNumber->invoice_row_id = $invoice_row->id;
+							$SerialNumber->transaction_date =$invoice->date_created; 
+							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
+						}
+					}
+				}
+				
+			}else{
+				$discount=$invoice->discount;
+				$pf=$invoice->pnf;
+				$exciseDuty=$invoice->exceise_duty;
+				$sale_tax=$invoice->sale_tax_amount;
+				$fright=$invoice->fright_amount;
+				//pr($discount); exit;
+				$amt=0;
+				$total_amt=0;
+				foreach($invoice->invoice_rows as $invoice_row){
+					@$NewSerialNumbers=$this->Invoices->ItemLedgers->NewSerialNumbers->find()->where(['invoice_id'=>$invoice->id,'item_id'=>$invoice_row->item_id])->toArray();
+					if($NewSerialNumbers){
+						foreach(@$NewSerialNumbers as $NewSerialNumber){
+							$SerialNumberData = $this->Invoices->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$NewSerialNumber->item_id,'name'=>$NewSerialNumber->serial_no,'status'=>'In','company_id'=>$invoice->company_id])->first(); 
+							
+							$SerialNumber = $this->Invoices->ItemLedgers->SerialNumbers->newEntity();
+							$SerialNumber->item_id = $SerialNumberData->item_id;
+							$SerialNumber->name = $SerialNumberData->name;
+							$SerialNumber->status = 'Out';
+							$SerialNumber->company_id = $NewSerialNumber->company_id;
+							$SerialNumber->parent_id = $SerialNumberData->id;
+							$SerialNumber->invoice_id = $invoice->id;
+							$SerialNumber->invoice_row_id = $invoice_row->id;
+							$SerialNumber->transaction_date =$invoice->date_created;  
+							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
+						}
+					}
+					
+					$amt=$invoice_row->amount;
+					$total_amt=$total_amt+$amt;
+				}
+				
+				foreach($invoice->invoice_rows as $invoice_row){ 
+						$item_id=$invoice_row->item_id;
+						$qty=$invoice_row->quantity;
+						$rate=$invoice_row->rate;
+						$amount=$invoice_row->amount;
+						$item_id=$invoice_row->item_id;
+						
+						$dis=$discount*$amount/$total_amt;
+						$item_discount=$dis/$qty;
+						$pnf=$pf*$amount/$total_amt;
+						$item_pf=$pnf/$qty;
+						$excise=$exciseDuty*$amount/$total_amt;
+						$item_excise=$excise/$qty;
+						$saletax=$sale_tax*$amount/$total_amt;
+						$item_saletax=$saletax/$qty;
+						$fr_amount=$fright*$amount/$total_amt;
+						$item_fright=$fr_amount/$qty;
+						
+						
+						//Insert in Item Ledger//
+						$itemLedger = $this->Invoices->ItemLedgers->newEntity();
+						$itemLedger->item_id = $item_id;
+						$itemLedger->quantity = $qty;
+						$itemLedger->source_model = 'Invoices';
+						$itemLedger->source_id = $invoice->id;
+						$itemLedger->in_out = 'Out';
+						$itemLedger->rate = $rate-$item_discount+$item_excise+$item_pf;
+						$itemLedger->company_id = $invoice->company_id;
+						$itemLedger->processed_on = $invoice->date_created;
+						$itemLedger->source_row_id = $invoice_row->id;
+						//$this->Invoices->ItemLedgers->save($itemLedger);
+				}
+			}
+		}
+		echo "Done";
+		exit;
+	}
  	
 	public function DataMigrate()
     {
@@ -592,22 +783,7 @@ class InvoicesController extends AppController
 		$sales_order_id=@(int)$this->request->query('sales-order'); 
 		$sales_order=array(); $process_status='New';
 		if(!empty($sales_order_id)){
-			/* $sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
-				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) 
-						{
-						   return $q
-								->contain(['SerialNumbers'=>function($q) use($st_company_id){
-									return $q->where(['SerialNumbers.status' => 'In','SerialNumbers.company_id' => $st_company_id]); 
-								},
-								'ItemCompanies'=>function($q) use($st_company_id){
-									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
-								}]);
-						},'SalesOrderRows.SaleTaxes','Companies','Customers','Employees'
-					]
-			]);
-			 */
 			
-			//$SalesOrderRows = $this->Invoices->SalesOrders->SalesOrderRows->find();
 				$sales_order = $this->Invoices->SalesOrders->get($sales_order_id,[
 				'contain' => ['SalesOrderRows.Items' => function ($q) use($st_company_id) 
 						{

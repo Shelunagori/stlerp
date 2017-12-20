@@ -78,7 +78,19 @@ class ItemLedgersController extends AppController
 			$this->ItemLedgers->save($itemLedger);
 		} */
 		
-		pr($NewItems->toArray()); exit;
+		@$NewSerialNumbers=$this->ItemLedgers->NewSerialNumbers->find()->where(['NewSerialNumbers.master_item_id > '=>0]);;
+		
+		//pr($NewSerialNumbers->toArray()); exit;
+		foreach($NewSerialNumbers as $NewSerialNumber){ 
+			$SerialNumber = $this->ItemLedgers->SerialNumbers->newEntity();
+			$SerialNumber->item_id = $NewSerialNumber->item_id;
+			$SerialNumber->name = $NewSerialNumber->serial_no;
+			$SerialNumber->status = 'In';
+			$SerialNumber->is_opening_balance = 'Yes';
+			$SerialNumber->company_id = $NewSerialNumber->company_id;
+			$SerialNumber->transaction_date ='2017-04-01';
+			$this->ItemLedgers->SerialNumbers->save($SerialNumber);
+		}
 	
 		 exit;
 	} 
