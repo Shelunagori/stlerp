@@ -424,7 +424,7 @@ class InvoicesController extends AppController
 						foreach(@$NewSerialNumbers as $NewSerialNumber){
 							$SerialNumberData = $this->Invoices->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$NewSerialNumber->item_id,'name'=>$NewSerialNumber->serial_no,'status'=>'In','company_id'=>$invoice->company_id])->first();
 							
-							
+							if($SerialNumberData){
 							//pr($SerialNumberData); exit;
 							$SerialNumber = $this->Invoices->ItemLedgers->SerialNumbers->newEntity();
 							$SerialNumber->item_id = $SerialNumberData->item_id;
@@ -436,6 +436,9 @@ class InvoicesController extends AppController
 							$SerialNumber->invoice_row_id = $invoice_row->id;
 							$SerialNumber->transaction_date =$invoice->date_created; 
 							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
+							}else{
+								pr($NewSerialNumber->serial_no); exit;
+							}
 						}
 					}
 				}
@@ -454,7 +457,7 @@ class InvoicesController extends AppController
 					if($NewSerialNumbers){
 						foreach(@$NewSerialNumbers as $NewSerialNumber){
 							$SerialNumberData = $this->Invoices->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$NewSerialNumber->item_id,'name'=>$NewSerialNumber->serial_no,'status'=>'In','company_id'=>$invoice->company_id])->first(); 
-							
+							if($SerialNumberData){
 							$SerialNumber = $this->Invoices->ItemLedgers->SerialNumbers->newEntity();
 							$SerialNumber->item_id = $SerialNumberData->item_id;
 							$SerialNumber->name = $SerialNumberData->name;
@@ -465,6 +468,9 @@ class InvoicesController extends AppController
 							$SerialNumber->invoice_row_id = $invoice_row->id;
 							$SerialNumber->transaction_date =$invoice->date_created;  
 							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
+							}else{
+								pr($NewSerialNumber->serial_no); exit;
+							}
 						}
 					}
 					
