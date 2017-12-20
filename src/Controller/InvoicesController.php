@@ -416,7 +416,7 @@ class InvoicesController extends AppController
 						$itemLedger->source_row_id = $invoice_row->id;
 						$itemLedger->processed_on = $invoice->date_created;
 						//pr($itemLedger); exit;
-						//$this->Invoices->ItemLedgers->save($itemLedger);
+						$this->Invoices->ItemLedgers->save($itemLedger);
 						
 						
 					@$NewSerialNumbers=$this->Invoices->ItemLedgers->NewSerialNumbers->find()->where(['invoice_id'=>$invoice->id,'item_id'=>$invoice_row->item_id])->toArray();
@@ -502,7 +502,7 @@ class InvoicesController extends AppController
 						$itemLedger->company_id = $invoice->company_id;
 						$itemLedger->processed_on = $invoice->date_created;
 						$itemLedger->source_row_id = $invoice_row->id;
-						//$this->Invoices->ItemLedgers->save($itemLedger);
+						$this->Invoices->ItemLedgers->save($itemLedger);
 				}
 			}
 		}
