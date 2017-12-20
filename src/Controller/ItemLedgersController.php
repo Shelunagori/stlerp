@@ -50,7 +50,7 @@ class ItemLedgersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		$this->loadModel('NewItems');
-/* 		$NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Items']);
+		$NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Items']);
 		
 		foreach($NewItems as $NewItem){
 			$itemLedger = $this->ItemLedgers->newEntity();
@@ -63,7 +63,7 @@ class ItemLedgersController extends AppController
 			$itemLedger->company_id = $NewItem->company_id;
 			$itemLedger->processed_on ="2017-04-01";
 			$this->ItemLedgers->save($itemLedger);
-		} */
+		}
 		/* $NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Grns']);
 		foreach($NewItems as $NewItem){ pr($NewItem);exit;
 			$itemLedger = $this->ItemLedgers->newEntity();
@@ -78,7 +78,7 @@ class ItemLedgersController extends AppController
 			$this->ItemLedgers->save($itemLedger);
 		} */
 		
-		@$NewSerialNumbers=$this->ItemLedgers->NewSerialNumbers->find()->where(['NewSerialNumbers.master_item_id > '=>0]);;
+		@$NewSerialNumbers=$this->ItemLedgers->NewSerialNumbers->find()->where(['NewSerialNumbers.master_item_id > '=>0]);
 		
 		//pr($NewSerialNumbers->toArray()); exit;
 		foreach($NewSerialNumbers as $NewSerialNumber){ 
@@ -91,7 +91,7 @@ class ItemLedgersController extends AppController
 			$SerialNumber->transaction_date ='2017-04-01';
 			$this->ItemLedgers->SerialNumbers->save($SerialNumber);
 		}
-	
+	echo "done"; exit;
 		 exit;
 	} 
 	

@@ -204,8 +204,8 @@ class IvsController extends AppController
 							
 							$SerialNumberData = $this->Ivs->ItemLedgers->SerialNumbers->find()->where(['item_id'=>$OutSerialNo->item_id,'name'=>$OutSerialNo->serial_no,'status'=>'In','company_id'=>$OutSerialNo->company_id])->first(); 
 							if($SerialNumberData){
-								$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($SerialNumberData->id); 
-								
+								//$UnitRateSerialItem = $this->weightedAvgCostForSerialWise($SerialNumberData->id); 
+								$UnitRateSerialItem=0;
 								$SerialNumber = $this->Ivs->ItemLedgers->SerialNumbers->newEntity();
 								$SerialNumber->item_id = $SerialNumberData->item_id;
 								$SerialNumber->name = $SerialNumberData->name;
@@ -223,7 +223,7 @@ class IvsController extends AppController
 							}
 							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
-							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
+							//$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
 						}
 							
 						$unit_rate = round($unit_rate,2); //pr($unit_rate); 
@@ -240,7 +240,7 @@ class IvsController extends AppController
 						$itemledgers->processed_on=$iv->transaction_date;
 						$itemledgers->company_id=$st_company_id;
 						$itemledgers->iv_row_item_id=$iv_row_item->id; 
-						//$this->Ivs->ItemLedgers->save($itemledgers);				
+						$this->Ivs->ItemLedgers->save($itemledgers);				
 					} 
 					
 					$unit_rate_item_in = $unit_rate_In/$iv_row->quantity; 
@@ -255,7 +255,7 @@ class IvsController extends AppController
 						$itemledgersIN->processed_on=$iv->transaction_date;
 						$itemledgersIN->company_id=$st_company_id;
 						$itemledgersIN->iv_row_id=$iv_row->id;
-						//$this->Ivs->ItemLedgers->save($itemledgersIN);				
+						$this->Ivs->ItemLedgers->save($itemledgersIN);				
 				}
 		}
 		

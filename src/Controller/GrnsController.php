@@ -103,7 +103,7 @@ class GrnsController extends AppController
 		$st_company_id = $session->read('st_company_id'); //pr($st_company_id); exit;
 		$Grns=$this->Grns->find()->contain(['GrnRows']);
 		//pr($Grns->toArray()); exit;
-		/* foreach($Grns as $grn){ 
+		foreach($Grns as $grn){ 
 			foreach($grn->grn_rows as $grn_row){ //pr($grn); exit;
 				$itemLedger = $this->Grns->ItemLedgers->newEntity();
 				$itemLedger->item_id = $grn_row->item_id;
@@ -116,14 +116,12 @@ class GrnsController extends AppController
 				$itemLedger->source_row_id = $grn_row->id;
 				$this->Grns->ItemLedgers->save($itemLedger);
 			}
-		} */
+		}
 		
 		foreach($Grns as $grn){ 
 			$NewSerialNumbers=$this->Grns->ItemLedgers->NewSerialNumbers->find()->where(['grn_id'=>$grn->id]);
-			//pr($NewSerialNumbers->toArray()); exit;
 			foreach($NewSerialNumbers as $NewItem){
 				$grn_row=$this->Grns->GrnRows->find()->where(['grn_id'=>$NewItem->grn_id,'item_id'=>$NewItem->item_id])->first();
-				// pr($NewItem->serial_no); exit;
 				$SerialNumber = $this->Grns->ItemLedgers->SerialNumbers->newEntity();
 				$SerialNumber->name = $NewItem->serial_no;
 				$SerialNumber->item_id = $grn_row->item_id;
@@ -132,8 +130,8 @@ class GrnsController extends AppController
 				$SerialNumber->grn_row_id = $grn_row->id;
 				$SerialNumber->source_model = 'Grns';
 				$SerialNumber->transaction_date = $grn->transaction_date;
-				$SerialNumber->company_id = $grn->company_id; //pr($SerialNumber); exit;
-				//$this->Grns->ItemLedgers->SerialNumbers->save($SerialNumber);
+				$SerialNumber->company_id = $grn->company_id;
+				$this->Grns->ItemLedgers->SerialNumbers->save($SerialNumber);
 			}
 		} 
 		
