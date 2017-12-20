@@ -44,6 +44,8 @@ class IvsTable extends Table
             'joinType' => 'INNER'
         ]);
 		$this->belongsTo('InventoryVouchers');
+		$this->belongsTo('FinancialYears');
+		$this->belongsTo('FinancialMonths');
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('JobCards');
         $this->belongsTo('Companies', [
