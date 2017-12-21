@@ -130,6 +130,81 @@ class ReceiptsController extends AppController
         $this->set(compact('receipts','url','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['receipts']);
     }
+	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$Receipts = $this->Receipts->find()->contain(['ReceiptRows'])->toArray();
+		
+		foreach($Receipts as $Receipt){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($Receipt->receipt_rows as $receipt_row){
+					$OldReferenceDetails = $this->Receipts->ReferenceDetails->OldReferenceDetails->find()->where(['receipt_id'=>$Receipt->id,'ledger_account_id'=>$receipt_row->received_from_id])->toArray();
+					 
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ 
+							$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$Receipt->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->receipt_id = $Receipt->id;
+							$ReferenceDetail->receipt_row_id = $receipt_row->id;
+							$ReferenceDetail->transaction_date = $Receipt->transaction_date; 
+							$this->Receipts->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->Receipts->Ledgers->newEntity();
+					$ledger->company_id=$Receipt->company_id;
+					$ledger->ledger_account_id = $receipt_row->received_from_id;
+					if($receipt_row->cr_dr=="Cr"){
+					$ledger->credit = $receipt_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$receipt_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $receipt_row->amount;
+					$total_dr=$total_dr+$receipt_row->amount;
+					}
+					$ledger->voucher_id = $Receipt->id;
+					$ledger->voucher_source = 'Receipt Voucher';
+					$ledger->transaction_date = $Receipt->transaction_date; 
+					$this->Receipts->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+				$bankAmt=$total_dr-$total_cr;
+				$ledger = $this->Receipts->Ledgers->newEntity();
+				$ledger->company_id=$Receipt->company_id;
+				$ledger->ledger_account_id = $Receipt->bank_cash_id;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
+				$ledger->voucher_id = $Receipt->id;
+				$ledger->voucher_source = 'Receipt Voucher';
+				$ledger->transaction_date = $Receipt->transaction_date; //pr($ledger); exit;
+				if($bankAmt != 0){
+					$this->Receipts->Ledgers->save($ledger);
+				}
+			
+			
+		}
+		
+		echo "Done";
+		exit;
+	}
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');

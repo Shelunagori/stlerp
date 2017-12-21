@@ -97,6 +97,7 @@ class InvoiceBookingsTable extends Table
         ]);
 		
 		$this->belongsTo('Ivs');
+		$this->belongsTo('OldReferenceDetails');
     }
 
     /**

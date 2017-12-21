@@ -393,6 +393,37 @@ class InvoicesController extends AppController
 		exit;
 	}
 	
+	public function OldRefBal()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Invoices=$this->Invoices->find()->toArray();
+		foreach($Invoices as $Invoice){ 
+			$old_datas=$this->Invoices->OldReferenceDetails->find()->where(['invoice_id'=>$Invoice->id])->toArray();
+			
+			if($old_datas){
+				foreach($old_datas as $old_data){
+					$ReferenceDetail = $this->Invoices->ReferenceDetails->newEntity();
+					$ReferenceDetail->company_id=$Invoice->company_id;
+					$ReferenceDetail->invoice_id=$old_data->invoice_id;
+					$ReferenceDetail->reference_no=$old_data->reference_no;
+					$ReferenceDetail->ledger_account_id = $old_data->ledger_account_id;
+					$ReferenceDetail->credit = $old_data->credit;
+					$ReferenceDetail->debit = $old_data->debit;
+					$ReferenceDetail->transaction_date =$Invoice->date_created;  
+					$this->Invoices->ReferenceDetails->save($ReferenceDetail);
+				}
+			}
+			
+		}
+		
+		
+		echo "Done";
+		exit;
+	}
+	
 	public function ItemLedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -437,7 +468,7 @@ class InvoicesController extends AppController
 							$SerialNumber->transaction_date =$invoice->date_created; 
 							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
 							}else{
-								pr($NewSerialNumber->serial_no); exit;
+								pr($NewSerialNumber->serial_no);
 							}
 						}
 					}
@@ -469,7 +500,7 @@ class InvoicesController extends AppController
 							$SerialNumber->transaction_date =$invoice->date_created;  
 							$this->Invoices->ItemLedgers->SerialNumbers->save($SerialNumber);
 							}else{
-								pr($NewSerialNumber->serial_no); exit;
+								pr($NewSerialNumber->serial_no); 
 							}
 						}
 					}

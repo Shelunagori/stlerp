@@ -91,7 +91,7 @@ class ItemLedgersController extends AppController
 			$SerialNumber->transaction_date ='2017-04-01';
 			$this->ItemLedgers->SerialNumbers->save($SerialNumber);
 		}
-	echo "done"; exit;
+		echo "done"; exit;
 		 exit;
 	} 
 	

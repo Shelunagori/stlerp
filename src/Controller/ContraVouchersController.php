@@ -85,6 +85,82 @@ class ContraVouchersController extends AppController
         $this->set('_serialize', ['contravouchers']);
     }
 	
+	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$ContraVouchers = $this->ContraVouchers->find()->contain(['ContraVoucherRows'])->toArray();
+		
+		foreach($ContraVouchers as $ContraVoucher){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($ContraVoucher->contra_voucher_rows as $contra_voucher_row){ 
+					$OldReferenceDetails = $this->ContraVouchers->ReferenceDetails->OldReferenceDetails->find()->where(['contra_voucher_id'=>$ContraVoucher->id,'ledger_account_id'=>$contra_voucher_row->received_from_id])->toArray();
+					//pr($OldReferenceDetails); exit;
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ //pr($old_data); exit;
+							$ReferenceDetail = $this->ContraVouchers->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$ContraVoucher->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->contra_voucher_id = $ContraVoucher->id;
+							$ReferenceDetail->contra_voucher_row_id = $contra_voucher_row->id;
+							$ReferenceDetail->transaction_date = $ContraVoucher->transaction_date; 
+							$this->ContraVouchers->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->ContraVouchers->Ledgers->newEntity();
+					$ledger->company_id=$ContraVoucher->company_id;
+					$ledger->ledger_account_id = $contra_voucher_row->received_from_id;
+					if($contra_voucher_row->cr_dr=="Cr"){
+					$ledger->credit = $contra_voucher_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$contra_voucher_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $contra_voucher_row->amount;
+					$total_dr=$total_dr+$contra_voucher_row->amount;
+					}
+					$ledger->voucher_id = $ContraVoucher->id;
+					$ledger->voucher_source = 'Contra Voucher';
+					$ledger->transaction_date = $ContraVoucher->transaction_date; 
+					$this->ContraVouchers->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+				$bankAmt=$total_dr-$total_cr;
+				$ledger = $this->ContraVouchers->Ledgers->newEntity();
+				$ledger->company_id=$ContraVoucher->company_id;
+				$ledger->ledger_account_id = $ContraVoucher->bank_cash_id;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
+				$ledger->voucher_id = $ContraVoucher->id;
+				$ledger->voucher_source = 'Contra Voucher';
+				$ledger->transaction_date = $ContraVoucher->transaction_date; 
+				if($bankAmt != 0){
+					$this->ContraVouchers->Ledgers->save($ledger);
+				}
+			
+			
+		}
+		
+		echo "Done";
+		exit;
+	}
+	
 	public function exportExcell(){
 		$this->viewBuilder()->layout('');
         

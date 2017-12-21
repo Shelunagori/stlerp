@@ -62,6 +62,63 @@ class JournalVouchersController extends AppController
 		$this->set('_serialize', ['journalVouchers']);
     }
 	
+	
+		public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$JournalVouchers = $this->JournalVouchers->find()->contain(['JournalVoucherRows'])->toArray();
+		//pr($JournalVouchers); exit;
+		foreach($JournalVouchers as $JournalVoucher){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($JournalVoucher->journal_voucher_rows as $journal_voucher_row){ 
+					$OldReferenceDetails = $this->JournalVouchers->ReferenceDetails->OldReferenceDetails->find()->where(['journal_voucher_id'=>$JournalVoucher->id,'ledger_account_id'=>$journal_voucher_row->received_from_id])->toArray();
+					//pr($OldReferenceDetails); exit;
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ //pr($old_data); exit;
+							$ReferenceDetail = $this->JournalVouchers->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$JournalVoucher->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->journal_voucher_id = $JournalVoucher->id;
+							$ReferenceDetail->journal_voucher_row_id = $journal_voucher_row->id;
+							$ReferenceDetail->transaction_date = $JournalVoucher->transaction_date; 
+							$this->JournalVouchers->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->JournalVouchers->Ledgers->newEntity();
+					$ledger->company_id=$JournalVoucher->company_id;
+					$ledger->ledger_account_id = $journal_voucher_row->received_from_id;
+					if($journal_voucher_row->cr_dr=="Cr"){
+					$ledger->credit = $journal_voucher_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$journal_voucher_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $journal_voucher_row->amount;
+					$total_dr=$total_dr+$journal_voucher_row->amount;
+					}
+					$ledger->voucher_id = $JournalVoucher->id;
+					$ledger->voucher_source = 'Journal Voucher';
+					$ledger->transaction_date = $JournalVoucher->transaction_date; 
+					$this->JournalVouchers->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+		}
+		
+		echo "Done";
+		exit;
+	}
+	
+	
 	public function exportExcell(){
 		$this->viewBuilder()->layout('');
 		$this->paginate = [

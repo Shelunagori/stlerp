@@ -84,6 +84,81 @@ class NppaymentsController extends AppController
         $this->set('_serialize', ['nppayments']);
     }
 	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$Nppayments = $this->Nppayments->find()->contain(['NppaymentRows'])->toArray();
+		
+		foreach($Nppayments as $Nppayment){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($Nppayment->nppayment_rows as $nppayment_row){ //pr($nppayment_row); exit;
+					$OldReferenceDetails = $this->Nppayments->ReferenceDetails->OldReferenceDetails->find()->where(['nppayment_id'=>$Nppayment->id,'ledger_account_id'=>$nppayment_row->received_from_id])->toArray();
+					
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ //pr($old_data); exit;
+							$ReferenceDetail = $this->Nppayments->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$Nppayment->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->nppayment_id = $Nppayment->id;
+							$ReferenceDetail->nppayment_row_id = $nppayment_row->id;
+							$ReferenceDetail->transaction_date = $Nppayment->transaction_date; 
+							$this->Nppayments->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->Nppayments->Ledgers->newEntity();
+					$ledger->company_id=$Nppayment->company_id;
+					$ledger->ledger_account_id = $nppayment_row->received_from_id;
+					if($nppayment_row->cr_dr=="Cr"){
+					$ledger->credit = $nppayment_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$nppayment_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $nppayment_row->amount;
+					$total_dr=$total_dr+$nppayment_row->amount;
+					}
+					$ledger->voucher_id = $Nppayment->id;
+					$ledger->voucher_source = 'Non Print Payment Voucher';
+					$ledger->transaction_date = $Nppayment->transaction_date;
+					$this->Nppayments->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+				$bankAmt=$total_dr-$total_cr;
+				$ledger = $this->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$Nppayment->company_id;
+				$ledger->ledger_account_id = $Nppayment->bank_cash_id;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
+				$ledger->voucher_id = $Nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $Nppayment->transaction_date; //pr($ledger); exit;
+				if($bankAmt != 0){
+					$this->Nppayments->Ledgers->save($ledger);
+				}
+			
+			
+		}
+		
+		echo "Done";
+		exit;
+	}
+	
 	public function exportExcel(){
 		
 		$this->viewBuilder()->layout('');
