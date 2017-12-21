@@ -136,6 +136,7 @@ class InvoiceBookingsController extends AppController
 					$ReferenceDetail->company_id=$InvoiceBooking->company_id;
 					$ReferenceDetail->invoice_booking_id=$old_data->invoice_booking_id;
 					$ReferenceDetail->reference_no=$old_data->reference_no;
+					$ReferenceDetail->reference_type=$old_data->reference_type;
 					$ReferenceDetail->ledger_account_id = $old_data->ledger_account_id;
 					$ReferenceDetail->credit = $old_data->credit;
 					$ReferenceDetail->debit = $old_data->debit;
