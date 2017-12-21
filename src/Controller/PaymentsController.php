@@ -85,6 +85,81 @@ class PaymentsController extends AppController
         $this->set(compact('payments','url','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['payments']);
     }
+	
+	
+	public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$Payments = $this->Payments->find()->contain(['PaymentRows'])->toArray();
+		//pr($Payments); exit;
+		foreach($Payments as $payment){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($payment->payment_rows as $payment_row){
+					$OldReferenceDetails = $this->Payments->ReferenceDetails->OldReferenceDetails->find()->where(['payment_id'=>$payment->id,'ledger_account_id'=>$payment_row->received_from_id])->toArray();
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ //pr($old_data); exit;
+							$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$payment->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->payment_id = $payment->id;
+							$ReferenceDetail->payment_row_id = $payment_row->id;
+							$ReferenceDetail->transaction_date = $payment->transaction_date; //pr($ReferenceDetail); exit;
+							$this->Payments->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->Payments->Ledgers->newEntity();
+					$ledger->company_id=$payment->company_id;
+					$ledger->ledger_account_id = $payment_row->received_from_id;
+					if($payment_row->cr_dr=="Cr"){
+					$ledger->credit = $payment_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$payment_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $payment_row->amount;
+					$total_dr=$total_dr+$payment_row->amount;
+					}
+					$ledger->voucher_id = $payment->id;
+					$ledger->voucher_source = 'Payment Voucher';
+					$ledger->transaction_date = $payment->transaction_date; //pr($total_cr);pr($total_dr); exit;
+					$this->Payments->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+				$bankAmt=$total_dr-$total_cr;
+				$ledger = $this->Payments->Ledgers->newEntity();
+				$ledger->company_id=$payment->company_id;
+				$ledger->ledger_account_id = $payment->bank_cash_id;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
+				$ledger->voucher_id = $payment->id;
+				$ledger->voucher_source = 'Payment Voucher';
+				$ledger->transaction_date = $payment->transaction_date; //pr($ledger); exit;
+				if($bankAmt != 0){
+					$this->Payments->Ledgers->save($ledger);
+				}
+			
+			
+		}
+		
+		echo "Done";
+		exit;
+	}
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');

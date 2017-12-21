@@ -99,6 +99,31 @@ class LedgersController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
 	 
+	 public function DataMigrate()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$OpeningBalances = $this->Ledgers->OpeningBalances->find()->where(['voucher_source'=>'Opening Balance'])->toArray();
+		//pr($OpeningBalances); exit;
+		$i=0;
+		foreach($OpeningBalances as $OpeningBalance){ $i++;
+			$ledger = $this->Ledgers->newEntity();
+			$ledger->ledger_account_id = $OpeningBalance->ledger_account_id;
+			$ledger->credit = $OpeningBalance->credit;
+			$ledger->debit = $OpeningBalance->debit;
+			$ledger->voucher_id = 0;
+			$ledger->voucher_source = 'Opening Balance';
+			$ledger->company_id = $OpeningBalance->company_id;
+			$ledger->transaction_date = $OpeningBalance->transaction_date;
+			$this->Ledgers->save($ledger); 
+		}
+		
+		echo $i; 
+		echo "done"; 
+		 exit;
+	}
+	 
 	 public function exportOb()
     {
 		$this->viewBuilder()->layout('');
@@ -1371,7 +1396,6 @@ class LedgersController extends AppController
 		}
 		
 		$GrossProfit= $this->GrossProfit($from_date,$to_date);
-		$closingValue= $this->StockValuation();
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		

@@ -99,11 +99,11 @@ class InvoiceBookingsController extends AppController
 				if(sizeof($InvoiceBookings) > 0){ 
 					foreach($InvoiceBookings as $InvoiceBooking){
 						foreach($InvoiceBooking->invoice_booking_rows as $invoice_booking_row){
-							/*$query = $this->InvoiceBookings->InvoiceBookingRows->query();
+							$query = $this->InvoiceBookings->InvoiceBookingRows->query();
 							 $query->update()
 								->set(['grn_row_id' => $Grn->id])
 								->where(['item_id' => $Grn->item_id,'invoice_booking_id'=>$InvoiceBooking->id])
-								->execute(); */
+								->execute();
 							
 							$query1 = $this->InvoiceBookings->ItemLedgers->query();
 							$query1->update()
@@ -118,6 +118,37 @@ class InvoiceBookingsController extends AppController
 		}
 		
 	echo "done"; exit;
+	}
+	
+	public function OldRefBal()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$InvoiceBookings=$this->InvoiceBookings->find()->toArray();
+		foreach($InvoiceBookings as $InvoiceBooking){ 
+			$old_datas=$this->InvoiceBookings->OldReferenceDetails->find()->where(['invoice_booking_id'=>$InvoiceBooking->id])->toArray();
+			
+			if($old_datas){
+				foreach($old_datas as $old_data){
+					$ReferenceDetail = $this->InvoiceBookings->ReferenceDetails->newEntity();
+					$ReferenceDetail->company_id=$InvoiceBooking->company_id;
+					$ReferenceDetail->invoice_booking_id=$old_data->invoice_booking_id;
+					$ReferenceDetail->reference_no=$old_data->reference_no;
+					$ReferenceDetail->ledger_account_id = $old_data->ledger_account_id;
+					$ReferenceDetail->credit = $old_data->credit;
+					$ReferenceDetail->debit = $old_data->debit;
+					$ReferenceDetail->transaction_date =$InvoiceBooking->created_on;  
+					$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
+				}
+			}
+			
+		}
+		
+		
+		echo "Done";
+		exit;
 	}
 	
 	public function LedgerEntry()
@@ -227,8 +258,8 @@ class InvoiceBookingsController extends AppController
 				$ledger->voucher_source = 'Invoice Booking';
 				$this->InvoiceBookings->Ledgers->save($ledger);
 				
-			}else if($invoiceBooking->gst=='yes'){   $i++; $invoice_other_charges=0;
-				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){  $j++;
+			}else if($invoiceBooking->gst=='yes'){    $invoice_other_charges=0;
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){  
 					if($invoice_booking_row->cgst > 0){
 						$cg_LedgerAccount=$this->InvoiceBookings->LedgerAccounts->find()->where(['company_id'=>$invoiceBooking->company_id,'source_model'=>'SaleTaxes','source_id'=>$invoice_booking_row->cgst_per])->first(); 
 						$ledger = $this->InvoiceBookings->Ledgers->newEntity();
@@ -320,8 +351,7 @@ class InvoiceBookingsController extends AppController
 			
 		}
 		
-		echo $i; echo "<br>";
-		echo $j; echo "<br>";
+		
 		echo "done"; exit;
 	}
 	

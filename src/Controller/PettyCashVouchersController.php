@@ -59,6 +59,81 @@ class PettyCashVouchersController extends AppController
         $this->set(compact('pettycashvouchers','url','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['pettycashvouchers']);
     }
+	
+		public function DataMigrate()
+	{
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id'); 
+		$PettyCashVouchers = $this->PettyCashVouchers->find()->contain(['PettyCashVoucherRows'])->toArray();
+		//pr($PettyCashVouchers); exit;
+		foreach($PettyCashVouchers as $PettyCashVoucher){
+			$total_dr=0;
+			$total_cr=0;
+			$bankAmt=0;
+				foreach($PettyCashVoucher->petty_cash_voucher_rows as $petty_cash_voucher_row){ 
+					$OldReferenceDetails = $this->PettyCashVouchers->ReferenceDetails->OldReferenceDetails->find()->where(['petty_cash_voucher_id'=>$PettyCashVoucher->id,'ledger_account_id'=>$petty_cash_voucher_row->received_from_id])->toArray();
+					
+					if($OldReferenceDetails){
+						foreach($OldReferenceDetails as $old_data){ //pr($old_data); exit;
+							$ReferenceDetail = $this->PettyCashVouchers->ReferenceDetails->newEntity();
+							$ReferenceDetail->company_id=$PettyCashVoucher->company_id;
+							$ReferenceDetail->ledger_account_id=$old_data->ledger_account_id;
+							$ReferenceDetail->reference_type=$old_data->reference_type;
+							$ReferenceDetail->reference_no=$old_data->reference_no;
+							$ReferenceDetail->debit = $old_data->debit;
+							$ReferenceDetail->credit = $old_data->credit;
+							$ReferenceDetail->petty_cash_voucher_id = $PettyCashVoucher->id;
+							$ReferenceDetail->petty_cash_voucher_row_id = $petty_cash_voucher_row->id;
+							$ReferenceDetail->transaction_date = $PettyCashVoucher->transaction_date; 
+							$this->PettyCashVouchers->ReferenceDetails->save($ReferenceDetail);
+							}
+						
+					}
+					
+					$ledger = $this->PettyCashVouchers->Ledgers->newEntity();
+					$ledger->company_id=$PettyCashVoucher->company_id;
+					$ledger->ledger_account_id = $petty_cash_voucher_row->received_from_id;
+					if($petty_cash_voucher_row->cr_dr=="Cr"){
+					$ledger->credit = $petty_cash_voucher_row->amount;
+					$ledger->debit = 0;
+					$total_cr=$total_cr+$petty_cash_voucher_row->amount;
+					}else{
+					$ledger->credit = 0;
+					$ledger->debit = $petty_cash_voucher_row->amount;
+					$total_dr=$total_dr+$petty_cash_voucher_row->amount;
+					}
+					$ledger->voucher_id = $PettyCashVoucher->id;
+					$ledger->voucher_source = 'Petty Cash Payment Voucher';
+					$ledger->transaction_date = $PettyCashVoucher->transaction_date; 
+					$this->PettyCashVouchers->Ledgers->save($ledger);
+				//pr($payment_row); exit;
+				}
+				$bankAmt=$total_dr-$total_cr;
+				$ledger = $this->PettyCashVouchers->Ledgers->newEntity();
+				$ledger->company_id=$PettyCashVoucher->company_id;
+				$ledger->ledger_account_id = $PettyCashVoucher->bank_cash_id;
+				if($bankAmt > 0){
+					$ledger->credit = $bankAmt;
+					$ledger->debit = 0;
+				}else{
+					$ledger->debit = abs($bankAmt);
+					$ledger->credit = 0;
+				}
+				
+				$ledger->voucher_id = $PettyCashVoucher->id;
+				$ledger->voucher_source = 'Petty Cash Payment Voucher';
+				$ledger->transaction_date = $PettyCashVoucher->transaction_date; //pr($ledger); exit;
+				if($bankAmt != 0){
+					$this->PettyCashVouchers->Ledgers->save($ledger);
+				}
+			
+			
+		}
+		
+		echo "Done";
+		exit;
+	}
 
 	public function exportExcel(){
 		 $this->viewBuilder()->layout('');
