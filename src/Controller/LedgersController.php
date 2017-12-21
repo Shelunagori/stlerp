@@ -805,8 +805,10 @@ class LedgersController extends AppController
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));
 			$company = $this->Companies->get($st_company_id);
 		//	pr($Ledger_Account_data);exit;
+		
 			if($from == date("d-m-Y",strtotime($company->accounting_book_date))){
 				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
+				
 				$opening_balance_ar=[];
 			foreach($OB as $Ledger)
 				{
@@ -831,7 +833,7 @@ class LedgersController extends AppController
 				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id])
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
-				})->order(['transaction_date' => 'DESC']);
+				})->order(['transaction_date' => 'ASC']);
 				//pr($opening_balance_ar); exit;
 		
 			$url_link=[];
