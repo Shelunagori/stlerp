@@ -394,7 +394,7 @@ class AppController extends Controller
 		}
 		}
 		//pr($sumValue); exit;
-		return $sumValue;
+		return round($sumValue,2);
 	}
 	
 	public function stockValuationWithDate2($date=null){ 
@@ -417,7 +417,7 @@ class AppController extends Controller
 				foreach($StockLedgers as $StockLedger){ 
 					if($StockLedger->in_out=='In'){ 
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-							for($inc=0;$inc<$StockLedger->quantity;$inc++){
+							for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
 								$stock[$Item->id][]=$StockLedger->rate;
 							}
 						}
@@ -426,7 +426,7 @@ class AppController extends Controller
 				foreach($StockLedgers as $StockLedger){
 					if($StockLedger->in_out=='Out' and $StockLedger->processed_on<$date){
 						if(sizeof(@$stock[$Item->id])>0){
-							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+							$stock[$Item->id] = array_slice($stock[$Item->id],  $StockLedger->quantity*100); 
 						}
 					}
 				}
@@ -499,7 +499,7 @@ class AppController extends Controller
 		}
 		
 		
-		return $sumValue;
+		return round($sumValue,2);
 	}
 	
 	public function differenceInOpeningBalance(){
@@ -521,7 +521,7 @@ class AppController extends Controller
 		foreach($ItemLedgers as $ItemLedger){
 			$output+=$ItemLedger->quantity*$ItemLedger->rate;
 		}
-		return $output;
+		return round($output,2);
 	}
 	
 	public function GrossProfit($from_date,$to_date){
@@ -562,7 +562,7 @@ class AppController extends Controller
 		
 		$totalDr+=$openingValue;
 		$totalCr+=$closingValue;
-		return $totalCr-$totalDr;
+		return round($totalCr-$totalDr,2);
 	}
 
     /**

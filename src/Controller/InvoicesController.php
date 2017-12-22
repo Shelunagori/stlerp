@@ -409,6 +409,7 @@ class InvoicesController extends AppController
 					$ReferenceDetail->company_id=$Invoice->company_id;
 					$ReferenceDetail->invoice_id=$old_data->invoice_id;
 					$ReferenceDetail->reference_no=$old_data->reference_no;
+					$ReferenceDetail->reference_type=$old_data->reference_type;
 					$ReferenceDetail->ledger_account_id = $old_data->ledger_account_id;
 					$ReferenceDetail->credit = $old_data->credit;
 					$ReferenceDetail->debit = $old_data->debit;

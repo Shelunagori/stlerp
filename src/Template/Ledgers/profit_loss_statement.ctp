@@ -135,7 +135,7 @@ $this->set('title', 'Profit & Loss Statement');
 											<tr>
 												<td>Gross Profit</td>
 												<td align="right">
-													<?php echo $totalDiff; $LeftTotal+=$totalDiff; ?>
+													<?php echo round($totalDiff,2); $LeftTotal+=$totalDiff; ?>
 												</td>
 											</tr>
 										</tbody>
@@ -149,7 +149,7 @@ $this->set('title', 'Profit & Loss Statement');
 											<tr>
 												<td>Gross Loss</td>
 												<td align="right">
-													<?php echo abs($totalDiff); $RightTotal+=abs($totalDiff); ?>
+													<?php echo round(abs($totalDiff),2); $RightTotal+=abs($totalDiff); ?>
 												</td>
 											</tr>
 										</tbody>
