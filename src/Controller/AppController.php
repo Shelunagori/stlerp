@@ -418,7 +418,7 @@ class AppController extends Controller
 					if($StockLedger->in_out=='In'){ 
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
 							for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
-								$stock[$Item->id][]=$StockLedger->rate;
+								$stock[$Item->id][]=$StockLedger->rate/100;
 							}
 						}
 					}
