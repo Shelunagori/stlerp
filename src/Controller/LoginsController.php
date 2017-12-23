@@ -136,16 +136,16 @@ class LoginsController extends AppController
 		$Employee=$this->Logins->Employees->get($login->employee_id, [
 					'contain' => ['Companies']
 				]);
-		if($Employee->status == '1' || $Employee->id == 23){
+		/* if($Employee->status == '1' || $Employee->id == 23){ */
 			if(!empty($company_id)){ 
 			$this->request->allowMethod(['post', 'delete']);
 			
 			$this->request->session()->write('st_company_id',$company_id);
-			$query_1 = $this->Logins->Employees->query();
+			/* $query_1 = $this->Logins->Employees->query();
 					$query_1->update()
 						->set(['status' => 1])
 						->where(['id' => $login->employee_id])
-						->execute();
+						->execute(); */
 			return $this->redirect(['controller'=>'FinancialYears','action' => 'selectCompanyYear']);
 			
 		}
@@ -155,9 +155,9 @@ class LoginsController extends AppController
 		$Employee=$this->Logins->Employees->EmployeeCompanies->find()->where(['EmployeeCompanies.freeze'=>'0','EmployeeCompanies.employee_id'=>$login->employee_id])->contain(['Companies']);
 		//pr($Employee->toArray()); exit;
 		$this->set(compact('st_login_id','Employee'));
-		}else{
+		/* }else{
 			return $this->redirect(['controller'=>'Logins', 'action' => 'generateOtp',$login->employee_id,$login->id]);
-		}
+		} */
 		
 	}
 	
@@ -170,7 +170,7 @@ class LoginsController extends AppController
 		$Emp_name = $Employee->name;		
 		$mobile_no = $Employee->mobile;	
 		$randomString = rand(1000, 9999);
-		if($status == '0'){
+		/* if($status == '0'){ */
 				
 			$query = $this->Logins->Employees->query();
 					$query->update()
@@ -194,7 +194,7 @@ class LoginsController extends AppController
 				return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
 			}
 			curl_close($ch);
-		}
+		/* } */
 		return $this->redirect(['controller'=>'Logins', 'action' => 'generateOtp',$employee_id,$login_id]);
 	}
 	
@@ -210,7 +210,8 @@ class LoginsController extends AppController
 			{ 
 				$otp_no=$this->request->data["otp_no"];
 			
-				if($Employee['status'] == '0' && $Employee['otp_no'] == $otp_no){
+				/* if($Employee['status'] == '0' && $Employee['otp_no'] == $otp_no){ */
+				if($Employee['otp_no'] == $otp_no){
 				
 					$time = Time::now();
 					$user_logs = $this->Logins->UserLogs->newEntity();
@@ -234,11 +235,11 @@ class LoginsController extends AppController
 					}
 					else
 					{
-						$query_1 = $this->Logins->Employees->query();
+						/* $query_1 = $this->Logins->Employees->query();
 						$query_1->update()
 						->set(['status' => 1])
 						->where(['id' => $employee_id])
-						->execute();
+						->execute(); */
 						
 						return $this->redirect(['action' => 'Switch-Company']);
 					}
@@ -271,7 +272,7 @@ class LoginsController extends AppController
 						->where(['id' => $employee_id])
 						->execute();
 						
-		if($status == '0'){
+		/* if($status == '0'){ */
 			 $sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
 			  $working_key='A7a76ea72525fc05bbe9963267b48dd96';
 			$sms_sender='MOGRAG';
@@ -286,7 +287,7 @@ class LoginsController extends AppController
 				return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
 			}
 			curl_close($ch);
-		}	
+		/* }	 */
 		$this->set(compact('st_login_id','Employee'));
 		$this->set('_serialize', ['Employee']);
 	}
