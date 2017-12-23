@@ -372,7 +372,7 @@ class SalesOrdersController extends AppController
     }
 	
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -400,7 +400,7 @@ class SalesOrdersController extends AppController
 		exit;
 	}
 	
-	
+	 */
 	
 	
     /**

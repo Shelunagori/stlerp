@@ -87,7 +87,7 @@ class PaymentsController extends AppController
     }
 	
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -159,7 +159,7 @@ class PaymentsController extends AppController
 		
 		echo "Done";
 		exit;
-	}
+	} */
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');

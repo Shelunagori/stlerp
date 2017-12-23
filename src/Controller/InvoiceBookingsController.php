@@ -85,7 +85,7 @@ class InvoiceBookingsController extends AppController
 		$this->set(compact('url'));
     }
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -118,9 +118,9 @@ class InvoiceBookingsController extends AppController
 		}
 		
 	echo "done"; exit;
-	}
+	} */
 	
-	public function OldRefBal()
+	/* public function OldRefBal()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -151,8 +151,40 @@ class InvoiceBookingsController extends AppController
 		echo "Done";
 		exit;
 	}
+	*/
+	/* 
+	public function OldOpeningRefBal()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$old_datas=$this->InvoiceBookings->OldReferenceDetails->find()->where(['receipt_id'=>0,'payment_id'=>0,'invoice_id'=>0,'invoice_booking_id'=>0,'credit_note_id'=>0,'journal_voucher_id'=>0,'sale_return_id'=>0,'purchase_return_id'=>0,'petty_cash_voucher_id'=>0,'nppayment_id'=>0,'contra_voucher_id'=>0])->toArray();
+			//pr($old_datas); exit;
+			if($old_datas){
+				foreach($old_datas as $old_data){
+					$lc=$this->InvoiceBookings->LedgerAccounts->get($old_data->ledger_account_id);
+					//pr($lc->company_id); exit;
+					$ReferenceDetail = $this->InvoiceBookings->ReferenceDetails->newEntity();
+					$ReferenceDetail->company_id=$lc->company_id;
+					$ReferenceDetail->reference_no=$old_data->reference_no;
+					$ReferenceDetail->reference_type=$old_data->reference_type;
+					$ReferenceDetail->opening_balance='Yes';
+					$ReferenceDetail->ledger_account_id = $old_data->ledger_account_id;
+					$ReferenceDetail->credit = $old_data->credit;
+					$ReferenceDetail->debit = $old_data->debit;
+					$ReferenceDetail->transaction_date ='2017-04-01';  //pr($ReferenceDetail); exit;
+					$this->InvoiceBookings->ReferenceDetails->save($ReferenceDetail);
+				}
+			}
 	
-	public function LedgerEntry()
+		
+		
+		echo "Done";
+		exit;
+	}  */
+	
+	/* public function LedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -171,10 +203,10 @@ class InvoiceBookingsController extends AppController
 					$invoice_ledget_amt+=$invoice_booking_row->amount; 
 					$invoice_other_charges+=$invoice_booking_row->other_charges; 
 				}
-				//exit;
+				
 				$accountReferences = $this->InvoiceBookings->AccountReferences->get(2);
 				if($invoiceBooking->cst_vat=='CST'){ //echo "CST"; pr($invoiceBooking); exit;
-					//ledger posting for PURCHASE ACCOUNT
+					
 					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
 					$ledger->ledger_account_id = $invoiceBooking->purchase_ledger_account;
 					$ledger->debit = $invoiceBooking->total;
@@ -188,7 +220,7 @@ class InvoiceBookingsController extends AppController
 					
 				
 					
-					//ledger posting for PURCHASE ACCOUNT
+
 					if($invoice_other_charges < 0){
 						$ledger_amount=$invoice_ledget_amt+abs($invoice_other_charges);
 					}else if($invoice_other_charges > 0){
@@ -196,11 +228,6 @@ class InvoiceBookingsController extends AppController
 					}else{
 						$ledger_amount=$invoice_ledget_amt;
 					}
-					/* if($invoiceBooking->id==3){
-						pr($ledger_amount); 
-						pr($invoice_ledget_amt); 
-						pr($invoice_other_charges); exit;
-					} */
 					
 					
 					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
@@ -300,8 +327,6 @@ class InvoiceBookingsController extends AppController
 					
 					$invoice_other_charges+=$invoice_booking_row->other_charges; 
 				}
-						//pr($invoiceBooking->purchase_ledger_account); exit;
-						//ledger posting for PURCHASE ACCOUNT
 					$ledger = $this->InvoiceBookings->Ledgers->newEntity();
 					$ledger->ledger_account_id = $invoiceBooking->purchase_ledger_account;
 					$ledger->debit = $invoiceBooking->taxable_value;
@@ -346,7 +371,6 @@ class InvoiceBookingsController extends AppController
 					$ledger->company_id = $invoiceBooking->company_id;
 					$ledger->voucher_source = 'Invoice Booking';
 					$this->InvoiceBookings->Ledgers->save($ledger);
-					//pr($invoice_other_charges); exit;
 				
 			}
 			
@@ -355,7 +379,7 @@ class InvoiceBookingsController extends AppController
 		
 		echo "done"; exit;
 	}
-	
+	 */
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -1807,27 +1831,32 @@ class InvoiceBookingsController extends AppController
 			$st_company_id = $session->read('st_company_id');
 			$ivs = $this->InvoiceBookings->Ivs->find()->contain(['IvRows'=>['Items','IvRowItems'=>['Items'=>['ItemCompanies']]]])->toArray();
 			
+			$outExist = $this->InvoiceBookings->ItemLedgers->exists(['ItemLedgers.source_model' => 'Inventory Vouchers','ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id]); 
+			if($outExist >0){
 			foreach($ivs as $iv){ 
 				
-				foreach($iv->iv_rows as $iv_row){ 
-					$InItemAmount=0;
-					$OutItemAmount=0;
-					foreach($iv_row->iv_row_items as $iv_row_item){
-						$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Inventory Vouchers','ItemLedgers.company_id'=>$st_company_id,'iv_row_item_id'=>$iv_row_item->id])->first();
-						
-						$OutItemAmount+=$ItemLedgersOuts->rate*$ItemLedgersOuts->quantity;
-						
-					}  
-					$InItemAmount=$OutItemAmount/$iv_row->quantity;
-					$query1 = $this->InvoiceBookings->ItemLedgers->query();
-					$query1->update()
-						->set(['rate' => $InItemAmount])
-						->where(['source_model'=>'Inventory Vouchers','company_id'=>$st_company_id,'iv_row_id'=>$iv_row->id])
-						->execute();
-					//pr($InItemAmount);
+					foreach($iv->iv_rows as $iv_row){ 
+						$InItemAmount=0;
+						$OutItemAmount=0;
+						foreach($iv_row->iv_row_items as $iv_row_item){
+							$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Inventory Vouchers','ItemLedgers.company_id'=>$st_company_id,'iv_row_item_id'=>$iv_row_item->id])->first();
+							if($ItemLedgersOuts){
+								//pr($ItemLedgersOuts->rate);
+								//pr($ItemLedgersOuts->quantity);
+							$OutItemAmount+=$ItemLedgersOuts->rate*$ItemLedgersOuts->quantity;
+							}
+							
+						}  
+						$InItemAmount=$OutItemAmount/$iv_row->quantity;
+						$query1 = $this->InvoiceBookings->ItemLedgers->query();
+						$query1->update()
+							->set(['rate' => $InItemAmount])
+							->where(['source_model'=>'Inventory Vouchers','company_id'=>$st_company_id,'iv_row_id'=>$iv_row->id])
+							->execute();
+						//pr($InItemAmount);
+					}
 				}
 			}
-			
 		 
 	}
 	public function weightedAvgCostIvs($item_id=null,$supplier_date=null){ 

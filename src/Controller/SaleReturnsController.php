@@ -275,22 +275,23 @@ class SaleReturnsController extends AppController
 				
 				////start updated serial number code Oct17 changes
 				 foreach($saleReturn->sale_return_rows as $sale_return_row){
-					foreach($sale_return_row->serial_numbers as $serial_nos){
-						$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial_nos);
-						$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','transaction_date'])
-									->values([
-									'name' => $serial_data->name,
-									'item_id' => $sale_return_row->item_id,
-									'status' => 'In',
-									'sales_return_id' => $saleReturn->id,
-									'sales_return_row_id' => $sale_return_row->id,
-									'company_id'=>$st_company_id,
-									'transaction_date'=>$saleReturn->transaction_date
-									]);
-								$query->execute();  	
-					}
-					
+					 if($sale_return_row->serial_numbers){
+						foreach($sale_return_row->serial_numbers as $serial_nos){
+							$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial_nos);
+							$query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'sales_return_id','sales_return_row_id','company_id','transaction_date'])
+										->values([
+										'name' => $serial_data->name,
+										'item_id' => $sale_return_row->item_id,
+										'status' => 'In',
+										'sales_return_id' => $saleReturn->id,
+										'sales_return_row_id' => $sale_return_row->id,
+										'company_id'=>$st_company_id,
+										'transaction_date'=>$saleReturn->transaction_date
+										]);
+									$query->execute();  	
+							}
+						}
 					
 						$item_details=$this->SaleReturns->ItemLedgers->find()->where(['item_id'=>$sale_return_row->item_id,'in_out'=>'In','processed_on <='=>$saleReturn->transaction_date,'rate >'=>0,'quantity >'=>0]);
 						//pr($item_details->toArray()); exit;
@@ -599,21 +600,21 @@ class SaleReturnsController extends AppController
 					
 				 foreach($item_serial_no as $serial){
 					 
-				$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial);
+					$serial_data=$this->SaleReturns->SaleReturnRows->SerialNumbers->get($serial);
 				 
-				 $query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
-									$query->insert(['name', 'item_id', 'status', 'sales_return_row_id','sales_return_id','company_id'])
-									->values([
-									'name' => $serial_data->name,
-									'item_id' => $sale_return_row->item_id,
-									'status' => 'In',
-									'sales_return_row_id' => $sale_return_row->id,
-									'sales_return_id' => $saleReturn->id,
-									'company_id'=>$st_company_id
-									]);
-								$query->execute();  
-						
-					}
+					 $query = $this->SaleReturns->SaleReturnRows->SerialNumbers->query();
+										$query->insert(['name', 'item_id', 'status', 'sales_return_row_id','sales_return_id','company_id'])
+										->values([
+										'name' => $serial_data->name,
+										'item_id' => $sale_return_row->item_id,
+										'status' => 'In',
+										'sales_return_row_id' => $sale_return_row->id,
+										'sales_return_id' => $saleReturn->id,
+										'company_id'=>$st_company_id
+										]);
+									$query->execute();  
+							
+						}
 					}	
 				/////
 				

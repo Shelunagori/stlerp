@@ -84,7 +84,7 @@ class NppaymentsController extends AppController
         $this->set('_serialize', ['nppayments']);
     }
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -157,7 +157,7 @@ class NppaymentsController extends AppController
 		
 		echo "Done";
 		exit;
-	}
+	} */
 	
 	public function exportExcel(){
 		

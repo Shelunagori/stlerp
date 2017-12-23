@@ -85,7 +85,7 @@ class ContraVouchersController extends AppController
         $this->set('_serialize', ['contravouchers']);
     }
 	
-	
+/* 	
 	public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
@@ -160,7 +160,7 @@ class ContraVouchersController extends AppController
 		echo "Done";
 		exit;
 	}
-	
+	 */
 	public function exportExcell(){
 		$this->viewBuilder()->layout('');
         
