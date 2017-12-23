@@ -56,9 +56,14 @@
 					</tr>
 				</thead>
 				<tbody>
-				<?php $total_debit=0; $total_credit=0; foreach($ReferenceBalances as $ReferenceBalance){  
+				<?php $total_debit=0; $total_credit=0;$payment_terms=0; foreach($ReferenceBalances as $ReferenceBalance){  
 					if($ReferenceBalance['reference_type']!="On_account"){
-					$payment_terms=$customer_data->payment_terms;
+						if(!empty($customer_data->payment_terms)){
+							$payment_terms=$customer_data->payment_terms;
+						}else{
+							$payment_terms=0;
+						}
+					
 					$due_date=date('Y-m-d', strtotime($ReferenceBalance['transaction_date']. ' +'. $payment_terms .'days'));
 				?>
 				
