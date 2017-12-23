@@ -187,7 +187,7 @@ class InvoiceBookingsController extends AppController
 				}else{  
 					
 				
-					pr()
+					
 					//ledger posting for PURCHASE ACCOUNT
 					if($invoice_other_charges < 0){
 						$ledger_amount=$invoice_ledget_amt+abs($invoice_other_charges);
