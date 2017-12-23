@@ -791,7 +791,7 @@ select
 					<ul class="sub-menu">
 						<?php 
 						if(in_array(129,$allowed_pages)){
-						//echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
+						echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
 						echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Gst','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';
 						 }
 						 ?>

@@ -225,6 +225,7 @@ class PurchaseReturnsController extends AppController
 			
 			 foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
 				 	////start updated serial number code Oct17 changes
+				if(!empty($purchase_return_row->serial_numbers)){	
 					foreach($purchase_return_row->serial_numbers as $serial_nos){
 						$query = $this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->query();
 									$query->insert(['name', 'item_id', 'status', 'purchse_return_id','purchase_return_row_id','company_id'])
@@ -238,8 +239,10 @@ class PurchaseReturnsController extends AppController
 									]);
 								$query->execute();  	
 					}	
+				}	
 				////end updated serial number code Oct17 changes
 					$results=$this->PurchaseReturns->ItemLedgers->find()->where(['ItemLedgers.item_id' => $purchase_return_row->item_id,'ItemLedgers.in_out' => 'In','rate_updated' => 'Yes','company_id' => $st_company_id,'source_model'=>'Grns','source_id'=>$invoiceBooking['grn_id']])->first();
+					
 					$itemLedger = $this->PurchaseReturns->ItemLedgers->newEntity();
 					$itemLedger->item_id = $purchase_return_row->item_id;
 					$itemLedger->quantity = $purchase_return_row->quantity;
@@ -250,7 +253,7 @@ class PurchaseReturnsController extends AppController
 					$itemLedger->company_id = $st_company_id;
 					$itemLedger->processed_on = $purchaseReturn->transaction_date;
 					$this->PurchaseReturns->ItemLedgers->save($itemLedger);
-				}
+				} 
 				$vat_amounts=[]; $total_amounts=[];
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
 					$amount=$invoice_booking_row->unit_rate_from_po*$invoice_booking_row->quantity;
@@ -1264,7 +1267,7 @@ class PurchaseReturnsController extends AppController
 				}
 				//////start serial Number database changes Oct17	  
 				foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){ 
-					
+					if(!empty($purchase_return_row->serial_numbers)){
 					$item_serial_no=$purchase_return_row->serial_numbers;
 				/////for delete serial number in table					
 					$this->PurchaseReturns->PurchaseReturnRows->SerialNumbers->deleteAll(['SerialNumbers.purchse_return_id'=>$purchaseReturn->id,'SerialNumbers.purchase_return_row_id' => $purchase_return_row->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out']);					
@@ -1282,6 +1285,7 @@ class PurchaseReturnsController extends AppController
 								$query->execute();  
 						
 					}
+				}
 				}
 			//////End serial Number database changes Oct17	
 				

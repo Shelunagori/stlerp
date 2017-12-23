@@ -220,7 +220,7 @@ class InvoiceBookingsController extends AppController
 					
 				
 					
-					
+
 					if($invoice_other_charges < 0){
 						$ledger_amount=$invoice_ledget_amt+abs($invoice_other_charges);
 					}else if($invoice_other_charges > 0){
