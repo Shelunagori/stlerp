@@ -138,15 +138,14 @@ margin-bottom: 0;
 				 $purchaseReturn->invoice_booking->purchase_ledger_account==160){ ?>
 		<tr>
 			<td colspan="3"></td>
-			<td align="right"></td>
-			<td style="font-size:14px;"  align="right"> VAT Amount
-				<?php if(empty($LedgerAccount->alias)){ ?>
+			<td style="font-size:14px;"  align="right"> VAT Amount</td>
+			<td style="font-size:14px; font-weight:bold; "  align="right">	<?php if(empty($LedgerAccount->alias)){ ?>
 						: <?php echo $LedgerAccount->name; ?>
 					<?php }else{ ?>
 						: <?php echo $LedgerAccount->name; ?> (<?php echo $LedgerAccount->alias; ?>)
 					<?php } ?>
-			</td>
 			
+			</td>
 		</tr>
 		<?php } ?>
 		<tr>
