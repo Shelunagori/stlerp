@@ -303,8 +303,8 @@ class AppController extends Controller
 				foreach($StockLedgers as $StockLedger){
 					if($StockLedger->in_out=='In'){
 						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-							for($inc=0;$inc<$StockLedger->quantity;$inc++){
-								$stock[$Item->id][]=$StockLedger->rate;
+							for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
+								$stock[$Item->id][]=$StockLedger->rate/100;
 							}
 						}
 					}
@@ -312,7 +312,7 @@ class AppController extends Controller
 				foreach($StockLedgers as $StockLedger){
 					if($StockLedger->in_out=='Out' and $StockLedger->processed_on<$date){
 						if(sizeof(@$stock[$Item->id])>0){
-							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity); 
+							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
 						}
 					}
 				}
