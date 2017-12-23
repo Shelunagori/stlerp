@@ -43,7 +43,7 @@ class ItemLedgersController extends AppController
         $this->set('_serialize', ['itemLedgers']);
     }
 	
-	 public function DataMigrate()
+	/*  public function DataMigrate()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -64,19 +64,6 @@ class ItemLedgersController extends AppController
 			$itemLedger->processed_on ="2017-04-01";
 			$this->ItemLedgers->save($itemLedger);
 		}
-		/* $NewItems=$this->NewItems->find()->where(['NewItems.source_model'=>'Grns']);
-		foreach($NewItems as $NewItem){ pr($NewItem);exit;
-			$itemLedger = $this->ItemLedgers->newEntity();
-			$itemLedger->item_id = $NewItem->item_id;
-			$itemLedger->quantity = $NewItem->quantity;
-			$itemLedger->rate = $NewItem->rate;
-			$itemLedger->source_model = 'Grns';
-			$itemLedger->source_id = $NewItem->item_id;
-			$itemLedger->in_out = 'In';
-			$itemLedger->company_id = $NewItem->company_id;
-			$itemLedger->processed_on =$NewItem->company_id;
-			$this->ItemLedgers->save($itemLedger);
-		} */
 		
 		@$NewSerialNumbers=$this->ItemLedgers->NewSerialNumbers->find()->where(['NewSerialNumbers.master_item_id > '=>0]);
 		
@@ -93,7 +80,7 @@ class ItemLedgersController extends AppController
 		}
 		echo "done"; exit;
 		 exit;
-	} 
+	}  */
 	
 	public function GetVoucherParty($source_model=null,$source_id=null)
     {
@@ -840,7 +827,7 @@ class ItemLedgersController extends AppController
 		 $ItemUnits=[]; 
 
 		 $Items =$this->ItemLedgers->Items->find()->contain(['Units','ItemCompanies'=>function($p) use($st_company_id){
-						return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
+						return $p->where(['ItemCompanies.company_id' => $st_company_id]);
 		}])->where($where);
 		
 		$itemSerialNumberStatus=[];
@@ -864,13 +851,16 @@ class ItemLedgersController extends AppController
 				foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
+								for($inc=0.01;$inc<=$StockLedger->quantity;$inc+=0.01){
 									$stock[$Item->id][]=$StockLedger->rate;
 								}
 							}
 						}
 					}
-
+					if($Item->id==1079){
+						//pr($stock[$Item->id]);
+					}
+					
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){
 							if(sizeof(@$stock[$Item->id])>0){
@@ -949,6 +939,8 @@ class ItemLedgersController extends AppController
 		}
 	}
 	
+//exit;	
+	
 	$unitRate=[]; $totalRate=[];
 		foreach ($item_stocks as $key=> $item_stock1){
 			$r=@$itemSerialRate[$key];
@@ -959,6 +951,7 @@ class ItemLedgersController extends AppController
 			$totalRate[$key]=$UR*$q;
 			}
 		}
+		
 		//pr($itemSerialQuantity);
 		//pr(@$itemSerialRate); exit;
 

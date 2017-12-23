@@ -99,7 +99,7 @@ class LedgersController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
 	 
-	 public function DataMigrate()
+	 /* public function DataMigrate()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -123,7 +123,7 @@ class LedgersController extends AppController
 		echo "done"; 
 		 exit;
 	}
-	 
+	  */
 	 public function exportOb()
     {
 		$this->viewBuilder()->layout('');
@@ -618,7 +618,7 @@ class LedgersController extends AppController
 		{
 		$Ledger_Account_data = $this->Ledgers->LedgerAccounts->get($ledger_account_id, [
         'contain' => ['AccountSecondSubgroups'=>['AccountFirstSubgroups'=>['AccountGroups'=>['AccountCategories']]]] ]);
-		
+		$customer_data=0;
 		if($Ledger_Account_data->source_model=='Customers'){
 			$customer_data = $this->Ledgers->LedgerAccounts->Customers->get($Ledger_Account_data->source_id);
 			//pr($customer_data); exit;
@@ -776,16 +776,16 @@ class LedgersController extends AppController
 				$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$LedgerAccount->id]);
 				foreach($Ledgers as $Ledger){ 
 					$Ledger->transaction_date = date("Y-m-d",strtotime($Ledger->transaction_date));
-					if($Ledger->transaction_date <= $from_date && $Ledger->debit > 0){ //pr($from_date);  pr($Ledger->transaction_date); 
+					if($Ledger->transaction_date < $from_date && $Ledger->debit > 0){ //pr($from_date);  pr($Ledger->transaction_date); 
 						@$OpeningBalanceDebit[@$LedgerAccount->id]+=@$Ledger->debit;
 					}
-					if($Ledger->transaction_date <= $from_date && $Ledger->credit > 0){ 
+					if($Ledger->transaction_date < $from_date && $Ledger->credit > 0){ 
 						@$OpeningBalanceCredit[@$LedgerAccount->id]+=@$Ledger->credit;
 					}
-					if(($Ledger->transaction_date > $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->debit > 0){
+					if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->debit > 0){
 						@$TransactionsDebit[@$LedgerAccount->id]+=@$Ledger->debit;
 					}
-					if(($Ledger->transaction_date > $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->credit > 0){
+					if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->credit > 0){
 						@$TransactionsCredit[@$LedgerAccount->id]+=@$Ledger->credit;
 					}
 				}
@@ -1347,7 +1347,7 @@ class LedgersController extends AppController
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date])->first();
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
 							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
 							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
 						}
@@ -1386,7 +1386,7 @@ class LedgersController extends AppController
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date])->first();
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
 							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
 							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
 						}

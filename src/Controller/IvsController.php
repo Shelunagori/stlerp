@@ -105,7 +105,7 @@ class IvsController extends AppController
         $this->set(compact('ivs','url','From','To'));
 	} 
 	
-	public function DataMigrate()
+/* 	public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -162,31 +162,7 @@ class IvsController extends AppController
 		foreach($Ivs as $iv){   
 			foreach($iv->iv_rows as $iv_row){   
 			
-				/* $InSrNo = $this->Ivs->ItemLedgers->NewSerialNumbers->find()->where(['invoice_id'=>$iv->invoice_id,'q_item_id'=>$iv_row->item_id	])->toArray();
-				 pr($InSrNo); exit;
-					/////For In
-					if(!empty($InSrNo)){
-						
-						$serial_numbers_iv_row = array_filter(@$iv_row->serial_numbers);
-						
-						 if(!empty($serial_numbers_iv_row)){
-							 
-							 foreach($serial_numbers_iv_row as $sr_nos){
-								 
-							$query = $this->Ivs->IvRows->SerialNumbers->query();
-										$query->insert(['name', 'item_id', 'status', 'iv_row_id','company_id','transaction_date'])
-										->values([
-										'name' => $sr_nos,
-										'item_id' => $iv_row->item_id,
-										'status' => 'In',
-										'iv_row_id' => $iv_row->id,
-										'company_id'=>$st_company_id,
-										'transaction_date'=>$transaction_date
-										]);
-									$query->execute(); 
-							} 
-						} 
-					} */
+				
 					
 					$unit_rate_In=0;$unit_rate=0;
 					
@@ -238,7 +214,7 @@ class IvsController extends AppController
 						$itemledgers->in_out='Out';
 						$itemledgers->rate=$unit_rate;
 						$itemledgers->processed_on=$iv->transaction_date;
-						$itemledgers->company_id=$st_company_id;
+						$itemledgers->company_id=$iv->company_id;
 						$itemledgers->iv_row_item_id=$iv_row_item->id; 
 						$this->Ivs->ItemLedgers->save($itemledgers);				
 					} 
@@ -253,7 +229,7 @@ class IvsController extends AppController
 						$itemledgersIN->source_id=$iv->id;
 						$itemledgersIN->in_out='In';
 						$itemledgersIN->processed_on=$iv->transaction_date;
-						$itemledgersIN->company_id=$st_company_id;
+						$itemledgersIN->company_id=$iv->company_id;
 						$itemledgersIN->iv_row_id=$iv_row->id;
 						$this->Ivs->ItemLedgers->save($itemledgersIN);				
 				}
@@ -264,7 +240,7 @@ class IvsController extends AppController
 		//pr($Ivs); exit;
 		echo "Done";
 		exit;
-	}
+	} */
 	 
 	 
     public function view($id = null)

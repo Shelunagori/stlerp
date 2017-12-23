@@ -60,7 +60,7 @@ class PettyCashVouchersController extends AppController
         $this->set('_serialize', ['pettycashvouchers']);
     }
 	
-		public function DataMigrate()
+	/* 	public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -134,7 +134,7 @@ class PettyCashVouchersController extends AppController
 		echo "Done";
 		exit;
 	}
-
+ */
 	public function exportExcel(){
 		 $this->viewBuilder()->layout('');
         

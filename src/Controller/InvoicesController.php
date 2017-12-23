@@ -188,7 +188,7 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
 	}
 	
-	public function LedgerEntry()
+	/* public function LedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -576,7 +576,7 @@ class InvoicesController extends AppController
 		echo "done"; exit;
 	} 
 	
-	
+	 */
 	
 	public function DueInvoices($customer_id=null)
     {

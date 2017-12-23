@@ -96,7 +96,7 @@ class GrnsController extends AppController
         $this->set('_serialize', ['grns']);
     }
 	
-	public function ItemLedgerEntry()
+	/* public function ItemLedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -164,7 +164,7 @@ class GrnsController extends AppController
 			}
 		}
 		echo "done"; exit;
-	} 
+	}  */
 	
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');

@@ -59,7 +59,7 @@ class InventoryTransferVouchersController extends AppController
         $this->set('_serialize', ['inventoryTransferVouchers']);
     }
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -204,7 +204,7 @@ class InventoryTransferVouchersController extends AppController
 		echo "Done";
 		exit;
 		
-	}
+	} */
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');

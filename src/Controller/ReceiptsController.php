@@ -131,7 +131,7 @@ class ReceiptsController extends AppController
         $this->set('_serialize', ['receipts']);
     }
 	
-	public function DataMigrate()
+	/* public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -204,7 +204,7 @@ class ReceiptsController extends AppController
 		
 		echo "Done";
 		exit;
-	}
+	} */
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');
