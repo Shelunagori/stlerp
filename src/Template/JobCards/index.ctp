@@ -133,18 +133,19 @@
 					<?php } } ?>
 
 				
-					<?php if(in_array(34,$allowed_pages)) {?>
+					<!-- // if(in_array(34,$allowed_pages)) { 
 
-					<?php if($status==null or $status=='Pending'){ ?>
-					<?= $this->Form->postLink('Close',
-						['action' => 'close', $jobCard->id], 
-						[
-							'escape' => false,
-							'class'=>'btn btn-xs red tooltips','data-original-title'=>'Close',
-							'confirm' => __('Are you sure ?')
-						]
-					) ?>
-					<?php } } }?>
+					 //if($status==null or $status=='Pending'){ 
+					 //$this->Form->postLink('Close',
+						//['action' => 'close', $jobCard->id], 
+						//[
+						//	'escape' => false,
+						//	'class'=>'btn btn-xs red tooltips','data-original-title'=>'Close',
+//'confirm' => __('Are you sure ?')
+					//	]
+					//) 
+					// } }  -->
+					<?php } ?>
 					</td>
 				</tr>
 		    <?php }  else if($jobCardStatus=='Closed'){
@@ -170,10 +171,10 @@
 					<?php if(in_array(24,$allowed_pages)){ ?>
 					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); ?>
 					<?php } ?>
-					<?php if(in_array(34,$allowed_pages)) {?>
+					<!--if(in_array(34,$allowed_pages)) {
 
-					<?php if($status==null or $status=='Pending'){ ?>
-					<?= $this->Form->postLink('Close',
+					 if($status==null or $status=='Pending'){ 
+					$this->Form->postLink('Close',
 						['action' => 'close', $jobCard->id], 
 						[
 							'escape' => false,
@@ -181,7 +182,7 @@
 							'confirm' => __('Are you sure ?')
 						]
 					) ?>
-					<?php } } ?>
+					} } ?>-->
 					</td>
 				</tr>
 			
