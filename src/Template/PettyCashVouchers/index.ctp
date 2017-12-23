@@ -63,7 +63,7 @@
 									$total_cr=$total_cr+$petty_cash_voucher_row->amount;
 								}
 							}  $total= $total_dr-$total_cr?>
-                            <td align="right"><?= h($this->Number->format($total,[ 'places' => 2])) ?></td>
+                            <td align="right"><?= h($this->Number->format(abs($total),[ 'places' => 2])) ?></td>
                             <td class="actions">
                             <?php 
 							if(in_array(100,$allowed_pages)){
