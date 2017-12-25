@@ -63,7 +63,7 @@ $this->set('title', 'Profit & Loss Statement');
 													<td>Opening Stock</td>
 													<td align="right">
 														<?php 
-														echo $openingValue;
+														echo round($openingValue,2);
 														$LeftTotal+=$openingValue;
 														?>
 													</td>
@@ -116,7 +116,7 @@ $this->set('title', 'Profit & Loss Statement');
 													<td>Closing Stock</td>
 													<td align="right">
 														<?php 
-														echo $closingValue; 
+														echo round($closingValue,2); 
 														$RightTotal+=$closingValue; 
 														?>
 													</td>
@@ -165,7 +165,7 @@ $this->set('title', 'Profit & Loss Statement');
 										<tbody>
 											<tr>
 												<td><b>Total</b></td>
-												<td align="right"><b><?php echo $LeftTotal; ?></b></td>
+												<td align="right"><b><?php echo round($LeftTotal,2); ?></b></td>
 											</tr>
 										</tbody>
 									</table>
@@ -175,7 +175,7 @@ $this->set('title', 'Profit & Loss Statement');
 										<tbody>
 											<tr>
 												<td><b>Total</b></td>
-												<td align="right"><b><?php echo $RightTotal; ?></b></td>
+												<td align="right"><b><?php echo round($RightTotal,2); ?></b></td>
 											</tr>
 										</tbody>
 									</table>
