@@ -133,7 +133,7 @@ class SerialNumbersController extends AppController
         $this->set('_serialize', ['serialNumbers']);
 	}
 	
-	public function getSerialNumberEditList(){
+	public function getSerialNumberEditList(){ 
 		$item_id=$this->request->query('item_id');
 		$sr_nos=$this->request->query('sr_nos');
 		$in_row_id=$this->request->query('in_row_id');
@@ -158,7 +158,7 @@ class SerialNumbersController extends AppController
 			if($inExist == 0){
 				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
 			}
-		}
+		} 
 		//pr($in_row_id);
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
