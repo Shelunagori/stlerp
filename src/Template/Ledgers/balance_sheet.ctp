@@ -67,7 +67,7 @@ $this->set('title', 'Balance Sheet');
 													<td><?php echo $groupForPrintRow['name']; ?></td>
 													<td align="right">
 														<?php if($groupForPrintRow['balance']!=0){
-															echo abs($groupForPrintRow['balance']);
+															echo round(abs($groupForPrintRow['balance']),2);
 															$LeftTotal+=abs($groupForPrintRow['balance']);
 														} ?>
 													</td>
@@ -86,7 +86,7 @@ $this->set('title', 'Balance Sheet');
 													<td><?php echo $groupForPrintRow['name']; ?></td>
 													<td align="right">
 														<?php if($groupForPrintRow['balance']!=0){
-															echo abs($groupForPrintRow['balance']); 
+															echo round(abs($groupForPrintRow['balance']),2); 
 															$RightTotal+=abs($groupForPrintRow['balance']); 
 														} ?>
 													</td>
@@ -97,7 +97,7 @@ $this->set('title', 'Balance Sheet');
 													<td>Closing Stock</td>
 													<td align="right">
 														<?php 
-														echo $closingValue; 
+														echo round($closingValue,2); 
 														$RightTotal+=$closingValue; 
 														?>
 													</td>
@@ -117,7 +117,7 @@ $this->set('title', 'Balance Sheet');
 												<td>Profit & Loss A/c</td>
 												<td align="right">
 													<?php 
-													echo $GrossProfit;
+													echo round($GrossProfit,2);
 													$LeftTotal+=abs($GrossProfit);
 													?>
 												</td>
@@ -191,7 +191,7 @@ $this->set('title', 'Balance Sheet');
 										<tbody>
 											<tr>
 												<td><b>Total</b></td>
-												<td align="right"><b><?php echo $LeftTotal; ?></b></td>
+												<td align="right"><b><?php echo round($LeftTotal,2); ?></b></td>
 											</tr>
 										</tbody>
 									</table>
@@ -201,7 +201,7 @@ $this->set('title', 'Balance Sheet');
 										<tbody>
 											<tr>
 												<td><b>Total</b></td>
-												<td align="right"><b><?php echo $RightTotal; ?></b></td>
+												<td align="right"><b><?php echo round($RightTotal,2); ?></b></td>
 											</tr>
 										</tbody>
 									</table>
