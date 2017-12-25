@@ -288,7 +288,7 @@ class AppController extends Controller
 		$Items =$this->ItemLedgers->Items->find()->contain(['ItemCompanies'=>function($p) use($st_company_id){
 		return $p->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0]);
 		}]);
-		
+		$stockNew=[];
 		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
 			if(@$Item->item_companies[0]->serial_number_enable==0){
@@ -297,31 +297,57 @@ class AppController extends Controller
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
 				}else{
-					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
 				}
 				
 				foreach($StockLedgers as $StockLedger){
 					if($StockLedger->in_out=='In'){
-						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-							for($inc=0.01;$inc<=$StockLedger->quantity;$inc+=0.01){
+						//if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							/* for($inc=0.01;$inc<=$StockLedger->quantity;$inc+=0.01){
 								$stock[$Item->id][]=$StockLedger->rate/100;
-							}
-						}
+							} */
+							$stockNew[$Item->id][]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
+						//}
 					}
 				}
 				foreach($StockLedgers as $StockLedger){
 					$processed_on=date('Y-m-d',strtotime($StockLedger->processed_on));
 					if($StockLedger->in_out=='Out' and $processed_on<$date){
-						if(sizeof(@$stock[$Item->id])>0){
+						/* if(sizeof(@$stock[$Item->id])>0){
 							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
+						} */
+						
+						if(sizeof(@$stockNew[$Item->id])==0){
+							break;
 						}
+						
+						$outQty=$StockLedger->quantity;
+						a:
+						if(sizeof(@$stockNew[$Item->id])==0){
+							break;
+						}
+						$R=@$stockNew[$Item->id][0]['qty']-$outQty;
+						if($R>0){
+							$stockNew[$Item->id][0]['qty']=$R;
+						}
+						else if($R<0){
+							unset($stockNew[$Item->id][0]);
+							@$stockNew[$Item->id]=array_values(@$stockNew[$Item->id]);
+							$outQty=abs($R);
+							goto a;
+						}
+						else{
+							unset($stockNew[$Item->id][0]);
+							$stockNew[$Item->id]=array_values($stockNew[$Item->id]);
+						}
+						
 					}
 				}
-				if(sizeof(@$stock[$Item->id]) > 0){ 
+				/* if(sizeof(@$stock[$Item->id]) > 0){ 
 					foreach(@$stock[$Item->id] as $stockRate){
 						@$sumValue+=@$stockRate;
 					}
-				}
+				} */
 			}else if(@$Item->item_companies[0]->serial_number_enable==1){
 				if(strtotime($date)==strtotime('2017-4-1')){
 					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
@@ -338,6 +364,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -347,8 +374,9 @@ class AppController extends Controller
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-							@$sumValue+=@$ItemLedgerData['rate'];
+								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -358,8 +386,9 @@ class AppController extends Controller
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 							//pr($ItemLedgerData); 
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-							@$sumValue+=@$ItemLedgerData['rate'];
+								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -369,8 +398,9 @@ class AppController extends Controller
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 							//pr($ItemLedgerData); 
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
-							@$sumValue+=@$ItemLedgerData['rate'];
+								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
+								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -385,8 +415,9 @@ class AppController extends Controller
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'source_model'=>"Items",'company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->first();
 							
 							if($ItemLedgerData){
-							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;//pr(@$ItemLedgerData['rate']);
-							@$sumValue+=@$ItemLedgerData['rate'];
+								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;//pr(@$ItemLedgerData['rate']);
+								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -395,7 +426,14 @@ class AppController extends Controller
 		}
 		}
 		//pr($sumValue); exit;
-		return round($sumValue,2);
+		$closingValue=0;
+		foreach($stockNew as $qw){
+			foreach($qw as $rt){
+				$closingValue+=$rt['qty']*$rt['rate'];
+			}
+		}
+		return $closingValue;
+		//return round($sumValue,2); 
 	}
 	
 	public function stockValuationWithDate2($date=null){ 
@@ -411,6 +449,7 @@ class AppController extends Controller
 		return $p->where(['ItemCompanies.company_id' => $st_company_id]);
 		}]);
 		
+		$stockNew=[];
 		$sumValue=0; $sumValue2=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
 			if(@$Item->item_companies[0]->serial_number_enable==0){ $stock=[];  
@@ -418,27 +457,52 @@ class AppController extends Controller
 				foreach($StockLedgers as $StockLedger){ 
 					if($StockLedger->in_out=='In'){ 
 						//if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-							for($inc=0.01;$inc<=$StockLedger->quantity;$inc+=0.01){
+							/* for($inc=0.01;$inc<=$StockLedger->quantity;$inc+=0.01){
 								$stock[$Item->id][]=$StockLedger->rate/100;
-							//}
-						}
+							} */
+						//}
+						$stockNew[$Item->id][]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
 					}
 				}
 				
 				foreach($StockLedgers as $StockLedger){
 					$processed_on=date('Y-m-d',strtotime($StockLedger->processed_on));
 					if($StockLedger->in_out=='Out' and $processed_on<$date){
-						if(sizeof(@$stock[$Item->id])>0){
+						/* if(sizeof(@$stock[$Item->id])>0){
 							$stock[$Item->id] = array_slice($stock[$Item->id],  $StockLedger->quantity*100); 
+						} */
+						
+						if(sizeof(@$stockNew[$Item->id])==0){
+							break;
+						}
+						
+						$outQty=$StockLedger->quantity;
+						a:
+						if(sizeof(@$stockNew[$Item->id])==0){
+							break;
+						}
+						$R=@$stockNew[$Item->id][0]['qty']-$outQty;
+						if($R>0){
+							$stockNew[$Item->id][0]['qty']=$R;
+						}
+						else if($R<0){
+							unset($stockNew[$Item->id][0]);
+							@$stockNew[$Item->id]=array_values(@$stockNew[$Item->id]);
+							$outQty=abs($R);
+							goto a;
+						}
+						else{
+							unset($stockNew[$Item->id][0]);
+							$stockNew[$Item->id]=array_values($stockNew[$Item->id]);
 						}
 					}
 				}
 				
-				if(sizeof(@$stock[$Item->id]) > 0){ 
+				/* if(sizeof(@$stock[$Item->id]) > 0){ 
 					foreach(@$stock[$Item->id] as $stockRate){
 						@$sumValue+=@$stockRate;
 					}
-				}
+				} */
 				
 			}else if(@$Item->item_companies[0]->serial_number_enable==1){
 				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
@@ -452,6 +516,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -463,6 +528,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -474,6 +540,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -485,6 +552,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -497,6 +565,7 @@ class AppController extends Controller
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 								@$sumValue+=@$ItemLedgerData['rate'];
+								$stockNew[$Item->id][]=['qty'=>1, 'rate'=>@$ItemLedgerData['rate']];
 							}
 						}
 					}
@@ -508,8 +577,14 @@ class AppController extends Controller
 	//	pr($itemSerialQuantity); 
 	//	exit;
 		//$output=$sumValue+$sumValue2;
-		
-		return round($sumValue,2);
+		$closingValue=0;
+		foreach($stockNew as $qw){
+			foreach($qw as $rt){
+				$closingValue+=$rt['qty']*$rt['rate'];
+			}
+		}
+		return $closingValue;
+		//return round($sumValue,2);
 		//return 0; 
 	}
 	
