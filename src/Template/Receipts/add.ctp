@@ -340,11 +340,14 @@ $(document).ready(function() {
 	
 	$('.cr_dr').live("change",function() { 
 		do_ref_total();
+		do_mian_amount_total();
 	});
 	
 	$('.drcrChange').live("change",function() { 
 		do_ref_total();
 	});
+	
+	
 	
 	function do_ref_total(){  
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
