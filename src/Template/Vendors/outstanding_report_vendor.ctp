@@ -78,7 +78,7 @@ table td, table th{
 				<td><?php echo $VendorPaymentTerms[$LedgerAccount->id].' Days'; ?></td>
 				<td>
 					<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
-						echo '<span class="clrRed">'.@$Outstanding[$LedgerAccount->id]['Slab1'].'</span>';
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
 					}else{
 						echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab1'].'</span>';
 					} ?>

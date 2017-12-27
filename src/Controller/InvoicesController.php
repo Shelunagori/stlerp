@@ -1873,7 +1873,7 @@ class InvoicesController extends AppController
 				$customerIds=array($customer_id);
 				 $customer_text='Past Records of customer - <b>'.$customer->customer_name.'</b>';
 			}
-			$Invoices=$this->Invoices->find()->where(['customer_id IN' => $customerIds])->matching(
+			$Invoices=$this->Invoices->find()->where(['customer_id IN' => $customerIds,'company_id'=>$st_company_id])->matching(
 					'InvoiceRows', function ($q) use($item_id) {
 						return $q->where(['InvoiceRows.item_id' => $item_id]);
 					}
