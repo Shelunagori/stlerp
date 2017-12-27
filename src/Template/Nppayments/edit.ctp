@@ -597,6 +597,7 @@ $(document).ready(function() {
 	
 	$('.cr_dr').live("change",function() { 
 		do_ref_total();
+		do_mian_amount_total();
 	});
 	
 	$('.drcrChange').live("change",function() { 

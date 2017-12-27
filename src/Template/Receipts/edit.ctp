@@ -448,6 +448,7 @@ $(document).ready(function() {
 	
 	$('.cr_dr').live("change",function() { 
 		do_ref_total();
+		do_mian_amount_total();
 	});
 	
 	$('.drcrChange').live("change",function() { 
@@ -458,6 +459,7 @@ $(document).ready(function() {
 		//do_mian_amount_total();
 		do_ref_total();
 	});
+	
 	
 	
 	do_ref_total();
@@ -569,8 +571,9 @@ $(document).ready(function() {
 	$('.mian_amount').live("keyup",function() {
 		do_mian_amount_total();
 		do_ref_total();
-	});
+	}); */
 	
+	do_mian_amount_total();
 	function do_mian_amount_total(){
 		var mian_amount_total_cr=0; var mian_amount_total_dr=0;
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -587,7 +590,7 @@ $(document).ready(function() {
 			$('#receipt_amount').text(mian_amount_total.toFixed(2));
 		});
 	}
-	 */
+	
 	
 	
 });

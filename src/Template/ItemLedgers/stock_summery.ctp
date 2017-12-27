@@ -96,28 +96,17 @@
 					</thead>
 					<tbody>
 						<?php $total_inv=0; $totalColumn=0; $page_no=0;  $RowTotal=0;
-						foreach ($item_stocks as $key=> $item_stock){
-						if($item_stock!=0){
-							if(@$in_qty[$key]==0){ 
-								$per_unit=@$item_rate[$key];
-							}else{
-								$per_unit=@$item_rate[$key]/@$in_qty[$key];
-							}
-						}else{ 
-							if(@$in_qty[$key]==0){ 
-								$per_unit=@$item_rate[$key];
-							}else{
-								$per_unit=@$item_rate[$key]/@$in_qty[$key];
-							}
-							
+						foreach ($item_stocks as $key=>$item_stock){
+						if(@$itmQty[$key]==0){
+							$unitRate=0;
+						}else{
+							$unitRate=$itemRate[$key]/$itmQty[$key];
 						}
 						
-						$amount=@$item_stock*abs($per_unit);
-						$total_inv+=$amount;
 						?>
 							
 						<tr class="main_tr" id="<?= h($key) ?>">
-							<td><?= h(++$page_no) ?></td>
+							<td><?= h($key) ?></td>
 							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide show_data" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
 								<button type="button" class="btn btn-xs tooltips revision_show" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
 								&nbsp;&nbsp;<?= h($items_names[$key]) ?><div class="show_ledger"></div></td>
@@ -125,22 +114,18 @@
 							<td><?= h($items_unit_names[$key]) ?></td>
 							<td align="right">
 								<?php 
-								//pr($key);
-								//pr(@$itemSerialNumberStatus[$key]);
 								 if(@$itemSerialNumberStatus[$key]==1){
 									if($item_stock > 0){
-										//echo @$unitRate[$key]."yes";
-										echo $this->Number->format(@$unitRate[$key],['places'=>2]);
-										$RowTotal=@$unitRate[$key]*$item_stock;
+										echo $this->Number->format(@$unitRate,['places'=>2]);
+										$RowTotal=@$unitRate*@$itmQty[$key];
 									}else{
 										echo '0';
 										$RowTotal=0;
 									}
 								}else{
 									if($item_stock > 0){
-										$UR=@$sumValue[$key]/$item_stock;
-										echo $this->Number->format($UR,['places'=>2]);
-										$RowTotal=$UR*@$item_stock;
+										echo $this->Number->format(@$unitRate,['places'=>2]);
+										$RowTotal=@$unitRate*@$itmQty[$key];
 									}else{
 										echo '0';
 										$RowTotal=0;
