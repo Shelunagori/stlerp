@@ -16,13 +16,13 @@ $html = '
 <html>
 <head>
   <style>
-  @page { margin: 150px 15px 10px 30px; }
+  @page { margin: 160px 15px 10px 30px; }
 
   body{
     line-height: 20px;
 	}
 	
-    #header { position:fixed; left: 0px; top: -150px; right: 0px; height: 150px;}
+    #header { position:fixed; left: 0px; top: -160px; right: 0px; height: 160px;}
     
 	#content{
     position: relative; 
@@ -98,6 +98,11 @@ $html = '
 <body>
   <div id="header" ><br/>	
 		<table width="100%">
+			<tr>
+				<td colspan="3" align="right">
+				<span style="font-size: 13px;margin:0;"><b>'. h($invoice->pdf_to_print) .'</b></span>
+				</td>
+			</tr>
 			<tr>
 				<td width="35%" rowspan="2" valign="bottom">
 				<img src='.ROOT . DS  . 'webroot' . DS  .'logos/'.$invoice->company->logo.' height="80px" />

@@ -48,6 +48,9 @@ class IvRowItemsTable extends Table
 		 $this->hasMany('SerialNumbers', [
             'foreignKey' => 'iv_row_items'
         ]);
+		$this->hasMany('ItemLedgers', [
+            'foreignKey' => 'iv_row_item_id'
+        ]);
     }
 
     /**

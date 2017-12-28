@@ -17,6 +17,24 @@ $Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
 			<?php } } ?>
 			<a href="#" class="list-group-item" onclick="window.close()"><i class="fa fa-times"></i> Close </a>
 		</div>
+		
+		<div style="padding:5px;overflow: auto;">
+		<h4>Invoice Type</h4>
+		<?= $this->Form->create($invoice) ?>
+			
+							<?php 
+							$options=[];
+							$options=[['text'=>'Original','value'=>'ORIGINAL'],['text'=>'Copy','value'=>'COPY'],['text'=>'Duplicate For Transporter','value'=>'DUPLICATE FOR TRANSPORTER']];
+							
+							?>
+							<?php echo $this->Form->input('pdf_to_print', ['options'=>$options,'empty' => "--Select Invoice Type--",'label' => false,'class' => 'form-control input-sm ','required']); ?>
+
+			
+			<?= $this->Form->button(__('Update'),['class'=>'btn btn-sm default']) ?>
+		
+		<?= $this->Form->end() ?>
+		</div>
+		
 		<div style="padding:5px;overflow: auto;">
 		<h4>Adjust Font Size</h4>
 		<?= $this->Form->create($invoice) ?>

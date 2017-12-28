@@ -188,7 +188,7 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
 	}
 	
-	/* public function LedgerEntry()
+	public function LedgerEntry()
     {
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -264,7 +264,7 @@ class InvoicesController extends AppController
 						
 				}
 				
-				$ledger_fright=@(int)$invoice->fright_amount;
+				$ledger_fright=@(float)$invoice->fright_amount;
 				$ledger = $this->Invoices->Ledgers->newEntity();
 				$ledger->ledger_account_id = $invoice->sales_ledger_account;
 				$ledger->debit = 0;
@@ -576,7 +576,7 @@ class InvoicesController extends AppController
 		echo "done"; exit;
 	} 
 	
-	 */
+	
 	
 	public function DueInvoices($customer_id=null)
     {
@@ -745,6 +745,17 @@ class InvoicesController extends AppController
 					$this->Invoices->InvoiceRows->save($invoiceRow);
 				}
 			}
+			
+			if(!empty($this->request->data['pdf_to_print'])){
+				$pdf_to_print=$this->request->data['pdf_to_print'];
+				//pr($pdf_to_print); exit;
+				$query = $this->Invoices->query();
+					$query->update()
+						->set(['pdf_to_print' => $pdf_to_print])
+						->where(['id' => $id])
+						->execute();
+			}
+			
 			return $this->redirect(['action' => 'confirm/'.$id]);
         }
 		$this->set(compact('invoice','id'));
@@ -2454,7 +2465,7 @@ class InvoicesController extends AppController
 				//Ledger posting for Account Reference
 				//$ledger_pnf=$invoice->total_after_pnf;
 				//$accountReferences=$this->Invoices->AccountReferences->get(1);
-				$ledger_fright=@(int)$invoice->fright_amount;
+				$ledger_fright=@(float)$invoice->fright_amount;
 				$ledger = $this->Invoices->Ledgers->newEntity();
 				$ledger->ledger_account_id = $invoice->sales_ledger_account;
 				$ledger->debit = 0;
@@ -2875,7 +2886,11 @@ class InvoicesController extends AppController
 				
 				//pr($invoice->taxable_value); exit;
 				//Ledger posting for Account Reference
-				$ledger_fright=@(int)$invoice->fright_amount;
+				//pr($invoice->total); 
+				
+				$ledger_fright=@(float)$invoice->fright_amount;
+				//pr($ledger_fright); 
+				//exit;
 				$ledger = $this->Invoices->Ledgers->newEntity();
 				$ledger->ledger_account_id = $invoice->sales_ledger_account;
 				$ledger->debit = 0;
@@ -3319,6 +3334,15 @@ class InvoicesController extends AppController
 					$invoiceRow->height=$value["height"];
 					$this->Invoices->InvoiceRows->save($invoiceRow);
 				}
+			}
+			if(!empty($this->request->data['pdf_to_print'])){
+				$pdf_to_print=$this->request->data['pdf_to_print'];
+				//pr($pdf_to_print); exit;
+				$query = $this->Invoices->query();
+					$query->update()
+						->set(['pdf_to_print' => $pdf_to_print])
+						->where(['id' => $id])
+						->execute();
 			}
 			return $this->redirect(['action' => 'GstConfirm/'.$id]);
         }
@@ -6074,5 +6098,30 @@ class InvoicesController extends AppController
 	$this->set(compact('hsn','item_category','quantity','total_value','taxable_value','cgst','sgst','igst','unit'));	
 //pr($cgst);
 // exit;
+	}
+	
+	
+	public function InvoiceHsnWise(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('From','To'));
+		$this->set(compact('From','To'));
+		$where=[];
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+		}
+
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items','IvRows'=>['IvRowItems'=>['Items','ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
+		//pr($Invoices);exit;
+		$this->set(compact('Invoices'));
 	}
 }

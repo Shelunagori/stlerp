@@ -728,6 +728,9 @@ select
 						<?php } ?>
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> HSN Wise Sale',array('controller'=>'Invoices','action'=>'HsnWiseReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
+						
+						<li><?php $today =date('d-m-Y');
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Invoice Wise HSN Details',array('controller'=>'Invoices','action'=>'InvoiceHsnWise','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php if(in_array(39,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Material Indent Report','/Item-Ledgers/material-indent-report?stockstatus=Positive&company_name=&company_name%5B%5D='.$st_company_id,array('escape'=>false)); ?></li>
 						<?php } ?>

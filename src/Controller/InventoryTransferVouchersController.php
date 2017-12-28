@@ -59,7 +59,7 @@ class InventoryTransferVouchersController extends AppController
         $this->set('_serialize', ['inventoryTransferVouchers']);
     }
 	
-	/* public function DataMigrate()
+	public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -204,7 +204,7 @@ class InventoryTransferVouchersController extends AppController
 		echo "Done";
 		exit;
 		
-	} */
+	}
 
 	public function excelExport(){
 		$this->viewBuilder()->layout('');
@@ -402,7 +402,7 @@ class InventoryTransferVouchersController extends AppController
 						}
 						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row_data['quantity'];
 					}else{
-							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row_data['item_id'],$inventoryTransferVoucher->transaction_date); 
 					}
 					
 					$unit_rate = round($unit_rate,3);
@@ -621,13 +621,14 @@ class InventoryTransferVouchersController extends AppController
 			$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id,'ItemLedgers.in_out'=>'Out']);
 			
 			$this->InventoryTransferVouchers->Items->SerialNumbers->deleteAll(['itv_id'=>$inventoryTransferVoucher->id,'company_id'=>$st_company_id,'SerialNumbers.status'=>'Out']);
-			//pr($inventory_transfer_voucher_rows);exit;
+			
 			$no=1;
 				foreach($inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_data){
 				
 				
 				if($inventory_transfer_voucher_row_data['status'] == 'Out')
-				{
+				{ 
+					
 					$serial_data=0;
 					$serial_data=sizeof(@$inventory_transfer_voucher_row_data['serial_number_data']);
 					if($serial_data>0)
@@ -659,8 +660,8 @@ class InventoryTransferVouchersController extends AppController
 						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row_data['quantity'];
 						//pr($serial_number_data); exit;
 					}else{
-							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
-						//	pr($unit_rate); exit;
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row_data['item_id'],$inventoryTransferVoucher->transaction_date); 
+							//pr($unit_rate); exit;
 					}
 						
 					
@@ -1089,7 +1090,7 @@ class InventoryTransferVouchersController extends AppController
 						}
 						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row->quantity;
 					}else{
-							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id,$inventoryTransferVoucher->transaction_date); 
 					}
 					
 					$unit_rate = round($unit_rate,3);
@@ -1289,7 +1290,7 @@ class InventoryTransferVouchersController extends AppController
 						}
 						$unit_rate = round($unit_rate,3)/@$inventory_transfer_voucher_row->quantity;
 					}else{
-							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs($inventory_transfer_voucher_row->item_id,$inventoryTransferVoucher->transaction_date); 
 					}
 					$unit_rate = round($unit_rate,3);
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
@@ -1441,11 +1442,12 @@ class InventoryTransferVouchersController extends AppController
 	}
 	
 	
-	public function weightedAvgCostIvs($item_id=null){ 
+	public function weightedAvgCostIvs($item_id=null,$transaction_date){ 
+	
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
-			
+			//pr($transaction_date); exit;
 			$Items = $this->InventoryTransferVouchers->ItemLedgers->Items->get($item_id, [
 				'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
 					return $q->where(['company_id'=>$st_company_id]);
@@ -1454,28 +1456,71 @@ class InventoryTransferVouchersController extends AppController
 			$to_date = date('Y-m-d');
 			$unit_rate=0;
 			if($Items->item_companies[0]->serial_number_enable == '0'){   
-				$stock=[];  $sumValue=0;
-					$StockLedgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Items->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+				$stock=[];  $sumValue=0; $stockNew=[];
+					$StockLedgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Items->id,'ItemLedgers.company_id'=>$st_company_id,'processed_on <='=>$transaction_date])->order(['ItemLedgers.processed_on'=>'ASC']);
 					
 					foreach($StockLedgers as $StockLedger){  
 						if($StockLedger->in_out=='In'){ 
-							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							/* if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
 								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
 									$stock[]=$StockLedger->rate;
 								}
-							}
+							} */
+							$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
 						}
 					}
-
-				
+					
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){	
-							if(sizeof(@$stock) > 0){
+							/* if(sizeof(@$stock) > 0){
 								$stock= array_slice($stock, $StockLedger->quantity*100); 	
+							} */
+							
+							if(sizeof(@$stockNew)==0){
+							break;
+							}
+							
+							$outQty=$StockLedger->quantity;
+							a:
+							if(sizeof(@$stockNew)==0){
+								break;
+							}
+							$R=@$stockNew[0]['qty']-$outQty;
+							if($R>0){
+								$stockNew[0]['qty']=$R;
+							}
+							else if($R<0){
+								unset($stockNew[0]);
+								@$stockNew=array_values(@$stockNew);
+								$outQty=abs($R);
+								goto a;
+							}
+							else{
+								unset($stockNew[0]);
+								$stockNew=array_values($stockNew);
 							}
 						}
 					}
-
+				//	pr($Items->id); exit;
+					
+					
+					$closingValue=0;
+					$total_stock=0;
+					$total_amt=0;
+					foreach($stockNew as $qw){
+						//pr($qw); 
+							$total_stock+=$qw['qty'];
+							$total_amt+=$qw['rate']*$qw['qty'];
+						
+					} 
+					//$total_stock=$total_stock/100;
+						if($total_amt > 0 && $total_stock > 0){
+							 $unit_rate = $total_amt/$total_stock; 
+						}
+						
+						
+					//pr($unit_rate); exit;
+/* 
 					$total_stock=0;
 					$total_amt=0;
 					if(sizeof(@$stock) > 0){ 
@@ -1488,7 +1533,7 @@ class InventoryTransferVouchersController extends AppController
 				if($total_amt > 0 && $total_stock > 0){
 					 $unit_rate = $total_amt/$total_stock; 
 				}
-				
+				 */
 				
 			}
 			

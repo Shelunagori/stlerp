@@ -106,7 +106,7 @@
 						?>
 							
 						<tr class="main_tr" id="<?= h($key) ?>">
-							<td><?= h($key) ?></td>
+							<td><?= h(++$page_no) ?></td>
 							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide show_data" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
 								<button type="button" class="btn btn-xs tooltips revision_show" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
 								&nbsp;&nbsp;<?= h($items_names[$key]) ?><div class="show_ledger"></div></td>

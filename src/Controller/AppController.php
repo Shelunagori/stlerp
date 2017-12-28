@@ -292,7 +292,7 @@ class AppController extends Controller
 		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
 			if(@$Item->item_companies[0]->serial_number_enable==0){
-				if(strtotime($date)==strtotime('2017-4-1')){
+				if(strtotime($date)==strtotime('2017-04-01')){
 					$StockLedgers=$this->ItemLedgers->find()
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
@@ -349,7 +349,7 @@ class AppController extends Controller
 					}
 				} */
 			}else if(@$Item->item_companies[0]->serial_number_enable==1){
-				if(strtotime($date)==strtotime('2017-4-1')){
+				if(strtotime($date)==strtotime('2017-04-01')){
 					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
 				}else{
 					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date < '=>$date])->toArray();

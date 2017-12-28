@@ -848,7 +848,8 @@ $(document).ready(function() {
 		//alert(fright_amount);
 		if(isNaN(fright_amount)) { var fright_amount = 0; }
 		
-		grand_total=total_after_pnf+sale_tax+fright_amount;
+		grand_total=round(total_after_pnf,2)+round(sale_tax,2)+round(fright_amount,2);
+		//alert(grand_total);
 		$('input[name="grand_total"]').val(round(grand_total,2));
 		
 		var old_due_payment1=parseFloat($('input[name="old_due_payment"]').val());

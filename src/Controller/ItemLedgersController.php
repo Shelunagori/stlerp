@@ -2167,5 +2167,40 @@ pr($purchase_id);
 	
 		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
 	}
+	
+	public function SerialMisMatchList(){ 
+		$this->viewBuilder()->layout('index_layout');
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+	
+		$Items =$this->ItemLedgers->Items->find()->contain(['Units','ItemCompanies'=>function($p) use($st_company_id){
+						return $p->where(['ItemCompanies.company_id' => $st_company_id]);
+		}])->toArray();
+		foreach($Items as $Item){ 
+		if(@$Item->item_companies[0]->serial_number_enable==1){ 
+				$ItemLedgersQty=$this->ItemLedgers->find()
+				->select(['item_id','quantity'=>$this->ItemLedgers->find()->func()->sum('ItemLedgers.quantity')])
+				->group(['ItemLedgers.item_id'])
+				->where(['item_id'=>$Item->id,'in_out'=>'Out','company_id'=>$st_company_id])->first();
+				
+				$ItemSerialQty=$this->ItemLedgers->SerialNumbers->find()
+				->select(['item_id'=>$this->ItemLedgers->SerialNumbers->find()->func()->count('SerialNumbers.item_id')])
+				->group(['SerialNumbers.item_id'])
+				->where(['item_id'=>$Item->id,'status'=>'Out','company_id'=>$st_company_id])->first();
+				
+				
+				
+				if(@$ItemLedgersQty->quantity != @$ItemSerialQty->item_id){
+					pr(@$Item->name);
+					pr(@$ItemLedgersQty->item_id);
+					echo "<br>";
+				}
+			}
+		}
+		//pr($Items); exit;
+		
+		exit;
+	
+	}
 }
 

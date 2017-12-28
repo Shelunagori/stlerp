@@ -807,5 +807,24 @@ public function CheckCompany($company_id=null,$item_id=null)
 //pr($company25);exit;
 		$this->set(compact('Items','company25','company26','company27','item_name25','item_cat25','item_name26','item_cat26','item_cat27','item_name27','item_grp25','item_subgrp25','item_grp26','item_subgrp26','item_grp27','item_subgrp27'));
 	}
+	public function ItemHsnReport(){
+		$item_datas= $this->Items->find()->toArray();?>
+		<html>
+			<body>
+				<table border="1">
+					
+					<?php foreach($item_datas as $item_data) {?>
+					<tr>
+						<td><?php echo  $item_data->id; ?></td>
+						<td><?php echo  $item_data->name; ?></td>
+						<td><?php echo  $item_data->hsn_code; ?></td>
+					</tr>
+						<?php } ?>
+					
+				</table>
+			</body>
+		</html>
+		<?php exit;
+	}
 	
 }
