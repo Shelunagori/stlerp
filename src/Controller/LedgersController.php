@@ -963,7 +963,7 @@ class LedgersController extends AppController
 		{
 			$transaction_from_date= date('Y-m-d', strtotime($this->request->query['From']));
 			$transaction_to_date= date('Y-m-d', strtotime($this->request->query['To']));
-			
+			/* 
 			$Bank_Ledgers = $this->Ledgers->find()
 				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id,'voucher_source NOT IN'=>'Opening Balance'
 				])
@@ -973,9 +973,21 @@ class LedgersController extends AppController
 					return $exp
 					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'))
 					;
-				})->order('transaction_date','ASC');	
+				})
+				->order('transaction_date','ASC');	 */
+			
+			
+			
+			//pr($Bank_Ledgers1->toArray());exit;
+			$Bank_Ledgers = $this->Ledgers->find()
+				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id,'voucher_source NOT IN'=>'Opening Balance'
+				])
+				->where(['transaction_date <='=>$transaction_to_date,'reconciliation_date'=>'0000-00-00'])
+				->orWhere(['transaction_date <='=>$transaction_to_date,'transaction_date >='=>$transaction_from_date,'reconciliation_date >'=>$transaction_to_date])
+				->order('transaction_date','ASC');	
 		}
 		
+		//pr($Bank_Ledgers);exit;
 		
 		if($ledger_account_id)
 		{
@@ -1143,7 +1155,7 @@ class LedgersController extends AppController
 		{
 		$bank_ledger_data=$this->Ledgers->LedgerAccounts->get($ledger_account_id);
 		}
-		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','To','financial_year'));
+		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','To','financial_year','from'));
 	}
 	public function findDate($ledger_account_id=null){ 
 	

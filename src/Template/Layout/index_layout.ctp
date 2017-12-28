@@ -741,7 +741,7 @@ select
 						<?php if(in_array(164,$allowed_pages)){ echo '<li>'.$this->Html->link( '<i class="fa fa-users"></i>User Logs Report', '/UserLogs/',array('escape'=>false) ).'</li>';}?>
 						<?php if(in_array(126,$allowed_pages)){ ?>
 						<li><?php $today =date('d-m-Y');
-						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconciliation Add',array('controller'=>'Ledgers','action'=>'bankReconciliationAdd','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconciliation Add',array('controller'=>'Ledgers','action'=>'bankReconciliationAdd','From'=>$fromdate1,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php } ?>
 					</ul>
 				</li><?php } ?>

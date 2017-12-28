@@ -65,7 +65,7 @@
 			<?php 
 			if(in_array(127,$allowed_pages)){
 			$today =date('d-m-Y');
-						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation View',array('controller'=>'Ledgers','action'=>'bankReconciliationView','From'=>$today,'To'=>$today),array('escape'=>false)); 
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Bank Reconcilation View',array('controller'=>'Ledgers','action'=>'bankReconciliationView','From'=>date("d-m-Y",strtotime($financial_year->date_from)),'To'=>$today),array('escape'=>false)); 
 			} ?>
 		</div>
 	
@@ -80,10 +80,15 @@
 							<div class="col-md-4">
 									<?php echo $this->Form->input('ledger_account_id', ['empty'=>'--Select--','options' => @$banks,'empty' => "--Select Bank--",'label' => false,'class' => 'bank_data form-control input-sm select2me','required','value'=>@$ledger_account_id]); ?>
 							</div>
+							<?php if(empty($from)){ ?>
 							<div class="col-md-4">
 								<?php echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => @date('01-04-Y', strtotime($from)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
-								
 							</div>
+							<?php }else{ ?>
+							<div class="col-md-4">
+								<?php echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => $from,'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+							</div>		
+							<?php } ?>
 							<?php if(empty($To)){ ?>
 							<div class="col-md-4">
 								<?php echo $this->Form->input('	To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($To)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
