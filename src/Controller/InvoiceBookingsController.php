@@ -985,6 +985,16 @@ class InvoiceBookingsController extends AppController
 					->execute();
 				$i++;
 				}
+				
+				
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->weightedAvgCostIvs($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
+			//	pr($unit_rate); exit;
+				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row){
+					$unit_rate = $this->updateIvsInItemRate($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
+				}
+				
 				$accountReferences = $this->InvoiceBookings->AccountReferences->get(2);
 				
 				if($invoiceBooking->purchase_ledger_account==$cst_purchase){ 
@@ -1927,16 +1937,11 @@ class InvoiceBookingsController extends AppController
 					$stock=[];  $sumValue=0; $stockNew=[]; $where=[];
 					
 					if(!empty($supplier_date)){
-						//$From=date("Y-m-d",strtotime($this->request->query('From')));
 						$where['ItemLedgers.processed_on <']=$ItemLedgersOut->processed_on;
-						//$where['ItemLedgers.processed_on <']=$ItemLedgersOut->processed_on;
 					}
 					
 					$StockLedgers=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id])->where($where)->order(['ItemLedgers.processed_on'=>'ASC'])->toArray();
 					
-					//pr($supplier_date);
-					//pr($ItemLedgersOut->processed_on);
-					//pr($StockLedgers);exit;
 					foreach($StockLedgers as $StockLedger){  
 						if($StockLedger->in_out=='In'){ 
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
@@ -1944,14 +1949,12 @@ class InvoiceBookingsController extends AppController
 							}
 						}
 					}
-					//pr($stockNew); exit;
+
 					foreach($StockLedgers as $StockLedger){
 						if($StockLedger->in_out=='Out'){	
-							
 							if(sizeof(@$stockNew)==0){
 							break;
 							}
-							
 							$outQty=$StockLedger->quantity;
 							a:
 							if(sizeof(@$stockNew)==0){
@@ -1973,29 +1976,29 @@ class InvoiceBookingsController extends AppController
 							}
 						}
 					}
-				$closingValue=0;
+					$closingValue=0;
 					$total_stock=0;
 					$total_amt=0;
 					$unit_rate=0;
 					foreach($stockNew as $qw){
-						//pr($qw); 
 							$total_stock+=$qw['qty'];
 							$total_amt+=$qw['rate']*$qw['qty'];
 						
 					} 
-						if($total_amt > 0 && $total_stock > 0){
-							 $unit_rate = $total_amt/$total_stock; 
-						}
+
+					if($total_amt > 0 && $total_stock > 0){
+						 $unit_rate = $total_amt/$total_stock; 
+					}
 						
 					
 					
-				$query1 = $this->InvoiceBookings->ItemLedgers->query();
-				$query1->update()
-					->set(['rate' => $unit_rate])
-					->where(['id' => $ItemLedgersOut->id])
-					->execute();
-					
-				}
+					$query1 = $this->InvoiceBookings->ItemLedgers->query();
+					$query1->update()
+						->set(['rate' => $unit_rate])
+						->where(['id' => $ItemLedgersOut->id])
+						->execute();
+						
+					}
 				//pr($unit_rate); exit;
 			}
 			return;

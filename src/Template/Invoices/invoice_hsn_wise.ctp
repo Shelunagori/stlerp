@@ -58,10 +58,10 @@
 														<td width="50%"><?php echo $iv_row_item->item->hsn_code; ?></td>
 														<td width="50%"><?php echo $iv_row_item->item_ledgers[0]->rate*$iv_row_item->item_ledgers[0]->quantity; ?></td>
 													</tr>
-												<?php  } }else{ ?>
+												<?php  } }else{ //pr($invoice_row); exit; ?>
 													<tr>	
 														<td width="50%"><?php echo $invoice_row->item->hsn_code; ?></td>
-														<td width="50%"><?php echo $invoice_row->rate*$invoice_row->quantity; ?></td>
+														<td width="50%"><?php echo $invoice_row->taxable_value; ?></td>
 													</tr>
 												<?php } 
 												

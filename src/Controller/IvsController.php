@@ -555,7 +555,7 @@ class IvsController extends AppController
 		}	
 		
 	}
-	public function weightedAvgCostIvs($item_id=null){ 
+	public function weightedAvgCostIvs($item_id=null,$transaction_date){ 
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
@@ -568,43 +568,68 @@ class IvsController extends AppController
 			$to_date = date('Y-m-d');
 			$unit_rate=0;
 			
-			if($Items->item_companies[0]->serial_number_enable == '0'){   
-				$stock=[];  $sumValue=0;
-					$StockLedgers=$this->Ivs->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Items->id,'ItemLedgers.company_id'=>$st_company_id])->order(['ItemLedgers.processed_on'=>'ASC']);
+			if($Items->item_companies[0]->serial_number_enable == '0'){
+
+				$stock=[];  $sumValue=0; $where=[];   $stockNew=[]; 
 					
-					foreach($StockLedgers as $StockLedger){  
+					if(!empty($transaction_date)){
+						$where['ItemLedgers.processed_on <']=$transaction_date;
+						$where['ItemLedgers.item_id']=$item_id;
+						$where['ItemLedgers.company_id']=$st_company_id;
+					}
+					
+					$StockLedgers=$this->Ivs->ItemLedgers->find()->where($where)->order(['ItemLedgers.processed_on'=>'ASC']);
+					//unset($stockNew);
+					
+					
+					foreach($StockLedgers as $StockLedger){ 
 						if($StockLedger->in_out=='In'){ 
 							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
-								for($inc=0.01;$inc<$StockLedger->quantity;$inc+=0.01){
-									$stock[]=$StockLedger->rate;
-								}
+							$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
 							}
 						}
 					}
-				
+					
 					foreach($StockLedgers as $StockLedger){
-						if($StockLedger->in_out=='Out'){ 
-							if(sizeof(@$stock) > 0){// pr($stock); 
-								//$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
-								$stock= array_slice($stock, $StockLedger->quantity*100); 	
+						if($StockLedger->in_out=='Out'){	
+							if(sizeof(@$stockNew)==0){
+							break;
+							}
+							$outQty=$StockLedger->quantity;
+							a:
+							if(sizeof(@$stockNew)==0){
+								break;
+							}
+							$R=@$stockNew[0]['qty']-$outQty;
+							if($R>0){
+								$stockNew[0]['qty']=$R;
+							}
+							else if($R<0){
+								unset($stockNew[0]);
+								@$stockNew=array_values(@$stockNew);
+								$outQty=abs($R);
+								goto a;
+							}
+							else{
+								unset($stockNew[0]);
+								$stockNew=array_values($stockNew);
 							}
 						}
 					}
+					$closingValue=0;
 					$total_stock=0;
 					$total_amt=0;
-					if(sizeof(@$stock) > 0){ 
-						foreach($stock as $data){
-							$total_amt+=$data/100;
-							++$total_stock;
-						}
+					$unit_rate=0;
+					foreach($stockNew as $qw){
+							$total_stock+=$qw['qty'];
+							$total_amt+=$qw['rate']*$qw['qty'];
+						
+					} 
+
+					if($total_amt > 0 && $total_stock > 0){
+						 $unit_rate = $total_amt/$total_stock; 
 					}
-				$total_stock=$total_stock/100;
-				
-				if($total_amt > 0 && $total_stock > 0){
-					 $unit_rate = $total_amt/$total_stock; 
-				}
-				
-				
+					
 			}
 				
 				// pr($unit_rate); exit;
@@ -706,7 +731,7 @@ class IvsController extends AppController
 							}
 							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
-							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id,$transaction_date); 
 						}
 						
 						$unit_rate = round($unit_rate,2);
