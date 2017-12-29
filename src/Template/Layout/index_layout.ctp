@@ -706,7 +706,7 @@ select
 						<?php if(in_array(36,$allowed_pages)){?>
 						
 						
-						<li><?php echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>$today),array('escape'=>false)); ?></li>	
+						<li><?php echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>@$today),array('escape'=>false)); ?></li>	
 						
 						<?php } ?>
 						<?php if(in_array(162,$allowed_pages)){ ?>

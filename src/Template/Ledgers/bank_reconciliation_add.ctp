@@ -111,7 +111,7 @@
 		<!-- BEGIN FORM-->
 <?php if(!empty($Bank_Ledgers)){  ?>
 	<div class="row " id="hide_div">
-		<div class="col-md-12">
+		<!-- <div class="col-md-12">
 			<div class="col-md-8"></div>	
 			<div class="col-md-4 caption-subject " align="left" style="background-color:#E7E2CB; font-size: 16px;"><b>Opening Balance : 
 				<?php 
@@ -133,7 +133,7 @@
 			</b>
 			
 			</div>
-		</div>
+		</div> -->
 		<div class="col-md-12"> 
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
@@ -151,10 +151,11 @@
 				
 				$total_balance_acc=0; $total_debit=0; $total_credit=0;
 				$balance_as_per_total_debit=0; $balance_as_per_total_credit=0;
-				foreach($Bank_Ledgers as $ledger): 
+				foreach($Bank_Ledgers as $ledger):
+				if(date('Y-m-d',strtotime($ledger->reconciliation_date))=="1970-01-01" or strtotime($ledger->reconciliation_date)>strtotime($transaction_to_date)){
 				?>
 				<tr class="main_tr">
-						<td><?php echo date("d-m-Y",strtotime($ledger->transaction_date)); ?></td>
+						<td><?php echo date("d-m-Y",strtotime($ledger->transaction_date));  ?></td>
 						<td><?= h($ledger->voucher_source); ?></td>
 						
 						<td align="right"><?= $this->Number->format($ledger->debit,[ 'places' => 2]); 
@@ -172,6 +173,7 @@
 							<button type="button" ledger_id=<?php echo $ledger->id ?> class="btn btn-primary btn-sm subdate"><i class="fa fa-arrow-right" ></i></button>	
 						</td>
 				</tr>
+				<?php } ?>
 				<?php  endforeach; ?>
 				<tr>
 					<td colspan="2" align="right">Total</td>
@@ -183,7 +185,7 @@
 				</tbody>
 			</table>
 			</div>
-			<div class="col-md-12">
+			<!-- <div class="col-md-12">
 				<div class="col-md-8"></div>	
 				<div class="col-md-4 caption-subject " align="left" style="background-color:#E3F2EE; font-size: 16px;"><b>Closing Balance:  </b>
 				<?php 
@@ -238,7 +240,7 @@
 						
 				?>
 				</div>
-			</div>
+			</div> -->
 			<div class="col-md-12"><br/></div>
 			<div class="col-md-12">
 				<div class="col-md-4"></div>
