@@ -154,7 +154,7 @@ $url_excel="/?".$url;
 						<th>Source</th>
 						<th>Reference</th>
 						<th>Party</th>
-						<th>TIN</th>
+						<th>GST</th>
 						<th>VAT</th>
 						<th>CGST</th>
 						<th>SGST</th>
@@ -300,9 +300,9 @@ $url_excel="/?".$url;
 						</td>
 						<td>
 							<?php if($ledger->voucher_source=="Invoice"){ ?>
-								<?php echo $url_link[$ledger->id]->customer->tin_no; ?>
+								<?php echo $url_link[$ledger->id]->customer->gst_no; ?>
 							<?php }elseif($ledger->voucher_source=="Invoice Booking"){ ?>
-								<?php echo $url_link[$ledger->id]->vendor->tin_no; ?>
+								<?php echo $url_link[$ledger->id]->vendor->gst_no; ?>
 							<?php } ?>
 						</td>
 						<td align="right">

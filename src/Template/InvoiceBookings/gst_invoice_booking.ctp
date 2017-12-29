@@ -413,7 +413,7 @@ $(document).ready(function() {
 	$('.disc_amt').die().live("blur",function() { 
 		calculate_discount_amt(); 
 	});
-	calculate_pnf_discount();
+	//calculate_pnf_discount();
 	function calculate_pnf_discount()
 	{ 
 		var total_amount=0; var total_misc=0; var total_discount=0; 
@@ -530,8 +530,8 @@ $(document).ready(function() {
 			var pnf_amt=parseFloat($(this).find("td:nth-child(10) input").val()); 
 			if(pnf_amt){ pnf=0; }
 			total_pnf = total_pnf+pnf_amt;
-			row_total=total_amount-discount+pnf_amt;
-				
+			row_total=amount-discount+pnf_amt;
+				//alert(row_total);
 			$(this).find("td:nth-child(11) input").val(round(row_total,2));
 			total_taxable_value = total_taxable_value+parseFloat(round(row_total,2));  
 			var cgst_percentage=parseFloat($(this).find("td:nth-child(12) option:selected").attr("percentage"));

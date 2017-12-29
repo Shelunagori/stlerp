@@ -516,7 +516,7 @@ $(document).ready(function() {
 			total_discount=total_discount+discount;
 			var pnf_amt=parseFloat($(this).find("td:nth-child(10) input").val()); 
 			if(pnf_amt){ pnf=0; }
-			row_total=total_amount-discount+pnf_amt;
+			row_total=amount-discount+pnf_amt;
 			total_pnf = total_pnf+pnf_amt;
 			$(this).find("td:nth-child(11) input").val(round(row_total,2));
 			 total_taxable_value = total_taxable_value+parseFloat(round(row_total,2));    

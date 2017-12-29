@@ -6120,7 +6120,7 @@ class InvoicesController extends AppController
 			$where['Invoices.date_created <=']=$To;
 		}
 
-		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items','IvRows'=>['IvRowItems'=>['Items','ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units'],'IvRows'=>['IvRowItems'=>['Items'=>['Units'],'ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
 		//pr($Invoices);exit;
 		$this->set(compact('Invoices'));
 	}
