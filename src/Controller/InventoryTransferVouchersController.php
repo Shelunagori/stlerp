@@ -1513,27 +1513,11 @@ class InventoryTransferVouchersController extends AppController
 							$total_amt+=$qw['rate']*$qw['qty'];
 						
 					} 
-					//$total_stock=$total_stock/100;
 						if($total_amt > 0 && $total_stock > 0){
 							 $unit_rate = $total_amt/$total_stock; 
 						}
 						
-						
-					//pr($unit_rate); exit;
-/* 
-					$total_stock=0;
-					$total_amt=0;
-					if(sizeof(@$stock) > 0){ 
-						foreach($stock as $data){
-							$total_amt+=$data/100;
-							++$total_stock;
-						}
-					}
-				$total_stock=$total_stock/100;
-				if($total_amt > 0 && $total_stock > 0){
-					 $unit_rate = $total_amt/$total_stock; 
-				}
-				 */
+					
 				
 			}
 			

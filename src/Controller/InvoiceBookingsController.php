@@ -1863,8 +1863,9 @@ class InvoiceBookingsController extends AppController
 			$this->viewBuilder()->layout('');
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
+			//pr($supplier_date); exit;
 			$ItemLedgersOuts=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'Out'])->where(['ItemLedgers.source_model IN'=>['Inventory Vouchers','Inventory Transfer Voucher']])->toArray();
-
+//pr($ItemLedgersOuts); exit;
 			$ItemSerialNo=$this->InvoiceBookings->Items->ItemCompanies->find()->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.item_id'=>$item_id])->first();
 			
 			$serial_number_enable=$ItemSerialNo->serial_number_enable;
@@ -1923,27 +1924,79 @@ class InvoiceBookingsController extends AppController
 				}
 			}else{
 				foreach($ItemLedgersOuts as $ItemLedgersOut){
-					$ItemLedgersIns=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id,'in_out'=>'In','processed_on <= '=>$ItemLedgersOut->processed_on])->toArray(); //pr($ItemLedgersOut->processed_on); exit;
-					$ItemAmt=0;
-					$Itemqty=0;
-					foreach($ItemLedgersIns as $ItemLedgersIn){
-						$ItemAmt+=@$ItemLedgersIn->rate*@$ItemLedgersIn->quantity;
-						$Itemqty+=@$ItemLedgersIn->quantity;
-					} 
-					if($Itemqty==0){
-						$itemUnitRate=0;
-					}else{
-						$itemUnitRate=$ItemAmt/$Itemqty;
+					$stock=[];  $sumValue=0; $stockNew=[]; $where=[];
+					
+					if(!empty($supplier_date)){
+						//$From=date("Y-m-d",strtotime($this->request->query('From')));
+						$where['ItemLedgers.processed_on <']=$ItemLedgersOut->processed_on;
+						//$where['ItemLedgers.processed_on <']=$ItemLedgersOut->processed_on;
 					}
+					
+					$StockLedgers=$this->InvoiceBookings->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$item_id,'ItemLedgers.company_id'=>$st_company_id])->where($where)->order(['ItemLedgers.processed_on'=>'ASC'])->toArray();
+					
+					//pr($supplier_date);
+					//pr($ItemLedgersOut->processed_on);
+					//pr($StockLedgers);exit;
+					foreach($StockLedgers as $StockLedger){  
+						if($StockLedger->in_out=='In'){ 
+							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
+							}
+						}
+					}
+					//pr($stockNew); exit;
+					foreach($StockLedgers as $StockLedger){
+						if($StockLedger->in_out=='Out'){	
+							
+							if(sizeof(@$stockNew)==0){
+							break;
+							}
+							
+							$outQty=$StockLedger->quantity;
+							a:
+							if(sizeof(@$stockNew)==0){
+								break;
+							}
+							$R=@$stockNew[0]['qty']-$outQty;
+							if($R>0){
+								$stockNew[0]['qty']=$R;
+							}
+							else if($R<0){
+								unset($stockNew[0]);
+								@$stockNew=array_values(@$stockNew);
+								$outQty=abs($R);
+								goto a;
+							}
+							else{
+								unset($stockNew[0]);
+								$stockNew=array_values($stockNew);
+							}
+						}
+					}
+				$closingValue=0;
+					$total_stock=0;
+					$total_amt=0;
+					$unit_rate=0;
+					foreach($stockNew as $qw){
+						//pr($qw); 
+							$total_stock+=$qw['qty'];
+							$total_amt+=$qw['rate']*$qw['qty'];
+						
+					} 
+						if($total_amt > 0 && $total_stock > 0){
+							 $unit_rate = $total_amt/$total_stock; 
+						}
+						
 					
 					
 				$query1 = $this->InvoiceBookings->ItemLedgers->query();
 				$query1->update()
-					->set(['rate' => $itemUnitRate])
+					->set(['rate' => $unit_rate])
 					->where(['id' => $ItemLedgersOut->id])
 					->execute();
 					
 				}
+				//pr($unit_rate); exit;
 			}
 			return;
 		}
