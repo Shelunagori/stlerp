@@ -1,4 +1,19 @@
-<?php $url_excel="/?".$url; ?>
+<?php 
+
+	$date= date("d-m-Y"); 
+	$time=date('h:i:a',time());
+
+	$filename="Invoice_report_".$date.'_'.$time;
+
+	header ("Expires: 0");
+	header ("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT");
+	header ("Cache-Control: no-cache, must-revalidate");
+	header ("Pragma: no-cache");
+	header ("Content-type: application/vnd.ms-excel");
+	header ("Content-Disposition: attachment; filename=".$filename.".xls");
+	header ("Content-Description: Generated Report" );
+
+?>
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -6,27 +21,10 @@
 			<span class="caption-subject font-blue-steel uppercase">Item Report</span>
 		</div>
 		<div class="actions">
-			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Invoices/InvoiceHsnWiseExcel/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+			
 		</div>
 	</div>
 	<div class="portlet-body">
-		<form method="GET" >
-			<table class="table table-condensed">
-				<tbody>
-					<tr>
-						<td width="20%">
-							<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
-						</td>
-						<td width="20%">
-									<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Transaction To" value="<?php echo @$To; ?>"  data-date-format="dd-mm-yyyy" >
-						</td>
-						<td>
-							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</form>
 		
 		<div class="table-scrollable">
 		<?php $page_no=$this->Paginator->current('Customers'); $page_no=($page_no-1)*20; ?>
@@ -100,7 +98,7 @@
 						<td><?php echo $invoice->total_cgst_amount; ?></td>
 						<td><?php echo $invoice->total_sgst_amount; ?></td>
 						<td><?php echo $invoice->total_igst_amount; ?></td>
-						<td><?php echo $invoice->grand_total; ?></td>
+						<td><?php echo $invoice->grand_total; ?></td> 
 						
 					</tr>
 					<?php  endforeach; ?>

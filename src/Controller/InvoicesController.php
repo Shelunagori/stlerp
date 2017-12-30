@@ -6102,6 +6102,8 @@ class InvoicesController extends AppController
 	
 	
 	public function InvoiceHsnWise(){
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
@@ -6122,6 +6124,33 @@ class InvoicesController extends AppController
 
 		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units'],'IvRows'=>['IvRowItems'=>['Items'=>['Units'],'ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
 		//pr($Invoices);exit;
-		$this->set(compact('Invoices'));
+		$this->set(compact('Invoices','url'));
+	}
+	
+	
+	public function InvoiceHsnWiseExcel(){
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$this->set(compact('From','To'));
+		$this->set(compact('From','To'));
+		$where=[];
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+		}
+
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units'],'IvRows'=>['IvRowItems'=>['Items'=>['Units'],'ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
+		//pr($Invoices);exit;
+		$this->set(compact('Invoices','url'));
 	}
 }

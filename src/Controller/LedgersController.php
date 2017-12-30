@@ -1396,4 +1396,39 @@ class LedgersController extends AppController
 		
 		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance'));
 	}
+	
+	public function OpeningBalanceData(){
+		$this->viewBuilder()->layout('index_layout');
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		$Ledgers= $this->Ledgers->find()->contain(['LedgerAccounts'])->where(['Ledgers.company_id'=>$st_company_id,'voucher_source'=>'Opening Balance'])->toArray();
+		//pr($Ledgers); exit;
+		?>
+		<html>
+			<body>
+				<table border="1">
+					<th>ID</th>
+					<th>Ledger Account</th>
+					<th>Dr</th>
+					<th>Cr</th>
+					<?php foreach($Ledgers as $Ledger) {?>
+					<tr>
+						<td><?php echo  $Ledger->id; ?></td>
+						<?php if($Ledger->ledger_account->alias) {?>
+							<td><?php echo  $Ledger->ledger_account->name.'('.$Ledger->ledger_account->alias.')'; ?></td>
+						<?php }else{ ?>
+							<td><?php echo  $Ledger->ledger_account->name; ?></td>
+						<?php } ?>
+						<td><?php echo  $Ledger->debit; ?></td>
+						<td><?php echo  $Ledger->credit; ?></td>
+					</tr>
+						<?php } ?>
+					
+				</table>
+			</body>
+		</html>
+		<?php exit;
+	}
+	
+	
 }

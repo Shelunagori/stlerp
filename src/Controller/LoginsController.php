@@ -177,7 +177,7 @@ class LoginsController extends AppController
 						->set(['otp_no' => $randomString])
 						->where(['id' => $employee_id])
 						->execute();
-						
+				
 			$sms=str_replace(' ', '+', 'Dear '.$Emp_name.', Your one time password is '.$randomString.'.');
 			$working_key='A7a76ea72525fc05bbe9963267b48dd96';
 			

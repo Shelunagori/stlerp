@@ -827,4 +827,31 @@ public function CheckCompany($company_id=null,$item_id=null)
 		<?php exit;
 	}
 	
+	public function ItemOpeningBalanceData(){
+		$this->viewBuilder()->layout('index_layout');
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		$Ledgers= $this->Items->ItemLedgers->find()->contain(['Items'])->where(['ItemLedgers.company_id'=>$st_company_id,'source_model'=>'Items'])->toArray();
+		//pr($Ledgers); exit;
+		?>
+		<html>
+			<body>
+				<table border="1">
+					<th>Item</th>
+					<th>Quantity</th>
+					<th>Rate</th>
+					<?php foreach($Ledgers as $Ledger) {?>
+					<tr>
+						<td><?php echo  $Ledger->item->name; ?></td>
+						<td><?php echo  $Ledger->quantity; ?></td>
+						<td><?php echo  $Ledger->rate; ?></td>
+					</tr>
+						<?php } ?>
+					
+				</table>
+			</body>
+		</html>
+		<?php exit;
+	}
+	
 }
