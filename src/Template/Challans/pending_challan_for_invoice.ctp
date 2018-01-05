@@ -4,7 +4,7 @@
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Converted Challans</span>
+			<span class="caption-subject font-blue-steel uppercase">Pending Challans</span>
 		
 		</div>
 		<div class="actions">
@@ -12,12 +12,12 @@
 			<?= $this->Html->link(
 				'Pending',
 				'/Challans/PendingChallanForInvoice',
-				['class' => 'btn btn-default']
+				['class' => 'btn btn-primary']
 			); ?>
 			<?= $this->Html->link(
 				'Converted',
 				'/Challans/Index2',
-				['class' => 'btn btn-primary']
+				['class' => 'btn btn-default']
 			); ?>
 			</div>
 		</div>

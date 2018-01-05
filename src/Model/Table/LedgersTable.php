@@ -61,6 +61,7 @@ class LedgersTable extends Table
 		$this->belongsTo('Rivs');
 		$this->belongsTo('Vendors');
 		$this->belongsTo('OpeningBalances');
+		$this->belongsTo('ItemLedgers');
     }
 
     /**

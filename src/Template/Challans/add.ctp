@@ -9,19 +9,12 @@
 		<?= $this->Form->create($challan,['id'=>'form_sample_3']) ?>
 		<div class="form-body">
 			<div class="row">
-				<div class="col-md-2">
-						<div class="form-group">
-							<div class="radio-list" >
-							<label class="control-label">Challan Type <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->radio('challan_type',[['value' => 'Returnable', 'text' => 'Returnable'],['value' => 'Non Returnable', 'text' => 'Non Returnable']]); ?>
-							</div>
-						</div>
-				</div>
+				
 				<div class="col-md-2">
 						<div class="form-group">
 							<div class="radio-list" >
 							<label class="control-label">Challan For<span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->radio('challan_for',[['value' => 'Customer', 'text' => 'Customer','id' => 'id_radio1','checked'=>'checked'],['value' => 'Vendor', 'text' => 'Vendor','id' => 'id_radio2']]); ?>
+							<?php echo $this->Form->radio('challan_for',[['value' => 'Customer', 'text' => 'Customer','id' => 'id_radio1','checked'=>'checked']/* ,['value' => 'Vendor', 'text' => 'Vendor','id' => 'id_radio2'] */]); ?>
 							</div>
 						</div>
 				</div>
@@ -52,20 +45,6 @@
 							echo $this->Form->input('vendor_id', ['empty' => "--Select--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me']); ?>
 						</div>
 					</div>
-					<div class="col-md-2">
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label">Date</label>
-							<?php echo $this->Form->input('created_on', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y"),'readonly']); ?>
-						</div>
-						<span style="color: red;"><?php if($chkdate == 'Not Found'){  ?>
-					You are not in Current Financial Year
-				<?php } ?></span>
-					</div>
-				</div>
-				<div class="row">
-					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Challan No. <span class="required" aria-required="true">*</span></label>
@@ -82,33 +61,39 @@
 							</div>
 						</div>
 					</div>
-					
-				<div class="col-md-3" id="invoice_div">
+					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Invoice No. <span class="required" aria-required="true">*</span></label>
-							<div class="row">
-								<?php
-									$options=array();
-									foreach($invoices as $invoice){
-										$merge=(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4));
-										$options[]=['text' =>$merge, 'value' => $invoice->id];
-									}
-									echo $this->Form->input('invoice_id', ['empty' => "--Select--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me']); ?>
-							</div>
+							<label class="control-label">Date</label>
+							<?php echo $this->Form->input('created_on', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y"),'readonly']); ?>
+						</div>
+						<span style="color: red;"><?php if($chkdate == 'Not Found'){  ?>
+					You are not in Current Financial Year
+				<?php } ?></span>
+					</div>
+				</div>
+				<div class="row">
+					
+					<div class="col-md-5" id="customer_address_div">
+						<div class="form-group">
+							<label class="control-label">Address <span class="required" aria-required="true">*</span></label>
+							
+							<?php echo $this->Form->textarea('customer_address', ['label' => false,'class' => 'form-control','placeholder' => 'Address']); ?>
+							<a href="#" role="button" class="pull-right select_address" >
+							Select Address </a>
 						</div>
 					</div>
-					
-					<div class="col-md-3" id="invoice_booking_div" style="display:none;">
+					<div class="col-md-5" id="vendor_address_div" style="display:none;">
 						<div class="form-group">
-							<label class="control-label">Invoice Booking No. <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">Address <span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->textarea('vendor_address', ['label' => false,'class' => 'form-control','placeholder' => 'Address']); ?>
+						</div>
+					</div>	
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label">Courier <span class="required" aria-required="true">*</span></label>
 							<div class="row">
-								<?php
-									$options=array();
-									foreach($invoice_bookings as $invoice_booking){
-									$merge=(($invoice_booking->ib1.'/IB-'.str_pad($invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoice_booking->ib3.'/'.$invoice_booking->ib4));
-									$options[]=['text' =>$merge, 'value' => $invoice_booking->id];
-									}
-									echo $this->Form->input('invoice_booking_id', ['empty' => "--Select--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me']); ?>
+							<?php 
+							echo $this->Form->input('transporter_id',['empty'=>'--Select--','options'=>$transporters,'label' => false,'class' => 'form-control input-sm select2me']); ?>
 							</div>
 						</div>
 					</div>
@@ -124,48 +109,7 @@
 				</div><br/>
 		
 				
-				<div class="row">
-					<div class="col-md-4" id="customer_address_div">
-						<div class="form-group">
-							<label class="control-label">Address <span class="required" aria-required="true">*</span></label>
-							
-							<?php echo $this->Form->textarea('customer_address', ['label' => false,'class' => 'form-control','placeholder' => 'Address']); ?>
-							<a href="#" role="button" class="pull-right select_address" >
-							Select Address </a>
-						</div>
-					</div>
-					<div class="col-md-4" id="vendor_address_div" style="display:none;">
-						<div class="form-group">
-							<label class="control-label">Address <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->textarea('vendor_address', ['label' => false,'class' => 'form-control','placeholder' => 'Address']); ?>
-						</div>
-					</div>	
-					<div class="col-md-3">
-						<div class="form-group">
-							<label class="control-label">Courier <span class="required" aria-required="true">*</span></label>
-							<div class="row">
-							<?php 
-							echo $this->Form->input('transporter_id',['empty'=>'--Select--','options'=>$transporters,'label' => false,'class' => 'form-control input-sm select2me']); ?>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<div class="radio-list" >
-							<label class="control-label">Pass Credit Note<span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->radio('pass_credit_note',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
-							</div>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<div class="radio-list" >
-							<label class="control-label">Pass Debit Note<span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->radio('pass_debit_note',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
-							</div>
-						</div>
-					</div>
-				</div>
+				
 		
 			<br/>
 			
@@ -174,10 +118,13 @@
 					<tr>
 						<th width="50">Sr.No. </th>
 						<th>Items</th>
-						<th width="130">Quantity</th>
+						<th width="100">Quantity</th>
 						<th width="130">Rate</th>
 						<th width="130">Amount</th>
-						<th width="70"></th>
+						<th width="130">Type</th>
+						<th width="100" align="center">Stock Impact</th>
+						<th width="100" align="center">Invoice</th>
+						<th width="50"></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -185,7 +132,7 @@
 				</tbody>
 				<tfoot>
 					<tr>
-						<td colspan="4" align="right"><b>Total</b></td>
+						<td colspan="7" align="right"><b>Total</b></td>
 						<td><?php echo $this->Form->input('total', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Total']); ?></td>
 						<td></td>
 					</tr>
@@ -234,6 +181,7 @@
 }
 </style>
 
+<?php $challan_type=[['text' =>'Returnable', 'value' => 'Returnable'],['text'=>'Non Returnable','value'=>'Non Returnable']]; ?>
 
 <table id="sample_tb" style="display:none;">
 	<tbody>
@@ -261,13 +209,29 @@
 					</div>
 				</div>
 			</td>
-			<td width="100"><?php echo $this->Form->input('quantity[]', ['label' => false,'class' => 'form-control input-sm','placeholder' => 'Quantity']); ?></td>
-			<td width="130"><?php echo $this->Form->input('rate[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Rate']); ?></td>
-			<td width="130"><?php echo $this->Form->input('amount[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount']); ?></td>
+			<td width="100">
+				<?php echo $this->Form->input('quantity[]', ['label' => false,'class' => 'form-control 	input-sm','placeholder' => 'Quantity']); ?>
+			</td>
+			<td width="130">
+				<?php echo $this->Form->input('rate[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Rate']); ?>
+			</td>
+			<td width="130">
+				<?php echo $this->Form->input('amount[]', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Amount']); ?>
+			</td>
+			<td width="130">
+				<?php echo $this->Form->input('challan_type', ['empty'=>'Select','options' => $challan_type,'label' => false,'class' => 'form-control input-sm select2-offscreen challan_type','placeholder' => 'Item']); ?>
+			</td>
+			
+			<td align="center">
+				<label><?php echo $this->Form->input('check.', ['label' => false,'type'=>'checkbox','class'=>'rename_check1 rm1']); ?></label>
+			</td>
+			<td align="center">
+				<label><?php echo $this->Form->input('check.', ['label' => false,'type'=>'checkbox','class'=>'rename_check2 rm1']); ?></label>
+			</td>
 			<td  width="70"><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a></td>
 		</tr>
 		<tr class="tr2">
-			<td colspan="4"><?php echo $this->Form->textarea('description', ['label' => false,'class' => 'form-control input-sm autoExpand','placeholder' => 'Description','rows'=>'1']); ?></td>
+			<td colspan="7"><?php echo $this->Form->textarea('description', ['label' => false,'class' => 'form-control input-sm autoExpand','placeholder' => 'Description','rows'=>'1']); ?></td>
 			<td></td>
 		</tr>
 	</tbody>
@@ -435,6 +399,41 @@ $(document).ready(function() {
 
 	});
 	//--	 END OF VALIDATION
+	$('.challan_type').die().live("change",function() {
+		var c_type=$(this).val();
+		
+		if(c_type != 'Returnable'){ 
+			$(this).closest("tr").find('.rename_check1').removeAttr("disabled",false);
+			$(this).closest("tr").find('.rename_check2').removeAttr("disabled",false);
+		}else { 
+		//$(this).closest("tr").remove();
+			$(this).closest("tr").find('.rename_check1').attr("checked", false);
+			$(this).closest("tr").find('.rename_check1').attr("disabled", true);
+			$(this).closest("tr").find('.rename_check2').attr("checked", false);
+			$(this).closest("tr").find('.rename_check2').attr("disabled", true);
+		}
+		rename_rows();
+	});
+	
+	$('.rm1').die().live("change",function() { 
+		var check='';
+		if($(this).is(':checked'))
+		{
+			check='checked'; 
+		}
+		
+		$(this).closest("tr").find('.rm1').each(function(){ 
+			$(this).prop('checked',false);
+			$.uniform.update();
+		});
+		if(check=='checked'){
+			$(this).prop('checked',true);
+			$.uniform.update();
+		}
+	});
+	
+	
+	
 	rename_rows();
     add_row();
     $('.addrow').die().live("click",function() { 
@@ -479,28 +478,27 @@ $(document).ready(function() {
 	var i=0;
 			$("#main_tb tbody tr.tr1").each(function(){
 				$(this).find("td:nth-child(1)").html(++i); --i;
-				//$(this).find("td:nth-child(2) select").select2().attr({name:"challan_rows["+i+"][item_id]", id:"challan_rows-"+i+"-item_id"}).rules("add", "required");
-				$(this).find("td:nth-child(2) select").select2().attr({name:"challan_rows["+i+"][item_id]", id:"challan_rows-"+i+"-item_id",popup_id:i}).rules('add', {
-							required: true,
-							notEqualToGroup: ['.item_id'],
-							messages: {
-								notEqualToGroup: "Do not select same Item again."
-							}
-						});
-				$(this).find("td:nth-child(3) input").attr({name:"challan_rows["+i+"][quantity]", id:"challan_rows-"+i+"-quantity"}).rules('add', {
-						required: true,
-						digits: true,
-						min: 1,
-						messages: {
-							min: "Quantity can't be zero."
-						}
-					});
-				$(this).find("td:nth-child(4) input").attr({name:"challan_rows["+i+"][rate]", id:"challan_rows-"+i+"-rate",r_popup_id:i}).rules('add', {
-						required: true,
-						number: true,
-						min: 0.01
-					});
-				$(this).find("td:nth-child(5) input").attr({name:"challan_rows["+i+"][amount]", id:"challan_rows-"+i+"-amount"});
+				
+				
+				$(this).find('td:nth-child(2) select').select2().attr("name","challan_rows["+i+"][item_id]").attr("id","challan_rows-"+i+"-item_id").rules("add", "required");
+				
+				$(this).find('td:nth-child(3) input').attr("name","challan_rows["+i+"][quantity]").attr("id","challan_rows-"+i+"-quantity").rules("add", "required");
+				
+				$(this).find('td:nth-child(4) input').attr("name","challan_rows["+i+"][rate]").attr("id","challan_rows-"+i+"-rate").rules("add", "required");
+				
+				$(this).find('td:nth-child(5) input').attr("name","challan_rows["+i+"][amount]").attr("id","challan_rows-"+i+"-amount").rules("add", "required");
+				
+				$(this).find('td:nth-child(6) select').select2().attr("name","challan_rows["+i+"][challan_type]").attr("id","challan_rows-"+i+"-challan_type").rules("add", "required");
+				
+				$(this).find("td:nth-child(7) input").attr({name:"challan_rows["+i+"][stock_impact]", id:"challan_rows-"+i+"-stock_impact"}).uniform();
+				//var test = $("input[type=checkbox]:not(.toggle)");
+				//if (test) { test.uniform(); }
+				
+				$(this).find("td:nth-child(8) input").attr({name:"challan_rows["+i+"][invoice]", id:"challan_rows-"+i+"-invoice"}).uniform();
+				//var test = $("input[type=checkbox]:not(.toggle)");
+				//if (test) { test.uniform(); }
+				
+				
 				i++; 
 			});
 			var i=0;
@@ -563,6 +561,8 @@ $(document).ready(function() {
 		var vaddress=$('select[name="vendor_id"] option:selected').attr('v_address');
 		$('textarea[name="vendor_address"]').val(vaddress);
 	});
+	
+	
 	
 	$('select[name="customer_id"]').on("change",function() {
 		var contact_person=$('select[name="customer_id"] option:selected').attr('contact_person');
@@ -701,7 +701,7 @@ $(document).ready(function() {
 		
 	}
 	
-	$('select[name="invoice_id"]').live("change",function() {  
+	/* $('select[name="invoice_id"]').live("change",function() {  
 		var in_id=$(this).val(); 
 		itemsAsInvoice(in_id,'Invoices');
 	});
@@ -722,7 +722,7 @@ $(document).ready(function() {
 			$("#main_tb tbody tr").remove();
 			add_row();
 		});
-	}
+	} */
 	
 	
 });

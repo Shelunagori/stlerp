@@ -29,7 +29,7 @@ class ChallansController extends AppController
 		$To=$this->request->query('To');
 		$this->set(compact('ch2','customer','From','To','file'));
         $this->paginate = [
-            'contain' => ['Customers', 'Companies', 'Invoices', 'Transporters','Vendors']
+            'contain' => ['Customers', 'Companies',  'Transporters','Vendors']
         ];
 		if(!empty($ch2)){
 			$where['ch2 LIKE']='%'.$ch2.'%';
@@ -48,8 +48,8 @@ class ChallansController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['created_on <=']=$To;
 		}
-		$challans=$this->paginate($this->Challans->find()->where($where)->where(['challan_type' => 'Returnable','Challans.company_id'=>$st_company_id]));
-        
+		$challans=$this->paginate($this->Challans->find()->where(['Challans.company_id'=>$st_company_id]));
+        //pr($challans); exit;
         $this->set(compact('challans'));
         $this->set('_serialize', ['challans']);
     }
@@ -68,7 +68,7 @@ class ChallansController extends AppController
 		$To=$this->request->query('To');
 		$this->set(compact('ch2','customer','From','To','file'));
         $this->paginate = [
-            'contain' => ['Customers', 'Companies', 'Invoices', 'Transporters','Vendors']
+            'contain' => ['Customers', 'Companies', 'Transporters','Vendors']
         ];
 		if(!empty($ch2)){
 			$where['ch2 LIKE']='%'.$ch2.'%';
@@ -87,13 +87,12 @@ class ChallansController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['created_on <=']=$To;
 		}
-        $this->paginate = [
-            'contain' => ['Customers', 'Companies', 'Invoices', 'Transporters','Vendors']
-        ];
-		$challans=$this->paginate($this->Challans->find()->where($where)->where(['challan_type' => 'Non Returnable','challans.company_id'=>$st_company_id]));
-        
-        $this->set(compact('challans'));
-        $this->set('_serialize', ['challans']);
+       
+		$Challans = $this->paginate($this->Challans->find()->matching('ChallanRows' , function($q) use($st_company_id){
+			return $q->where(['ChallanRows.invoice'=>1]);
+		})->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Converted'])->order(['Challans.id' => 'ASC']));
+	//	pr($Challans->toArray()); exit;
+		$this->set(compact('Challans'));
     }
     /**
      * View method
@@ -146,9 +145,10 @@ class ChallansController extends AppController
 		if ($this->request->is('post')) {
 			
             $challan = $this->Challans->patchEntity($challan, $this->request->data);
-			$type=$challan->challan_type;
 			
-			$last_ch_no_rt=$this->Challans->find()->select(['ch2'])->where(['company_id' => $st_company_id,'challan_type' => $type])->order(['ch2' => 'DESC'])->first();
+			//$type=$challan->challan_type;
+			
+			$last_ch_no_rt=$this->Challans->find()->select(['ch2'])->where(['company_id' => $st_company_id])->order(['ch2' => 'DESC'])->first();
 			
 			if($last_ch_no_rt){
 				
@@ -160,27 +160,33 @@ class ChallansController extends AppController
 			}
 		
 			$challan->created_by=$s_employee_id; 
+			$challan->ch3=$challan->qt3; 
 			$challan->company_id=$st_company_id;
 			$challan->created_on=date("Y-m-d",strtotime($challan->created_on));
 			$customer_id=$challan->customer_id;
 			$vendor_id=$challan->vendor_id;
-			
-            if ($this->Challans->save($challan)) {
+			//pr($challan); exit;
+            if ($this->Challans->save($challan)) { //pr($challan->challan_rows); exit;
 					
 					foreach($challan->challan_rows as $challan_row){
-					$itemLedger = $this->Challans->ItemLedgers->newEntity();
-					$itemLedger->item_id = $challan_row->item_id;	
-					$itemLedger->quantity = $challan_row->quantity;
-					$itemLedger->source_model = 'Challan';
-					$itemLedger->source_id = $challan_row->challan_id;
-					$itemLedger->in_out = 'Out';
-					$itemLedger->rate = $challan_row->rate;
-					$itemLedger->company_id = $st_company_id;
-					$itemLedger->processed_on = date("Y-m-d");
-					$itemLedger->challan_type = $challan->challan_type;
-					//pr($itemLedger); exit;
-					$this->Challans->ItemLedgers->save($itemLedger);
+						if($challan_row->challan_type=="Non Returnable" && $challan_row->stock_impact==1){
+							
+							$itemLedger = $this->Challans->ItemLedgers->newEntity();
+							$itemLedger->item_id = $challan_row->item_id;	
+							$itemLedger->quantity = $challan_row->quantity;
+							$itemLedger->source_model = 'Challan';
+							$itemLedger->source_id = $challan->id;
+							$itemLedger->in_out = 'Out';
+							$itemLedger->rate = $challan_row->rate;
+							$itemLedger->company_id = $st_company_id;
+							$itemLedger->processed_on = date("Y-m-d");
+							$itemLedger->challan_type = $challan->challan_type;
+							$itemLedger->source_row_id = $challan_row->id;
+							
+							$this->Challans->ItemLedgers->save($itemLedger);
+						}
 					}
+					
                 $this->Flash->success(__('The challan has been saved.'));
 
                   return $this->redirect(['action' => 'confirm/'.$challan->id]);
@@ -230,10 +236,25 @@ class ChallansController extends AppController
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$Company = $this->Challans->Companies->get($st_company_id);
 		
-		
+		$st_year_id = $session->read('st_year_id');
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		$fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		$todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		$tody1 = date("Y-m-d");
+
+		$fromdate = strtotime($fromdate1);
+		$todate = strtotime($todate1); 
+		$tody = strtotime($tody1);
+
+		if($fromdate >= $tody || $todate <= $tody){
+			$chkdate = 'Not Found';
+		}else{
+			$chkdate = 'Found';
+		}
         $challan = $this->Challans->get($id, [
-            'contain' => ['Companies','Invoices' => ['InvoiceRows' => ['Items']],'InvoiceBookings' => ['InvoiceBookingRows' => ['Items']],'Transporters','ChallanRows','Creator','Vendors']
+            'contain' => ['Companies','Transporters','ChallanRows','Creator','Vendors']
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $challan = $this->Challans->patchEntity($challan, $this->request->data);
@@ -243,6 +264,7 @@ class ChallansController extends AppController
 			$challan->created_on=date("Y-m-d",strtotime($challan->created_on));
 			$customer_id=$challan->customer_id;
 			$vendor_id=$challan->vendor_id;
+			$challan->challan_status=$challan->challan_status;
 			
 			if(empty($customer_id))
 			{
@@ -256,22 +278,28 @@ class ChallansController extends AppController
 			$challan->invoice_booking_id =0;
 			$challan->vendor_address ='';
 			}
+			//pr($challan); exit;
             if ($this->Challans->save($challan)) {
 				
 				$this->Challans->ItemLedgers->deleteAll(['source_id' => $id, 'source_model' => 'Challan']);
-				foreach($challan->challan_rows as $challan_row){
-					$itemLedger = $this->Challans->ItemLedgers->newEntity();
-					$itemLedger->item_id = $challan_row->item_id;	
-					$itemLedger->quantity = $challan_row->quantity;
-					$itemLedger->source_model = 'Challan';
-					$itemLedger->source_id = $challan_row->challan_id;
-					$itemLedger->in_out = 'Out';
-					$itemLedger->rate = $challan_row->rate;
-					$itemLedger->company_id = $st_company_id;
-					$itemLedger->processed_on = date("Y-m-d");
-					$itemLedger->challan_type = $challan->challan_type;
-					//pr($itemLedger); exit;
-					$this->Challans->ItemLedgers->save($itemLedger);}
+					foreach($challan->challan_rows as $challan_row){
+						if($challan_row->challan_type=="Non Returnable" && $challan_row->stock_impact==1){
+							
+							$itemLedger = $this->Challans->ItemLedgers->newEntity();
+							$itemLedger->item_id = $challan_row->item_id;	
+							$itemLedger->quantity = $challan_row->quantity;
+							$itemLedger->source_model = 'Challan';
+							$itemLedger->source_id = $challan->id;
+							$itemLedger->in_out = 'Out';
+							$itemLedger->rate = $challan_row->rate;
+							$itemLedger->company_id = $st_company_id;
+							$itemLedger->processed_on = date("Y-m-d");
+							$itemLedger->challan_type = $challan->challan_type;
+							$itemLedger->source_row_id = $challan_row->id;
+							
+							$this->Challans->ItemLedgers->save($itemLedger);
+						}
+					}
 				
                 $this->Flash->success(__('The challan has been saved.'));
 				return $this->redirect(['action' => 'index']);
@@ -318,7 +346,7 @@ class ChallansController extends AppController
 			'keyField' => function ($row) {
 				return $row['file1'] . '-' . $row['file2'];
 			}]);
-        $this->set(compact('challan', 'customers', 'Company', 'invoices', 'transporters','items','vendors','filenames','invoice_bookings','id'));
+        $this->set(compact('challan', 'customers', 'Company', 'invoices', 'transporters','items','vendors','filenames','invoice_bookings','id','chkdate'));
 	
         $this->set('_serialize', ['challan']);
     }
@@ -347,13 +375,26 @@ class ChallansController extends AppController
     {
 		$this->viewBuilder()->layout('');
          $challan = $this->Challans->get($id, [
-            'contain' => ['Companies','Customers','Invoices','Transporters','ChallanRows','Creator','Vendors','InvoiceBookings']
+            'contain' => ['Companies','Customers','Transporters','ChallanRows','Creator','Vendors']
 			]);
 
         $this->set('challan', $challan);
         $this->set('_serialize', ['challan']);
     }
 	
+	public function PendingChallanForInvoice()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Challans = $this->paginate($this->Challans->find()->matching('ChallanRows' , function($q) use($st_company_id){
+			return $q->where(['ChallanRows.invoice'=>1]);
+		})->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Pending'])->order(['Challans.id' => 'ASC']));
+	//	pr($Challans->toArray()); exit;
+		$this->set(compact('Challans'));
+		
+	}
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');

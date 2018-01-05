@@ -8,7 +8,7 @@ $url_excel="/?".$url;
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Trail Balance</span>
+			<span class="caption-subject font-blue-steel uppercase">Trial Balance</span>
 		</div>
 		<div class="actions">
 			<?php  //echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/Export-Ob/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
@@ -39,8 +39,7 @@ $url_excel="/?".$url;
 			</table>
 	</form>
 		<!-- BEGIN FORM-->
-<?php if(!empty($LedgerAccounts)){ //pr($LedgerAccounts->toArray()); exit;  ?>
-		
+<?php if(!empty($LedgerAccounts)){?>
 <table class="table table-bordered table-hover table-condensed" width="100%">
 					<thead>
 						<tr>
@@ -74,18 +73,27 @@ $url_excel="/?".$url;
 							}else{
 								$ledger_name=@$LedgerAccount->name;
 							}
-								    
+							
+							if((@$OpeningBalanceDebit[$LedgerAccount->id] > 0 || @$OpeningBalanceCredit[$LedgerAccount->id] > 0) || (@$TransactionsDebit[$LedgerAccount->id] > 0 || @$TransactionsCredit[$LedgerAccount->id] > 0) ){
 							?>
+							
 									<tr>
 										<td scope="col"><?php echo $ledger_name;   ?></td>
+										
+										
 										<td scope="col" align="right">
-											<?php echo @$OpeningBalanceDebit[$LedgerAccount->id];?>
-											<?php @$TotalOpeningBalanceDebit+=$OpeningBalanceDebit[$LedgerAccount->id];?>
+											<?php echo round(@$OpeningBalanceDebit[$LedgerAccount->id],2);
+											$opd=@$OpeningBalanceDebit[$LedgerAccount->id]; ?>
+											<?php @$TotalOpeningBalanceDebit+=$opd;?>
 										</td>
 										<td scope="col" align="right">
-											<?php echo @$OpeningBalanceCredit[$LedgerAccount->id];?>
-											<?php @$TotalOpeningBalanceCredit+=$OpeningBalanceCredit[$LedgerAccount->id];?>
+											<?php echo round(@$OpeningBalanceCredit[$LedgerAccount->id],2);
+											$opc=@$OpeningBalanceCredit[$LedgerAccount->id];
+											?>
+											<?php @$TotalOpeningBalanceCredit+=@$opc;?>
 										</td>
+										
+										
 										<td scope="col" align="right">
 											<?php echo @$TransactionsDebit[$LedgerAccount->id];?>
 											<?php @$TotalTransactionsDebit+=$TransactionsDebit[$LedgerAccount->id];?>
@@ -94,39 +102,89 @@ $url_excel="/?".$url;
 											<?php echo @$TransactionsCredit[$LedgerAccount->id];?>
 											<?php @$TotalTransactionsCredit+=$TransactionsCredit[$LedgerAccount->id];?>
 										</td>
+										
+										<?php 
+											$totalClosingDr= @$OpeningBalanceDebit[$LedgerAccount->id]+@$TransactionsDebit[$LedgerAccount->id];
+											$totalClosingCr= @$OpeningBalanceCredit[$LedgerAccount->id]+@$TransactionsCredit[$LedgerAccount->id];
+										?>
+										
+										<?php if(@$totalClosingDr > @$totalClosingCr){ ?>
 										<td scope="col" align="right">
-											<?php echo @$OpeningBalanceDebit[$LedgerAccount->id]+@$TransactionsDebit[$LedgerAccount->id];?>
-											<?php  $ClosingAmmountDebit+=@$OpeningBalanceDebit[$LedgerAccount->id]+@$TransactionsDebit[$LedgerAccount->id];?>
+											<?php echo round(@$totalClosingDr-@$totalClosingCr,2); ?>
+											<?php @$ClosingAmmountDebit+=@$totalClosingDr-@$totalClosingCr;?>
 										</td>
+										<td scope="col" align="right">- </td>
+										<?php } else if(@$totalClosingDr < @$totalClosingCr){ ?>
+										<td scope="col" align="right">- </td>
 										<td scope="col" align="right">
-											<?php echo @$OpeningBalanceCredit[$LedgerAccount->id]+@$TransactionsCredit[$LedgerAccount->id];?>
-											<?php  $ClosingAmmountCredit+=@$OpeningBalanceDebit[$LedgerAccount->id]+@$TransactionsDebit[$LedgerAccount->id];?>
+											<?php echo round(@$totalClosingCr-@$totalClosingDr,2); ?>
+											<?php @$ClosingAmmountCredit+=@$totalClosingCr-@$totalClosingDr ;?>
 										</td>
+										
+										<?php }else{ ?>
+											<td scope="col" align="right">- </td>
+											<td scope="col" align="right">- </td>
+										<?php } ?>
 									</tr>
 						<?php 
-								
+							}	
 							}
 						?>
 							<tr>
+								<td colspan="5">Opening Stocks</td>
+								<td  scope="col" align="right"><?php echo round($itemOpeningBalance,2); ?></td>
+								<td></td>
+							</tr>
+							<tr style="color:red;">
+								<td colspan="5">Diff. In Opening Balance</td>
+								<?php if($differenceInOpeningBalance > 0){ ?>
+									<td  scope="col" align="right"><?php echo round($differenceInOpeningBalance,2); ?></td>
+									<td></td>
+								<?php } else { ?>
+									<td></td>	
+									<td  scope="col" align="right"><?php 
+									$differenceInOpeningBalance=abs($differenceInOpeningBalance);
+									echo round($differenceInOpeningBalance,2); ?></td>
+								<?php } ?>
+								
+							</tr>
+							<tr>
 								<td scope="col"><b>Total </td>
+								
 								<td scope="col" align="right"><b>
-									<?php echo @$TotalOpeningBalanceDebit;?>
+									<?php echo round(@$TotalOpeningBalanceDebit,2);?>
 								</td>
 								<td scope="col" align="right"><b>
-									<?php echo @$TotalOpeningBalanceCredit;?>
+								<?php echo round(@$TotalOpeningBalanceCredit,2);?>
 								</td>
+								
+
+								
+								
 								<td scope="col" align="right"><b>
 									<?php echo @$TotalTransactionsDebit;?>
 								</td>
 								<td scope="col" align="right"><b>
 									<?php echo @$TotalTransactionsCredit;?>
 								</td>
+								
+								<?php 
+								if(@$itemOpeningBalance > 0){
+									@$ClosingAmmountDebit=@$ClosingAmmountDebit+@$itemOpeningBalance+abs($differenceInOpeningBalance);
+								}else{
+									@$ClosingAmmountCredit=@$ClosingAmmountCredit+abs(@$itemOpeningBalance)+abs($differenceInOpeningBalance);
+								}
+								?>
+								
 								<td scope="col" align="right"><b>
-									<?php echo @$ClosingAmmountDebit;?>
+									<?php echo round(@$ClosingAmmountDebit,2);?>
 								</td>
+								
 								<td scope="col" align="right"><b>
-									<?php echo @$ClosingAmmountCredit;?>
+								<?php echo round(@$ClosingAmmountCredit,2);?>
 								</td>
+								
+								
 							</tr>
 					</tbody>
 					<tfoot>

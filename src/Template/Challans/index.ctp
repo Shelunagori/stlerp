@@ -7,18 +7,7 @@
 		
 		</div>
 		<div class="actions">
-			<div class="btn-group">
-			<?= $this->Html->link(
-				'Returnable',
-				'/Challans/Index',
-				['class' => 'btn btn-primary']
-			); ?>
-			<?= $this->Html->link(
-				'Non Returnable',
-				'/Challans/Index2',
-				['class' => 'btn btn-default']
-			); ?>
-			</div>
+			
 		</div>
 
 	<div class="portlet-body">

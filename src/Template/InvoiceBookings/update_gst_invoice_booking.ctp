@@ -506,7 +506,10 @@ $(document).ready(function() {
 			var misc=parseFloat($(this).find("td:nth-child(5) input").val());
 			if(!misc){ misc=0; $(this).find("td:nth-child(6) input").val('');}
 			var amount_after_misc=amount+misc;
+			
 			row_total=row_total+misc;
+			amount=amount_after_misc;
+			//alert(amount_after_misc)
 			total_amount=total_amount+amount_after_misc;
 			$(this).find("td:nth-child(6) input").val(round(amount_after_misc,2));
 		

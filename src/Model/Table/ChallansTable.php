@@ -104,9 +104,9 @@ class ChallansTable extends Table
             ->requirePresence('transporter_id', 'create')
             ->notEmpty('transporter_id');
 		
-		$validator
+		/* $validator
             ->requirePresence('challan_type', 'create')
-            ->notEmpty('challan_type');
+            ->notEmpty('challan_type'); */
 		
         $validator
             ->requirePresence('reference_detail', 'create')

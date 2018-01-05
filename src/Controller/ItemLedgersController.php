@@ -1471,58 +1471,68 @@ class ItemLedgersController extends AppController
 			$SalesOrderQty=$SalesOrderRows->quantity;
 			$job_card_Qt=$job_card_row->quantity;
 			$jciq=(@$invoice_qty*@$job_card_Qt)/@$SalesOrderQty;
-			@$job_card_qty[@$job_card_row->item_id]+=$jciq;
+			
 			if(@$jciq > 0){
+				@$job_card_qty[@$job_card_row->item_id]+=$jciq;
 				@$job_id[$job_card_row->item_id].=@$job_card_row->job_card_id.',';
 			}
 		}
 		}
 	}
+	//pr($job_id); exit;
 
-	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows','Invoices'=>['InvoiceRows' => function($q) {
+	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
 	}]])->where($where1);
-		
+	//pr($SalesOrders->toArray()); exit;
+	
 	$sales_order_qty=[];
-	$invoice_qty=[];
+	 $invoice_qty=[];
 	$sales_id=[];
-		foreach($SalesOrders as $SalesOrder){ $sales_qty=[];
-			foreach($SalesOrder->invoices as $invoice){
-				foreach($invoice->invoice_rows as $invoice_row){
+	
+		foreach($SalesOrders as $SalesOrder){ $sales_qty=[]; $inc_qty=[]; 
+			foreach($SalesOrder->sales_order_rows as $sales_order_row){ 
+				foreach($sales_order_row->invoice_rows as $invoice_row){ //pr($invoice_row); exit;
 					@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+					@$inc_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
 				}
-			}
-			foreach($SalesOrder->sales_order_rows as $sales_order_row){  
 				@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
 				@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
 			}
+			
+			
 			foreach(@$sales_qty as $key=>$sales_order_qt){
-					if(@$sales_order_qt > @$invoice_qty[$key] ){ 
+					if(@$sales_order_qt > @$inc_qty[$key] ){ 
 						@$sales_id[$key].=@$SalesOrder->id.',';
 					}
-				
 			}
+			//if()
 		}
+		//pr($invoice_qty); 
+		//pr($sales_qty); 
+		//pr($sales_id); 
+	//	exit;
 		
-	$PurchaseOrders = $this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows','Grns'=>['GrnRows' => function($q) {
+	$PurchaseOrders = $this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['GrnRows' => function($q) {
 				return $q->select(['grn_id','purchase_order_row_id','item_id','total_qty' => $q->func()->sum('GrnRows.quantity')])->group('GrnRows.purchase_order_row_id');
 	}]])->where($where3);
 		//pr($PurchaseOrders->toArray()); exit;
 	$purchase_order_qty=[];
 	$grn_qty=[];
 	$purchase_id=[];
-		foreach($PurchaseOrders as $PurchaseOrder){ $sales_qty=[];
-			foreach($PurchaseOrder->grns as $grn){
-				foreach($grn->grn_rows as $grn_row){
+		foreach($PurchaseOrders as $PurchaseOrder){ $sales_qty=[]; $g_qty=[];
+			foreach($PurchaseOrder->purchase_order_rows as $purchase_order_row){
+				foreach($purchase_order_row->grn_rows as $grn_row){
 					@$grn_qty[$grn_row['item_id']]+=$grn_row['total_qty'];
+					@$g_qty[$grn_row['item_id']]+=$grn_row['total_qty'];
 				}
-			}
-			foreach($PurchaseOrder->purchase_order_rows as $purchase_order_row){  
 				@$purchase_order_qty[$purchase_order_row['item_id']]+=$purchase_order_row['quantity'];
 				@$sales_qty[$purchase_order_row['item_id']]+=$purchase_order_row['quantity'];
+				
 			}
+			
 			foreach(@$sales_qty as $key=>$sales_order_qt){
-					if(@$sales_order_qt > @$grn_qty[$key] ){ 
+					if(@$sales_order_qt > @$g_qty[$key] ){ 
 						@$purchase_id[$key].=@$PurchaseOrder->id.',';
 					}
 				
@@ -1534,25 +1544,25 @@ pr($grn_qty);
 pr($purchase_id); 
 
 //exit;	 */
-	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows','SalesOrders'=>['SalesOrderRows' => function($q) {
+	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows'=>['SalesOrderRows' => function($q) {
 				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
 	}]])->where($where5);
 	//	pr($Quotations->toArray()); exit;
 	$qo_qty=[];
 	$so_qty=[];
 	$qotation_id=[];
-		foreach($Quotations as $Quotation){ $sales_qty=[];
-			foreach($Quotation->sales_orders as $sales_order){
-				foreach($sales_order->sales_order_rows as $sales_order_row){
+		foreach($Quotations as $Quotation){ $sales_qty=[]; $s_qt=[];
+			foreach($Quotation->quotation_rows as $quotation_row){
+				foreach($quotation_row->sales_order_rows as $sales_order_row){
 					@$so_qty[$sales_order_row['item_id']]+=$sales_order_row['total_qty'];
+					@$s_qt[$sales_order_row['item_id']]+=$sales_order_row['total_qty'];
 				}
-			}
-			foreach($Quotation->quotation_rows as $quotation_row){  
 				@$qo_qty[$quotation_row['item_id']]+=$quotation_row['quantity'];
 				@$sales_qty[$quotation_row['item_id']]+=$quotation_row['quantity'];
 			}
+			
 			foreach(@$sales_qty as $key=>$sales_order_qt){
-					if(@$sales_order_qt > @$so_qty[$key] ){  
+					if(@$sales_order_qt > @$s_qt[$key] ){  
 						@$qotation_id[$key].=@$Quotation->id.',';
 					}
 				

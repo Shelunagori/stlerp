@@ -371,6 +371,23 @@ fieldset legend {
 				</div></br>
 				<div class="col-md-6">
                     	<fieldset>
+        				<legend>Challans</b></legend>
+						<div class="checkbox-list">
+						<label class="checkbox-inline">
+							<?php 
+							if(in_array(11,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+							echo $this->Form->input('user_rights.11.page_id', ['label' => 'Add','class' => '','type'=>'checkbox','value'=>11,$checked_status]); ?>
+						</label>
+						<label class="checkbox-inline">
+							<?php 
+							if(in_array(12,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+							echo $this->Form->input('user_rights.12.page_id', ['label' => 'Edit','class' => '','type'=>'checkbox','value'=>12,$checked_status]); ?>
+						</label>
+						</div>
+					</fieldset>
+				</div></br>
+				<div class="col-md-6">
+                    	<fieldset>
         				<legend>User-Rights/Logins</b></legend>
 						<div class="checkbox-list">
 						<label class="checkbox-inline">

@@ -763,6 +763,8 @@ class LedgersController extends AppController
 		$from_date = $this->request->query('From');
 		 $to_date   = $this->request->query('To');
 		 
+		 $company = $this->Companies->get($st_company_id);
+			//pr($company->accounting_book_date);exit;
 		  
 		if($from_date){ 
 		$from_date = date("Y-m-d",strtotime($from_date));
@@ -772,36 +774,71 @@ class LedgersController extends AppController
 		$OpeningBalanceDebit=[];
 		$TransactionsDebit=[];
 		$TransactionsCredit=[];
-			foreach($LedgerAccounts as $LedgerAccount){
-				$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$LedgerAccount->id]);
-				foreach($Ledgers as $Ledger){ 
-					$Ledger->transaction_date = date("Y-m-d",strtotime($Ledger->transaction_date));
-					if($Ledger->transaction_date < $from_date && $Ledger->debit > 0){ //pr($from_date);  pr($Ledger->transaction_date); 
-						@$OpeningBalanceDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+			foreach($LedgerAccounts as $LedgerAccount){ 
+				$company->accounting_book_date = date("Y-m-d",strtotime($company->accounting_book_date));
+				//pr(@$from_date);
+				//pr(@$company->accounting_book_date); exit;
+				if($company->accounting_book_date == $from_date){
+					$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$LedgerAccount->id]);
+					
+						foreach($Ledgers as $Ledger){ 
+							$Ledger->transaction_date = date("Y-m-d",strtotime($Ledger->transaction_date));
+							
+							if(($Ledger->transaction_date == $from_date) && ($Ledger->debit > 0) && ($Ledger->voucher_source == 'Opening Balance')){ //pr($from_date);  pr($Ledger->transaction_date); 
+								@$OpeningBalanceDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+							}
+							if(($Ledger->transaction_date == $from_date) && ($Ledger->credit > 0) && ($Ledger->voucher_source =='Opening Balance')){
+								@$OpeningBalanceCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+							}
+						if(($Ledger->transaction_date > $from_date) || ($Ledger->transaction_date <= $to_date) && ($Ledger->debit > 0) && ($Ledger->voucher_source != 'Opening Balance')){
+								@$TransactionsDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+							}
+							if(($Ledger->transaction_date > $from_date) || ($Ledger->transaction_date <= $to_date) && ($Ledger->credit > 0) && ($Ledger->voucher_source != 'Opening Balance')){
+								@$TransactionsCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+							}
+							
+						}
+				}else{ 
+					$Ledgers = $this->Ledgers->find()->where(['Ledgers.ledger_account_id'=>$LedgerAccount->id]);
+						foreach($Ledgers as $Ledger){ 
+							$Ledger->transaction_date = date("Y-m-d",strtotime($Ledger->transaction_date));
+							
+							if($Ledger->transaction_date < $from_date && $Ledger->debit > 0){ //pr($from_date);  pr($Ledger->transaction_date); 
+								@$OpeningBalanceDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+							}
+							if($Ledger->transaction_date < $from_date && $Ledger->credit > 0){ 
+								@$OpeningBalanceCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+							}
+							if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->debit > 0){
+								@$TransactionsDebit[@$LedgerAccount->id]+=@$Ledger->debit;
+							}
+							if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->credit > 0){
+								@$TransactionsCredit[@$LedgerAccount->id]+=@$Ledger->credit;
+							}
+						}
 					}
-					if($Ledger->transaction_date < $from_date && $Ledger->credit > 0){ 
-						@$OpeningBalanceCredit[@$LedgerAccount->id]+=@$Ledger->credit;
-					}
-					if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->debit > 0){
-						@$TransactionsDebit[@$LedgerAccount->id]+=@$Ledger->debit;
-					}
-					if(($Ledger->transaction_date >= $from_date && $Ledger->transaction_date <= $to_date) && $Ledger->credit > 0){
-						@$TransactionsCredit[@$LedgerAccount->id]+=@$Ledger->credit;
-					}
-				}
+				
 			}
 		
 		}
+		$ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
+		$itemOpeningBalance=0;
+		foreach($ItemLedgers as $ItemLedger){ 
+			$itemOpeningBalance+=$ItemLedger->quantity*$ItemLedger->rate;
+		}
+		//pr($itemOpeningBalance); exit;
 		if(empty($from_date) || empty($to_date))
 		{
 			$from_date = date("Y-m-d",strtotime($financial_year->date_from));
 			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
 		} 
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
-		
-		//pr($differenceInOpeningBalance); exit;
-		
-		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date'));
+		//pr(@$OpeningBalanceDebit);
+		//ssspr(@$OpeningBalanceCredit); exit;
+		//					
+		//$differenceInOpeningBalance= $this->differenceInOpeningBalance();
+		//pr(@$differenceInOpeningBalance); exit;
+		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance'));
 		
 	}
 	
@@ -937,11 +974,11 @@ class LedgersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$ledger_name=$this->request->query('ledger_name');
 		
-		$OpeningBalanceViews = $this->paginate($this->Ledgers->find()
+		$OpeningBalanceViews = $this->Ledgers->find()
 		->contain(['LedgerAccounts'=>function($q) use($ledger_name){
 			return $q->where(['LedgerAccounts.name LIKE'=>'%'.$ledger_name.'%']);
 		}])
-		->where(['Ledgers.company_id'=>$st_company_id,'Ledgers.voucher_source'=>'Opening Balance']));
+		->where(['Ledgers.company_id'=>$st_company_id,'Ledgers.voucher_source'=>'Opening Balance']);
 		//pr($OpeningBalanceViews->toArray()); exit;
 		$this->set(compact('OpeningBalanceViews', 'ledger_name'));
 	}

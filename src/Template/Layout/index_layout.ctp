@@ -412,7 +412,7 @@ select
 					</ul>
 				</li>
 				<?php } ?>
-				<!--<?php if(in_array(11,$allowed_pages) || in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){ ?>
+				<?php if(in_array(11,$allowed_pages) || in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-puzzle-piece"></i>
@@ -426,10 +426,10 @@ select
 						<?php if(in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/Challans/',array('escape'=>false)).'</li>';
 						} ?>
-						<li><?php echo $this->Html->link('<i class="icon-home"></i> Pending Challan','/Challans/PendingChallanForCreditNote',array('escape'=>false)); ?></li>
+						<li><?php echo $this->Html->link('<i class="icon-home"></i> Pending Challan','/Challans/PendingChallanForInvoice',array('escape'=>false)); ?></li>
 					</ul>
 				</li>
-				<?php } ?>-->
+				<?php } ?>
 				<?php if(in_array(124,$allowed_pages) || in_array(161,$allowed_pages) || in_array(165,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
