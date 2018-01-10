@@ -66,6 +66,11 @@ class LeaveApplicationsController extends AppController
 					$this->Flash->success(__('The leave application has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				}
+				else
+				{
+					$this->Flash->success(__('The leave application has been saved.'));
+					return $this->redirect(['action' => 'index']);
+				}
             } else {
 					$this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }

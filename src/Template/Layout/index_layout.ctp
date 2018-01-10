@@ -858,18 +858,40 @@ select
 						
 						<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
 						<?php if(in_array(118,$allowed_pages) ||in_array(119,$allowed_pages)){ ?>
-						<li><?php echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Employee Personal Informaion',array('controller'=>'Employees','action'=>'employeeList'),array('escape'=>false)); ?></li>
+						<li>
+						
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Employee Personal Informaion</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeePersonalInformations/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/EmployeePersonalInformations' ).'</li>'; ?>
+							</ul>
+						</li>
 						<?php } ?>
 						
 						<li>
 							<a href="javascript:;">
-							<i class="icon-basket"></i>
-							<span class="title">Leave</span>
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Leave Application</span>
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-						    	<li><?php echo $this->Html->link( 'Add', '/RequestLeaves/add' ); ?></li>
-							    <li><?php echo $this->Html->link( 'View', '/RequestLeaves' ); ?></li>
+								<?php echo '<li>'.$this->Html->link( 'Add', '/LeaveApplications/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/LeaveApplications' ).'</li>'; ?>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Travel Request</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/TravelRequests/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/TravelRequests' ).'</li>'; ?>
 							</ul>
 						</li>
 						</ul>
