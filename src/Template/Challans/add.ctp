@@ -133,8 +133,8 @@
 				<tfoot>
 					<tr>
 						<td colspan="7" align="right"><b>Total</b></td>
-						<td><?php echo $this->Form->input('total', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Total']); ?></td>
-						<td></td>
+						<td colspan="2"><?php echo $this->Form->input('total', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder' => 'Total']); ?></td>
+						
 					</tr>
 				</tfoot>
 			</table>
@@ -223,7 +223,7 @@
 			</td>
 			
 			<td align="center">
-				<label><?php echo $this->Form->input('check.', ['label' => false,'type'=>'checkbox','class'=>'rename_check1 rm1']); ?></label>
+				<label><?php echo $this->Form->input('check.', ['label' => false,'type'=>'checkbox','class'=>'rename_check1 rm1','checked']); ?></label>
 			</td>
 			<td align="center">
 				<label><?php echo $this->Form->input('check.', ['label' => false,'type'=>'checkbox','class'=>'rename_check2 rm1']); ?></label>
@@ -458,7 +458,7 @@ $(document).ready(function() {
 	
 
 	
-		function add_row(){
+	function add_row(){
 		var tr1=$("#sample_tb tbody tr.tr1").clone();
 		$("#main_tb tbody").append(tr1);
 		var tr2=$("#sample_tb tbody tr.tr2").clone();

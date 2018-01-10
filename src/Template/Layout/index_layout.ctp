@@ -420,13 +420,42 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(11,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Challans/Add',array('escape'=>false)).'</li>';
-						} ?>
-						<?php if(in_array(12,$allowed_pages) || in_array(28,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/Challans/',array('escape'=>false)).'</li>';
-						} ?>
-						<li><?php echo $this->Html->link('<i class="icon-home"></i> Pending Challan','/Challans/PendingChallanForInvoice',array('escape'=>false)); ?></li>
+						<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
+					
+						<li>
+							<a href="javascript:;">
+							<i class="icon-home"></i>
+							<span class="title">Challan Out</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+							<?php if(in_array(90,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'Add', '/Challans/Add' ); ?></li>
+							<?php } ?>
+							<?php if(in_array(91,$allowed_pages)|| in_array(92,$allowed_pages) ||in_array(93,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'View', '/Challans' ); ?></li>
+							<?php } ?>
+							</ul>
+						</li>
+						
+						<li>
+							<a href="javascript:;">
+							<i class="icon-home"></i>
+							<span class="title">Challan In</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+							<?php if(in_array(90,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'Add', '/Challans/PendingChallanForVoucher' ); ?></li>
+							<?php } ?>
+							<?php if(in_array(91,$allowed_pages)|| in_array(92,$allowed_pages) ||in_array(93,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'View', '/ChallanReturnVouchers/' ); ?></li>
+							<?php } ?>
+							</ul>
+						</li>
+						<li><?php echo $this->Html->link('<i class="icon-home"></i> Pending Challan For Invoice','/Challans/PendingChallanForInvoice',array('escape'=>false)); ?></li>
+						
+						</ul>
 					</ul>
 				</li>
 				<?php } ?>

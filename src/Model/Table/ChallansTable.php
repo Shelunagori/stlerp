@@ -82,6 +82,11 @@ class ChallansTable extends Table
 			
 		$this->belongsTo('Filenames');
 		$this->belongsTo('ItemLedgers');
+		
+		$this->hasMany('ChallanReturnVouchers', [
+            'foreignKey' => 'challan_id',
+        ]);
+		//$this->belongsTo('ChallanReturnVouchers');
     }
 
     /**

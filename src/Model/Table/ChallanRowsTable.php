@@ -45,6 +45,11 @@ class ChallanRowsTable extends Table
             'foreignKey' => 'item_id',
             'joinType' => 'INNER'
         ]);
+		
+		$this->belongsTo('ChallanReturnVoucherRows', [
+            'foreignKey' => 'id',
+            'joinType' => 'LEFT'
+        ]);
     }
 
     /**

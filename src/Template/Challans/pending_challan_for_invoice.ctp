@@ -30,7 +30,8 @@
 							<tr>
 								<th>S.No</th>
 								<th>Challan.No</th>
-								<th>Status</th>
+								<th>Customer</th>
+								<th>Actions</th>
 							</tr>
 					
 					</thead>
@@ -40,9 +41,23 @@
             <tr>
                 <td><?= h(++$page_no) ?></td>
 				<td><?= h(($challan->ch1.'/CH-'.str_pad($challan->ch2, 3, '0', STR_PAD_LEFT).'/'.$challan->ch3.'/'.$challan->ch4)) ?></td>
-                          
-				<td>
-					<?php echo $challan->challan_status; ?>
+                <td><?php echo $challan->customer->customer_name; ?></td>            
+				<td class="actions">
+								<?php if(in_array(28,$allowed_pages)){  ?>
+								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challan->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+								<?php } ?>
+								<?php if(in_array(12,$allowed_pages)){  ?>
+								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $challan->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
+								
+								<?= $this->Form->postLink('Invoice Create',
+								['action' => 'ConvertedIntoInvoice', $challan->id],
+								[
+									'escape' => false,
+									'class'=>' btn btn-xs green tooltips'
+									
+								]
+								) ?>
+								<?php } ?>
 				</td>
             </tr>
             <?php endforeach; ?>

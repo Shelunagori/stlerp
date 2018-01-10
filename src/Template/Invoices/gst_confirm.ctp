@@ -6,6 +6,7 @@ if($invoice->invoice_type=="GST"){
 }else{
 	$Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
 }
+$mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
 
 //pr($pdf_url); exit;
 ?>
@@ -14,7 +15,7 @@ if($invoice->invoice_type=="GST"){
 		<td valign="top" style="background: #FFF;">
 		<div class="list-group">
 			<a href="<?php echo $list_url; ?>" class="list-group-item"><i class="fa fa-chevron-left"></i> Back to Invoices </a>
-			<a href="#" class="list-group-item"><i class="fa fa-envelope"></i> Email </a>
+			<a href="<?php echo $mail_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-envelope"></i> Email </a>
 			<?php if(in_array(8,$allowed_pages)){
 				if(!in_array(date("m-Y",strtotime($invoice->date_created)),$closed_month))
 				{ 

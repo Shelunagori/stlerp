@@ -390,15 +390,91 @@ class ChallansController extends AppController
 		
 		$Challans = $this->paginate($this->Challans->find()->matching('ChallanRows' , function($q) use($st_company_id){
 			return $q->where(['ChallanRows.invoice'=>1]);
-		})->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Pending'])->order(['Challans.id' => 'ASC']));
-	//	pr($Challans->toArray()); exit;
+		})->contain('Customers')->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Pending'])->order(['Challans.id' => 'ASC']));
+		
+		
 		$this->set(compact('Challans'));
+		
+	}
+	public function PendingChallanForVoucher()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		
+		$Challans = $this->paginate($this->Challans->find()->contain(['Customers','ChallanRows' => function($q) {
+				return $q->where(['ChallanRows.challan_type'=>'Returnable']);
+			}])->order(['Challans.id' => 'ASC']));
+			
+		$ChallanReturnVouchers = $this->Challans->ChallanReturnVouchers->find()->contain(['ChallanReturnVoucherRows' => function($q) {
+				return $q->select(['challan_return_voucher_id','challan_row_id','item_id','total_qty' => $q->func()->sum('ChallanReturnVoucherRows.quantity')])->group('ChallanReturnVoucherRows.challan_row_id');
+			}]);
+		$challanQty=[];
+		foreach($Challans as $Challan){ //pr($Challan); exit;
+			foreach($Challan->challan_rows as $challan_row){
+				@$challanQty[$Challan->id]+=$challan_row->quantity;
+			}
+		}
+		
+		$challanReturnQty=[];
+		foreach($ChallanReturnVouchers as $ChallanReturnVoucher){
+			foreach($ChallanReturnVoucher->challan_return_voucher_rows as $challan_return_voucher_row){
+				@$challanReturnQty[$ChallanReturnVoucher->challan_id]+=$challan_return_voucher_row->total_qty;
+			}
+		}
+		
+		$this->set(compact('Challans','challanQty','challanReturnQty'));
+		
+	}	
+	public function ConvertedChallanVoucher()
+    {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		
+		$Challans = $this->paginate($this->Challans->find()->contain(['Customers','ChallanRows' => function($q) {
+				return $q->where(['ChallanRows.challan_type'=>'Returnable']);
+			}])->order(['Challans.id' => 'ASC']));
+			
+		$ChallanReturnVouchers = $this->Challans->ChallanReturnVouchers->find()->contain(['ChallanReturnVoucherRows' => function($q) {
+				return $q->select(['challan_return_voucher_id','challan_row_id','item_id','total_qty' => $q->func()->sum('ChallanReturnVoucherRows.quantity')])->group('ChallanReturnVoucherRows.challan_row_id');
+			}]);
+		$challanQty=[];
+		foreach($Challans as $Challan){ //pr($Challan); exit;
+			foreach($Challan->challan_rows as $challan_row){
+				@$challanQty[$Challan->id]+=$challan_row->quantity;
+			}
+		}
+		
+		$challanReturnQty=[];
+		foreach($ChallanReturnVouchers as $ChallanReturnVoucher){
+			foreach($ChallanReturnVoucher->challan_return_voucher_rows as $challan_return_voucher_row){
+				@$challanReturnQty[$ChallanReturnVoucher->challan_id]+=$challan_return_voucher_row->total_qty;
+			}
+		}
+		
+		$this->set(compact('Challans','challanQty','challanReturnQty'));
 		
 	}
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
 		
+        $this->set('id', $id);
+    }
+	public function ConvertedIntoInvoice($id = null)
+    {
+		$this->viewBuilder()->layout('');
+		
+		$query2 = $this->Challans->query();
+		$query2->update()
+			->set(['challan_status' => 'Converted'])
+			->where(['id' => $id])
+			->execute();
+		
+		return $this->redirect(['action' => 'PendingChallanForInvoice']);
         $this->set('id', $id);
     }
 	public function PendingChallanForCreditNote()

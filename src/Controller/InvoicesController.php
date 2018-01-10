@@ -5,6 +5,8 @@ use App\Controller\AppController;
 use Cake\View\Helper\NumberHelper;
 use Cake\View\Helper\HtmlHelper;
 use Cake\Utility\Text;
+use Cake\Mailer\Email;
+use Cake\View\Helper\TextHelper;
 /**
  * Invoices Controller
  *
@@ -6153,4 +6155,142 @@ class InvoicesController extends AppController
 		//pr($Invoices);exit;
 		$this->set(compact('Invoices','url'));
 	}
+	
+	public function sendMail($id=null)
+		{ 
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->Invoices->Companies->get($st_company_id);
+		
+		
+		$email = new Email();
+		$Number = new NumberHelper(new \Cake\View\View());
+		$Html = new HtmlHelper(new \Cake\View\View());
+		$Text = new TextHelper(new \Cake\View\View());
+		$email->transport('gmail');
+		$from_name="STL";
+		
+		$email_to="gopalkrishanp3@gmail.com";
+		$invoice = $this->Invoices->get($id, [
+			'contain' => ['SalesOrders','Customers'=>['Districts'=>['States']],
+							'Employees',
+							'Transporters',
+							'Creator'=>['Designations'],
+							'Companies'=> ['CompanyBanks'=> function ($q) {
+								return $q
+								->where(['CompanyBanks.default_bank' => 1]);
+								}],
+							'InvoiceRows' => ['Items'=>['ItemGroups','Units']]
+						]
+		]);
+		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
+		$sub='Despatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"';
+$message_web = '
+<html>
+	<body>
+		
+		<div id="content"> 
+			<table  valign="center" width="100%" style="margin-top: 0px;" class="table2">
+				<tr>
+					<td width="50%" align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;">'. h($invoice->company->name) .'
+					</td>
+				</tr>
+				
+				
+				<tr>
+					<td valign="top" width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';">
+					<br/><span><b>'. h($invoice->customer->customer_name).'</b></span>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top" width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';">
+					<span>'. $Text->autoParagraph(h($invoice->customer_address)) .'</span>
+						
+					</td>
+				</tr>
+				
+				<tr>
+					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Attn
+					<span><b>:</b></span>
+					<span><b>'. h($invoice->sales_order->dispatch_name) .'</b></span><br/>
+					</td>
+				</tr>
+				<tr>
+					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Sub
+					<span><b>:</b></span>
+					<span><b>Despatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"</b></span><br/>
+					</td>
+				</tr>
+				<tr>
+					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Ref
+					<span><b>:</b></span>
+					<span><b>
+			Your Purchase Order No.'. h($invoice->customer_po_no) .' dated '. h(date("d-m-Y",strtotime($invoice->po_date))) .'</b></span><br/>
+					</td>
+				</tr>
+				<tr>
+					<td><br/>Dear sir,</td>
+				</tr>
+				<tr>
+					<td><br/>With reference to above, please find herewith following despatch documents:</td>
+				</tr>
+				<tr>
+					<td><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' Dated '. h(($invoice->date_created)).' For Rs.'. h(($invoice->grand_total)).'/- in Duplicate.</td>
+				</tr>
+				<tr>
+					<td><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' Dated '. h(($invoice->date_created)).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'</td>
+				</tr>
+				<tr>
+					<td><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .' by '. h(($invoice->date_created)).'<br/>In favour of '. h(($company_data->name)).'in our account No '
+					. h(($invoice->company->company_banks[0]->account_no)).' Of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
+				</tr>
+				<tr></tr>
+				<tr></tr>
+				<tr>
+					<td><b>Regards</b></br></td>
+				</tr>
+				<tr>
+					<td></br>'.h($invoice->creator->name).'
+					<br><span>'.h($invoice->creator->designation->name).'</span>
+					</td>
+				</tr>
+				<tr>
+					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
+					<span><b>:</b></span>
+					<span><b>dispatch@mogragroup.com</b></span><br/>
+					</td>
+				</tr>
+				<tr>
+					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br>Website
+					<span><b>:</b></span>
+					<a target="_blank" href="http://www.mogragroup.com"><span><b> www.mogragroup.com</b></span></a><br/>
+					</td>
+				</tr>
+			</table>
+	   </div>
+	</body>
+</html>';
+		
+		
+		//$message_web="done";
+		$member_name="Gopal";
+		// pr($message_web);exit;
+		 	$email->from(['gopalkrishanp3@gmail.com' => $from_name])
+					->to($email_to)
+					->replyTo('gopalkrishanp3@gmail.com')
+					->subject($sub)
+					->profile('default')
+					->template('notice_send_email')
+					->emailFormat('html')
+					->viewVars(['content'=>$message_web,'member_name'=>$member_name]);
+					$email->send();
+		$this->Flash->success(__('The Mail has been Sent.'));
+		return $this->redirect(['action' => 'GstConfirm/'.$id]);
+		
+ pr($id);exit;
+exit;
+	
+	} 
+
 }
