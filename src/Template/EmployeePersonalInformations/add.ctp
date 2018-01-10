@@ -176,6 +176,29 @@ border:none;
 			
 			<div class="col-md-12 pad">
 					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Height (in feet)</label>
+							<?php
+							echo $this->Form->input('height', ['data-placeholder'=>'Height','label' => false,'class'=>'form-control input-sm','placeholder'=>'Height']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Category</label>
+							<?php echo $this->Form->input('category', ['label' => false,'placeholder'=>'Category','class'=>'form-control input-sm','placeholder'=>'Category']); ?>
+						</div>
+					</div>
+					
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Blood Group</label>
+							<?php echo $this->Form->input('blood_group', ['label' => false,'placeholder'=>'Blood Group','class'=>'form-control input-sm','type'=>'text']); ?>
+						</div>
+					</div>
+			
+			</div>
+			<div class="col-md-12 pad">
+					<div class="col-md-4">
 								<div class="form-group">
 									<label class="control-label  label-css">Account Type</label>
 									<?php
@@ -201,28 +224,11 @@ border:none;
 			</div>
 			<div class="col-md-12 pad">
 					<div class="col-md-4">
-								<div class="form-group">
-									<label class="control-label  label-css">Height (in cms)</label>
-									<?php
-									echo $this->Form->input('height', ['data-placeholder'=>'Height','label' => false,'class'=>'form-control input-sm','placeholder'=>'Height']); ?>
-								</div>
-					</div>
-					<div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label  label-css">Category</label>
-							<?php echo $this->Form->input('category', ['label' => false,'placeholder'=>'Category','class'=>'form-control input-sm','placeholder'=>'Category']); ?>
+							<label class="control-label  label-css">Bank & Branch</label>
+							<?php echo $this->Form->input('bank_branch', ['label' => false,'placeholder'=>'Bank & Branch','class'=>'form-control input-sm','type'=>'text']); ?>
 						</div>
 					</div>
-					
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Blood Group</label>
-							<?php echo $this->Form->input('blood_group', ['label' => false,'placeholder'=>'Blood Group','class'=>'form-control input-sm','type'=>'text']); ?>
-						</div>
-					</div>
-			
-			</div>
-			<div class="col-md-12 pad">
 					<div class="col-md-4">
 								<div class="form-group">
 									<label class="control-label  label-css">Driving Licence No</label>
@@ -237,13 +243,6 @@ border:none;
 						</div>
 					</div>
 					
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Bank & Branch</label>
-							<?php echo $this->Form->input('bank_branch', ['label' => false,'placeholder'=>'Bank & Branch','class'=>'form-control input-sm','type'=>'text']); ?>
-						</div>
-					</div>
-			
 			</div>
 		</fieldset>	
 		<fieldset style="margin-left: 20px;margin-right: 30px;">	
