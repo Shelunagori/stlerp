@@ -110,6 +110,8 @@ class InvoicesTable extends Table
         ]);
 		$this->belongsTo('InvoiceBookings');
 		$this->belongsTo('Filenames');
+		$this->belongsTo('DispatchDocuments');
+		$this->belongsTo('SendEmails');
 		
 		 $this->hasOne('Ivs', [
             'foreignKey' => 'invoice_id',

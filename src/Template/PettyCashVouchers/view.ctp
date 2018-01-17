@@ -147,10 +147,10 @@ margin-bottom: 0;
                 <table>
                     <tr>
                         <td style="font-size: 16px;font-weight: bold;">
-                        Rs: <?= h($this->Number->format(abs($total),[ 'places' => 2])) ?></td>
+                        Rs: <?= h($this->Number->format(abs(round($total)),[ 'places' => 2])) ?></td>
                     </tr>
                     <tr>
-                        <td style="font-size: 12px;">Rupees<?php echo ucwords($this->NumberWords->convert_number_to_words(abs($total))) ?> Only </td>
+                        <td style="font-size: 12px;">Rupees<?php echo ucwords($this->NumberWords->convert_number_to_words(abs(round($total)))) ?> Only </td>
                     </tr>
                     <tr>
                         <td style="font-size: 12px;">

@@ -556,8 +556,10 @@ class ReceiptsController extends AppController
 			$receipt->transaction_date=date("Y-m-d",strtotime($receipt->transaction_date));
 				
 			//Save receipt
-		//	pr($receipt->receipt_rows); exit;
+			//pr($receipt->bank_cash_id); exit;
             if ($this->Receipts->save($receipt)) {
+				$old_ledger_data=$this->Receipts->Ledgers->find()->where(['voucher_id' => $receipt->id, 'voucher_source' => 'Receipt Voucher','ledger_account_id'=>$receipt->bank_cash_id])->first();
+				//pr($old_ledger_data); exit;
 				$this->Receipts->Ledgers->deleteAll(['voucher_id' => $receipt->id, 'voucher_source' => 'Receipt Voucher']);
 				$this->Receipts->ReferenceDetails->deleteAll(['receipt_id' => $receipt->id]);
 				$total_cr=0; $total_dr=0;
@@ -634,6 +636,9 @@ class ReceiptsController extends AppController
 				$ledger->voucher_id = $receipt->id;
 				$ledger->voucher_source = 'Receipt Voucher';
 				$ledger->transaction_date = $receipt->transaction_date;
+				if($old_ledger_data){
+					$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
+				}
 				if($bankAmt != 0){
 					$this->Receipts->Ledgers->save($ledger);
 				}

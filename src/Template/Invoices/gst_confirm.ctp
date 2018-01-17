@@ -15,7 +15,7 @@ $mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
 		<td valign="top" style="background: #FFF;">
 		<div class="list-group">
 			<a href="<?php echo $list_url; ?>" class="list-group-item"><i class="fa fa-chevron-left"></i> Back to Invoices </a>
-			<a href="<?php echo $mail_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-envelope"></i> Email </a>
+			<a href="#" class="list-group-item select_term_condition"><i class="fa fa-envelope"></i> Email </a>
 			<?php if(in_array(8,$allowed_pages)){
 				if(!in_array(date("m-Y",strtotime($invoice->date_created)),$closed_month))
 				{ 
@@ -96,5 +96,75 @@ $(document).ready(function() {
 				return false;  
 			}
 	});
+	
+	$('.select_term_condition').die().live("click",function() { 
+		var addr=$(this).text();
+		$("#myModal2").show();
+    });
+	$('.closebtn2').on("click",function() { 
+		$("#myModal2").hide();
+    });
+	$('.insert_tc').die().live("click",function() {
+		$('#sortable').html("");
+		var i=0;
+		var send_data = [];
+		$(".tabl_tc tbody tr").each(function(){
+			var v=$(this).find('td:nth-child(1)  input[type="checkbox"]:checked').val();
+			
+			if(v){
+				var tc=$(this).find('td:nth-child(1) .check_value').val(); 
+				send_data[i++] = tc;
+				//send_data[++i]=tc;
+			}
+		});
+		var json_data=JSON.stringify(send_data);
+		
+		 var id="<?php echo $id; ?>";
+		
+		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'sendMail']); ?>";
+		url=url+'?id='+id+'&data='+json_data;
+		
+		$.ajax({
+			url: url,
+			type: "GET",
+		}).done(function(response) {
+			alert("Email Send successfully")
+		}); 
+		
+		//console.log(send_data);
+		$("#myModal2").hide();
+    });
 });
 </script>
+
+<ol id="sortable"></ol>
+<div id="myModal2" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body" id="result_ajax">
+			<h4>Terms & Conditions</h4>
+				<div style=" overflow: auto; height: 450px;">
+				<table class="table table-hover tabl_tc">
+					
+				<?php foreach ($termsConditions as $termsCondition): ?>
+					 <tr>
+						<td>
+						 <div class="checkbox-list">
+							<label>
+								<input type="checkbox" name="dummy" value="<?= h($termsCondition->id) ?>" class="check_value"><?= h($termsCondition->text_line) ?>
+							</label> 
+						 </div>
+						
+						</td>
+					</tr>
+				<?php endforeach; ?>
+				</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn default closebtn2">Close</button>
+				<button class="btn btn-primary insert_tc">Send Email</button>
+			</div>
+		</div>
+	</div>
+</div>

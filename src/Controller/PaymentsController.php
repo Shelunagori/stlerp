@@ -683,6 +683,7 @@ class PaymentsController extends AppController
 					   }
 					}
 				}
+				$old_ledger_data=$this->Payments->Ledgers->find()->where(['voucher_id' => $payment->id, 'voucher_source' => 'Payment Voucher','ledger_account_id'=>$payment->bank_cash_id])->first();
 				$this->Payments->Ledgers->deleteAll(['voucher_id' => $payment->id, 'voucher_source' => 'Payment Voucher']);
 				$this->Payments->ReferenceDetails->deleteAll(['payment_id' => $payment->id]);
 				$total_cr=0; $total_dr=0;
@@ -759,7 +760,9 @@ class PaymentsController extends AppController
 					$ledger->debit = abs($bankAmt);
 					$ledger->credit = 0;
 				}
-				
+				if($old_ledger_data){
+					$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
+				}
 				$ledger->voucher_id = $payment->id;
 				$ledger->voucher_source = 'Payment Voucher';
 				$ledger->transaction_date = $payment->transaction_date;

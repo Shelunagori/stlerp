@@ -511,6 +511,7 @@ class ContraVouchersController extends AppController
           
 			//Save receipt
             if ($this->ContraVouchers->save($contravoucher)) {
+				$old_ledger_data=$this->ContraVouchers->Ledgers->find()->where(['voucher_id' => $contravoucher->id, 'voucher_source' => 'Contra Voucher','ledger_account_id'=>$contravoucher->bank_cash_id])->first();
                 $this->ContraVouchers->Ledgers->deleteAll(['voucher_id' => $contravoucher->id, 'voucher_source' => 'Contra Voucher']);
                 $this->ContraVouchers->ReferenceDetails->deleteAll(['contra_voucher_id' => $contravoucher->id]);
                 $total_cr=0; $total_dr=0;
@@ -585,6 +586,9 @@ class ContraVouchersController extends AppController
 					}else{
 						$ledger->debit = abs($bankAmt);
 						$ledger->credit = 0;
+					}
+					if($old_ledger_data){
+						$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
 					}
 					$ledger->voucher_id = $contravoucher->id;
 					$ledger->voucher_source = 'Contra Voucher';

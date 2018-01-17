@@ -316,9 +316,97 @@ class LoginsController extends AppController
 	public function dashbord()
     {
        $this->viewBuilder()->layout('index_layout');
-	   $leaves = $this->Logins->RequestLeaves->find()->contain(['Employees', 'LeaveTypes'])->where(['leave_status'=>'In-Process']);
-	   //pr($Leaves->toArray()); exit;
-	   $this->set(compact('leaves'));
+	   $session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$employee_id=$this->viewVars['s_employee_id'];
+	   //pr($employee_id); exit;
+	   
+	   $quotations = $this->Logins->Quotations->find()->contain(['QuotationRows'=>['Items']])->where(['company_id'=>$st_company_id,'status'=>'Pending','Quotations.revision '=> 0])->order(['Quotations.id' => 'DESC']);
+	  // pr($quotations->toArray()); exit;
+	   $quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
+	   $pending_quotation=$quotations->ct;
+	   
+	   $SalesOrderRows = $this->Logins->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->Logins->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id])
+					->order(['SalesOrders.id'=>'DESC']);
+	   $total_sales=[]; $total_qty=[];
+		foreach($salesOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->sales_order_rows as $sales_order_row){
+				foreach($sales_order_row->invoice_rows as $invoice_row){
+						if(sizeof($invoice_row) > 0){
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
+		$pending_sales=0;
+		foreach ($salesOrders as $salesOrder){ 
+			if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ 
+				++$pending_sales;
+			}
+		}
+		
+		$invoices=[];
+		$invoice1=$this->Logins->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+			return $q->where(['source !='=>'Purchessed']);
+			},'SalesOrderRows'=>function ($q) {
+			return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
+			}
+			]])
+			->where(['Invoices.company_id'=>$st_company_id])
+			->order(['Invoices.id' => 'DESC']);
+		// pr($invoice1->toArray()); exit;	
+			foreach($invoice1 as $invoice){
+				$AccountGroupsexists = $this->Logins->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
+				if(!$AccountGroupsexists){ // pr($invoice);
+					$invoices[]=$invoice;
+				}
+			}
+			$pending_invoice=0;
+			foreach($invoices as $invoice){  
+				 if(sizeof($invoice->invoice_rows) > 0){
+						++$pending_invoice;
+				 }
+			}
+		$PurchaseOrderRows = $this->Logins->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->Logins->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->order(['PurchaseOrders.id'=>'DESC']);
+				$total_sales=[]; $total_qty=[];
+				
+		foreach($purchaseOrders as $salesorder){
+			$total_sales[$salesorder->id]=$salesorder->total_sales;
+			foreach($salesorder->purchase_order_rows as $sales_order_row){
+				foreach($sales_order_row->grn_rows as $invoice_row){ 
+						if(sizeof($invoice_row) > 0){
+							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
+						}
+				}
+			}
+		}
+		$pending_po=0;
+		foreach ($purchaseOrders as $salesOrder){ 
+			if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ 
+				++$pending_po;
+			}
+		}
+		$grns = $this->Logins->Grns->find()->where(['status'=>'Pending'])->where(['Grns.company_id'=>$st_company_id]);
+		$grns = $grns->select(['ct' => $grns->func()->count('Grns.id')])->first();
+		$pending_grn=$grns->ct;
+	 //pr($grns->ct); exit;
+	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id'));
 		
     }
 }

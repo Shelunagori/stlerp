@@ -54,7 +54,9 @@
 							</tr>
 						</thead>
 						<tbody class="MainTbody">
-							<?php foreach($Invoice->invoice_rows as $invoice_row){ ?>
+							<?php foreach($Invoice->invoice_rows as $invoice_row){ 
+							if(@$item_display[@$invoice_row->id]){
+							?>
 							<tr class="MainTr" row_no='<?php echo @$invoice_row->id; ?>'>
 								<td>
 									
@@ -63,7 +65,7 @@
 									<input type="hidden" value="<?php echo $invoice_row->quantity; ?>" class="quantity"/>
 									<input type="hidden" value="<?php echo $invoice_row->item->item_companies[0]->serial_number_enable; ?>" class="serial_number"/>
 
-										<?= h($item_display[$invoice_row->id]); ?>
+										<?= h(@$item_display[@$invoice_row->id]); ?>
 										
 								</td>
 								<td><?= h($invoice_row->quantity); ?></td>
@@ -95,7 +97,7 @@
 									</table>
 								</td>
 							</tr>
-							<?php } ?>
+							<?php } } ?>
 						</tbody>
 					</table>
 				</div>
@@ -232,7 +234,7 @@ $(document).ready(function() {
 	});
 	
 	
-	addRowOnLoad();
+	//addRowOnLoad();
 	function addRowOnLoad(){
 		$('.MainTable tbody.MainTbody tr.MainTr').each(function(){
 			var tr1=$("#sample_tb tbody").html();

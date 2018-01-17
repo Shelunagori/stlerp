@@ -18,6 +18,11 @@ class LoginsTable extends Table
 		$this->belongsTo('UserLogs');
 		$this->belongsTo('RequestLeaves');
 		$this->belongsTo('EmployeeCompanies');
+		$this->belongsTo('Quotations');
+		$this->belongsTo('SalesOrders');
+		$this->belongsTo('Invoices');
+		$this->belongsTo('PurchaseOrders');
+		$this->belongsTo('Grns');
 		
     }
 	

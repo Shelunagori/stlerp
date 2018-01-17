@@ -3348,7 +3348,8 @@ class InvoicesController extends AppController
 			}
 			return $this->redirect(['action' => 'GstConfirm/'.$id]);
         }
-		$this->set(compact('invoice','id'));
+		$termsConditions = $this->Invoices->DispatchDocuments->find('all',['limit' => 200]);
+		$this->set(compact('invoice','id','termsConditions'));
     }
 	
 	public function gstSalesReport(){
@@ -6156,13 +6157,18 @@ class InvoicesController extends AppController
 		$this->set(compact('Invoices','url'));
 	}
 	
-	public function sendMail($id=null)
+	public function sendMail()
 		{ 
+		
+		$data=$this->request->query('data');
+		$id=$this->request->query('id');
+		$data=json_decode($data);
+		$t=sizeof($data); 
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->Invoices->Companies->get($st_company_id);
-		
+		//pr($t); exit;
 		
 		$email = new Email();
 		$Number = new NumberHelper(new \Cake\View\View());
@@ -6171,9 +6177,9 @@ class InvoicesController extends AppController
 		$email->transport('gmail');
 		$from_name="STL";
 		
-		$email_to="gopalkrishanp3@gmail.com";
+		
 		$invoice = $this->Invoices->get($id, [
-			'contain' => ['SalesOrders','Customers'=>['Districts'=>['States']],
+			'contain' => ['SalesOrders','Customers'=>['CustomerContacts','Districts'=>['States']],
 							'Employees',
 							'Transporters',
 							'Creator'=>['Designations'],
@@ -6184,93 +6190,99 @@ class InvoicesController extends AppController
 							'InvoiceRows' => ['Items'=>['ItemGroups','Units']]
 						]
 		]);
+		$email_to=$invoice->customer->customer_contacts[0]->email;
+		//$email_to="gopalkrishanp3@gmail.com";
+		//pr($email_to); exit;
 		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
-		$sub='Despatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"';
-$message_web = '
-<html>
-	<body>
-		
-		<div id="content"> 
-			<table  valign="center" width="100%" style="margin-top: 0px;" class="table2">
+		$sub='Dispatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"';
+		$message_web = '
+			<table  valign="center" width="100%" >
 				<tr>
-					<td width="50%" align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;">'. h($invoice->company->name) .'
-					</td>
-				</tr>
-				
-				
-				<tr>
-					<td valign="top" width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';">
-					<br/><span><b>'. h($invoice->customer->customer_name).'</b></span>
+					<td align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;">'. h($invoice->company->name) .'
 					</td>
 				</tr>
 				<tr>
-					<td valign="top" width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';">
-					<span>'. $Text->autoParagraph(h($invoice->customer_address)) .'</span>
-						
+					<td  style="width: 1em; word-wrap: break-word; font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>
+					'. h($invoice->customer->customer_name).'
+					
 					</td>
 				</tr>
-				
 				<tr>
-					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Attn
+					<td  style="width: 1em; word-wrap: break-word; font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">
+					<p style="margin-top: 0px !important;width: 15em; word-wrap: break-word;">'. h($invoice->customer_address) .'</p>
+					</td>
+				</tr>
+				<tr>
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">Attn
 					<span><b>:</b></span>
-					<span><b>'. h($invoice->sales_order->dispatch_name) .'</b></span><br/>
+					<span>'. h($invoice->sales_order->dispatch_name) .'</span><br/>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Sub
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Sub
 					<span><b>:</b></span>
-					<span><b>Despatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"</b></span><br/>
+					<span style="font-family:Palatino Linotype;">Dispatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"</span><br/>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Ref
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Ref
 					<span><b>:</b></span>
-					<span><b>
-			Your Purchase Order No.'. h($invoice->customer_po_no) .' dated '. h(date("d-m-Y",strtotime($invoice->po_date))) .'</b></span><br/>
+					<span>Your Purchase Order No.'. h($invoice->customer_po_no) .' dated '. h(date("d-m-Y",strtotime($invoice->po_date))) .'</span><br/>
 					</td>
 				</tr>
 				<tr>
-					<td><br/>Dear sir,</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Dear sir,</td>
 				</tr>
 				<tr>
-					<td><br/>With reference to above, please find herewith following despatch documents:</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>With reference to above, please find here with following despatch documents:</td>
 				</tr>
 				<tr>
-					<td><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' Dated '. h(($invoice->date_created)).' For Rs.'. h(($invoice->grand_total)).'/- in Duplicate.</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' Dated '. h(($invoice->date_created)).' For Rs.'. h(($invoice->grand_total)).'/- in Duplicate.</td>
 				</tr>
 				<tr>
-					<td><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' Dated '. h(($invoice->date_created)).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' Dated '. h(($invoice->date_created)).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'</td>
 				</tr>
+				'; if($t > 0){ $p=2;
+					foreach($data as $d){
+						$terms = $this->Invoices->DispatchDocuments->get($d); $message_web.= '
+						<tr>
+							<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($terms->text_line)).'</td>
+						</tr>
+						';
+						//pr($terms->text_line); 
+					}
+				} //exit;
+				$message_web.= '
 				<tr>
-					<td><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .' by '. h(($invoice->date_created)).'<br/>In favour of '. h(($company_data->name)).'in our account No '
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .' by '. h(($invoice->date_created)).'<br/>In favour of '. h(($company_data->name)).'in our account No '
 					. h(($invoice->company->company_banks[0]->account_no)).' Of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
 				</tr>
 				<tr></tr>
 				<tr></tr>
 				<tr>
-					<td><b>Regards</b></br></td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><b>Regards</b></br></td>
 				</tr>
 				<tr>
-					<td></br>'.h($invoice->creator->name).'
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
 					<br><span>'.h($invoice->creator->designation->name).'</span>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
 					<span><b>:</b></span>
 					<span><b>dispatch@mogragroup.com</b></span><br/>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style="font-size:'. h(($invoice->pdf_font_size)) .';"><br>Website
+					<td width="50%" style="font-family:Palatino Linotype;font-size:'. h(($invoice->pdf_font_size)) .';"><br>Website
 					<span><b>:</b></span>
 					<a target="_blank" href="http://www.mogragroup.com"><span><b> www.mogragroup.com</b></span></a><br/>
 					</td>
 				</tr>
+				
 			</table>
-	   </div>
-	</body>
-</html>';
+	   
+	';
 		
 		
 		//$message_web="done";
@@ -6285,10 +6297,15 @@ $message_web = '
 					->emailFormat('html')
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name]);
 					$email->send();
-		$this->Flash->success(__('The Mail has been Sent.'));
-		return $this->redirect(['action' => 'GstConfirm/'.$id]);
+					
+				$SendEmail = $this->Invoices->SendEmails->newEntity();	
+				$SendEmail->send_data=$message_web;
+				$SendEmail->invoice_id=$id;
+				$this->Invoices->SendEmails->save($SendEmail);
+		//$this->Flash->success(__('The Mail has been Sent.'));
+		//return $this->redirect(['action' => 'GstConfirm/'.$id]);
 		
- pr($id);exit;
+// pr($id);exit;
 exit;
 	
 	} 

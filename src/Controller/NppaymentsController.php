@@ -677,6 +677,8 @@ class NppaymentsController extends AppController
 				$nppayment_row->invoice_ids =@$invoiceIds[$key];
 			}
             if($this->Nppayments->save($nppayment)) {
+				$old_ledger_data=$this->Nppayments->Ledgers->find()->where(['voucher_id' => $nppayment->id, 'voucher_source' => 'Non Print Payment Voucher','ledger_account_id'=>$nppayment->bank_cash_id])->first();
+				
 				$this->Nppayments->Ledgers->deleteAll(['voucher_id' => $nppayment->id, 'voucher_source' => 'Non Print Payment Voucher']);
 				$this->Nppayments->ReferenceDetails->deleteAll(['nppayment_id' => $nppayment->id]);
 
@@ -779,7 +781,9 @@ class NppaymentsController extends AppController
 						$ledger->debit = abs($bankAmt);
 						$ledger->credit = 0;
 					}
-					
+					if($old_ledger_data){
+						$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
+					}
 					$ledger->voucher_id = $nppayment->id;
 					$ledger->voucher_source = 'Non Print Payment Voucher';
 					$ledger->transaction_date = $nppayment->transaction_date;

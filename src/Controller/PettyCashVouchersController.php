@@ -654,7 +654,7 @@ class PettyCashVouchersController extends AppController
 					   }
 					}
 				}
-				
+				$old_ledger_data=$this->PettyCashVouchers->Ledgers->find()->where(['voucher_id' => $pettycashvoucher->id, 'voucher_source' => 'Petty Cash Payment Voucher','ledger_account_id'=>$pettycashvoucher->bank_cash_id])->first();
 				
                 $this->PettyCashVouchers->Ledgers->deleteAll(['voucher_id' => $pettycashvoucher->id, 'voucher_source' => 'Petty Cash Payment Voucher']);
 				
@@ -731,6 +731,9 @@ class PettyCashVouchersController extends AppController
 					}else{
 						$ledger->debit = abs($bankAmt);
 						$ledger->credit = 0;
+					}
+					if($old_ledger_data){
+						$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
 					}
 					
 					$ledger->voucher_id = $pettycashvoucher->id;

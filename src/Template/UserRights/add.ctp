@@ -955,6 +955,16 @@ fieldset legend {
 							</label>
 						</div>
 				</div>
+				<div class="col-md-3">
+					<div class="titletext"><b>Dispatch Details</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(167,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.167.page_id', ['label' => 'Add','class' => '','type'=>'checkbox','value'=>167,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
                 
                 </div>
                 </fieldset>

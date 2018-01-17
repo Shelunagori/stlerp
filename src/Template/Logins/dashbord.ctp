@@ -1,79 +1,173 @@
-
-			<!-- END DASHBOARD STATS -->
-			<div class="clearfix">
+<?php if($employee_id==23 or $employee_id==16){ ?>
+<div class="row">
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 ">
+		<div class="dashboard-stat blue-madison">
+			<div class="visual">
+				<i class="fa fa-comments"></i>
 			</div>
-			<div class="row">
-				<div class="col-md-6 col-sm-6">
-					<!-- BEGIN PORTLET-->
-					<div class="portlet light ">
-						<div class="portlet-title">
-							<div class="caption">
-								<i class="icon-bar-chart font-green-sharp hide"></i>
-								<span class="caption-subject font-green-sharp bold uppercase">Leave Request</span>
-							</div>
-							<table class="table table-bordered table-striped table-hover">
-					<thead>
-						<tr>
-							<th>Sr. No.</th>
-							<th>Employee Name</th>
-							<th>No of Days</th>
-							<th class="actions"><?= __('Actions') ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php $i=0; foreach ($leaves as $requestLeave): $i++; 
-						
-					?>
-						<tr>
-							<td><?php echo $i; ?></td>
-							<td>
-							<a href="#" role="button" employee_id='<?php echo $requestLeave->employee_id; ?>' req_id='<?php echo $requestLeave->id; ?>' class="pull-right onhover" >
-							<?php echo $requestLeave->employee->name; ?> </a>
-							
-							
-							</td>
-							<td><?php echo $requestLeave->no_of_days; ?></td>
-							
-							<td><?php echo $this->Html->link('Approve',['controller'=>'RequestLeaves','action' => 'approveLeaves', $requestLeave->id],array('escape'=>false,'employee_id'=>$requestLeave->employee_id,'class'=>'btn btn-sm default ','data-original-title'=>'Edit','req_id'=>$requestLeave->id)); 
-							echo $this->Html->link('<i class="fa fa-minus-circle">Cancle</i> ',['controller'=>'RequestLeaves','action' => 'cancleLeaves', $requestLeave->id],array('escape'=>false,'class'=>'btn btn-xs red'));
-						
-							?>
-							</td>
-						</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-				
-							
-							
-						</div>
-						<?php ?>
-					</div>
-					<!-- END PORTLET-->
+			<div class="details">
+				<div class="number">
+					 <?php echo $pending_quotation; ?>
 				</div>
-				<div class="col-md-6 col-sm-6">
-					<!-- BEGIN PORTLET-->
-					<div class="portlet light ">
-						<div class="portlet-title">
-							<div class="caption">
-								<i class="icon-share font-red-sunglo hide"></i>
-								<span class="caption-subject font-red-sunglo bold uppercase">Loan Request</span>
-								
-							</div>
-							<div class="actions">
-								<div class="btn-group">
-									
-									
-								</div>
-							</div>
-						</div>
-						
-					</div>
-					<!-- END PORTLET-->
+				<div class="desc">
+					 Quotations
 				</div>
 			</div>
-			<div class="clearfix">
+			
+			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'Quotations','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
+		</div>
 	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		<div class="dashboard-stat purple-plum">
+			<div class="visual">
+				<i class="fa fa-group fa-icon-medium"></i>
+			</div>
+			<div class="details">
+				<div class="number">
+					<?php echo $pending_sales; ?>
+				</div>
+				<div class="desc">
+					 Sales Orders
+				</div>
+			</div>
+			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'SalesOrders','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
+		</div>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		<div class="dashboard-stat green-haze">
+			<div class="visual">
+				<i class="fa fa-shopping-cart"></i>
+			</div>
+			<div class="details">
+				<div class="number">
+					 <?php echo $pending_invoice; ?>
+				</div>
+				<div class="desc">
+					 Invoice For Inventory Vouchers
+				</div>
+			</div>
+			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'Invoices','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
+		</div>
+	</div>
+
+</div>
+<div class="row">
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 ">
+		<div class="dashboard-stat green-haze">
+			<div class="visual">
+				<i class="fa fa-comments"></i>
+			</div>
+			<div class="details">
+				<div class="number">
+					 <?php echo $pending_po; ?>
+				</div>
+				<div class="desc">
+					 Purchase order for GRNs
+				</div>
+			</div>
+			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'Purchase-Orders','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
+		</div>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		<div class="dashboard-stat red-intense">
+			<div class="visual">
+				<i class="fa fa-bar-chart-o"></i>
+			</div>
+			<div class="details">
+				<div class="number">
+					<?php echo $pending_grn; ?>
+				</div>
+				<div class="desc">
+					 GRN for Invoice Bookings
+				</div>
+			</div>
+			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'Grns','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
+		</div>
+	</div>
+	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+		
+	</div>
+	<div class="row">
+	<div class="col-md-12">
+					<!-- BEGIN SAMPLE TABLE PORTLET-->
+					<div class="portlet box blue-madison">
+						<div class="portlet-title">
+							<div class="caption">
+								<i class="icon-docs"></i>Report
+							</div>
+							
+						</div>
+						<div class="portlet-body">
+							<table class="table ">
+							
+							<tbody>
+							<tr>
+								<td>
+									<?php
+										$fromdate1 = date('d-m-Y',strtotime($fromdate1));
+										$todate1 = date('d-m-Y',strtotime($todate1));
+									?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Daily Report',array('controller'=>'Ledgers','action'=>'Index','from'=>@$today,'to'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Material Indent',array('controller'=>'Item-Ledgers','action'=>'material-indent-report','stockstatus'=>'Positives','company_name%5B%5D'=>@$st_company_id),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Account Statement',array('controller'=>'Ledgers','action'=>'Account-Statement'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td width="25%">
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Account Statement Ref',array('controller'=>'Ledgers','action'=>'AccountStatementRefrence'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+							</tr>
+							<tr>
+								<td width="25%">
+									<?php
+										$fromdate1 = date('d-m-Y',strtotime($fromdate1));
+										$todate1 = date('d-m-Y',strtotime($todate1));
+									?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Outstandings for Customers',array('controller'=>'Customers','action'=>'Breakup-Range-Overdue-New','request'=>'customer'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td width="25%">
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Outstandings for Vendors',array('controller'=>'Customers','action'=>'Breakup-Range-Overdue-New','request'=>'vendor'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td width="25%">
+									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Non-GST Sales',array('controller'=>'Invoices','action'=>'salesReport','From'=>$fromdate1,'To'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td width="25%">
+									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> GST Sales',array('controller'=>'Invoices','action'=>'gstSalesReport','From'=>$fromdate1,'To'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<?php
+										$fromdate1 = date('d-m-Y',strtotime($fromdate1));
+										$todate1 = date('d-m-Y',strtotime($todate1));
+									?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Trial Balance',array('controller'=>'ledgers','action'=>'Trail-Balance'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Profit & Loss ',array('controller'=>'Ledgers','action'=>'ProfitLossStatement','from_date'=>$fromdate1,'to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+								<td width="25%">
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Balance Sheet',array('controller'=>'Ledgers','action'=>'BalanceSheet','from_date'=>$fromdate1,'to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+								</td>
+							</tr>
+							
+							</tbody>
+							</table>
+						</div>
+					</div>
+					<!-- END SAMPLE TABLE PORTLET-->
+				</div>
+	
+	</div>
+
+</div>
+<!-- END DASHBOARD STATS -->
+<div class="clearfix"></div>
 	
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
@@ -120,3 +214,4 @@ $(document).ready(function() {
 		</div>
 	</div>
 </div>
+<?php } ?>

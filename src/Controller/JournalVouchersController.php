@@ -565,6 +565,8 @@ class JournalVouchersController extends AppController
 					   }
 					}
 				}
+				
+				
 				$this->JournalVouchers->Ledgers->deleteAll(['voucher_id' => $journalVoucher->id, 'voucher_source' => 'Journal Voucher']);
 				$this->JournalVouchers->ReferenceDetails->deleteAll(['journal_voucher_id' => $journalVoucher->id]);
 				$total_cr=0; $total_dr=0;
