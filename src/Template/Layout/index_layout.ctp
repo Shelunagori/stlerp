@@ -894,6 +894,39 @@ select
 								<?php echo '<li>'.$this->Html->link( 'Index', '/TravelRequests' ).'</li>'; ?>
 							</ul>
 						</li>
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Loan Application</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/LoanApplications/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/LoanApplications' ).'</li>'; ?>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Salary Advances</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/SalaryAdvances/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/SalaryAdvances' ).'</li>'; ?>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Employee Records</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeRecords/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Index', '/EmployeeRecords' ).'</li>'; ?>
+							</ul>
+						</li>
 						</ul>
 					</ul>
 				</li>
