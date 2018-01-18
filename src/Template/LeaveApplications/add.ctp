@@ -27,19 +27,23 @@ border:none;
 }
 </style>
 
+<div class="portlet light bordered">
+	<div class="portlet-title">
+		<div class="caption">
+			<i class="icon-globe font-blue-steel"></i>
+			<span class="caption-subject font-blue-steel uppercase">Leave Application</span>
+		</div>
+	</div>
 
-<div class="col-md-12">
-<?php echo $this->Form->create($leaveApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-			<h3 class="box-title">Leave Application</h3>
-			</div>
-			<div class="box-body" style="display: block;">
-			<div class="row">
-	
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
-			<legend><b>  </b></legend>
-			<div class="col-md-12 pad">
+<div class="portlet-body form">
+		<?php echo $this->Form->create($leaveApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+				
+					
+	<div class="row">
+			
+			<div class="form-body">
+			<div class="form-body">
+				<div class="row">
 				
 			      <div class="col-md-4">
 						<div class="form-group">
@@ -47,6 +51,7 @@ border:none;
 							<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
 						</div>
 					</div>
+					
 			       
 				   <div class="col-md-4">
 						<div class="form-group">
@@ -61,7 +66,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 				<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Leave Required (From)</label>   
@@ -82,14 +87,14 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Leave Type</label>
 							<?php 
 							$type[]=['value'=>'sick','text'=>'sick'];
 							$type[]=['value'=>'casual','text'=>'casual'];
-							echo $this->Form->input('leave_type', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm leave_type','options'=>@$type]); ?>
+							echo $this->Form->input('leave_type', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control select2me input-sm leave_type','options'=>@$type]); ?>
 							
 						</div>
 					</div>

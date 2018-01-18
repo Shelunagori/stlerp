@@ -28,18 +28,23 @@ border:none;
 </style>
 
 
-<div class="col-md-12">
-<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3']); ?>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-			<h3 class="box-title">Travel Request</h3>
-			</div>
-			<div class="box-body" style="display: block;">
-			<div class="row">
-	
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
-			<legend><b>  </b></legend>
-			<div class="col-md-12 pad">
+<div class="portlet light bordered">
+	<div class="portlet-title">
+		<div class="caption">
+			<i class="icon-globe font-blue-steel"></i>
+			<span class="caption-subject font-blue-steel uppercase">Travel Request</span>
+		</div>
+	</div>
+
+	<div class="portlet-body form">
+		<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+				
+					
+	<div class="row">
+			
+			<div class="form-body">
+			<div class="form-body">
+				<div class="row">
 				
 			      <div class="col-md-4">
 						<div class="form-group">
@@ -63,7 +68,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (From)</label>
@@ -103,9 +108,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
-				
-			        
+			<div class="row">
 					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label  label-css">Mode Of Travel</label>
@@ -155,7 +158,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Other Mode</label>
