@@ -405,9 +405,13 @@ $(document).ready(function()
 	{ 
 				var i=0;
 				$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-					$(this).find('td:nth-child(1)').html(i+1);
+					$(this).find('td:nth-child(1)').html(i+1); 
 					$(this).find("td:nth-child(2) input.datepic").datepicker().attr({name:"travel_request_rows["+i+"][date]", id:"travel_request_rows-"+i+"-date"}).rules("add", "required");
-					$(this).find("td:nth-child(2) input.hiddenId").attr({name:"travel_request_rows["+i+"][id]", id:"travel_request_rows-"+i+"-id"}).rules("add", "required");
+					var hidden_id_length = $(this).find("td:nth-child(2) input.hiddenId").length; 
+					if(hidden_id_length>0)
+					{
+						$(this).find("td:nth-child(2) input.hiddenId").attr({name:"travel_request_rows["+i+"][id]", id:"travel_request_rows-"+i+"-id"});
+					} 
 					$(this).find("td:nth-child(3) input").attr({name:"travel_request_rows["+i+"][party_name]", id:"travel_request_rows-"+i+"-party_name"}).rules("add", "required");		
 					$(this).find("td:nth-child(4) input").attr({name:"travel_request_rows["+i+"][destination]", id:"travel_request_rows-"+i+"-destination"}).rules("add", "required");
 					$(this).find("td:nth-child(5) input").attr({name:"travel_request_rows["+i+"][meeting_person]", id:"travel_request_rows-"+i+"-meeting_person"}).rules("add", "required");
@@ -443,7 +447,7 @@ $(document).ready(function()
 		<tr class="main_tr" class="tab">
 			<td style="width:3%;"></td>
 			<td style="vertical-align: top !important;width:12%;" >
-				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd/mm/yyyy']); ?>
+				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker datepic','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd/mm/yyyy']); ?>
 			</td>
 			<td width="18%" style="vertical-align: top !important;">
 				<?php echo $this->Form->input('party_name', ['label' => false,'class' => 'form-control input-sm count_value','id'=>'check']); ?>
