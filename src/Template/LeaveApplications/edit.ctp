@@ -40,9 +40,7 @@ border:none;
 		<?php echo $this->Form->create($leaveApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 				
 					
-	<div class="row">
-			
-			<div class="form-body">
+	
 			<div class="form-body">
 				<div class="row">
 				

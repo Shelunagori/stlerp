@@ -28,22 +28,24 @@ border:none;
 </style>
 
 
-<div class="col-md-12">
-<?php echo $this->Form->create($employeePersonalInformation, ['id'=>'form_sample_3']); ?>
-		<div class="box box-primary">
-			<div class="box-header with-border">
-			<h3 class="box-title">EMPLOYEE PERSONAL INFORMATION</h3>
-			</div>
-			<div class="box-body" style="display: block;">
-			<div class="row">
-			
-		<fieldset border="1" style="margin-left: 20px;margin-right: 30px;">
-			<legend><b>Personal Information </b></legend>
+
 				
+<div class="portlet light bordered">
+	<div class="portlet-title">
+		<div class="caption">
+			<i class="icon-globe font-blue-steel"></i>
+			<span class="caption-subject font-blue-steel uppercase">EMPLOYEE PERSONAL INFORMATION</span>
+		</div>
+	</div>
+
+<div class="portlet-body form">
+		<?php echo $this->Form->create($employeePersonalInformation, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+				
+		<fieldset style="margin-left:  0px;margin-right: 0px;">	
+			<legend><b>Personal Information </b></legend>
 			
-			
-			
-			<div class="col-md-12 pad">
+			<div class="form-body">
+				<div class="row">
 				
 			      <div class="col-md-4">
 						<div class="form-group">
@@ -65,7 +67,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 				<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Birth</label>
@@ -92,7 +94,7 @@ border:none;
 				</div>
 				
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 			
 				<div class="col-md-4">
 						<div class="form-group">
@@ -121,8 +123,7 @@ border:none;
 					</div>
 					
 			</div>
-			<div class="col-md-12 pad">
-			
+			<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Religion</label>
@@ -150,8 +151,7 @@ border:none;
 			</div>
 			
 			
-			<div class="col-md-12 pad">
-			
+			<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Adhar Card No</label>
@@ -174,7 +174,7 @@ border:none;
 					
 			</div>
 			
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Height (in feet)</label>
@@ -197,7 +197,7 @@ border:none;
 					</div>
 			
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-4">
 								<div class="form-group">
 									<label class="control-label  label-css">Account Type</label>
@@ -222,7 +222,7 @@ border:none;
 					</div>
 			
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Bank & Branch</label>
@@ -245,7 +245,7 @@ border:none;
 					
 			</div>
 		</fieldset>	
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">	
 			<legend><b>Present Address details  </b></legend>
 			<div class="col-md-12 pad">
 				
@@ -305,7 +305,7 @@ border:none;
 					</div>
 			</div>
 		</fieldset>	
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Permanent Address details  </b></legend>
 			<div class="col-md-12 pad">
 				
@@ -363,7 +363,7 @@ border:none;
 					</div>
 			</div>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee  Family Information </b></legend>
 			<table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
 				<thead>
@@ -382,7 +382,7 @@ border:none;
 				</tbody>
 			</table>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee Emergency Details </b></legend>
 			<table id="main_table2" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
 				<thead>
@@ -401,7 +401,7 @@ border:none;
 				</tbody>
 			</table>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee Reference Details </b></legend>
 			<table id="main_table3" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
 				<thead>
@@ -419,7 +419,7 @@ border:none;
 				</tbody>
 			</table>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee Work Experience </b></legend>
 			<table id="main_table4" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
 				<thead>
@@ -437,7 +437,7 @@ border:none;
 				</tbody>
 			</table>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee  Nomination Information  </b></legend>
 			<div class="col-md-12 pad">
 				
@@ -502,7 +502,7 @@ border:none;
 					</div>
 			</div>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee Professional Information  ( Joining  Details )</b></legend>
 			<div class="col-md-12 pad">
 				
@@ -558,7 +558,7 @@ border:none;
 					</div>
 			</div>
 		</fieldset>
-		<fieldset style="margin-left: 20px;margin-right: 30px;">	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Salary Details -(At The Time of Initial Joining )</b></legend>
 			<div class="col-md-12 pad">
 				

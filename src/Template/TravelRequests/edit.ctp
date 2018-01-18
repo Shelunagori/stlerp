@@ -40,9 +40,7 @@ border:none;
 		<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 				
 					
-	<div class="row">
-			
-			<div class="form-body">
+	
 			<div class="form-body">
 				<div class="row">
 				
@@ -68,7 +66,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (From)</label>
@@ -126,9 +124,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
-				
-			        
+			<div class="row">    
 					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label  label-css">Mode Of Travel</label>
@@ -198,7 +194,7 @@ border:none;
 						</div>
 					</div>
 			</div>
-			<div class="col-md-12 pad">
+			<div class="row">
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Other Mode</label>
@@ -211,7 +207,7 @@ border:none;
 			
 		</fieldset>	
 		
-		<fieldset style="margin-left: 6px;margin-right: 16px;">
+		<fieldset style="margin-left: 2px;margin-right: 16px;">
 			<legend><b>Travel Schedule Date wise only </b></legend>
 			<table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
 				<thead>

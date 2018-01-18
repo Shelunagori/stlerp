@@ -36,7 +36,7 @@
 							<td><?= h($employeePersonalInformation->first_name) ?></td>
 							<td><?= h($employeePersonalInformation->middle_name) ?></td>
 							<td><?= h($employeePersonalInformation->last_name) ?></td>
-							<td><?= h($employeePersonalInformation->date_of_birth) ?></td>
+							<td><?= h(date("d-m-Y",strtotime($employeePersonalInformation->date_of_birth))) ?></td>
 							<td class="actions">
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $employeePersonalInformation->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
