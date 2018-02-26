@@ -6298,7 +6298,7 @@ class InvoicesController extends AppController
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' For Rs.'. h(round($invoice->grand_total,3)).'/- in duplicate.</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'.</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'.</td>
 				</tr>
 				'; $p=2; if($t > 0){ 
 					foreach($data as $d){
@@ -6325,8 +6325,8 @@ class InvoicesController extends AppController
 				//pr($message_web); exit;
 				$message_web.= '
 				<tr>
-					<td style="font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .'<br/>In favour of '. h(($company_data->name)).'in our account No '
-					. h(($invoice->company->company_banks[0]->account_no)).' Of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
+					<td style="text-align:justify;font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(round($invoice->grand_total)) .'<br/>In favour of '. h(($company_data->name)).' In our account No '
+					. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
 				</tr>
 				<tr></tr>
 				<tr></tr>
