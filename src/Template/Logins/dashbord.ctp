@@ -168,7 +168,263 @@
 </div>
 <!-- END DASHBOARD STATS -->
 <div class="clearfix"></div>
-	
+<?php if($PendingleaveRequests){ ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Pending Leave Request
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Employee Name</th>
+						<th>No of Days</th>
+						<th>Leave Status</th>
+						<th>Pending From</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $PendingRequest->name; ?></td>
+						<td><?php echo $PendingRequest->day_no; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
+						</td>
+						<td><?php echo $PendingRequest->emp_data->name; ?>
+						</td>
+						<td><?= $this->Html->link(' Approve ',
+								['controller'=>'LeaveApplications', 'action' => 'approved', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?>
+								<?= $this->Html->link(' Cancle ',
+								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?></td>
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
+<?php if($PendingTravelRequests){ ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Pending Travel Request
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Employee Name</th>
+						<th>Status</th>
+						<th>Pending From</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingTravelRequests as $PendingRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $PendingRequest->employee->name; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingRequest->status; ?></span>
+						</td>
+						<td><?php echo $PendingRequest->emp_data->name; ?>
+						</td>
+						<td><?= $this->Html->link(' Approve ',
+								['controller'=>'TravelRequests', 'action' => 'approved', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?>
+								<?= $this->Html->link(' Cancle ',
+								['controller'=>'TravelRequests', 'action' => 'cancle', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?></td>
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
+<?php } else { ?>	
+
+<?php if($PendingTravelRequestStatus){  ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Travel Request Status
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Status</th>
+						<th>Pending From</th>
+						
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingTravelRequestStatus as $PendingTravelRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingTravelRequest->status; ?></span>
+						</td>
+						<td><?php echo $PendingTravelRequest->emp_data->name; ?>
+						</td>
+						
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
+
+<?php if($PendingleaveRequests){ ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Pending Leave Request
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Employee Name</th>
+						<th>No of Days</th>
+						<th>Leave Status</th>
+						<th>Pending From</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $PendingRequest->name; ?></td>
+						<td><?php echo $PendingRequest->day_no; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
+						</td>
+						<td><?php echo $PendingRequest->emp_data->name; ?>
+						</td>
+						<td><?= $this->Html->link(' Approve ',
+								['controller'=>'LeaveApplications', 'action' => 'approved', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?>
+								<?= $this->Html->link(' Cancle ',
+								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
+								[
+									'escape' => false
+									
+								]
+							) ?></td>
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
+
+<?php if($PendingleaveStatus){
+
+?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Leave Request Status
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Status</th>
+						<th>Pending From</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingleaveStatus as $Pendingleave){ //pr($Pendingleave); ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $Pendingleave->leave_status; ?></span>
+						</td>
+						<?php if($Pendingleave->leave_status=='Pending'){ ?>
+						<td><?php echo $Pendingleave->emp_data->name; ?></td>
+						<?php } else {?>
+						<td><?php echo $Pendingleave->emp_data->name; ?></td>
+						<?php }?>
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
+<?php }  ?>	
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
@@ -214,4 +470,3 @@ $(document).ready(function() {
 		</div>
 	</div>
 </div>
-<?php } ?>

@@ -33,12 +33,21 @@ class EmployeeHierarchiesTable extends Table
         parent::initialize($config);
 
         $this->table('employee_hierarchies');
-        $this->displayField('id');
+        $this->displayField('name');
         $this->primaryKey('id');
-
+		$this->addBehavior('Tree', [
+        'parent' => 'parent_id', // Use this instead of parent_id
+        'left' => 'lft', // Use this instead of lft
+        'right' => 'rght' // Use this instead of rght
+    ]);
         $this->belongsTo('Employees', [
             'foreignKey' => 'employee_id',
             'joinType' => 'INNER'
+        ]);
+		
+		$this->belongsTo('ParentAccountingGroups', [
+            'className' => 'EmployeeHierarchies',
+            'foreignKey' => 'parent_id'
         ]);
     }
 
@@ -54,7 +63,7 @@ class EmployeeHierarchiesTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
+       /*  $validator
             ->integer('lft')
             ->requirePresence('lft', 'create')
             ->notEmpty('lft');
@@ -62,7 +71,7 @@ class EmployeeHierarchiesTable extends Table
         $validator
             ->integer('rgft')
             ->requirePresence('rgft', 'create')
-            ->notEmpty('rgft');
+            ->notEmpty('rgft'); */
 
         return $validator;
     }

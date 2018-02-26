@@ -48,15 +48,15 @@ class IvsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['Ivs.transaction_date <=']=$To;
 		}
-        $this->paginate = [
+        /* $this->paginate = [
             'contain' => ['Invoices'=>['Customers'],'IvRows']
         ];
 		
         $this->paginate = [
             'contain' => ['Invoices'=>['Customers'],'IvRows', 'Companies']
         ];
-		
-		$ivs = $this->paginate($this->Ivs->find()->contain(['Invoices'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']));
+		 */
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows', 'Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']);
         $this->set(compact('ivs','url'));
         $this->set('_serialize', ['ivs']);
     }

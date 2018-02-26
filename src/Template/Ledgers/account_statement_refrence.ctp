@@ -48,15 +48,21 @@
 			<table class="table table-bordered table-striped table-hover">
 				<thead>
 					<tr>
-						<th>Reference</th>
+						<th>Invoice No.</th>
 						<th>Transaction Date</th>
 						<th>Due Date</th>
+						
+						<th>PO Number</th>
+						<th>PO Date</th>
 						<th style="text-align:right;">Dr</th>
 						<th style="text-align:right;">Cr</th>
 					</tr>
 				</thead>
 				<tbody>
-				<?php $total_debit=0; $total_credit=0;$payment_terms=0; foreach($ReferenceBalances as $ReferenceBalance){  
+				<?php $total_debit=0; $total_credit=0;$payment_terms=0; foreach($ReferenceBalances as $key=>$ReferenceBalance){ 
+
+				//pr($key); 
+				//pr($Invoice_data[$key]->customer_po_no); exit;
 					if($ReferenceBalance['reference_type']!="On_account"){
 						if(!empty($customer_data->payment_terms)){
 							$payment_terms=$customer_data->payment_terms;
@@ -71,6 +77,21 @@
 						<td><?php echo $ReferenceBalance['reference_no']; ?></td>
 						<td><?php echo (date('d-m-Y',strtotime($ReferenceBalance['transaction_date']))); ?></td>
 						<td><?php echo (date('d-m-Y',strtotime($due_date))); ?></td>
+						<td>
+						<?php if(!empty($Invoice_data[$key])){
+								 echo $Invoice_data[$key]->customer_po_no; 
+							}else{
+								
+							}?>
+						</td>
+						<td>
+							<?php if(!empty($Invoice_data[$key])){
+								echo (date('d-m-Y',strtotime($Invoice_data[$key]->po_date))); 
+							}else{
+								
+							}?>
+						</td>
+						
 						<td align="right"><?= $this->Number->format($ReferenceBalance['debit'],[ 'places' => 2]); ?></td>
 						<td align="right"><?= $this->Number->format($ReferenceBalance['credit'],[ 'places' => 2]);  ?></td>
 						<?php $total_debit+=$ReferenceBalance['debit'];
@@ -79,12 +100,12 @@
 				</tr>
 				<?php } } ?>
 				<tr>
-					<td align="right" colspan="3">Total</td>
+					<td align="right" colspan="5">Total</td>
 					<td align="right"><?= $this->Number->format($total_debit,[ 'places' => 2]); ?>Dr.</td>
 					<td align="right"><?= $this->Number->format($total_credit,[ 'places' => 2]); ?>Cr.</td>
 				</tr>
 				<tr>
-					<td  align="right" colspan="3">On Account</td>	
+					<td  align="right" colspan="5">On Account</td>	
 					<?php 
 						$on_acc=0;
 						$on_acc=$on_dr-$on_cr;

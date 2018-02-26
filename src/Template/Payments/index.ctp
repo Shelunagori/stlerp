@@ -22,7 +22,7 @@
 					<tbody>
 						<tr>
 							<td width="15%">
-								<?php echo $this->Form->input('items', ['empty'=>'--Items--','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$items) ]); ?>
+								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction Date From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
 							</td>
 							<td width="15%">
 								<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Transaction Date To" value="<?php echo @$To; ?>" data-date-format="dd-mm-yyyy" >
@@ -36,7 +36,44 @@
 				</table>
 				</form>
 			<div class="col-md-12">
-				
+				<?php $page_no=$this->Paginator->current('Payments'); $page_no=($page_no-1)*20; ?>
+				<table class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th width="5%">Sr. No.</th>
+							<th width="15%">Transaction Date</th>
+							<th width="15%">Vocher No</th>
+							<th style="text-align:right;" width="15%"	>Amount</th>
+							<th width="20%" class="actions"><?= __('Actions') ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php $i=0; foreach ($payments as $payment): $i++; 
+						
+					?>
+						<tr>
+							<td><?= h(++$page_no) ?></td>
+							<td><?= h(date("d-m-Y",strtotime($payment->transaction_date)))?></td>
+							<td><?= h('#'.str_pad($payment->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
+							<td align="right"><?= h($this->Number->format(@$payment->payment_rows[0]->total_dr-@$payment->payment_rows[0]->total_cr,[ 'places' => 2])) ?></td>
+							<td class="actions">
+							<?php 
+							if(in_array($payment->created_by,$allowed_emp)){ 
+								if(in_array(92,$allowed_pages)){
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $payment->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+								} ?>
+								<?php
+								if(in_array(91,$allowed_pages)){
+								 echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $payment->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+								}	
+							}?>
+							
+							</td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+				</div>
 			</div>
 			</div>
 		</div>

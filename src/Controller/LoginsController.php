@@ -46,7 +46,8 @@ class LoginsController extends AppController
 					return $this->redirect(['controller'=>'Logins', 'action' => 'SwitchCompany']);
 				}*/
 				 if(!empty($emp_mobile)){
-					return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
+					return $this->redirect(['action' => 'Switch-Company']);
+					//return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
 				}else{
 					return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
 				} 
@@ -319,8 +320,6 @@ class LoginsController extends AppController
 	   $session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$employee_id=$this->viewVars['s_employee_id'];
-	   //pr($employee_id); exit;
-	   
 	   $quotations = $this->Logins->Quotations->find()->contain(['QuotationRows'=>['Items']])->where(['company_id'=>$st_company_id,'status'=>'Pending','Quotations.revision '=> 0])->order(['Quotations.id' => 'DESC']);
 	  // pr($quotations->toArray()); exit;
 	   $quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
@@ -405,8 +404,25 @@ class LoginsController extends AppController
 		$grns = $this->Logins->Grns->find()->where(['status'=>'Pending'])->where(['Grns.company_id'=>$st_company_id]);
 		$grns = $grns->select(['ct' => $grns->func()->count('Grns.id')])->first();
 		$pending_grn=$grns->ct;
-	 //pr($grns->ct); exit;
-	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id'));
+		if($employee_id==16){
+			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['leave_status'=>'Pending'])->contain(['empData'])->toArray();
+			
+			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
+			
+		}else{
+			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['parent_employee_id'=>$employee_id,'leave_status'=>'Pending'])->contain(['empData'])->toArray();
+			
+			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['parent_employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
+			//pr($PendingTravelRequests); exit;
+		}
+		
+
+		$PendingleaveStatus = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id])->contain(['empData'])->toArray();
+
+		$PendingTravelRequestStatus = $this->Logins->TravelRequests->find()->where(['TravelRequests.employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
+		/* pr($employee_id);
+		pr($PendingTravelRequestStatus); exit; */
+	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus'));
 		
     }
 }

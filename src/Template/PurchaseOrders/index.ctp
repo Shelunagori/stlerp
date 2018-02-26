@@ -106,7 +106,7 @@
 					<tbody>
 						<?php  foreach ($purchaseOrders as $purchaseOrder): ?>
 						<tr <?php if($status=='Pending'){ echo 'style="background-color:#f4f4f4"';   
-							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){
+							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ 
 						?>>
 							<td><?= h(++$page_no) ?></td>
 							
@@ -128,18 +128,23 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
-							<?php if(in_array(31,$allowed_pages)){ ?>
+							<?php
+							if(in_array($purchaseOrder->created_by,$allowed_emp)){
+							if(in_array(31,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 							<?php } ?>
+							<?php
+								if($status != 'Converted-Into-GRN') { 
+								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } } ?>
+							
+							
 								<?php if($pull_request=="true"){ 
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								} ?>
 								
 								
-								<?php
-								if($status != 'Converted-Into-GRN') {
-								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } ?>
+								
 
 							</td>
 						</tr>
@@ -169,10 +174,12 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
-							<?php if(in_array(31,$allowed_pages)){ ?>
-								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
-							<?php } ?>
-								<?php if($pull_request=="true"){
+							<?php if(in_array($purchaseOrder->created_by,$allowed_emp)){
+								if(in_array(31,$allowed_pages)){ ?>
+									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+							<?php } } ?>
+							
+								<?php if($pull_request=="true"){ 
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								} ?>
 								
@@ -186,7 +193,7 @@
 						</tr>
 						<?php }} endforeach; ?>
 						
-						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
+						<?php foreach ($purchaseOrders as $purchaseOrder):  ?>
 						<tr <?php if($status=='true' || $status==null){ echo 'style="background-color:#f4f4f4"';  
 							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ //exit;
 						?>>
@@ -210,18 +217,25 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
-							<?php if(in_array(31,$allowed_pages)){ ?>
-								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
-							<?php } ?>
+							<?php 
+							if(in_array($purchaseOrder->created_by,$allowed_emp)){
+								if(in_array(31,$allowed_pages)){ ?>
+									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+								<?php } ?>
+							
+								<?php
+									if($status != 'Converted-Into-GRN') {
+									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } 
+									
+							}?>
+							
 								<?php if($pull_request=="true"){ 
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-								} ?>
+							} ?>
 								
 								
-								<?php
-								if($status != 'Converted-Into-GRN') {
-								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } ?>
+								
 
 							</td>
 						</tr>

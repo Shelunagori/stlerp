@@ -32,7 +32,7 @@
 						<?php if(!empty($company_name)){ ?>
 								<?php echo $this->Form->input('company_name', ['options' => $Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=> $company_name]); ?>
 						<?php }else{ ?>  
-							<?php echo $this->Form->input('company_name', ['label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=> $st_company_id]); ?>
+							<?php echo $this->Form->input('company_name', ['options' => $Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=> $st_company_id]); ?>
 						<?php } ?>		
 						</td>
 						<td width="15%">
@@ -225,10 +225,42 @@
 							<?php }
 							
 						?>
+						
+						<?php $i++; }  ?>
+						<?php foreach($ItemDatas as $key=>$ItemData){ ?>
+									<tr class="tr1" row_no='<?php echo @$i; ?>'>
+										<td ><?php echo $i++; ?> </td>
+										<td style="text-align:center"><?php echo $ItemData; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										
+										 <td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td style="text-align:center"><?php echo "0"; ?></td>
+										<td align="center">
+											<label class="hello">
+											
+															<button type="button" id="item<?php echo $ItemData;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $ItemData; ?>" suggestindent="0"><i class="fa fa-plus"></i></button>
+											</label>
+										</td>
+									
+									
+									</tr>
+							<?php }
+							
+						?>
+						
+						
+						
 						<?php $i++ ;?>
 						<?php //echo $qty; exit;?>
 
-						<?php }  ?>
+						
 					</tbody>
 				</table>
 					

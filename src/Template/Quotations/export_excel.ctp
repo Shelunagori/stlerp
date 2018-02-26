@@ -37,7 +37,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $i=0; foreach ($quotations as $quotation): ?>
+		<?php $i=0; foreach ($quotations as $quotation): 
+		if($status==$quotation->status){
+		?>
 		<tr >
 			<td><?= h(++$i) ?></td>
 			<td><?= h(($quotation->qt1.'/QT-'.str_pad($quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$quotation->qt3.'/'.$quotation->qt4)) ?></td>
@@ -48,7 +50,7 @@
 			<td><?php echo date("d-m-Y",strtotime($quotation->finalisation_date)); ?></td>
 			<td><?php echo ucwords($quotation->status); ?></td>
 		</tr>
-		<?php endforeach; ?>
+		<?php } endforeach; ?>
 	</tbody>
 </table>
 			

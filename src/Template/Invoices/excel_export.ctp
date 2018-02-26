@@ -34,7 +34,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php $i=0; foreach ($invoices as $invoice): ?>
+						<?php $i=0; foreach ($invoices as $invoice):
+						if(in_array($invoice->created_by,$allowed_emp)){
+						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
 							<td><?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>
@@ -56,7 +58,7 @@
 							<td><?= h($invoice->total_after_pnf) ?></td>
 							
 						</tr>
-						<?php endforeach; ?>
+						<?php } endforeach; ?>
 					</tbody>
 				</table>
 				

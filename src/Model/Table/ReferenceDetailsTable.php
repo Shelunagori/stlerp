@@ -90,6 +90,7 @@ class ReferenceDetailsTable extends Table
             'foreignKey' => 'purchase_return_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('PettyCashVouchers');
     }
 
     /**

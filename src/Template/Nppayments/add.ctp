@@ -619,8 +619,8 @@ function do_ref_total(){
 					</div>
 					<div class="col-md-5  " style="padding-left: 0;">
 						<select name="cr_dr" class="form-control input-sm cr_dr" >
-							<option value="Cr">Cr</option>
 							<option value="Dr">Dr</option>
+							<option value="Cr">Cr</option>
 						</select>
 					</div>
 				</div>

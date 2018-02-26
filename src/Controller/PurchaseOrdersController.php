@@ -155,8 +155,9 @@ class PurchaseOrdersController extends AppController
     }
 
 	public function excelExport($status=null){
+		
 		$this->viewBuilder()->layout('');
-       
+       if(empty($status)){ $status="Pending"; }
 		$pull_request=$this->request->query('pull-request');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
@@ -197,25 +198,33 @@ class PurchaseOrdersController extends AppController
 			$where['PurchaseOrders.date_created <=']=$To;
 		}
 		$where1=[];
-		$having=[];
+		
+		if($status==null or $status=='Pending'){
+			$having=['total_sales >' => 0];
+			//$where1=['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity'];
+		}elseif($status=='Converted-Into-GRN'){
+			$having=['total_sales =' => 0];
+			//$where1=['PurchaseOrderRows.processed_quantity = PurchaseOrderRows.quantity'];
+		}
 		
 		
-				
-			/* $purchaseOrders=
-			$this->PurchaseOrders->find()->select(['total_rows' => 
-				$this->PurchaseOrders->find()->func()->count('PurchaseOrderRows.id')])
-				->leftJoinWith('PurchaseOrderRows', function ($q) {
-					return $q->where(['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity']);
-				})
+		if(!empty($items)){ 
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
 				->group(['PurchaseOrders.id'])
+				->matching('PurchaseOrderRows.Items', function ($q) use($items,$st_company_id) {
+											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+							})
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->having($having)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
-				->where(['company_id'=>$st_company_id])
-				->order(['PurchaseOrders.id' => 'DESC'])
-				->contain(['PurchaseOrderRows'=>['Items'],'Companies', 'Vendors'])
-			; */
-		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				->order(['PurchaseOrders.id'=>'DESC']);
+		}else{	
+			if($pull_request=="true"){
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
 				->innerJoinWith('PurchaseOrderRows')
@@ -223,23 +232,59 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+			}
+			if($status==null || $status=="Converted-Into-GRN" ){
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+			}
+			if($status==null || $status=="Pending" ){ 
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+			}
 			
+		} 
+		//pr($purchaseOrders->toArray()); exit;
+		//pr($status); exit;
 		
 		$total_sales=[]; $total_qty=[];
 		foreach($purchaseOrders as $salesorder){
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->purchase_order_rows as $sales_order_row){
-				foreach($sales_order_row->grn_rows as $invoice_row){
+				foreach($sales_order_row->grn_rows as $invoice_row){ 
 						if(sizeof($invoice_row) > 0){
 							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
 						}
 				}
 			}
 		}
-		$this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_sales','total_qty'));
+		//pr($total_sales); 
+		//pr($total_qty); 
+		
+		//exit;
+		
+		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find()->toArray();
+		$Items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
+        $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales'));
         $this->set('_serialize', ['purchaseOrders']);
-		$this->set(compact('url','purchaseOrders'));
+		$this->set(compact('url'));
 	}
     /**
      * View method

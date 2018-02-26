@@ -147,7 +147,7 @@ if($transaction_date <  $start_date ) {
 										$dr_cr="Dr";
 									}
 									echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount','value'=>$amount]); ?></td>
-									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>$dr_cr]); ?></td>
+									<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Cr'=>'Cr','Dr'=>'Dr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>$dr_cr]); ?></td>
 									<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 								</tr>
 								<?php }
@@ -567,11 +567,11 @@ $(document).ready(function() {
 		if(!v){ v=0; }
 		$(this).val(v.toFixed(2));
 	});
-	
+	*/
 	$('.mian_amount').live("keyup",function() {
 		do_mian_amount_total();
-		do_ref_total();
-	}); */
+		
+	}); 
 	
 	do_mian_amount_total();
 	function do_mian_amount_total(){
@@ -640,7 +640,7 @@ $(document).ready(function() {
 				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
 				<td class="ref_no"></td>
 				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
-				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Dr']); ?></td>
+				<td><?php echo $this->Form->input('ref_cr_dr', ['options'=>['Cr'=>'Cr','Dr'=>'Dr'],'label' => false,'class' => 'form-control input-sm  calculation drcrChange','value'=>'Cr']); ?></td>
 				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 			</tr>
 		</tbody>

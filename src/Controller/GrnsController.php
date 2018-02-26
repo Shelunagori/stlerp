@@ -23,9 +23,9 @@ class GrnsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-        $this->paginate = [
+       /*  $this->paginate = [
             'contain' => ['PurchaseOrders', 'Companies','Vendors']
-        ];
+        ]; */
 		$pull_request=$this->request->query('pull-request');
 		$grn_pull_request=$this->request->query('grn-pull-request');
 		$Actionstatus="";
@@ -65,33 +65,9 @@ class GrnsController extends AppController
 			$where['status']='Invoice-Booked';
 		}
 		
-/* 		 if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){
-					$GrnRows = $this->Grns->GrnRows->find();
-					$Grns = $this->Grns->find();
-					$Grns->select(['id','total_sales'=>$GrnRows->func()->sum('GrnRows.quantity')])
-					->innerJoinWith('GrnRows')
-					->group(['Grns.id'])
-					->contain(['GrnRows.InvoiceBookingRows','GrnRows'=>['Items']])
-					->autoFields(true)
-					->where(['Grns.company_id'=>$st_company_id])
-					->where($where);
-					$Actionstatus="NonGstInvoice";
-		 }
-		 else if($grn_pull_request=="true" || $Actionstatus=="GstInvoice"){
-					$GrnRows = $this->Grns->GrnRows->find();
-					$Grns = $this->Grns->find();
-					$Grns->select(['id','total_sales'=>$GrnRows->func()->sum('GrnRows.quantity')])
-					->innerJoinWith('GrnRows')
-					->group(['Grns.id'])
-					->contain(['GrnRows.InvoiceBookingRows','GrnRows'=>['Items']])
-					->autoFields(true)
-					->where(['Grns.company_id'=>$st_company_id])
-					->where($where);
-					$Actionstatus="NonGstInvoice";
-		 } */
+
 		
-		
-		$grns = $this->paginate($this->Grns->find()->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']));
+		$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
         $this->set(compact('grns','pull_request','status','grn_pull_request','url'));
         $this->set('_serialize', ['grns']);
     }
@@ -168,13 +144,15 @@ class GrnsController extends AppController
 	
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');
-		
+		if(empty($status)){ $status="Pending"; }
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-        
+        $this->paginate = [
+            'contain' => ['PurchaseOrders', 'Companies','Vendors']
+        ];
 		$pull_request=$this->request->query('pull-request');
 		$grn_pull_request=$this->request->query('grn-pull-request');
-		
+		$Actionstatus="";
 		$where1=[];
 		$grn_no=$this->request->query('grn_no');
 		$po_no=$this->request->query('po_no');
@@ -187,7 +165,9 @@ class GrnsController extends AppController
 			$where1['grn2 LIKE']=$grn_no;
 		}
 		if(!empty($po_no)){
-			$where1['PurchaseOrders.po2 LIKE']='%'.$po_no.'%';
+			$findpo = $this->Grns->PurchaseOrders->find()->where(['PurchaseOrders.po2'=>$po_no])->first();
+			//pr($findpo->id); exit;
+			$where1['Grns.purchase_order_id']=@$findpo->id;
 		}
 		
 		if(!empty($vendor)){
@@ -202,15 +182,15 @@ class GrnsController extends AppController
 			$where1['Grns.date_created <=']=$To;
 		}
       
-		/* $where=[];
-		if($status=='Pending'){
+		$where=[];
+		if($status==null or $status=='Pending'){
 			$where['status']='Pending';
 		}elseif($status=='Invoice-Booked'){
 			$where['status']='Invoice-Booked';
-		} */
+		}
 		
-		$grns = $this->Grns->find()->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC'])->contain(['PurchaseOrders', 'Companies','Vendors']);
-        $this->set(compact('grns','pull_request','status','grn_pull_request'));
+		$grns =$this->Grns->find()->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->contain(['PurchaseOrders', 'Companies','Vendors'])->order(['Grns.id' => 'DESC']);
+        $this->set(compact('grns','pull_request','status','grn_pull_request','url'));
         $this->set('_serialize', ['grns']);
 	}
 

@@ -104,30 +104,48 @@ $(document).ready(function() {
 	$('.closebtn2').on("click",function() { 
 		$("#myModal2").hide();
     });
+	
+	$('.check_value').die().live("change",function() {
+		$(".tabl_tc tbody tr").each(function(){
+		var v=$(this).find('td:nth-child(1)  input[type="checkbox"]:checked').val();
+		if(v){
+			$(this).find('td:nth-child(1)  input[type="text"].term').removeAttr("readonly"); ;
+			$(this).find('td:nth-child(1)  input[type="text"].term').focus();
+		}else{
+				
+			$(this).find('td:nth-child(1)  input[type="text"].term').attr('readonly','readonly');
+		}
+		});
+	});
+	
 	$('.insert_tc').die().live("click",function() {
 		$('#sortable').html("");
 		var i=0;
 		var send_data = [];
 		$(".tabl_tc tbody tr").each(function(){
 			var v=$(this).find('td:nth-child(1)  input[type="checkbox"]:checked').val();
-			
+			var term=$(this).find('td:nth-child(1)  input[type="text"].term').val();
+			if(term){
+			$(this).find('td:nth-child(1)  input[type="checkbox"]:checked').val(term);
+			}
 			if(v){
 				var tc=$(this).find('td:nth-child(1) .check_value').val(); 
 				send_data[i++] = tc;
 				//send_data[++i]=tc;
 			}
 		});
+		var textdata=$('.textdata').val(); 
 		var json_data=JSON.stringify(send_data);
 		
 		 var id="<?php echo $id; ?>";
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'sendMail']); ?>";
-		url=url+'?id='+id+'&data='+json_data;
+		url=url+'?id='+id+'&data='+json_data+'&otherData='+textdata;
 		
 		$.ajax({
 			url: url,
 			type: "GET",
-		}).done(function(response) {
+		}).done(function(response) { 
 			alert("Email Send successfully")
 		}); 
 		
@@ -151,13 +169,25 @@ $(document).ready(function() {
 						<td>
 						 <div class="checkbox-list">
 							<label>
-								<input type="checkbox" name="dummy" value="<?= h($termsCondition->id) ?>" class="check_value"><?= h($termsCondition->text_line) ?>
-							</label> 
+								<input type="checkbox" name="dummy" value="<?= h($termsCondition->id) ?>" class="check_value"><input style="border: none;
+								background: transparent;" type="text" size="60%" class="term" name="terms" value="<?php echo $termsCondition->text_line; ?>" readonly>
+							</label>
 						 </div>
 						
 						</td>
 					</tr>
 				<?php endforeach; ?>
+				<tr>
+					<td>
+						 <div class="checkbox-list">
+							<label>
+								
+								<textarea name="delivery_description" class="form-control input-sm textdata" placeholder="Other Description" id="delivery-description" rows="5"></textarea>
+							</label> 
+						 </div>
+						
+						</td>
+				</tr>
 				</table>
 				</div>
 			</div>

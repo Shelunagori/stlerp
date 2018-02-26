@@ -65,14 +65,16 @@
 							}  $total= $total_dr-$total_cr?>
                             <td align="right"><?= h($this->Number->format(abs($total),[ 'places' => 2])) ?></td>
                             <td class="actions">
-                            <?php 
-							if(in_array(100,$allowed_pages)){
-							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $pettycashvoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
-							} ?>
-							<?php 
-							if(in_array(99,$allowed_pages)){
-							  echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $pettycashvoucher->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-							} ?>
+							<?php if(in_array($pettycashvoucher->created_by,$allowed_emp)){  ?>
+								<?php 
+								if(in_array(100,$allowed_pages)){
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $pettycashvoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+								} ?>
+								<?php 
+								if(in_array(99,$allowed_pages)){
+								  echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $pettycashvoucher->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								} ?>
+							<?php } ?>
                             </td>
                         </tr>
                         <?php endforeach; ?>

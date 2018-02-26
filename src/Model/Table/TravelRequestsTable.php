@@ -36,10 +36,16 @@ class TravelRequestsTable extends Table
         $this->table('travel_requests');
         $this->displayField('id');
         $this->primaryKey('id');
-
+		$this->belongsTo('Employees');
+		$this->belongsTo('EmployeeHierarchies');
         $this->hasMany('TravelRequestRows', [
             'foreignKey' => 'travel_request_id',
 			'saveStrategy' => 'replace'
+        ]);
+		$this->belongsTo('empData', [
+			'className' => 'Employees',
+            'foreignKey' => 'parent_employee_id',
+            'joinType' => 'INNER'
         ]);
     }
 

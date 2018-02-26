@@ -84,12 +84,17 @@
 					</thead>
 					<tbody>
 					
-						<?php foreach ($grns as $grn): ?>
+						<?php foreach ($grns as $grn): 
+						
+						?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
-							<td><?php echo $this->Html->link($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4,[
+							<td>
+							<?php if(in_array($grn->purchase_order->created_by,$allowed_emp)){ ?>
+							<?php echo $this->Html->link($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4,[
 							'controller'=>'PurchaseOrders','action' => 'confirm',$grn->purchase_order->id],array('target'=>'_blank')); ?>
+							<?php } ?>
 							</td>
 							<td><?= h($grn->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($grn->date_created)); ?></td>
@@ -103,32 +108,27 @@
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Gst Book Invoice','/InvoiceBookings/gstInvoiceBooking?grn='.$grn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}
   							else { ?>
-							<?php if(in_array(35,$allowed_pages)){ ?>
+							<?php
+							if(in_array($grn->created_by,$allowed_emp)){
+							if(in_array(35,$allowed_pages)){ ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $grn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>	
 							
 							 <?php } ?>
 							<?php if($status!='Invoice-Booked' and in_array(16,$allowed_pages)){ ?>
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditNew', $grn->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));?> <?php } ?>
+							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditNew', $grn->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));?> <?php } }?>
 							
 							
 					
                              <?php } ?>
 							</td>
 						</tr>
-						<?php endforeach; ?>
+						<?php  endforeach; ?>
 					</tbody>
 				</table>
 					</div>
 			</div>
 		</div>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				</div>
+				
 			</div>
 		</div>
 	

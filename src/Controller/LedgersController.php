@@ -637,10 +637,15 @@ class LedgersController extends AppController
 		$ReferenceBalances=[];
 		$on_dr=0;
 		$on_cr=0;
+		$Invoice_data=[];
 		//pr($referenceDetails->toArray());
-		foreach($referenceDetails as $referenceDetail){
+		foreach($referenceDetails as $referenceDetail){ 
+			if($referenceDetail->invoice_id >0){
+				$Invoice_data[$referenceDetail->id] = $this->Ledgers->Invoices->get($referenceDetail->invoice_id);
+				//pr($Invoice_data); exit;	
+			}
 			if($referenceDetail->total_debit!=$referenceDetail->total_credit){ //pr($referenceDetail);
-				$ReferenceBalances[]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->total_debit,'credit' =>$referenceDetail->total_credit,'reference_type'=>$referenceDetail->reference_type];
+				$ReferenceBalances[$referenceDetail->id]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->total_debit,'credit' =>$referenceDetail->total_credit,'reference_type'=>$referenceDetail->reference_type];
 			}
 			
 			if($referenceDetail->reference_type=="On_account"){  
@@ -681,7 +686,7 @@ class LedgersController extends AppController
 			}])->where(['company_id'=>$st_company_id]);
 		}
 		
-		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr'));
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data'));
 	}
 	
 	public function excelExportAccountRef(){
@@ -750,6 +755,158 @@ class LedgersController extends AppController
 	
 	}
 	
+	public function excelBs(){ 
+		$this->viewBuilder()->layout('');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY); 
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$from_date=$this->request->query('from_date');
+		$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		
+		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
+		->where(['AccountCategories.id In'=>[1,2]])
+		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		
+		$groupForPrint=[];
+		foreach($AccountCategories as $AccountCategory){
+			foreach($AccountCategory->account_groups as $account_group){
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
+							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+						}
+					}
+				}
+			}
+		}
+		//pr(@$groupForPrint); exit;
+		$GrossProfit= $this->GrossProfit($from_date,$to_date);
+		$closingValue= $this->StockValuationWithDate2($to_date);
+		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
+		
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance','url'));
+	}
+	
+	public function excelPnl (){ 
+		$this->viewBuilder()->layout('');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY); 
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+        $st_year_id = $session->read('st_year_id');
+		$ledger_account_id=$this->request->query('ledger_account_id');
+		$financial_year = $this->Ledgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$company = $this->Companies->get($st_company_id);
+		$from_date = $this->request->query('from_date');
+		$to_date   = $this->request->query('to_date');
+		
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+	//	pr($from_date); exit;
+		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
+		->where(['AccountCategories.id In'=>[3,4]])
+		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		
+		$groupForPrint=[];
+		foreach($AccountCategories as $AccountCategory){
+			foreach($AccountCategory->account_groups as $account_group){
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
+							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+						}
+					}
+				}
+			}
+		}
+		
+		$openingValue= $this->StockValuationWithDate($from_date);
+		$closingValue= $this->StockValuationWithDate2($to_date);
+		
+		//$closingValue= $this->StockValuation();
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url'));
+	}
+	
+	public function excelTb (){ 
+		$this->viewBuilder()->layout('');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+        $st_year_id = $session->read('st_year_id');
+		$ledger_account_id=$this->request->query('ledger_account_id');
+		$financial_year = $this->Ledgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$company = $this->Companies->get($st_company_id);
+		$from_date = $this->request->query('From');
+		$to_date   = $this->request->query('To');
+		
+		if($from_date){ 
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date   = date("Y-m-d",strtotime($to_date));
+		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
+		->where(['AccountCategories.id In'=>[1,2,3,4]])
+		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		
+		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+		foreach($AccountCategories as $AccountCategory){
+			foreach($AccountCategory->account_groups as $account_group){
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
+							@$ClosingBalanceForPrint[$account_group->id]['name']=@$account_group->name;
+							@$ClosingBalanceForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							
+							// pr($ClosingBalanceForPrint);exit;
+							$query2=$this->Ledgers->find();
+							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
+
+							@$TransactionDr[@$account_group->id]['balance']+=@$query2->first()->totalDebit;
+							@$TransactionCr[@$account_group->id]['balance']+=@$query2->first()->totalCredit;
+
+							$query1=$this->Ledgers->find();
+							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
+							$OpeningBalanceForPrint[$account_group->id]['name']=@$account_group->name;
+							@$OpeningBalanceForPrint[$account_group->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
+							/* pr($TransactionDr);
+							pr($TransactionCr);
+								exit; */
+						}
+					}
+				}
+			}
+		} 
+	}
+		//pr($OpeningBalanceForPrint); exit;
+		$ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
+		$itemOpeningBalance=0;
+		foreach($ItemLedgers as $ItemLedger){ 
+			$itemOpeningBalance+=$ItemLedger->quantity*$ItemLedger->rate;
+		}
+		if(empty($from_date) || empty($to_date))
+		{ 
+			$from_date = date("Y-m-d",strtotime($financial_year->date_from));
+			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
+		} 
+		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
+		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance','groupForPrint','ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
+	}
+	
 	public function TrailBalance (){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
@@ -766,7 +923,7 @@ class LedgersController extends AppController
 		 $company = $this->Companies->get($st_company_id);
 			//pr($company->accounting_book_date);exit;
 		  
-		if($from_date){ 
+		/* if($from_date){ 
 		$from_date = date("Y-m-d",strtotime($from_date));
 		$to_date   = date("Y-m-d",strtotime($to_date));
 		$LedgerAccounts = $this->Ledgers->LedgerAccounts->find()->where(['LedgerAccounts.company_id'=>$st_company_id]);
@@ -820,15 +977,61 @@ class LedgersController extends AppController
 				
 			}
 		
-		}
+		} */
+		if($from_date){ 
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date   = date("Y-m-d",strtotime($to_date)); 
+		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
+		->where(['AccountCategories.id In'=>[1,2,3,4]])
+		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		
+		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+		foreach($AccountCategories as $AccountCategory){
+			foreach($AccountCategory->account_groups as $account_group){
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
+							@$ClosingBalanceForPrint[$account_group->id]['name']=@$account_group->name;
+							@$ClosingBalanceForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							
+
+							$query2=$this->Ledgers->find();
+							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
+
+							@$TransactionDr[@$account_group->id]['balance']+=@$query2->first()->totalDebit;
+							@$TransactionCr[@$account_group->id]['balance']+=@$query2->first()->totalCredit;
+
+							$query1=$this->Ledgers->find();
+							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
+							$OpeningBalanceForPrint[$account_group->id]['name']=@$account_group->name;
+							@$OpeningBalanceForPrint[$account_group->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
+							/* pr($TransactionDr);
+							pr($TransactionCr);
+								exit; */
+						}
+					}
+				}
+			}
+		/* pr($OpeningBalanceForPrint);
+		pr($TransactionDr);
+		pr($TransactionCr);
+		pr($ClosingBalanceForPrint); exit; */
+		} 
+}
+		//pr($groupForPrint); exit;
 		$ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
 		$itemOpeningBalance=0;
 		foreach($ItemLedgers as $ItemLedger){ 
 			$itemOpeningBalance+=$ItemLedger->quantity*$ItemLedger->rate;
 		}
-		//pr($itemOpeningBalance); exit;
+		//pr($itemOpeningBalance);  exit;
 		if(empty($from_date) || empty($to_date))
-		{
+		{ 
 			$from_date = date("Y-m-d",strtotime($financial_year->date_from));
 			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
 		} 
@@ -838,7 +1041,7 @@ class LedgersController extends AppController
 		//					
 		//$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		//pr(@$differenceInOpeningBalance); exit;
-		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance'));
+		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance','groupForPrint','ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
 		
 	}
 	
@@ -1360,6 +1563,8 @@ class LedgersController extends AppController
 	public function ProfitLossStatement()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY); 
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		$from_date=$this->request->query('from_date');
@@ -1392,13 +1597,15 @@ class LedgersController extends AppController
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		
 		//$closingValue= $this->StockValuation();
-		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue'));
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url'));
 		
     }
 	
 	public function BalanceSheet()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		$from_date=$this->request->query('from_date');
@@ -1431,41 +1638,239 @@ class LedgersController extends AppController
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
 		
-		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance'));
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance','url'));
 	}
 	
-	public function OpeningBalanceData(){
-		$this->viewBuilder()->layout('index_layout');
-        $session = $this->request->session();
+	public function firstSubGroupsPnl($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
-		$Ledgers= $this->Ledgers->find()->contain(['LedgerAccounts'])->where(['Ledgers.company_id'=>$st_company_id,'voucher_source'=>'Opening Balance'])->toArray();
-		//pr($Ledgers); exit;
-		?>
-		<html>
-			<body>
-				<table border="1">
-					<th>ID</th>
-					<th>Ledger Account</th>
-					<th>Dr</th>
-					<th>Cr</th>
-					<?php foreach($Ledgers as $Ledger) {?>
-					<tr>
-						<td><?php echo  $Ledger->id; ?></td>
-						<?php if($Ledger->ledger_account->alias) {?>
-							<td><?php echo  $Ledger->ledger_account->name.'('.$Ledger->ledger_account->alias.')'; ?></td>
-						<?php }else{ ?>
-							<td><?php echo  $Ledger->ledger_account->name; ?></td>
-						<?php } ?>
-						<td><?php echo  $Ledger->debit; ?></td>
-						<td><?php echo  $Ledger->credit; ?></td>
-					</tr>
-						<?php } ?>
-					
-				</table>
-			</body>
-		</html>
-		<?php exit;
+		//$from_date=$this->request->query('from_date');
+		//$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		//pr($from_date); exit;
+		$AccountGroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->find()
+		->where(['AccountGroups.id '=>$group_id])
+		->contain(['AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		//pr($AccountGroups->toArray()); exit;
+		$groupForPrint=[];
+		
+			foreach($AccountGroups as $account_group){  
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+							//pr($query->first()); exit;
+							@$groupForPrint[$account_first_subgroup->id]['name']=@$account_first_subgroup->name;
+							@$groupForPrint[$account_first_subgroup->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+						}
+					}
+				}
+			}
+
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue'));
+	}
+
+	public function secondSubGroupsPnl($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		//$from_date=$this->request->query('from_date');
+		//$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		//pr($from_date); exit;
+		$AccountFirstSubgroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->find()
+		->where(['AccountFirstSubgroups.id '=>$group_id])
+		->contain(['AccountSecondSubgroups.LedgerAccounts'=>function($q) use ($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]);
+		//pr($AccountGroups->toArray()); exit;
+		$groupForPrint=[];
+		
+			  
+				foreach($AccountFirstSubgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+							//pr($query->first()); exit;
+							@$groupForPrint[$account_second_subgroup->id]['name']=@$account_second_subgroup->name;
+							@$groupForPrint[$account_second_subgroup->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+						}
+					}
+				}
+	$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue'));
+	}
+
+	public function ledgerAccountDataPnl($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		//$from_date=$this->request->query('from_date');
+		//$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		//pr($from_date); exit;
+		$AccountSecondSubgroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->find()
+		->where(['AccountSecondSubgroups.id '=>$group_id])
+		->contain(['LedgerAccounts'=>function($q) use ($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]);
+		//pr($AccountGroups->toArray()); exit;
+		$groupForPrint=[];
+		
+			  foreach($AccountSecondSubgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							//pr($ledger_account); exit;
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+							//pr($query->first()); exit;
+							@$groupForPrint[$ledger_account->id]['name']=@$ledger_account->name;
+							@$groupForPrint[$ledger_account->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+						}
+					}//pr($groupForPrint); exit;
+				
+	$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue'));
+	}
+
+	public function firstSubGroupsTb($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		$AccountGroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->find()
+		->where(['AccountGroups.id '=>$group_id])
+		->contain(['AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		//pr($AccountGroups->toArray()); exit;
+		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+			foreach($AccountGroups as $account_group){  
+				foreach($account_group->account_first_subgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
+							@$ClosingBalanceForPrint[$account_first_subgroup->id]['name']=@$account_first_subgroup->name;
+							@$ClosingBalanceForPrint[$account_first_subgroup->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							
+
+							$query2=$this->Ledgers->find();
+							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
+
+							@$TransactionDr[@$account_first_subgroup->id]['balance']+=@$query2->first()->totalDebit;
+							@$TransactionCr[@$account_first_subgroup->id]['balance']+=@$query2->first()->totalCredit;
+
+							$query1=$this->Ledgers->find();
+							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
+							$OpeningBalanceForPrint[$account_first_subgroup->id]['name']=@$account_first_subgroup->name;
+							@$OpeningBalanceForPrint[$account_first_subgroup->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
+						}
+					}
+				}
+			}
+
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
+	}
+
+	public function secondSubGroupsTb($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		//$from_date=$this->request->query('from_date');
+		//$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		//pr($from_date); exit;
+		$AccountFirstSubgroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->find()
+		->where(['AccountFirstSubgroups.id '=>$group_id])
+		->contain(['AccountSecondSubgroups.LedgerAccounts'=>function($q) use ($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]);
+		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+				foreach($AccountFirstSubgroups as $account_first_subgroup){
+					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
+							@$ClosingBalanceForPrint[$account_second_subgroup->id]['name']=@$account_second_subgroup->name;
+							@$ClosingBalanceForPrint[$account_second_subgroup->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							
+
+							$query2=$this->Ledgers->find();
+							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
+
+							@$TransactionDr[@$account_second_subgroup->id]['balance']+=@$query2->first()->totalDebit;
+							@$TransactionCr[@$account_second_subgroup->id]['balance']+=@$query2->first()->totalCredit;
+
+							$query1=$this->Ledgers->find();
+							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
+							$OpeningBalanceForPrint[$account_second_subgroup->id]['name']=@$account_second_subgroup->name;
+							@$OpeningBalanceForPrint[$account_second_subgroup->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
+						}
+					}
+				}
+	$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue',
+'ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
 	}
 	
+public function ledgerAccountDataTb($group_id,$from_date,$to_date)
+	{ 
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		//$from_date=$this->request->query('from_date');
+		//$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		//pr($from_date); exit;
+		$AccountSecondSubgroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->find()
+		->where(['AccountSecondSubgroups.id '=>$group_id])
+		->contain(['LedgerAccounts'=>function($q) use ($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]);
+		//pr($AccountGroups->toArray()); exit;
+		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+			  foreach($AccountSecondSubgroups as $account_second_subgroup){  
+						foreach($account_second_subgroup->ledger_accounts as $ledger_account){ 
+							$query=$this->Ledgers->find();
+							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
+							@$ClosingBalanceForPrint[$ledger_account->id]['name']=@$ledger_account->name;
+							@$ClosingBalanceForPrint[$ledger_account->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							
+
+							$query2=$this->Ledgers->find();
+							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
+
+							@$TransactionDr[@$ledger_account->id]['balance']+=@$query2->first()->totalDebit;
+							@$TransactionCr[@$ledger_account->id]['balance']+=@$query2->first()->totalCredit;
+
+							$query1=$this->Ledgers->find();
+							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
+							$OpeningBalanceForPrint[$ledger_account->id]['name']=@$ledger_account->name;
+							@$OpeningBalanceForPrint[$ledger_account->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
+						}
+					}//pr($groupForPrint); exit;
+				
+	$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue',
+'ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
+	}
 	
 }

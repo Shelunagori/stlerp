@@ -45,7 +45,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($inventory_transfer_vouchs as $inventory_transfer_vouch_data): $i++; 
-						//pr($inventory_transfer_vouch_data); exit;
+						
 					?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
@@ -58,6 +58,7 @@
 							<?php } ?>
 							<td><?= h(date("d-m-Y",strtotime($inventory_transfer_vouch_data->transaction_date)))?></td>
 							<td>
+							<?php if(in_array($inventory_transfer_vouch_data->created_by,$allowed_emp)){ ?>
 							<?php if($inventory_transfer_vouch_data->in_out=='Out'){ ?>
 							<?php 
 							if(in_array(143,$allowed_pages)){
@@ -84,25 +85,18 @@
 							<?php 
 							if(in_array(138,$allowed_pages)){
 							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $inventory_transfer_vouch_data->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>
-							<?php }} ?>
+							<?php }} }?>
 							</td>
 							
 						
 						</tr>
-						<?php endforeach; ?>
+						<?php  endforeach; ?>
 					</tbody>
 				</table>
 				</div>
 			</div>
 		</div>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				</div>
+				
 			</div>
 		</div>
 	

@@ -96,8 +96,12 @@
 					<tr>
 						<td><?php echo $i; ?></td>
 						<td>
-							<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
-							'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
+								<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', 	STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
+								'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+							<?php } else { ?>
+								<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4; ?>
+							<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 						<td><?php echo $invoice->customer->customer_name.'('.$invoice->customer->alias.')'?></td>
@@ -199,8 +203,12 @@
 					<tr>
 						<td><?php echo $i; ?></td>
 						<td>
-							<?php echo $this->Html->link( $SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4,[
-							'controller'=>'SalesOrders','action' => 'gstConfirm',$SalesOrder->id],array('target'=>'_blank')); ?>
+							<?php if(in_array($SalesOrder->created_by,$allowed_emp)){  ?>
+								<?php echo $this->Html->link( $SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4,[
+								'controller'=>'SalesOrders','action' => 'gstConfirm',$SalesOrder->id],array('target'=>'_blank')); ?>
+							<?php } else { ?>
+							<?php echo $SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4; ?>
+							<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($SalesOrder->created_on)); ?></td>
 						<td><?php echo $SalesOrder->customer->customer_name.'('.$SalesOrder->customer->alias.')'?></td>
@@ -284,8 +292,12 @@
 								<?php echo $i; ?>
 							</td>
 							<td>
+							<?php if(in_array($openquotation->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $openquotation->qt1.'/QT-'.str_pad($openquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$openquotation->qt3.'/'.$openquotation->qt4,[
 								'controller'=>'Quotations','action' => 'Confirm',$openquotation->id],array('target'=>'_blank')); ?>
+							<?php } else { ?>
+								<?php echo $openquotation->qt1.'/QT-'.str_pad($openquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$openquotation->qt3.'/'.$openquotation->qt4;?>
+							<?php }  ?>
 							</td>
 							<td>
 								<?php echo date("d-m-Y",strtotime($openquotation->created_on)); ?>
@@ -351,8 +363,12 @@
 								<?php echo $i; ?>
 							</td>
 							<td>
+							<?php if(in_array($closedquotation->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $closedquotation->qt1.'/QT-'.str_pad($closedquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$closedquotation->qt3.'/'.$closedquotation->qt4,[
 								'controller'=>'Quotations','action' => 'Confirm',$closedquotation->id],array('target'=>'_blank')); ?>
+							<?php } else {?>
+							<?php echo $closedquotation->qt1.'/QT-'.str_pad($closedquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$closedquotation->qt3.'/'.$closedquotation->qt4;?>
+							<?php }?>
 							</td>
 							<td>
 								<?php echo date("d-m-Y",strtotime($closedquotation->created_on)); ?>

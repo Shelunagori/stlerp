@@ -171,29 +171,45 @@ $url_excel="/?".$url;
 				$cgst_amt=0;
 				$sgst_amt=0;
 				$igst_amt=0;
+				$emp_id="No";
 				if($ledger->voucher_source=="Journal Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($Receipt->voucher_no); 
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/JournalVouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($Receipt->voucher_no);exit;
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/Payments/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($url_link[$ledger->id]);exit;
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/petty-cash-vouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Contra Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/contra-vouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Receipt Voucher"){ 
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/receipts/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Invoice"){ 
 					$invoice=$url_link[$ledger->id];
 					$voucher_no=h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4));
@@ -211,6 +227,9 @@ $url_excel="/?".$url;
 						$cgst_amt="-";
 						$sgst_amt="-";
 						$igst_amt="-";
+					}
+					if(in_array($invoice->created_by,$allowed_emp)){
+							$emp_id="Yes";
 					}
 					
 					
@@ -258,22 +277,37 @@ $url_excel="/?".$url;
 							$sgst_amt="-";
 							$igst_amt="-";
 					}
+					if(in_array($ibs->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/nppayments/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Debit Note"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/debit-notes/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Credit Note"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/credit-notes/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/purchase-returns/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}
 				
 				if($ledger->voucher_source != 'Opening Balance')	
@@ -284,10 +318,15 @@ $url_excel="/?".$url;
 						<td><?= h($ledger->voucher_source); ?></td>
 						<td>
 						
-						<?php if(!empty($url_path)){
-								echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']);
+						<?php
+							if($emp_id=="Yes"){
+								if(!empty($url_path)){
+									echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']);
+								}else{
+									echo str_pad($ledger->voucher_id,4,'0',STR_PAD_LEFT);
+								}
 							}else{
-								echo str_pad($ledger->voucher_id,4,'0',STR_PAD_LEFT);
+								echo $voucher_no;
 							}
 						?>
 						</td>

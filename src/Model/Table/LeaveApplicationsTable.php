@@ -34,6 +34,15 @@ class LeaveApplicationsTable extends Table
         $this->table('leave_applications');
         $this->displayField('name');
         $this->primaryKey('id');
+        $this->belongsTo('Employees');
+        $this->belongsTo('EmployeeHierarchies');
+        $this->belongsTo('FinancialYears');
+        $this->belongsTo('LeaveTypes');
+		$this->belongsTo('empData', [
+			'className' => 'Employees',
+            'foreignKey' => 'parent_employee_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

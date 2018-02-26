@@ -73,13 +73,18 @@
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?></td>
-							<td><?php echo $this->Html->link( $invoiceBooking->grn->grn1.'/GRN-'.str_pad($invoiceBooking->grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->grn3.'/'.$invoiceBooking->grn->grn4,[
-							'controller'=>'Grns','action' => 'view', $invoiceBooking->grn->id],array('target'=>'_blank')); ?></td>
+							<td>
+							<?php if(in_array($invoiceBooking->grn->created_by,$allowed_emp)){ ?>
+							<?php echo $this->Html->link( $invoiceBooking->grn->grn1.'/GRN-'.str_pad($invoiceBooking->grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->grn3.'/'.$invoiceBooking->grn->grn4,[
+							'controller'=>'Grns','action' => 'view', $invoiceBooking->grn->id],array('target'=>'_blank')); ?>
+							<?php  } ?>
+							</td>
 							
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
 							<td class="actions">
+							<?php if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
 								<?php if(in_array(18,$allowed_pages)){ ?>
 								<?php 
 								if($invoiceBooking->gst=='no'){
@@ -89,6 +94,7 @@
 								}
 								?>
 								<?php } ?>
+								
 								<?php if(in_array(123,$allowed_pages)){ ?>
                                 <?php
 								if($invoiceBooking->gst=='no'){
@@ -97,7 +103,7 @@
 									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstInvoiceBookingView', $invoiceBooking->id,],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View'));
                                 }
 								?>
-                                <?php } ?>
+                                <?php } } ?>
 								<?php 
 								
 								if($purchase_return=="true"  && $invoiceBooking->purchase_return_status=='No'){

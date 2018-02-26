@@ -1066,10 +1066,10 @@ class CustomersController extends AppController
 		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
 			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
 			->order(['LedgerAccounts.name'=>'ASC']);
-			
+		
 		$CustmerPaymentTerms=[]; $Outstanding=[];
 		
-		foreach($LedgerAccounts as $LedgerAccount){
+		foreach($LedgerAccounts as $LedgerAccount){ 
 			$Customer =$this->Customers->get($LedgerAccount->source_id);
 			$CustmerPaymentTerms[$LedgerAccount->id]=$Customer->payment_terms;
 			
@@ -1080,30 +1080,42 @@ class CustomersController extends AppController
 				if($ReferenceDetail->reference_type=="On_account"){
 					@$Outstanding[$LedgerAccount->id]['OnAccount']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 				}else{
-					$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					//pr($ReferenceDetail); exit;
+					if($ReferenceDetail->reference_type=="Against Reference"){
+						$ReferenceDetailData=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>@$LedgerAccount->id,'reference_no'=>@$ReferenceDetail->reference_no,'reference_type !='=>'Against Reference'])->first(); 
+						$transaction_date=date('Y-m-d', strtotime(@$ReferenceDetailData->transaction_date));
+						
+						//pr($ReferenceDetail->transaction_date); exit;
+					}else{ //pr($ReferenceDetail->reference_no);  
+						$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					}
+					$transaction_date=date('Y-m-d', strtotime($transaction_date));
+					
 					$TransactionDateAfterPaymentTerms = date('Y-m-d', strtotime($transaction_date. ' + '.$Customer->payment_terms.' days'));
 					
 					$datediff = strtotime($TillDate) - strtotime($TransactionDateAfterPaymentTerms);
 					$Diff=floor($datediff / (60 * 60 * 24));
-					
+					//pr($TransactionDateAfterPaymentTerms); 
+					//pr($Diff); 
+					//pr($to_send['range3']); 
 					if($Diff<=0){
 						@$Outstanding[$LedgerAccount->id]['NoDue']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range0']) and ($Diff<=$to_send['range1'])){
+					}elseif(($Diff>=$to_send['range0']) and ($Diff<=$to_send['range1'])){
 						@$Outstanding[$LedgerAccount->id]['Slab1']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range2']) and ($Diff<=$to_send['range3'])){
+					}elseif(($Diff>=$to_send['range2']) and ($Diff<=$to_send['range3'])){ //pr($Diff);
 						@$Outstanding[$LedgerAccount->id]['Slab2']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range4']) and ($Diff<=$to_send['range5'])){
+					}elseif(($Diff>=$to_send['range4']) and ($Diff<=$to_send['range5'])){ //pr($Diff);
 						@$Outstanding[$LedgerAccount->id]['Slab3']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range6']) and ($Diff<=$to_send['range7'])){
+					}elseif(($Diff>=$to_send['range6']) and ($Diff<=$to_send['range7'])){
 						@$Outstanding[$LedgerAccount->id]['Slab4']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range7'])){
+					}elseif(($Diff>=$to_send['range7'])){
 						@$Outstanding[$LedgerAccount->id]['Slab5']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 					}
-					
+				
 				}
 			}
 		}
-		
+		//pr($Outstanding); exit;
 		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
 	}
 	
@@ -1138,15 +1150,15 @@ class CustomersController extends AppController
 					
 					if($Diff<=0){
 						@$Outstanding[$LedgerAccount->id]['NoDue']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range0']) and ($Diff<=$to_send['range1'])){
+					}elseif(($Diff>=$to_send['range0']) and ($Diff<=$to_send['range1'])){
 						@$Outstanding[$LedgerAccount->id]['Slab1']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range2']) and ($Diff<=$to_send['range3'])){
+					}elseif(($Diff>=$to_send['range2']) and ($Diff<=$to_send['range3'])){ //pr($Diff);
 						@$Outstanding[$LedgerAccount->id]['Slab2']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range4']) and ($Diff<=$to_send['range5'])){
+					}elseif(($Diff>=$to_send['range4']) and ($Diff<=$to_send['range5'])){ //pr($Diff);
 						@$Outstanding[$LedgerAccount->id]['Slab3']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range6']) and ($Diff<=$to_send['range7'])){
+					}elseif(($Diff>=$to_send['range6']) and ($Diff<=$to_send['range7'])){
 						@$Outstanding[$LedgerAccount->id]['Slab4']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
-					}elseif(($Diff>$to_send['range7'])){
+					}elseif(($Diff>=$to_send['range7'])){
 						@$Outstanding[$LedgerAccount->id]['Slab5']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 					}
 					

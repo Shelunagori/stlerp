@@ -18,9 +18,11 @@ class LeaveApplicationsController extends AppController
      */
     public function index()
     {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
 		$this->viewBuilder()->layout('index_layout');
-        $leaveApplications = $this->paginate($this->LeaveApplications);
-
+        $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes'])->where(['employee_id'=>$s_employee_id]));
         $this->set(compact('leaveApplications'));
         $this->set('_serialize', ['leaveApplications']);
     }
@@ -50,13 +52,26 @@ class LeaveApplicationsController extends AppController
     public function add()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		 $st_year_id = $session->read('st_year_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		//pr($empData); exit;
         $leaveApplication = $this->LeaveApplications->newEntity();
         if ($this->request->is('post')) {
 			$files=$this->request->data['supporting_attached']; 
             $leaveApplication = $this->LeaveApplications->patchEntity($leaveApplication, $this->request->data);
 			$leaveApplication->supporting_attached = $files['name'];
 			$attache = $this->request->data['supporting_attached'];
-			//pr($files);
+			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
+			$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			$leaveApplication->employee_id=$s_employee_id;
+			$leaveApplication->submission_date=date('Y-m-d');
+			$leaveApplication->from_leave_date = strtotime($leaveApplication->from_leave_date); 
+			$leaveApplication->to_leave_date =strtotime($leaveApplication->to_leave_date); 
+			$datediff =$leaveApplication->to_leave_date - $leaveApplication->from_leave_date;
+			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -75,7 +90,25 @@ class LeaveApplicationsController extends AppController
 					$this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('leaveApplication'));
+			
+		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
+		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$from_date = date("Y-m-d",strtotime($financial_year->date_from));
+		@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
+		$LeaveApplicationDatas=$this->LeaveApplications->find()->where(['employee_id'=>$s_employee_id,'from_leave_date >='=>$from_date,'to_leave_date <='=>$to_date,'leave_status'=>'approved']);
+		$TotaalleaveTake=[];
+		foreach($LeaveApplicationDatas as $LeaveApplicationData){
+			@$TotaalleaveTake[@$LeaveApplicationData->leave_type_id]+=@$LeaveApplicationData->day_no;
+			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
+		} //pr($Totaalleave); exit;
+	
+		$leavedatas = $this->LeaveApplications->LeaveTypes->find();
+		$Totaalleave=[]; $LeaveType=[];
+		foreach($leavedatas as $leavedata){
+			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
+			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
+		}
+        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake'));
         $this->set('_serialize', ['leaveApplication']);
     }
 
@@ -89,6 +122,10 @@ class LeaveApplicationsController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
         $leaveApplication = $this->LeaveApplications->get($id, [
             'contain' => []
         ]);
@@ -103,6 +140,19 @@ class LeaveApplicationsController extends AppController
 			{
 				$leaveApplication->supporting_attached = $leaveApplication->doc;
 			}
+			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
+			$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			$leaveApplication->employee_id=$s_employee_id;
+			$leaveApplication->submission_date=date('Y-m-d'); 
+			$leaveApplication->from_leave_date = date('Y-m-d',strtotime($leaveApplication->from_leave_date)); 
+			$leaveApplication->to_leave_date = date('Y-m-d',strtotime($leaveApplication->to_leave_date)); 
+			//pr($leaveApplication); exit;
+			$from_leave_date = strtotime($leaveApplication->from_leave_date); 
+			$to_leave_date =strtotime($leaveApplication->to_leave_date); 
+			
+			$datediff =$to_leave_date - $from_leave_date;
+			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;
+			
             if ($this->LeaveApplications->save($leaveApplication)) {
 				if(!empty($files['tmp_name']))
 				{
@@ -118,7 +168,8 @@ class LeaveApplicationsController extends AppController
                 $this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('leaveApplication'));
+		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
+        $this->set(compact('leaveApplication','leavetypes','empData'));
         $this->set('_serialize', ['leaveApplication']);
     }
 
@@ -129,14 +180,60 @@ class LeaveApplicationsController extends AppController
      * @return \Cake\Network\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function delete($id = null)
+    public function approved($id = null)
+    {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $leaveApplication = $this->LeaveApplications->get($id);
+		
+		$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
+//pr($EmployeeHierarchies->parent_accounting_group->employee_id); exit;
+		if($EmployeeHierarchies->parent_id != null){
+			$query = $this->LeaveApplications->query();
+					$query->update()
+						->set(['parent_employee_id' => $EmployeeHierarchies->parent_accounting_group->employee_id])
+						->where(['id' => $id])
+						->execute();
+		
+		}else{
+			$approve_date=date('Y-m-d');
+			$query = $this->LeaveApplications->query();
+					$query->update()
+						->set(['leave_status' =>'approved','approve_date'=>$approve_date])
+						->where(['id' => $id])
+						->execute();
+		}
+		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
+    }
+
+	public function cancle($id = null)
+    {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $leaveApplication = $this->LeaveApplications->get($id);
+		
+		$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
+
+			
+			$query = $this->LeaveApplications->query();
+					$query->update()
+						->set(['leave_status' =>'cancle'])
+						->where(['id' => $id])
+						->execute();
+	
+		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
+    }
+
+	 public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
-        $leaveApplication = $this->LeaveApplications->get($id);
-        if ($this->LeaveApplications->delete($leaveApplication)) {
-            $this->Flash->success(__('The leave application has been deleted.'));
+        $salaryAdvance = $this->LeaveApplications->get($id);
+        if ($this->LeaveApplications->delete($salaryAdvance)) {
+            $this->Flash->success(__('The salary advance has been deleted.'));
         } else {
-            $this->Flash->error(__('The leave application could not be deleted. Please, try again.'));
+            $this->Flash->error(__('The salary advance could not be deleted. Please, try again.'));
         }
 
         return $this->redirect(['action' => 'index']);

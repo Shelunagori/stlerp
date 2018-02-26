@@ -28,71 +28,56 @@ border:none;
 </style>
 
 <div class="portlet light bordered">
-	<div class="portlet-title">
-		<div class="caption">
+	<div class="portlet-title" >
+		<div class="caption" >
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Leave Application</span>
+			<span class="caption-subject font-blue-steel uppercase " align="center">Leave Application</span>
+		</div>
+	</div>
+	<div class="portlet-body">
+		<div class="row">
+			<div class="col-md-12">
+				<table class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+						<?php foreach($leavedatas as $leavedata){ ?>
+						<td>Total <?php  echo $leavedata->leave_name ?></td>
+						<?php  } ?>
+						<?php foreach($leavedatas as $leavedata){ ?>
+						<td>Pending <?php  echo $leavedata->leave_name ?></td>
+						<?php  } ?>
+						<tr>
+					</thead>
+					<tbody>
+						
+						<tr>	
+							<?php foreach($leavedatas as $leavedata){ ?>
+							<td><?php  echo $Totaalleave[$leavedata->id]; ?></td>
+							<?php  } ?>	
+							<?php foreach($leavedatas as $leavedata){ ?>
+							<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?></td>
+							<?php  } ?>	
+						</tr>
+						
+					</tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 
 <div class="portlet-body form">
 		<?php echo $this->Form->create($leaveApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
-				
-					
-	
+			
 			<div class="form-body">
-				<div class="row">
-				
-			      <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Name</label>   
-							<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
-						</div>
-					</div>
-					
-			       
-				   <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of submission</label>
-							<?php echo $this->Form->input('submission_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-			       <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Day No</label>
-							<?php echo $this->Form->input('day_no', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
-						</div>
-					</div>
-			</div>
-			<div class="row">
-				<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Leave Required (From)</label>   
-							<?php echo $this->Form->input('from_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-			       
-				   <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Leave Required (To)</label>
-							<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-			       <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Reason for leave</label>
-							<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
-						</div>
-					</div>
-			</div>
-			<div class="row">
-					<div class="col-md-4">
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			     <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Leave Type</label>
 							<?php 
 							$type[]=['value'=>'sick','text'=>'sick'];
 							$type[]=['value'=>'casual','text'=>'casual'];
-							echo $this->Form->input('leave_type', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control select2me input-sm leave_type','options'=>@$type]); ?>
+							echo $this->Form->input('leave_type_id', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control select2me input-sm leave_type','options'=>@$leavetypes]); ?>
 							
 						</div>
 					</div>
@@ -102,9 +87,53 @@ border:none;
 							<?php echo $this->Form->input('supporting_attached', ['label' => false,'placeholder'=>'','class'=>'form-control attache_file','type'=>'file','style'=>'display:none']); ?>
 						</div>
 					</div>
-			</div>
-			</div>
-			</div>
+				</div>
+				<div class="col-md-12"></div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+					  <div class="col-md-4">
+							<div class="form-group">
+								<label class="control-label  label-css">Name</label>   
+								<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+							</div>
+						</div>
+						
+					   
+					   <div class="col-md-4">
+							<div class="form-group">
+								<label class="control-label  label-css">Designation</label>
+								<?php echo $this->Form->input('designation', ['label' => false,'class'=>'form-control input-sm','value'=>$empData->designation->name,'readonly']); ?>
+							</div>
+						</div>
+					  
+				</div>
+			
+			<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+					<div class="col-md-4">
+							<div class="form-group">
+								<label class="control-label  label-css">Date of Leave Required (From)</label>   
+								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date' => date("d-m-Y")]); ?>
+							</div>
+						</div>
+					   
+					   <div class="col-md-4">
+							<div class="form-group">
+								<label class="control-label  label-css">Date of Leave Required (To)</label>
+								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
+							</div>
+						</div>
+					   
+				</div>
+			<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+					<div class="col-md-8">
+						<div class="form-group">
+							<label class="control-label  label-css">Reason for leave</label>
+							<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>4]); ?>
+						</div>
+					</div>
+				</div>
 			
 		</fieldset>	
 		
@@ -112,8 +141,7 @@ border:none;
 		</div>
 			<div class="box-footer">
 				<center>
-				
-				 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
+					<button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
 				</center>
 			</div>
 			</div>
@@ -225,7 +253,7 @@ $(document).ready(function()
 	
 	$('.leave_type').live("change",function(){
 		var leave_type = $(this).val();
-		if(leave_type=='sick')
+		if(leave_type=='2')
 		{
 			$('.attache_file').show();
 		}

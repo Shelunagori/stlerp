@@ -602,7 +602,6 @@ class InvoicesController extends AppController
 		$this->viewBuilder()->layout('');
 		$inventory_voucher=$this->request->query('inventory_voucher');
 		$sales_return=$this->request->query('sales_return');
-		//pr($sales_return); exit;
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
@@ -638,7 +637,12 @@ class InvoicesController extends AppController
 			$where['Invoices.total_after_pnf']=$total_From;
 		}
 		
-		if($inventory_voucher=='true'){
+	
+        $this->paginate = [
+            'contain' => ['Customers', 'Companies']
+        ];
+		
+		/* if($inventory_voucher=='true'){
 			$where['Invoices.inventory_voucher_status']='Pending';
 			
 		}else{
@@ -649,24 +653,51 @@ class InvoicesController extends AppController
 				$where['status']='Cancel';
 			}	
 		}
-		
-		if($inventory_voucher=='true'){  
-			$invoices=[]; 
-			$invoices=$this->Invoices->find()->where($where)->contain(['Customers', 'Companies','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
+		 */
+		  $current_rows=[];
+		if(!empty($items))
+		{ 
+			$InvoiceRows = $this->Invoices->InvoiceRows->find();
+				$invoices = $this->Invoices->find();
+				$invoices->select(['id','total_sales'=>$InvoiceRows->func()->sum('InvoiceRows.quantity')])
+				->innerJoinWith('InvoiceRows')
+				->group(['Invoices.id'])
+				->matching('InvoiceRows.Items', function ($q) use($items,$st_company_id) {
+											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+							})
+				->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])
+				->autoFields(true)
+				->where(['Invoices.company_id'=>$st_company_id])
+				->where($where);
+		}
+		else if($inventory_voucher=='true'){
+			$invoices=[];
+			$invoice1=$this->Invoices->find()->where($where)->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) {
 				return $q->where(['source !='=>'Purchessed']);
-				}]])->where(['Invoices.company_id'=>$st_company_id,'Invoices.inventory_voucher_status'=>'Pending','Invoices.inventory_voucher_create'=>'Yes'])->order(['Invoices.id' => 'DESC']);
-				//pr($invoices); exit;
+				},'SalesOrderRows'=>function ($q) {
+				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
+				}
+				]])
+				->where(['Invoices.company_id'=>$st_company_id])
+				->order(['Invoices.id' => 'DESC']);
+				
+				foreach($invoice1 as $invoice){
+					$AccountGroupsexists = $this->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
+					if(!$AccountGroupsexists){ // pr($invoice);
+						$invoices[]=$invoice;
+					}
+				} 
+				
+				
+			//pr($invoices);exit;
 		}else if($sales_return=='true'){
-			
-			$invoices = $this->Invoices->find()->contain(['Customers', 'Companies','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices = $this->Invoices->find()->contain(['SalesOrders','InvoiceRows'=>['Items'],'Customers', 'Companies'])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
 		} 
-		
-		//$invoices = $this->paginate($this->Invoices->find()->where($where)->order(['Invoices.id' => 'DESC']));
-		//pr($invoices);exit;
-		$this->set(compact('invoices','From','To'));
-		$this->set('_serialize', ['invoices']);
+		//pr($invoices->toArray());exit;
+		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
+		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url','current_rows'));
 	}
 	
 	 /**
@@ -6157,10 +6188,34 @@ class InvoicesController extends AppController
 		$this->set(compact('Invoices','url'));
 	}
 	
+	/* public function InvoiceList()
+		{
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			$ReferenceDetails =$this->Invoices->ReferenceDetails->find()->where(['reference_type'=>'On_account','invoice_id >'=>0])->contain(['Invoices'])->toArray();?>
+			<table  valign="center" width="10%" border="1">
+				<tr>
+					<th>Voucher No</th>
+					<th>company id</th>
+				</tr>
+				<?php foreach($ReferenceDetails as $data){ ?>
+				<tr>
+					<td align="center"><?php echo $data->invoice->in2; ?></td>
+					<td align="center"><?php echo $data->invoice->company_id; ?></td>
+				</tr>
+				<?php  }?>
+			</table>
+			<?php
+		
+			//pr($ReferenceDetails);
+			exit;
+		} */
+	
 	public function sendMail()
 		{ 
 		
 		$data=$this->request->query('data');
+		$otherData=$this->request->query('otherData');
 		$id=$this->request->query('id');
 		$data=json_decode($data);
 		$t=sizeof($data); 
@@ -6168,14 +6223,13 @@ class InvoicesController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->Invoices->Companies->get($st_company_id);
-		//pr($t); exit;
+		//pr($company_data->alias); exit;
 		
-		$email = new Email();
+		
 		$Number = new NumberHelper(new \Cake\View\View());
 		$Html = new HtmlHelper(new \Cake\View\View());
 		$Text = new TextHelper(new \Cake\View\View());
-		$email->transport('gmail');
-		$from_name="STL";
+		
 		
 		
 		$invoice = $this->Invoices->get($id, [
@@ -6190,11 +6244,13 @@ class InvoicesController extends AppController
 							'InvoiceRows' => ['Items'=>['ItemGroups','Units']]
 						]
 		]);
-		$email_to=$invoice->customer->customer_contacts[0]->email;
-		//$email_to="gopalkrishanp3@gmail.com";
-		//pr($email_to); exit;
+		//$email_to=$invoice->customer->customer_contacts[0]->email;
+		//
+		//pr($email_to); 
+		$email_to=$invoice->sales_order->dispatch_email; //pr($email_to); exit;
 		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
-		$sub='Dispatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"';
+		
+		$sub='Dispatch Intimation - "'. h($invoice->company->name) .'"';
 		$message_web = '
 			<table  valign="center" width="100%" >
 				<tr>
@@ -6209,7 +6265,7 @@ class InvoicesController extends AppController
 				</tr>
 				<tr>
 					<td  style="width: 1em; word-wrap: break-word; font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">
-					<p style="margin-top: 0px !important;width: 15em; word-wrap: break-word;">'. h($invoice->customer_address) .'</p>
+					<p style="margin-top: 0px !important;width: 10em; word-wrap: break-word;">'. h($invoice->customer_address) .'</p>
 					</td>
 				</tr>
 				<tr>
@@ -6221,7 +6277,7 @@ class InvoicesController extends AppController
 				<tr>
 					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Sub
 					<span><b>:</b></span>
-					<span style="font-family:Palatino Linotype;">Dispatch documents of "'. h($invoice->invoice_rows[0]->item->item_group->name) .'"</span><br/>
+					<span style="font-family:Palatino Linotype;">Dispatch Intimation</span><br/>
 					</td>
 				</tr>
 				<tr>
@@ -6231,36 +6287,49 @@ class InvoicesController extends AppController
 					</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Dear sir,</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>Dear Sir,</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>With reference to above, please find here with following despatch documents:</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>With reference to above, please find herewith following dispatch documents:</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' Dated '. h(($invoice->date_created)).' For Rs.'. h(($invoice->grand_total)).'/- in Duplicate.</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' For Rs.'. h(round($invoice->grand_total,3)).'/- in duplicate.</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' Dated '. h(($invoice->date_created)).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' Of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'.</td>
 				</tr>
-				'; if($t > 0){ $p=2;
+				'; $p=2; if($t > 0){ 
 					foreach($data as $d){
-						$terms = $this->Invoices->DispatchDocuments->get($d); $message_web.= '
+						//$terms = $this->Invoices->DispatchDocuments->get($d);
+						$message_web.= '
 						<tr>
-							<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($terms->text_line)).'</td>
+							<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
 						</tr>
 						';
 						//pr($terms->text_line); 
 					}
+					
+					//pr($message_web); exit;
 				} //exit;
+				
+				
+				if($otherData){
+						$message_web.= '
+						<tr>
+							<td style=" font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($otherData)) .'</td>
+						</tr>
+					'; 
+				}
+				//pr($message_web); exit;
 				$message_web.= '
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .' by '. h(($invoice->date_created)).'<br/>In favour of '. h(($company_data->name)).'in our account No '
+					<td style="font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(($invoice->grand_total)) .'<br/>In favour of '. h(($company_data->name)).'in our account No '
 					. h(($invoice->company->company_banks[0]->account_no)).' Of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
 				</tr>
 				<tr></tr>
 				<tr></tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><b>Regards</b></br></td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><b>Regards,</b></td>
 				</tr>
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
@@ -6271,39 +6340,52 @@ class InvoicesController extends AppController
 					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
 					<span><b>:</b></span>
 					<span><b>dispatch@mogragroup.com</b></span><br/>
-					</td>
-				</tr>
-				<tr>
-					<td width="50%" style="font-family:Palatino Linotype;font-size:'. h(($invoice->pdf_font_size)) .';"><br>Website
+					<span>Website</span>
 					<span><b>:</b></span>
-					<a target="_blank" href="http://www.mogragroup.com"><span><b> www.mogragroup.com</b></span></a><br/>
+					<span><a target="_blank" href="http://www.mogragroup.com"><span><b> www.mogragroup.com</b></span></a></span><br/>
 					</td>
 				</tr>
+				
 				
 			</table>
 	   
 	';
+	
 		
+		$email = new Email('default');
+		$email->transport('gmail');
+		$from_name=$company_data->alias;	
+		$cc_mail=$invoice->creator->email;
+		//$email_to="harkawat.priyanka0@gmail.com";
+		$email_to="gopalkrishanp3@gmail.com";
+		$cc_mail="harkawat.priyanka0@gmail.com";
+		//$cc_mail="priyankajinger143@gmail.com";
 		
-		//$message_web="done";
+		$name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4)); 
+		$attachments='';
+		$attachments[]='Invoice_email/'.$name.'.pdf';
+		//$attachments[]="Invoice_email/Invoice-STL_IN515_BE-3421_17-18.pdf";
+		
+	//	pr($attachments); exit;
 		$member_name="Gopal";
-		// pr($message_web);exit;
-		 	$email->from(['gopalkrishanp3@gmail.com' => $from_name])
+		
+		 	$email->from(['dispatch@mogragroup.com' => $from_name])
 					->to($email_to)
-					->replyTo('gopalkrishanp3@gmail.com')
+					->cc($cc_mail)
+					->replyTo('dispatch@mogragroup.com')
 					->subject($sub)
-					->profile('default')
 					->template('notice_send_email')
 					->emailFormat('html')
-					->viewVars(['content'=>$message_web,'member_name'=>$member_name]);
-					$email->send();
-					
+					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
+					->attachments($attachments);; 
+					$email->send($message_web);
+					 //pr($message_web);exit;
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web;
 				$SendEmail->invoice_id=$id;
-				$this->Invoices->SendEmails->save($SendEmail);
+				$this->Invoices->SendEmails->save($SendEmail); 
 		//$this->Flash->success(__('The Mail has been Sent.'));
-		//return $this->redirect(['action' => 'GstConfirm/'.$id]);
+		return $this->redirect(['action' => 'GstConfirm/'.$id]);
 		
 // pr($id);exit;
 exit;

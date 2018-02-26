@@ -761,7 +761,7 @@ select
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Invoice Wise HSN Details',array('controller'=>'Invoices','action'=>'InvoiceHsnWise','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php if(in_array(39,$allowed_pages)){?>
-						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Material Indent Report','/Item-Ledgers/material-indent-report?stockstatus=Positive&company_name=&company_name%5B%5D='.$st_company_id,array('escape'=>false)); ?></li>
+						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Material Indent Report','/Item-Ledgers/material-indent-report?stockstatus=Positive&company_name='.$st_company_id,array('escape'=>false)); ?></li>
 						<?php } ?>
 						
 						<?php if(in_array(40,$allowed_pages)){?>
@@ -846,11 +846,11 @@ select
 					</ul>-->
 				</li>
 				<?php } ?>
-				<?php if(in_array(17,$allowed_pages) || in_array(18,$allowed_pages) || in_array(123,$allowed_pages)){ ?>
+				
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-puzzle-piece"></i>
-					<span class="title">HRMS</span>
+					<span class="title">HR</span>
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
@@ -930,7 +930,7 @@ select
 						</ul>
 					</ul>
 				</li>
-				<?php } ?>
+				
 			</ul>
 			<!-- END SIDEBAR MENU -->
 		</div>

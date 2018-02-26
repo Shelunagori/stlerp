@@ -73,7 +73,7 @@ class PaymentsController extends AppController
 				);
 			return $PaymentRows->select([
 					'total_cr' => $PaymentRows->func()->sum($totalCrCase),
-					'total_dr' => $PaymentRows->func()->sum($totalDrCase)
+					'total_dr' => $PaymentRows->func()->sum($totalDrCase),'payment_id'
 				])
 				->group('payment_id')
 				
@@ -762,10 +762,13 @@ class PaymentsController extends AppController
 				}
 				if($old_ledger_data){
 					$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
+				}else{
+					$ledger->reconciliation_date = "0000-00-00";
 				}
 				$ledger->voucher_id = $payment->id;
 				$ledger->voucher_source = 'Payment Voucher';
 				$ledger->transaction_date = $payment->transaction_date;
+				
 				if($bankAmt != 0){
 					$this->Payments->Ledgers->save($ledger);
 				}

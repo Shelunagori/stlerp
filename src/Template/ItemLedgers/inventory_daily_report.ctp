@@ -58,7 +58,7 @@
 					$voucher="";
 					$location="";
 					$in_out="";
-					
+					$emp_id="No";
 					foreach($AllData as $key2=>$itemData) { 
 					$row_count=count($itemData->invoice_rows); 
 					if($key1=='Invoice'){
@@ -71,6 +71,9 @@
 						}
 						$in_out="Out";
 						$voucher_rows=$itemData->invoice_rows;
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 						
 					}
 					
@@ -84,6 +87,9 @@
 						}
 						$in_out="In";
 						$voucher_rows=$itemData->sale_return_rows;
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 						
 					}
 					if($key1=='Grns'){
@@ -92,7 +98,9 @@
 						$location='/Grns/View/'.$itemData->id;
 						$in_out="In";
 						$voucher_rows=$itemData->grn_rows;
-						//pr($i_rows); exit;
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 					}
 					if($key1=='InventoryTransferVouchers'){
 						$date=$itemData['transaction_date']; //pr($itemData); exit;
@@ -113,7 +121,9 @@
 							
 						} 
 						$voucher_rows=$itemData->inventory_transfer_voucher_rows;
-						//pr($i_rows); exit;
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 					}
 					$IVRs=[];
 					$IVRI=[];
@@ -136,6 +146,9 @@
 							}
 								$voucher_rows=$itemData->iv_rows;
 						}
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 					}
 					if($key1=='PurchaseReturns'){
 						$date=$itemData['created_on'];
@@ -149,9 +162,11 @@
 						
 						$in_out="Out";
 						$voucher_rows=$itemData->purchase_return_rows;
-						//pr($itemData); exit;
+						if(in_array($itemData->created_by,$allowed_emp)){
+							$emp_id="Yes";
+						}
 					}
-					
+					//pr($emp_id);
 						
 					?>
 					<?php if($flag==0){ ?>
@@ -159,7 +174,14 @@
 							<td style="vertical-align: top !important;" rowspan=""><?php echo ++$srn; ?> </td>
 							<td style="vertical-align: top !important;" rowspan=""><?php echo date("d-m-Y",strtotime($date)); ?></td>
 							<td style="vertical-align: top !important;" rowspan="">
-								<?php echo $this->Html->link($voucher,$location,array('target'=>'_blank'));?>
+								<?php 
+								if($emp_id=="Yes"){
+									echo $this->Html->link($voucher,$location,array('target'=>'_blank'));
+								} else{
+									echo $voucher;
+								}
+								?>
+								
 							</td>
 							<td style="vertical-align: top !important;" rowspan=""><?php echo $in_out; ?> </td>
 							<td>

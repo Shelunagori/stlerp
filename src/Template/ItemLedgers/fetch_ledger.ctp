@@ -63,6 +63,7 @@
 		}
 		else if($source_model=='Purchase Return')
 		{
+			$created_by = $itemLedger->voucher_info->created_by;
 			$party_name=$itemLedger->party_info->company_name;
 			$voucher_no= 
 			 $this->Html->link( '#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT),[
@@ -72,7 +73,7 @@
 		else if($source_model=='Sale Return')
 		{ 
 			$party_name=$itemLedger->party_info->customer_name;
-			
+			$created_by = $itemLedger->voucher_info->created_by;
 			$voucher_no=$itemLedger->voucher_info->sr1.'/SR-'.str_pad($itemLedger->voucher_info->sr2, 3, '0', STR_PAD_LEFT).'/'.$itemLedger->voucher_info->sr3.'/'.$itemLedger->voucher_info->sr4;
 			$url_path="/saleReturns/View/".$itemLedger->voucher_info->id;
 			
@@ -80,7 +81,8 @@
 		else if($source_model=='Inventory Transfer Voucher')
 		{ 
 			$party_name=$itemLedger->voucher_info;
-			//pr($party_name);
+			$created_by = $itemLedger->voucher_info->created_by;
+			//pr($itemLedger->party_info); exit;
 			$party_name='-';
 			$voucher_no='#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT);
 			if($itemLedger->voucher_info->in_out=='in_out'){
@@ -97,7 +99,7 @@
 			
 			$party_name='-';
 			$voucher_no='#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT);
-
+			$created_by = $itemLedger->voucher_info->created_by;
 			$url_path="/ivs/view/".$itemLedger->voucher_info->id;
 			$data=$itemLedger->voucher_info->transaction_date;
 			//pr($itemLedger);
@@ -112,6 +114,7 @@
 		else if($source_model=='Grns')
 		{ 
 			$party_name = $itemLedger->party_info->company_name;
+			$created_by = $itemLedger->voucher_info->created_by; //pr($itemLedger->voucher_info->created_by);pr($allowed_emp); exit;
 			$voucher_no=$itemLedger->voucher_info->grn1.'/GRN-'.str_pad($itemLedger->voucher_info->grn2, 3, '0', STR_PAD_LEFT).'/'.$itemLedger->voucher_info->grn3.'/'.$itemLedger->voucher_info->grn4;
 			$data=$itemLedger->voucher_info->transaction_date;
 			$url_path="/grns/view/".$itemLedger->voucher_info->id;
@@ -145,11 +148,12 @@
 			
 			<td><?= h($party_name) ?></td>
 			<td><?= h($itemLedger->source_model) ?></td>
-			<td><?php 
-			if(!empty($url_path)){
-				echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); 
-			}else{
-				echo $voucher_no;
+			<td>
+			<?php if(in_array($created_by,$allowed_emp)){ 
+					if(!empty($url_path)){
+						echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); 
+					}}else{
+					echo $voucher_no;
 			}
 			?>
 			</td>

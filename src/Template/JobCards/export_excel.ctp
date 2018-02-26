@@ -1,5 +1,5 @@
 <?php 
-
+$jobCardStatus=$status;
 	$date= date("d-m-Y"); 
 	$time=date('h:i:a',time());
 
@@ -34,7 +34,15 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $i=1; foreach ($jobCards as $jobCard): ?>
+		  <?php  $i=1;  foreach ($jobCards as $jobCard): 
+		  if(in_array($jobCard->created_by,$allowed_emp)){
+			$so=@$SalesOrderQty[@$jobCard->sales_order_id];
+			$in=@$InvoiceQty[@$jobCard->sales_order_id];
+			$iv=@$InventoryVoucherQty[@$jobCard->sales_order_id];
+			
+			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
+				if($so != $in || $so != $iv || $in != $iv ){
+			?>
 		<tr>
 			<td><?= h($i++) ?></td>
 			<td><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
@@ -43,10 +51,25 @@
 			<td><?= date("d-m-Y",strtotime($jobCard->created_on));?></td> 
 			<td><?php 
 			
-				echo ucwords($jobCard->status);
+				echo ucwords($jobCardStatus);
 			
 			 ?></td>			
 		</tr>
-		<?php endforeach; ?>
+			<?php } } else if($jobCardStatus=='Closed'){
+					if((($so == $in) && ($so == $iv) && ($so == $iv) )  || $jobCard->status=="Closed"){
+			?>
+			<tr>
+			<td><?= h($i++) ?></td>
+			<td><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
+			<td><?= h(($jobCard->sales_order->so1.'/SO-'.str_pad($jobCard->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->sales_order->so3.'/'.$jobCard->sales_order->so4))?></td>
+			<td><?= date("d-m-Y",strtotime($jobCard->required_date));?></td>
+			<td><?= date("d-m-Y",strtotime($jobCard->created_on));?></td> 
+			<td><?php 
+			
+				echo ucwords($jobCardStatus);
+			
+			 ?></td>	
+		  <?php } } } endforeach;?>			 
+		</tr>
 	</tbody>
 </table>	

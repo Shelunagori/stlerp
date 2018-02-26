@@ -61,15 +61,16 @@
 							<td><?= h('#'.str_pad($journalVoucher->voucher_no,4,'0',STR_PAD_LEFT)); ?></td>
 							
 							<td class="actions">
-							<?php if(in_array(116,$allowed_pages)){
-							 echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $journalVoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));
-							} ?>
-							
-							<?php 
-							 if(in_array(115,$allowed_pages)){
-							 echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $journalVoucher->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-							 }
-							 ?>
+							<?php if(in_array($journalVoucher->created_by,$allowed_emp)){  ?>
+								<?php if(in_array(116,$allowed_pages)){
+								 echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $journalVoucher->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));
+								} ?>
+								
+								<?php 
+								 if(in_array(115,$allowed_pages)){
+								 echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $journalVoucher->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								 } ?>
+							 <?php } ?>
 							
 							</td>
 						</tr>

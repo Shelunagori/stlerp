@@ -58,7 +58,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php  $i=0; foreach ($ivs as $iv): $i++;?>
+						<?php  $i=0; foreach ($ivs as $iv):
+						if(in_array($iv->created_by,$allowed_emp)){
+						$i++;?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h('#'.str_pad($iv->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
@@ -88,17 +90,10 @@
 							</td>
 							<?php  ?>
 						</tr>
-						<?php endforeach; ?>
+						<?php } endforeach; ?>
 					</tbody>
 				</table>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				</div>
+				
 			</div>
 		</div>
 	</div>

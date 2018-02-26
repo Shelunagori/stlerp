@@ -24,8 +24,8 @@
 							<th width="5%">Sr. No.</th>
 							<th width="15%">Name</th>
 							<th width="15%">Submission Date</th>
-							<th width="15%">Day No</th>
-							<th width="15%">Leave Type</th>
+							<th width="15%">No of Days</th>
+							<th width="15%">Status</th>
 							<th width="10%" class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
@@ -39,7 +39,7 @@
 							{
 							echo date("d-m-Y",strtotime($leaveApplication->submission_date));} ?></td>
 							<td><?= h($leaveApplication->day_no) ?></td>
-							<td><?= h($leaveApplication->leave_type) ?></td>
+							<td><?= h($leaveApplication->leave_status) ?></td>
 							<td class="actions">
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $leaveApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',

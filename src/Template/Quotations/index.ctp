@@ -140,6 +140,8 @@ if(!empty($status)){
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
+						
+						 
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?>
@@ -174,6 +176,7 @@ if(!empty($status)){
 								?></td>	
 							<?php } ?>
 							<td class="actions">
+							<?php if(in_array($quotation->created_by,$allowed_emp)){ ?>
 							<?php if(in_array(21,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 							<?php } ?>	
@@ -194,7 +197,7 @@ if(!empty($status)){
 										</li>
 									</ul>
 								</div>
-							<?php } } }?>
+							<?php } } } }?>
 								
 								<?php if($status == "Closed" && $pull_request=="true" && $close_status != "close"){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Sales Order','/Sales-Orders/Add?quotation='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
@@ -215,7 +218,7 @@ if(!empty($status)){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Sales Order','/Sales-Orders/Add?quotation='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 									
 								} ?>
-								
+								<?php if(in_array($quotation->created_by,$allowed_emp)){ ?>
 								<?php 
 								if(in_array(30,$allowed_pages)){
 								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true"){
@@ -227,22 +230,15 @@ if(!empty($status)){
 								<?php if($quotation->status=='Closed' ){
 								echo $this->Form->postLink('<i class="fa fa-minus-circle"></i> ',['action' =>'reopen', $quotation->id],['escape' => false,'class' => 'btn btn-xs green tooltips','data-original-title'=>'Reopen','confirm' => __('Are you sure, you want to reopen ?', $quotation->id)]
 								);
-								} ?>
+								} }?>
 								
 							</td>
 						</tr>
 						
-						<?php endforeach; ?>
+						<?php  endforeach; ?>
 					</tbody>
 				</table>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
-				</div>
+				
 			</div>
 		</div>
 	</div>

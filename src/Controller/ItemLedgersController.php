@@ -939,11 +939,13 @@ class ItemLedgersController extends AppController
 						}
 					}
 				}
-				if(@$ItemSerialNumber->sale_return_id > 0){ 
+				if(@$ItemSerialNumber->sales_return_id > 0){ 
 				$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 					if($outExist == 0){
-						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
-					//	pr($ItemLedgerData); 
+						$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sales_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->where($where1)->first();
+					/* if($Item->id==1148){
+						pr($ItemLedgerData); exit;
+					} */
 						if($ItemLedgerData){
 						@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
 						@$itemSerialRate[@$ItemSerialNumber->item_id]+=@$ItemLedgerData['rate'];
@@ -1348,7 +1350,7 @@ class ItemLedgersController extends AppController
 		$salesOrders=[];
 		foreach($qty_ids as $id){
 			if($status == 'salesorder'){
-				$salesOrders[]=$this->ItemLedgers->SalesOrders->find()->where(['SalesOrders.id'=>$id,'company_id'=>$st_company_id])->first();
+				$salesOrders[]=$this->ItemLedgers->SalesOrders->find()->where(['SalesOrders.id'=>$id])->first();
 			}
 			else if($status == 'jobcard'){
 				$salesOrders[]=$this->ItemLedgers->JobCards->find()->where(['JobCards.id'=>$id,'company_id'=>$st_company_id])->first();
@@ -1357,7 +1359,7 @@ class ItemLedgersController extends AppController
 				$salesOrders[]=$this->ItemLedgers->PurchaseOrders->find()->where(['PurchaseOrders.id'=>$id,'company_id'=>$st_company_id])->first();
 			}
 			else if($status == 'quotation'){
-				$salesOrders[]=$this->ItemLedgers->Quotations->find()->where(['Quotations.id'=>$id,'company_id'=>$st_company_id])->first();
+				$salesOrders[]=$this->ItemLedgers->Quotations->find()->where(['Quotations.id'=>$id])->first();
 			}
 			else if($status == 'mi'){
 				$salesOrders[]=$this->ItemLedgers->MaterialIndents->find()->where(['MaterialIndents.id'=>$id,'company_id'=>$st_company_id])->first();
@@ -1369,7 +1371,7 @@ class ItemLedgersController extends AppController
 	}
 	
 	
-	 public function materialindentreport($stockstatus=null){
+	 public function materialindentreport($stockstatus=null){ 
 		 
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
@@ -1380,10 +1382,10 @@ class ItemLedgersController extends AppController
 		$item_category=$this->request->query('item_category');
 		$item_group=$this->request->query('item_group_id');
 		$item_sub_group=$this->request->query('item_sub_group_id');
-		$company_name=$this->request->query('company_name');
+		$company_name[]=$this->request->query('company_name');
 		$stock=$this->request->query('stock');
 		$stockstatus=$this->request->query('stockstatus');
-
+		//pr($company_name); exit;
 		$where=[];
 		$whereItem=[];
 		
@@ -1426,8 +1428,8 @@ class ItemLedgersController extends AppController
 		if(!empty($company_name)){
 		
 		$company_names=array_filter($company_name);
-		// pr($company_names);
-			foreach($company_names as $names){  
+	
+			foreach($company_names[0] as $names){   
 					$where1['SalesOrders.company_id IN'][]=$names;
 					$where2['JobCards.company_id IN'][]=$names;
 					$where3['PurchaseOrders.company_id IN'][]=$names;
@@ -1436,10 +1438,15 @@ class ItemLedgersController extends AppController
 					$where6['ItemLedgers.company_id IN'][]=$names;
 					$where7['ItemCompanies.company_id IN'][]=$names;
 			}
+		}else{ $names=$st_company_id;
+				$where1['SalesOrders.company_id IN'][]=$names;
+				$where2['JobCards.company_id IN'][]=$names;
+				$where3['PurchaseOrders.company_id IN'][]=$names;
+				$where4['MaterialIndents.company_id IN'][]=$names;
+				$where5['Quotations.company_id IN'][]=$names;
+				$where6['ItemLedgers.company_id IN'][]=$names;
+				$where7['ItemCompanies.company_id IN'][]=$names;
 		}
-//exit;
-	
-	//$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'=>['SalesOrderRows'=>['InvoiceRows']]])->where($where2)->toArray();
 	$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'])->where($where2)->toArray();
 	
 	$job_card_qty=[];
@@ -1478,13 +1485,11 @@ class ItemLedgersController extends AppController
 			}
 		}
 		}
-	}
-	//pr($job_id); exit;
-
+	}  
+	
 	$SalesOrders = $this->ItemLedgers->SalesOrders->find()->contain(['SalesOrderRows'=>['InvoiceRows' => function($q) {
 				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
 	}]])->where($where1);
-	//pr($SalesOrders->toArray()); exit;
 	
 	$sales_order_qty=[];
 	 $invoice_qty=[];
@@ -1506,17 +1511,12 @@ class ItemLedgersController extends AppController
 						@$sales_id[$key].=@$SalesOrder->id.',';
 					}
 			}
-			//if()
 		}
-		//pr($invoice_qty); 
-		//pr($sales_qty); 
-		//pr($sales_id); 
-	//	exit;
 		
 	$PurchaseOrders = $this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['GrnRows' => function($q) {
 				return $q->select(['grn_id','purchase_order_row_id','item_id','total_qty' => $q->func()->sum('GrnRows.quantity')])->group('GrnRows.purchase_order_row_id');
 	}]])->where($where3);
-		//pr($PurchaseOrders->toArray()); exit;
+
 	$purchase_order_qty=[];
 	$grn_qty=[];
 	$purchase_id=[];
@@ -1539,15 +1539,9 @@ class ItemLedgersController extends AppController
 			}
 		}
 	
-/* pr($purchase_order_qty); 
-pr($grn_qty); 
-pr($purchase_id); 
-
-//exit;	 */
 	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows'=>['SalesOrderRows' => function($q) {
 				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
 	}]])->where($where5);
-	//	pr($Quotations->toArray()); exit;
 	$qo_qty=[];
 	$so_qty=[];
 	$qotation_id=[];
@@ -1568,12 +1562,10 @@ pr($purchase_id);
 				
 			}
 		}
-	//pr($qo_qty)	; pr($so_qty)	;  exit;
 	$MaterialIndents = $this->ItemLedgers->MaterialIndents->find()->contain(['MaterialIndentRows','PurchaseOrders'=>['PurchaseOrderRows' => function($q) {
 				return $q->select(['purchase_order_id','material_indent_row_id','item_id','total_qty' => $q->func()->sum('PurchaseOrderRows.quantity')])->group('PurchaseOrderRows.material_indent_row_id');
 	}]])->where($where4);
 		
-		//pr($MaterialIndents->toArray()); exit;
 	$mi_qty=[];
 	$po_qty=[];
 	$mi_id=[];
@@ -1585,7 +1577,6 @@ pr($purchase_id);
 					}
 				}
 			}
-		//	pr($MaterialIndents->toArray()); exit;
 			foreach(@$MaterialIndent->material_indent_rows as $material_indent_row){  
 				@$mi_qty[$material_indent_row['item_id']]+=$material_indent_row['required_quantity'];
 				@$sales_qty[$material_indent_row['item_id']]+=$material_indent_row['required_quantity'];
@@ -1597,11 +1588,6 @@ pr($purchase_id);
 				
 			}
 		}
-
-//	pr($mi_qty)	;	
-	//pr($po_qty)	; 
-	//exit;
-		
 		if(!empty($company_name)){ 
 		$ItemLedgers = $this->ItemLedgers->find();
 				$totalInCase = $ItemLedgers->newExpr()
@@ -1630,8 +1616,7 @@ pr($purchase_id);
 						return $p->where($where7)->where(['ItemCompanies.freeze' => 0]);
 					}]);
 				}]);
-			//	pr($ItemLedgers->toArray());  exit;
-		}else{ // exit;
+		}else{
 			$ItemLedgers = $this->ItemLedgers->find();
 				$totalInCase = $ItemLedgers->newExpr()
 					->addCase(
@@ -1667,21 +1652,37 @@ pr($purchase_id);
 					$ItemMiniStock[$Item->item_id]=$Item->minimum_stock;
 				
 			}
-			//pr($ItemLedgers->toArray()); exit;
 		
 		$material_report=[];
-		foreach ($ItemLedgers as $itemLedger){ //pr($itemLedger->item->item_companies[0]->minimum_stock); exit;
-			//pr($itemLedger->item->name);
+		$ledger_item=[];
+		foreach ($ItemLedgers as $itemLedger){ 
+			$ledger_item[]=$itemLedger->item->id;
 			$item_name=$itemLedger->item->name;
 			$item_id=$itemLedger->item->id;
 			$Current_Stock=$itemLedger->total_in-$itemLedger->total_out;
 			$material_report[$item_id]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'minimum_stock'=>@$itemLedger->item->item_companies[0]->minimum_stock);
 			
-		} 
+		} /*
+		$remaing_items=$this->ItemLedgers->Items->ItemCompanies->find()->where(['ItemCompanies.company_id' => $st_company_id,'ItemCompanies.freeze' => 0,'Items.id NOT IN'=>$ledger_item]);
+		foreach ($remaing_items as $remaing_item){ 
+		$item_name=$itemLedger->item->name;
+		$item_id=$itemLedger->item->id;
+		$Current_Stock=0;
+		$material_report[$item_id]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'minimum_stock'=>@$itemLedger->item->item_companies[0]->minimum_stock);
+		}
+		*/
+		//pr($material_report); exit;
 		$Items = $this->ItemLedgers->Items->find();
-		// pr($Items->toArray()); exit;
-		// pr($material_report); exit;
-			
+		$ItemDatas=[];
+		$ItemUnits=[];
+		foreach($Items as $Item){  
+			$ItemLedgersexists = $this->ItemLedgers->exists(['item_id' => $Item->id,'company_id'=>$st_company_id]);
+			if(empty($ItemLedgersexists)){
+				$ItemDatas[$Item->id]=$Item->name;
+			}
+		}
+		
+		//pr($ItemDatas); exit;
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
@@ -1861,7 +1862,7 @@ pr($purchase_id);
 			$itemDatas[$itemLedger['source_model'].$itemLedger['source_id']][]=$itemLedger;
 			
 		}
-		//pr($itemLedgers->toArray());exit;
+		
 		$serial_nos=[];
 		$voucher_no=[];
 		$link=[];
@@ -1870,7 +1871,7 @@ pr($purchase_id);
 	
 			$invoice=$this->ItemLedgers->Invoices->find()->contain(['InvoiceRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					})->toArray();
+					})->where(['Invoices.company_id' => $st_company_id])->toArray();
 					//pr($invoice->toArray()); exit;
 			if(!empty($invoice)){
 				$AllDatas[$To]['Invoice']=$invoice;
@@ -1878,41 +1879,41 @@ pr($purchase_id);
 			
 			$Grns=$this->ItemLedgers->Grns->find()->contain(['GrnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					})->toArray();
+					})->where(['Grns.company_id' => $st_company_id])->toArray();
 			if(!empty($Grns)){
 				$AllDatas[$To]['Grns']=$Grns;
 			}
 			
 			$InventoryTransferVouchers=$this->ItemLedgers->InventoryTransferVouchers->find()->contain(['InventoryTransferVoucherRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('transaction_date',$From ,$To, 'date');
-					})->toArray();
+					})->where(['InventoryTransferVouchers.company_id' => $st_company_id])->toArray();
 			if(!empty($InventoryTransferVouchers)){
 				$AllDatas[$To]['InventoryTransferVouchers']=$InventoryTransferVouchers;
 			}
 			
 			$Ivs=$this->ItemLedgers->Ivs->find()->contain(['IvRows'=>['Items','SerialNumbers','IvRowItems'=>['Items','SerialNumbers']]])->where(function($exp) use($From ,$To) {
 						return $exp->between('transaction_date',$From ,$To, 'date');
-					})->toArray();
+					})->where(['Ivs.company_id' => $st_company_id])->toArray();
 			if(!empty($Ivs)){
 				$AllDatas[$To]['InventoryVouchers']=$Ivs;
 			}
 			
 			$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
-					})->toArray();
+					})->where(['SaleReturns.company_id' => $st_company_id])->toArray();
 			if(!empty($SaleReturns)){
 				$AllDatas[$To]['SaleReturns']=$SaleReturns;
 			}
 			
 			$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
 						return $exp->between('created_on',$From ,$To, 'date');
-					})->toArray();
+					})->where(['PurchaseReturns.company_id' => $st_company_id])->toArray();
 					//pr($PurchaseReturns);exit;
 			if(!empty($PurchaseReturns)){
 				$AllDatas[$To]['PurchaseReturns']=$PurchaseReturns;
 				//pr($AllDatas);exit;
 			}
-			//pr($AllDatas);exit;
+			
 	
 		$this->set(compact('AllDatas','serial_nos','voucher_no','From','To','link','url'));
 	}

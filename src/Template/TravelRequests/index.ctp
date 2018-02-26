@@ -22,12 +22,11 @@
 					<thead>
 						<tr>
 							<th width="5%">Sr. No.</th>
-							<th width="15%">Employee Name</th>
-							<th width="15%">Employee Designation</th>
 							<th width="15%">Purpose</th>
 							<th width="15%">Advance Amount</th>
 							<th width="15%">Travel From Date</th>
 							<th width="15%">Travel To Date</th>
+							<th width="15%">Status</th>
 							<th width="10%" class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
@@ -35,12 +34,11 @@
 						<?php $i=0; foreach ($travelRequests as $travelRequest):  ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h($travelRequest->employee_name) ?></td>
-							<td><?= h($travelRequest->employee_designation) ?></td>
 							<td><?= h($travelRequest->purpose) ?></td>
 							<td><?= h($travelRequest->advance_amt) ?></td>
 							<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_from_date))) ?></td>
 							<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_to_date))) ?></td>
+							<td><?= h($travelRequest->status) ?></td>
 							<td class="actions">
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $travelRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',

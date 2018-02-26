@@ -18,8 +18,12 @@ class TravelRequestsController extends AppController
      */
     public function index()
     {
-		$this->viewBuilder()->layout('index_layout');
-        $travelRequests = $this->paginate($this->TravelRequests);
+		$this->viewBuilder()->layout('index_layout');	
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 
         $this->set(compact('travelRequests'));
         $this->set('_serialize', ['travelRequests']);
@@ -51,9 +55,21 @@ class TravelRequestsController extends AppController
     public function add()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		 $st_year_id = $session->read('st_year_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		//pr($empData);
         $travelRequest = $this->TravelRequests->newEntity();
         if ($this->request->is('post')) {
-            $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data); 
+            $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
+			$travelRequest->employee_id=$s_employee_id;
+			$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
+			$travelRequest->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
+			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->return_mode_to_date));
+
             if ($this->TravelRequests->save($travelRequest)) {
 				
                 $this->Flash->success(__('The travel request has been saved.'));
@@ -63,7 +79,7 @@ class TravelRequestsController extends AppController
                 $this->Flash->error(__('The travel request could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('travelRequest'));
+        $this->set(compact('travelRequest','empData'));
         $this->set('_serialize', ['travelRequest']);
     }
 
@@ -77,11 +93,22 @@ class TravelRequestsController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		 $st_year_id = $session->read('st_year_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		//$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		
         $travelRequest = $this->TravelRequests->get($id, [
-            'contain' => ['TravelRequestRows']
-        ]);
+            'contain' => ['TravelRequestRows','Employees'=>['Designations']]
+        ]); //pr($travelRequest);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
+			$travelRequest->employee_id=$s_employee_id;
+			$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
+			$travelRequest->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
+			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->return_mode_to_date));
             if ($this->TravelRequests->save($travelRequest)) {
                 $this->Flash->success(__('The travel request has been saved.'));
 
@@ -93,7 +120,51 @@ class TravelRequestsController extends AppController
         $this->set(compact('travelRequest'));
         $this->set('_serialize', ['travelRequest']);
     }
+	
+	public function approved($id = null)
+    {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $leaveApplication = $this->TravelRequests->get($id);
+		
+		$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
+		if($EmployeeHierarchies->parent_id != null){ 
+			$query = $this->TravelRequests->query();
+					$query->update()
+						->set(['parent_employee_id' => $EmployeeHierarchies->parent_accounting_group->employee_id])
+						->where(['id' => $id])
+						->execute();
+			
+		}else{
+			$approve_date=date('Y-m-d');
+			$query = $this->TravelRequests->query();
+					$query->update()
+						->set(['status' =>'approved','approve_date'=>$approve_date])
+						->where(['id' => $id])
+						->execute();
+		}
+		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
+    }
 
+	public function cancle($id = null)
+    {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $leaveApplication = $this->TravelRequests->get($id);
+		
+		$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
+
+			
+			$query = $this->TravelRequests->query();
+					$query->update()
+						->set(['leave_status' =>'cancle'])
+						->where(['id' => $id])
+						->execute();
+	
+		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
+    }
     /**
      * Delete method
      *

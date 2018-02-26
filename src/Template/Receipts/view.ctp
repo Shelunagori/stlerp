@@ -81,7 +81,8 @@ margin-bottom: 0;
 			<th><?= __('Received From') ?></th>
 			<th style="text-align: right;">Amount</th>
 		</tr>
-		<?php $total_cr=0; $total_dr=0; foreach ($receipt->receipt_rows as $receiptRows): //pr($receiptRows->reference_details); ?>
+		<?php $total_cr=0; $total_dr=0; foreach ($receipt->receipt_rows as $receiptRows): 
+		 ?>
 		<tr>
 			<td>
 				<?php $name=""; if(empty($receiptRows->ReceivedFrom->alias)){

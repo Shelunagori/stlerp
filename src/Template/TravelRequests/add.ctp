@@ -35,51 +35,33 @@ border:none;
 			<span class="caption-subject font-blue-steel uppercase">Travel Request</span>
 		</div>
 	</div>
-
+<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 	<div class="portlet-body form">
-		<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+		
 				
 	
 			<div class="form-body">
-				<div class="row">
-				
-			      <div class="col-md-4">
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			      <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Employee Name</label>   
-							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
 						</div>
 					</div>
 			       
-				   <div class="col-md-4">
+				   <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Employee Designation</label>
 							<div id="present_district2">
-								<?php echo $this->Form->input('employee_designation', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+								<?php echo $this->Form->input('employee_designation', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->designation->name,'readonly']); ?>
 							</div>
 						</div>
 					</div>
-			       <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Advance Amount</label>
-							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
-						</div>
-					</div>
-			</div>
-			<div class="row">
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php echo $this->Form->input('travel_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-					
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php echo $this->Form->input('travel_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-			      <div class="col-md-4">
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Purpose</label>
 							<div class="radio-list">
@@ -97,76 +79,78 @@ border:none;
 							</div>
 						</div>
 					</div>
-			       
-				   <div class="col-md-4">
+					 <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css"></label>
-							<?php echo $this->Form->input('purpose_specification', ['label' => false,'placeholder'=>'Others Specify','class'=>'form-control input-sm specify_hide','type'=>'textarea','rows'=>2,'style'=>'display:none']); ?>
+							<?php echo $this->Form->input('purpose_specification', ['label' => false,'placeholder'=>'Others Specify','class'=>'form-control input-sm specify_hide','type'=>'textarea','rows'=>1,'style'=>'display:none']); ?>
 						</div>
 					</div>
-			</div>
-			<div class="row">
-					<div class="col-md-2">
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Mode Of Travel</label>
-							<?php 
-							$mode[]=['value'=>'Taxi','text'=>'Taxi'];
-							$mode[]=['value'=>'Bus','text'=>'Bus'];
-							$mode[]=['value'=>'Rail','text'=>'Rail'];
-							$mode[]=['value'=>'Self','text'=>'Self'];
-							echo $this->Form->input('travel_mode', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$mode]); ?>
-						</div>
-					</div>
-					
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Mode Of Travel (<small>Return</small>)</label>
 							<?php 
 							$rmode[]=['value'=>'Taxi','text'=>'Taxi'];
 							$rmode[]=['value'=>'Bus','text'=>'Bus'];
 							$rmode[]=['value'=>'Rail','text'=>'Rail'];
 							$rmode[]=['value'=>'Self','text'=>'Self'];
-							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
+							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
 						</div>
 					</div>
 					
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php echo $this->Form->input('return_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+							<?php echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
 						</div>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php echo $this->Form->input('return_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+							<?php echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
 						</div>
 					</div>
-			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<div class="form-group">
-						<label class="control-label  label-css">Other Mode</label>
-						<?php echo $this->Form->input('other_mode', ['label' => false,'placeholder'=>'Other Mode Pls specify','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
-					</div>
-				</div>        
-			</div>
-			</div>
-			</div>
+				</div>
 			
-		</fieldset>	
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Mode Of Travel (<small>Return</small>)</label>
+							<?php 
+							/* $rmode[]=['value'=>'Taxi','text'=>'Taxi'];
+							$rmode[]=['value'=>'Bus','text'=>'Bus'];
+							$rmode[]=['value'=>'Rail','text'=>'Rail'];
+							$rmode[]=['value'=>'Self','text'=>'Self']; */
+							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
+						</div>
+					</div>
+					
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Travel (From)</label>
+							<?php echo $this->Form->input('return_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Travel (To)</label>
+							<?php echo $this->Form->input('return_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Advance Amount</label>
+							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
+						</div>
+					</div>
+				</div>
+				
 		
 		<fieldset style="margin-left: 6px;margin-right: 16px;">
 			<legend><b>Travel Schedule Date wise only </b></legend>
@@ -312,10 +296,9 @@ $(document).ready(function()
 	add_row();
 	function add_row()
 	{ 
-			var tr=$("#sample_table tbody tr.main_tr").clone();
-			$("#main_table tbody#main_tbody").append(tr);
-			
-			rename_rows();
+	var tr=$("#sample_table tbody tr.main_tr").clone();
+	$("#main_table tbody#main_tbody").append(tr);
+	rename_rows();
 	}
 
 	
@@ -323,12 +306,18 @@ $(document).ready(function()
 	{ 
 				var i=0;
 				$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
-					$(this).find('td:nth-child(1)').html(i+1);
-					$(this).find("td:nth-child(2) input").datepicker().attr({name:"travel_request_rows["+i+"][date]", id:"travel_request_rows-"+i+"-date"}).rules("add", "required");
+					$(this).find('td:nth-child(1)').html(i+1); 
+					$(this).find("td:nth-child(2) input.datepic").datepicker().attr({name:"travel_request_rows["+i+"][date]", id:"travel_request_rows-"+i+"-date"}).rules("add", "required");
+					var hidden_id_length = $(this).find("td:nth-child(2) input.hiddenId").length; 
+					if(hidden_id_length>0)
+					{
+						$(this).find("td:nth-child(2) input.hiddenId").attr({name:"travel_request_rows["+i+"][id]", id:"travel_request_rows-"+i+"-id"});
+					} 
 					$(this).find("td:nth-child(3) input").attr({name:"travel_request_rows["+i+"][party_name]", id:"travel_request_rows-"+i+"-party_name"}).rules("add", "required");		
 					$(this).find("td:nth-child(4) input").attr({name:"travel_request_rows["+i+"][destination]", id:"travel_request_rows-"+i+"-destination"}).rules("add", "required");
 					$(this).find("td:nth-child(5) input").attr({name:"travel_request_rows["+i+"][meeting_person]", id:"travel_request_rows-"+i+"-meeting_person"}).rules("add", "required");
 					$(this).find("td:nth-child(6) input").timepicker().attr({name:"travel_request_rows["+i+"][reporting_time]", id:"travel_request_rows-"+i+"-reporting_time"}).rules("add", "required");
+					
 					i++;
 				}); 
 	}
@@ -360,7 +349,7 @@ $(document).ready(function()
 		<tr class="main_tr" class="tab">
 			<td style="width:3%;"></td>
 			<td style="vertical-align: top !important;width:12%;" >
-				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd/mm/yyyy']); ?>
+				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker datepic','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd/mm/yyyy']); ?>
 			</td>
 			<td width="18%" style="vertical-align: top !important;">
 				<?php echo $this->Form->input('party_name', ['label' => false,'class' => 'form-control input-sm count_value','id'=>'check']); ?>

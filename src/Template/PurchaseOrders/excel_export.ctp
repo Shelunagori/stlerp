@@ -34,7 +34,10 @@
 				</tr>
 		</thead>
 <tbody>
-						<?php $i=1; foreach ($purchaseOrders as $purchaseOrder): ?>
+						<?php $i=1; foreach ($purchaseOrders as $purchaseOrder): 
+						if(in_array($purchaseOrder->created_by,$allowed_emp)){
+						if($status=='Pending'){ 
+							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ ?>
 						<tr>
 							<td><?= h($i++) ?></td>
 							
@@ -46,14 +49,33 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 						<td>
-							<?php if($total_sales[$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id] ){ 
-									echo "Pending";
-								}else{
-									echo "Converted-Into-GRN";
-								} ?>
+							<?php 
+									echo $status;
+								?>
 						
 						</td>
 						</tr>
-						<?php endforeach; ?>
+						<?php }}  else if($status=='Converted-Into-GRN'){
+							
+									if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){ ?>
+									<tr>
+							<td><?= h($i++) ?></td>
+							
+							<td><?= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4)) ?></td>
+							
+							<td><?= h($purchaseOrder->vendor->company_name) ?></td>
+							
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+						
+						<td>
+							<?php 
+									echo $status;
+								?>
+						
+						</td>
+						</tr>
+									
+						<?php }} } endforeach; ?>
 					</tbody>
 				</table>		

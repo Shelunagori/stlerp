@@ -35,7 +35,9 @@
 					</thead>
 					<tbody>
 					
-						<?php $i=1; foreach ($grns as $grn): ?>
+						<?php $i=1; foreach ($grns as $grn): 
+						if($status==$grn->status){ 
+						?>
 						<tr>
 							<td><?= h($i++) ?></td>
 							<td><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
@@ -45,6 +47,6 @@
 							<td><?php echo date("d-m-Y",strtotime($grn->date_created)); ?></td>
 							<td><?php echo $grn->status; ?></td>
 							</tr>
-						<?php endforeach; ?>
+						<?php } endforeach; ?>
 					</tbody>
 				</table>

@@ -1620,6 +1620,7 @@ class SaleReturnsController extends AppController
 						$itemLedger->in_out = 'In';
 						$itemLedger->rate = $toupdate_rate;
 						$itemLedger->company_id = $invoice->company_id;
+						$itemLedger->source_row_id = $sale_return_row['id'];
 						$itemLedger->processed_on =$saleReturn->transaction_date;   
 						$this->SaleReturns->ItemLedgers->save($itemLedger);
 						

@@ -126,7 +126,41 @@ class AppController extends Controller
 			foreach($UserRights as $qwe){
 				$allowed_pages[]=$qwe->page_id;
 			}
-			$this->set(compact('allowed_pages','st_company_id'));
+			$this->loadModel('EmployeeHierarchies');
+			$this->loadModel('Employees');
+			$this->loadModel('Logins');
+			$login_emp= $this->Logins->get($st_login_id);
+			$employees_data= $this->EmployeeHierarchies->find()->where(['employee_id'=>$login_emp->employee_id])->first();
+			$allowed_emp=array();
+			
+			/* if($login_emp->employee_id==23){
+				$employees_info= $this->Employees->find();
+				foreach($employees_info as $data1){ 
+					$allowed_emp[]=$data1->id; 
+				}
+			}else  */
+				if($employees_data){
+				$children = $this->EmployeeHierarchies
+				->find('children', ['for' =>$employees_data->id])
+				->toArray();
+				//pr($children); exit;
+				if($children){ //exit;
+					$allowed_emp=array();
+					foreach($children as $data){
+						$allowed_emp[]=$data->employee_id;
+					} 
+					$allowed_emp[]=$login_emp->employee_id; 
+					//pr($allowed_emp); exit;
+				}else{
+					
+					$allowed_emp[]=$login_emp->employee_id; 
+					//pr($allowed_emp); exit;
+				}
+			}
+
+
+			//pr($allowed_emp); exit;
+			$this->set(compact('allowed_pages','st_company_id','allowed_emp'));
 		}
 
 		$this->loadModel('Pages');
@@ -224,10 +258,10 @@ class AppController extends Controller
 							}
 						}
 					}
-					if(@$ItemSerialNumber->sale_return_id > 0){ 
+					if(@$ItemSerialNumber->sales_return_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id]);
 						if($outExist == 0){
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sales_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id])->first();
 						//	pr($ItemLedgerData); 
 							if($ItemLedgerData){
 							@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -368,10 +402,10 @@ class AppController extends Controller
 							}
 						}
 					}
-					if(@$ItemSerialNumber->sale_return_id > 0){ 
+					if(@$ItemSerialNumber->sales_return_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]);
 						if($outExist == 0){
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sales_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;
@@ -520,10 +554,10 @@ class AppController extends Controller
 							}
 						}
 					}
-					if(@$ItemSerialNumber->sale_return_id > 0){ 
+					if(@$ItemSerialNumber->sales_return_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
 						if($outExist == 0){
-							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sale_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
+							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sales_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
 							if($ItemLedgerData){
 								@$itemSerialQuantity[@$ItemSerialNumber->item_id]=$itemSerialQuantity[@$ItemSerialNumber->item_id]+1;

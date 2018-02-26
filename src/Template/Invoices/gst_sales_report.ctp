@@ -92,8 +92,12 @@
 					<tr>
 						<td><?php echo $i; ?></td>
 						<td>
+							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
 							<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
 							'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+							<?php } else{ ?>
+							<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4 ;?>
+							<?php }  ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 						<td><?php echo $invoice->customer->customer_name.'('.$invoice->customer->alias.')'?></td>
@@ -189,8 +193,12 @@
 					<tr>
 						<td><?php echo $j++; ?></td>
 						<td>
-							<?php echo $this->Html->link( $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4,[
-							'controller'=>'Invoices','action' => 'gstConfirm',$invoiceigsts->id],array('target'=>'_blank')); ?>
+							<?php if(in_array($invoiceigsts->created_by,$allowed_emp)){  ?>
+								<?php echo $this->Html->link( $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4,[
+								'controller'=>'Invoices','action' => 'gstConfirm',$invoiceigsts->id],array('target'=>'_blank')); ?>
+							<?php } else { ?>
+								<?php echo $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4; ?>
+							<?php }  ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoiceigsts->date_created)); ?></td>
 						<td><?php echo $invoiceigsts->customer->customer_name.'('.$invoiceigsts->customer->alias.')'?></td>
@@ -294,8 +302,12 @@
 					<tr>
 						<td><?php echo $i; ?></td>
 						<td>
-						<?php echo $this->Html->link( $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4,[
+						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
+							<?php echo $this->Html->link( $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4,[
 							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoicebooking->id],array('target'=>'_blank')); ?>
+						<?php }else{ ?>
+							<?php echo $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4; ?>
+						<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoicebooking->supplier_date)); ?></td>
 						<td><?php echo $invoicebooking->vendor->company_name; ?></td>
@@ -381,8 +393,12 @@
 					<tr>
 						<td><?php echo $i++; ?></td>
 						<td>
-						<?php echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4,[
+						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
+							<?php echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4,[
 							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoiceBooking->id],array('target'=>'_blank')); ?>
+						<?php }else{ ?>
+							<?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?>
+						<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoiceBooking->supplier_date)); ?></td>
 						<td><?php echo $invoiceBooking->vendor->company_name; ?></td>
@@ -475,7 +491,11 @@
 				?>
 					<tr>
 						<td><?php echo $i++; ?></td>
-						<td><?php echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); ?></td>
+						<td>
+						
+						<?php echo $voucher_no; ?>
+						
+						</td>
 						<?php $k=0; $AllTax=[];
 							foreach($LedgerAccountDetails as $Key1=>$SaleTaxeGst){ 
 									$AllTax[$k]=$Key1;
@@ -564,7 +584,7 @@
 				?>
 					<tr>
 						<td><?php echo $i++; ?></td>
-						<td><?php echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); ?></td>
+						<td><?php echo $voucher_no; ?></td>
 						<?php $k=0; $AllTax=[];
 							foreach($LedgerAccountDetailIgst as $Key1=>$SaleTaxeGst){ 
 									$AllTax[$k]=$Key1;

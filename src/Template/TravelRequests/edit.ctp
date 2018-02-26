@@ -35,62 +35,33 @@ border:none;
 			<span class="caption-subject font-blue-steel uppercase">Travel Request</span>
 		</div>
 	</div>
-
+<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 	<div class="portlet-body form">
-		<?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+		
 				
-					
 	
 			<div class="form-body">
-				<div class="row">
-				
-			      <div class="col-md-4">
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			      <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Employee Name</label>   
-							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$travelRequest->employee->name,'readonly']); ?>
 						</div>
 					</div>
 			       
-				   <div class="col-md-4">
+				   <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Employee Designation</label>
 							<div id="present_district2">
-								<?php echo $this->Form->input('employee_designation', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+								<?php echo $this->Form->input('employee_designation', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly']); ?>
 							</div>
 						</div>
 					</div>
-			       <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Advance Amount</label>
-							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
-						</div>
-					</div>
-			</div>
-			<div class="row">
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php 
-							if($travelRequest->travel_from_date!='1/1/70')
-							{
-								$travelFromDate=date("d-m-Y",strtotime($travelRequest->travel_from_date));
-							}
-							echo $this->Form->input('travel_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$travelFromDate]); ?>
-						</div>
-					</div>
-					
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php 
-							if($travelRequest->travel_to_date!='1/1/70')
-							{
-								$travelToDate=date("d-m-Y",strtotime($travelRequest->travel_to_date));
-							}
-							echo $this->Form->input('travel_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$travelToDate]); ?>
-						</div>
-					</div>
-			      <div class="col-md-4">
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css">Purpose</label>
 							<div class="radio-list">
@@ -108,103 +79,87 @@ border:none;
 							</div>
 						</div>
 					</div>
-			       
-				   <div class="col-md-4">
+					<?php if(empty($travelRequest->purpose_specification)){ ?>
+					 <div class="col-md-5">
 						<div class="form-group">
 							<label class="control-label  label-css"></label>
-							<?php
-							if($travelRequest->purpose=='Others Specify')
-							{
-								$style='';
-							}
-							else{
-								$style='display:none';
-							}
-							echo $this->Form->input('purpose_specification', ['label' => false,'placeholder'=>'Others Specify','class'=>'form-control input-sm specify_hide','type'=>'textarea','rows'=>2,'style'=>@$$style]); ?>
+							<?php echo $this->Form->input('purpose_specification', ['label' => false,'placeholder'=>'Others Specify','class'=>'form-control input-sm specify_hide','type'=>'textarea','rows'=>1,'style'=>'display:none']); ?>
 						</div>
 					</div>
-			</div>
-			<div class="row">    
-					<div class="col-md-2">
+					<?php }else{ ?>
+					<div class="col-md-5">
+						<div class="form-group">
+							<label class="control-label  label-css"></label>
+							<?php echo $this->Form->input('purpose_specification', ['label' => false,'placeholder'=>'Others Specify','class'=>'form-control input-sm specify_hide','type'=>'textarea','rows'=>1]); ?>
+						</div>
+					</div>
+					<?php } ?>
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Mode Of Travel</label>
-							<?php 
-							$mode[]=['value'=>'Taxi','text'=>'Taxi'];
-							$mode[]=['value'=>'Bus','text'=>'Bus'];
-							$mode[]=['value'=>'Rail','text'=>'Rail'];
-							$mode[]=['value'=>'Self','text'=>'Self'];
-							echo $this->Form->input('travel_mode', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$mode]); ?>
-						</div>
-					</div>
-					
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php 
-							if($travelRequest->travel_mode_from_date!='1/1/70')
-							{
-								$travelModeFromDate=date("d-m-Y",strtotime($travelRequest->travel_mode_from_date));
-							}
-							echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$travelModeFromDate]); ?>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php 
-							if($travelRequest->travel_mode_to_date!='1/1/70')
-							{
-								$travelModeToDate=date("d-m-Y",strtotime($travelRequest->travel_mode_to_date));
-							}
-							echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$travelModeToDate]); ?>
-						</div>
-					</div>
-					<div class="col-md-2">
-						<div class="form-group">
-							<label class="control-label  label-css">Mode Of Travel (<small>Return</small>)</label>
 							<?php 
 							$rmode[]=['value'=>'Taxi','text'=>'Taxi'];
 							$rmode[]=['value'=>'Bus','text'=>'Bus'];
 							$rmode[]=['value'=>'Rail','text'=>'Rail'];
 							$rmode[]=['value'=>'Self','text'=>'Self'];
-							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
+							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
 						</div>
 					</div>
 					
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php 
-							if($travelRequest->return_mode_from_date!='1/1/70')
-							{
-								$returnModeFromDate=date("d-m-Y",strtotime($travelRequest->return_mode_from_date));
-							}
-							echo $this->Form->input('return_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$returnModeFromDate]); ?>
+							<?php echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_from_date)),'data-date-start-date' => date("d-m-Y")]); ?>
 						</div>
 					</div>
-					<div class="col-md-2">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php 
-							if($travelRequest->return_mode_to_date!='1/1/70')
-							{
-								$returnModeToDate=date("d-m-Y",strtotime($travelRequest->return_mode_to_date));
-							}
-							echo $this->Form->input('return_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$returnModeToDate]); ?>
+							<?php echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_to_date)),'data-date-start-date' => date("d-m-Y")]); ?>
 						</div>
 					</div>
-			</div>
-			<div class="row">
-				<div class="col-md-4">
-					<div class="form-group">
-						<label class="control-label  label-css">Other Mode</label>
-						<?php echo $this->Form->input('other_mode', ['label' => false,'placeholder'=>'Other Mode Pls specify','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
-					</div>
-				</div>        
-			</div>
-			</div>
-			</div>
+				</div>
 			
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+			        <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Mode Of Travel (<small>Return</small>)</label>
+							<?php 
+							/* $rmode[]=['value'=>'Taxi','text'=>'Taxi'];
+							$rmode[]=['value'=>'Bus','text'=>'Bus'];
+							$rmode[]=['value'=>'Rail','text'=>'Rail'];
+							$rmode[]=['value'=>'Self','text'=>'Self']; */
+							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
+						</div>
+					</div>
+					
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Travel (From)</label>
+							<?php echo $this->Form->input('return_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->return_mode_from_date)),'data-date-start-date' => date("d-m-Y")]); ?>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Travel (To)</label>
+							<?php echo $this->Form->input('return_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->return_mode_to_date)),'data-date-start-date' => date("d-m-Y")]); ?>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-2"></div>
+				<div class="col-md-10" style="padding-bottom:10px;">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Advance Amount</label>
+							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
+						</div>
+					</div>
+				</div>
+		
 		</fieldset>	
 		
 		<fieldset style="margin-left: 2px;margin-right: 16px;">

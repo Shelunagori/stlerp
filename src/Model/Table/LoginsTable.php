@@ -22,6 +22,8 @@ class LoginsTable extends Table
 		$this->belongsTo('SalesOrders');
 		$this->belongsTo('Invoices');
 		$this->belongsTo('PurchaseOrders');
+		$this->belongsTo('LeaveApplications');
+		$this->belongsTo('TravelRequests');
 		$this->belongsTo('Grns');
 		
     }

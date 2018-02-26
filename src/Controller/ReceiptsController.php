@@ -119,9 +119,9 @@ class ReceiptsController extends AppController
 				);
 			return $ReceiptRows->select([
 					'total_cr' => $ReceiptRows->func()->sum($totalCrCase),
-					'total_dr' => $ReceiptRows->func()->sum($totalDrCase)
+					'total_dr' => $ReceiptRows->func()->sum($totalDrCase),'receipt_id'
 				])
-				->group('receipt_id')
+				->group('ReceiptRows.receipt_id')
 				->autoFields(true);
 			
 		}])->order(['transaction_date' => 'DESC']));
@@ -248,9 +248,9 @@ class ReceiptsController extends AppController
 				);
 			return $ReceiptRows->select([
 					'total_cr' => $ReceiptRows->func()->sum($totalCrCase),
-					'total_dr' => $ReceiptRows->func()->sum($totalDrCase)
+					'total_dr' => $ReceiptRows->func()->sum($totalDrCase),'receipt_id'
 				])
-				->group('receipt_id')
+				->group('ReceiptRows.receipt_id')
 				->autoFields(true);
 			
 		}])->order(['transaction_date' => 'DESC']);
@@ -582,8 +582,8 @@ class ReceiptsController extends AppController
 					$this->Receipts->Ledgers->save($ledger);
 					
 					if(!empty($receipt_row->ref_rows))
-					{
-					foreach($receipt_row->ref_rows as $ref_rows){
+					{ 
+					foreach($receipt_row->ref_rows as $ref_rows){ 
 						$ReferenceDetail = $this->Receipts->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
@@ -636,10 +636,15 @@ class ReceiptsController extends AppController
 				$ledger->voucher_id = $receipt->id;
 				$ledger->voucher_source = 'Receipt Voucher';
 				$ledger->transaction_date = $receipt->transaction_date;
-				if($old_ledger_data){
+				
+				if(!empty($old_ledger_data)){
 					$ledger->reconciliation_date = $old_ledger_data->reconciliation_date;
+				}else{
+					$ledger->reconciliation_date = "0000-00-00";
 				}
+				//pr($ledger); exit;
 				if($bankAmt != 0){
+					
 					$this->Receipts->Ledgers->save($ledger);
 				}
 	

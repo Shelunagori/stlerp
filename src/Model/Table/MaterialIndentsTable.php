@@ -44,6 +44,7 @@ class MaterialIndentsTable extends Table
 	   $this->belongsTo('ItemBuckets');
 	   //$this->belongsTo('PurchaseOrders');
 	   
+	   
         $this->belongsTo('Companies', [
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'

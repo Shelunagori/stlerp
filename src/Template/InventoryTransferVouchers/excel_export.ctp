@@ -31,7 +31,9 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $i=0; foreach ($inventory_transfer_vouchs as $inventory_transfer_vouch_data): $i++; ?>
+		<?php $i=0; foreach ($inventory_transfer_vouchs as $inventory_transfer_vouch_data):
+if(in_array($inventory_transfer_vouch_data->created_by,$allowed_emp)){
+		$i++; ?>
 	<tr>
 		<td><?= h($i) ?></td>		
 		<?php if($inventory_transfer_vouch_data->in_out=='in_out'){ ?>
@@ -43,6 +45,6 @@
 		<?php } ?>
 		<td><?= h(date("d-m-Y",strtotime($inventory_transfer_vouch_data->transaction_date)))?></td>
 	</tr>
-	<?php endforeach; ?>
+<?php } endforeach; ?>
 </tbody>
 </table>

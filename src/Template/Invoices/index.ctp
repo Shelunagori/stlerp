@@ -20,11 +20,7 @@
 				'/Invoices/index/Pending',
 				['class' => $class1]
 			); ?>
-			<?= $this->Html->link(
-				'Cancel',
-				'/Invoices/index/Cancel',
-				['class' => $class3]
-			); ?>
+			
 			
 			
 				
@@ -86,24 +82,28 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php $i=0; foreach ($invoices as $invoice): //pr($invoice);exit;
+						<?php $i=0; foreach ($invoices as $invoice): 
+						 
 						if($invoice->status=='Pending'){ $tr_color='#FFF'; }
 						if($invoice->status=='Cancel'){ $tr_color='#FFF'; }
 						?>
 						<?php if(sizeof($invoice->invoice_rows) > 0){ ?>
 						<tr>
 							<td><?php echo ++$i; ?></td>
-							<td><?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>
+							<td>
+							
+							<?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>
 							<?php if($invoice->sales_order_id != 0){ ?>
 							<td>
-							<?php 
+							
+							<?php if(in_array($invoice->sales_order->created_by,$allowed_emp)){
 							if($invoice->sales_order->gst == 'yes'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'gstConfirm',$invoice->sales_order->id],array('target'=>'_blank')); 
 							}else{
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'confirm',$invoice->sales_order->id],array('target'=>'_blank')); 
-							} ?>
+							} }?>
 							</td>
 							<?php }else{?>
 							<td></td><?php } ?>
@@ -124,7 +124,9 @@
 							<td><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 							<td align="right"><?= h($this->Number->format($invoice->total_after_pnf,['places'=>2])) ?></td>
 							<td class="actions">
-								<?php if($invoice->invoice_type=='GST'){ ?>
+							<?php
+							if(in_array($invoice->created_by,$allowed_emp)){
+								if($invoice->invoice_type=='GST'){ ?>
 									<?php 
 									if(in_array(27,$allowed_pages)){
 									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstConfirm', $invoice->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
@@ -144,7 +146,7 @@
 								 }
 								 
 								
-								}?>
+								} }?>
 								<?php
 								if($inventory_voucher=="true" ){
 								echo $this->Html->link('<i class="fa fa-repeat"></i>  Create Inventory Voucher','/Ivs/add/'.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
@@ -156,7 +158,7 @@
 								
 							</td>
 						</tr>
-						<?php } endforeach; ?>
+						 <?php }  endforeach; ?>
 					</tbody>
 				</table>
 				</div>

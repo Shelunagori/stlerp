@@ -33,7 +33,10 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php $i=0; foreach ($salesOrders as $salesOrder): ?>
+						<?php $i=0; foreach ($salesOrders as $salesOrder){ 
+						if($status=='Converted Into Invoice'){
+							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){ 
+						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
@@ -47,14 +50,33 @@
 							
 							
 							<td>
-								<?php if($total_sales[$salesOrder->id] != @$total_qty[@$salesOrder->id]){ 
-									echo "Pending";
-								}else{
+								<?php 
 									echo "Converted Into Invoice";
-								} ?>
+								?>
 							</td>
 						</tr>
-						<?php endforeach; ?>
+						<?php }} else { ?>
+							<?php if(@$total_sales[@$salesOrder->id] > @$total_qty[@$salesOrder->id]){ ?> 
+							<tr>
+							<td><?= h(++$i) ?></td>
+							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
+							<td><?= h($salesOrder->customer->customer_name) ?></td>
+							<?php if($salesOrder->quotation_id != 0){ ?>
+							<td>
+							<?php echo $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4; ?>
+							</td><?php }else{ ?><td>-</td><?php } ?>
+							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
+							<td><?= h($salesOrder->customer_po_no) ?></td>
+							
+							
+							<td>
+								<?php 
+									echo "Pending";
+								?>
+							</td>
+						</tr>
+							
+							<?php } } } ?>
 					</tbody>
 				</table>
 				

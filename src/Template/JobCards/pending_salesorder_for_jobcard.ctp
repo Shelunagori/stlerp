@@ -39,7 +39,7 @@
 					</tbody>
 				</table>
 				</form>
-			<?php $page_no=$this->Paginator->current('JobCards'); $page_no=($page_no-1)*20; ?>	 
+			<?php $page_no=0; ?>	 
 			<table class="table table-bordered table-striped ">
 				<thead>
 				<tr>
@@ -51,7 +51,9 @@
 					<th>Action</th>
 				</tr></thead>
 				<tbody>
-		    <?php foreach ($SalesOrders as $SalesOrder): ?>
+		    <?php foreach ($SalesOrders as $SalesOrder):
+				
+			?>
 				<tr>
 					<td><?= h(++$page_no) ?></td>
 					<td><?= h(($SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4))?></td> 
@@ -60,6 +62,7 @@
 					<td><?php echo $SalesOrder->customer_po_no; ?></td> 
 					
 					<td class="actions">
+						<?php if(in_array($SalesOrder->created_by,$allowed_emp)){ ?>
 						<?php if(sizeof($SalesOrder->job_card)==0){
 							if(sizeof($SalesOrder->sales_order_rows)>0){
 								echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Pre-Add?sales-order='.$SalesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
@@ -72,23 +75,16 @@
 							}else{
 								echo $this->Html->link('<i class="fa fa-repeat "></i> Edit Job Card',['action' => 'edit', $SalesOrder->job_card->id],array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 							}
-						} ?>
+						} } ?>
 					</td>
 				</tr>
-		    <?php endforeach; ?>
+				<?php  endforeach; ?>
 			 </tbody>
 			</table>
 		</div>
 	</div>
 </div>
-<div class="paginator">
-	<ul class="pagination">
-		<?= $this->Paginator->prev('< ' . __('previous')) ?>
-		<?= $this->Paginator->numbers() ?>
-		<?= $this->Paginator->next(__('next') . ' >') ?>
-	</ul>
-	<p><?= $this->Paginator->counter() ?></p>
-</div>
+
 </div>
 </div>
  
