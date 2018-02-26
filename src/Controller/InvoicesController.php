@@ -6249,8 +6249,10 @@ class InvoicesController extends AppController
 		//pr($email_to); 
 		$email_to=$invoice->sales_order->dispatch_email; //pr($email_to); exit;
 		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
-		
-		$sub='Dispatch Intimation - "'. h($invoice->company->name) .'"';
+		$d=urlencode($invoice->company->name);
+		$sub='Dispatch Intimation - "'. h($d) .'"';
+		$sub=(urldecode($sub));
+		//pr($sub); exit;
 		$message_web = '
 			<table  valign="center" width="100%" >
 				<tr>
@@ -6366,7 +6368,7 @@ class InvoicesController extends AppController
 		$attachments[]='Invoice_email/'.$name.'.pdf';
 		//$attachments[]="Invoice_email/Invoice-STL_IN515_BE-3421_17-18.pdf";
 		
-	//	pr($attachments); exit;
+		//pr($sub); exit;
 		$member_name="Gopal";
 		
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])
