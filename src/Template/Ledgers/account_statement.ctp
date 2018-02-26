@@ -152,6 +152,7 @@ $url_excel="/?".$url;
 					<tr>
 						<th>Transaction Date</th>
 						<th>Source</th>
+						<th>Voucher No</th>
 						<th>Reference</th>
 						<th>Party</th>
 						<th>GST</th>

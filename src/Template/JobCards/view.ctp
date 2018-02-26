@@ -89,6 +89,7 @@ margin-bottom: 0;
 		<th width="30%">Production</th>
 		<th width="30%">Consumption</th>
 	</thead>
+
 	<tbody>
 		<?php foreach ($jobCard->sales_order->sales_order_rows as $sales_order_row): ?>
 		<tr>
