@@ -6254,13 +6254,13 @@ class InvoicesController extends AppController
 		$sub=(urldecode($sub));
 		//pr($sub); exit;
 		$message_web = '
-			<table  valign="center" width="100%" >
+			<table  valign="center" width="62%" >
 				<tr>
 					<td align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;">'. h($invoice->company->name) .'
 					</td>
 				</tr>
 				<tr>
-					<td  style="width: 1em; word-wrap: break-word; font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>
+					<td  style="width: 1em; word-wrap: break-word;  font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>
 					'. h($invoice->customer->customer_name).'
 					
 					</td>
@@ -6295,7 +6295,7 @@ class InvoicesController extends AppController
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>With reference to above, please find herewith following dispatch documents:</td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' For Rs.'. h(round($invoice->grand_total,3)).'/- in duplicate.</td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' For Rs.'. h(number_format($invoice->grand_total,2)).'/- in duplicate.</td>
 				</tr>
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'.</td>
@@ -6325,8 +6325,11 @@ class InvoicesController extends AppController
 				//pr($message_web); exit;
 				$message_web.= '
 				<tr>
-					<td style="text-align:justify;font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(round($invoice->grand_total)) .'<br/>In favour of '. h(($company_data->name)).' In our account No '
-					. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',<br/>IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'</br></td>
+					<td>
+					<p style="text-align:justify;font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">
+					<br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(number_format($invoice->grand_total,2)) .'/-<br> In favour of '. h(($company_data->name)).'. In our account No '
+					. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'
+					</p></td>
 				</tr>
 				<tr></tr>
 				<tr></tr>
@@ -6352,15 +6355,14 @@ class InvoicesController extends AppController
 			</table>
 	   
 	';
-	
-		
+		 //pr($message_web);exit;
 		$email = new Email('default');
 		$email->transport('gmail');
 		$from_name=$company_data->alias;	
 		$cc_mail=$invoice->creator->email;
 		//$email_to="harkawat.priyanka0@gmail.com";
-		$email_to="gopalkrishanp3@gmail.com";
-		$cc_mail="harkawat.priyanka0@gmail.com";
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="harkawat.priyanka0@gmail.com";
 		//$cc_mail="priyankajinger143@gmail.com";
 		
 		$name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4)); 
@@ -6381,7 +6383,7 @@ class InvoicesController extends AppController
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
 					->attachments($attachments);; 
 					$email->send($message_web);
-					 pr($message_web);exit;
+					
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web;
 				$SendEmail->invoice_id=$id;
