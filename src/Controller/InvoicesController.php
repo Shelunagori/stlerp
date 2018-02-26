@@ -6381,7 +6381,7 @@ class InvoicesController extends AppController
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
 					->attachments($attachments);; 
 					$email->send($message_web);
-					 //pr($message_web);exit;
+					 pr($message_web);exit;
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web;
 				$SendEmail->invoice_id=$id;

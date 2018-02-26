@@ -141,7 +141,7 @@ $(document).ready(function() {
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'sendMail']); ?>";
 		url=url+'?id='+id+'&data='+json_data+'&otherData='+textdata;
-		
+		alert(url);
 		$.ajax({
 			url: url,
 			type: "GET",
