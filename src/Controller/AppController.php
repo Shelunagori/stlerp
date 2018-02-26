@@ -133,12 +133,12 @@ class AppController extends Controller
 			$employees_data= $this->EmployeeHierarchies->find()->where(['employee_id'=>$login_emp->employee_id])->first();
 			$allowed_emp=array();
 			
-			/* if($login_emp->employee_id==23){
+		if($login_emp->employee_id==23){
 				$employees_info= $this->Employees->find();
 				foreach($employees_info as $data1){ 
 					$allowed_emp[]=$data1->id; 
 				}
-			}else  */
+			}else 
 				if($employees_data){
 				$children = $this->EmployeeHierarchies
 				->find('children', ['for' =>$employees_data->id])

@@ -74,7 +74,7 @@
 				?>
 				
 				<tr>
-						<td><?php echo $ReferenceBalance['reference_no']; ?></td>
+						<td> <?= h(($Invoice_data[$key]->in1.'/IN-'.str_pad($Invoice_data[$key]->in2, 3, '0', STR_PAD_LEFT).'/'.$Invoice_data[$key]->in3.'/'.$Invoice_data[$key]->in4)) ?> </td>
 						<td><?php echo (date('d-m-Y',strtotime($ReferenceBalance['transaction_date']))); ?></td>
 						<td><?php echo (date('d-m-Y',strtotime($due_date))); ?></td>
 						<td>
