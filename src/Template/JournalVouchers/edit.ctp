@@ -406,6 +406,7 @@ $(document).ready(function() {
 		//delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_mian_amount_total();
+		do_ref_total();
 	});
 	
 	$('.addrefrow').live("click",function() {
@@ -442,12 +443,7 @@ $(document).ready(function() {
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"journal_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"journal_voucher_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
-		
-		
 	}
-	
-
-	
 	
 	$('.received_from').live("change",function() {
 		var sel=$(this);
