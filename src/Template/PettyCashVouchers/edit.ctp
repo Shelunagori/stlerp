@@ -441,6 +441,7 @@ $(document).ready(function() {
 		//delete_all_ref_no(sel);
 		$(this).closest("tr").remove();
 		do_mian_amount_total();
+		do_ref_total();
 	});
 	
 	$('.addrefrow').live("click",function() {

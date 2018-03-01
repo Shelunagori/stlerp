@@ -142,7 +142,24 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 			  $tr3_colspan=10; 
 			  $tr4_colspan=7; 
 			?>
-			
+			<?php 
+							$cgst_options=array();
+							$sgst_options=array();
+							$igst_options=array();
+							foreach($GstTaxes as $GstTaxe){
+								if($GstTaxe->cgst=="Yes"){
+									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->sgst=="Yes"){
+									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->igst=="Yes"){
+									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}
+								
+							}
+						?>
 			<div style="overflow: auto;">
 			<table class="table tableitm" id="main_tb" border="1" >
 				<thead>
@@ -168,33 +185,17 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 						<th align="right">Rs</th>
 						<th align="right">%</th>
 						<th align="right">Rs</th>
-						<th class="cgst_display" align="right">%</th>
+						<th class="cgst_display">%<?php echo $this->Form->input('common_cgst_per', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm common_cgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="cgst_display" align="right">Rs</th>
-						<th class="sgst_display" align="right">%</th>
+						<th class="sgst_display">%<?php echo $this->Form->input('common_sgst_per', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm common_sgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="sgst_display" align="right">Rs</th>
-						<th class="igst_display" align="right">%</th>
+						<th class="igst_display">%<?php echo $this->Form->input('common_igst_per', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm common_igst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="igst_display" align="right">Rs</th>
 					</tr>
 				</thead>
 				<tbody>
-					<?php 
-							$cgst_options=array();
-							$sgst_options=array();
-							$igst_options=array();
-							foreach($GstTaxes as $GstTaxe){
-								if($GstTaxe->cgst=="Yes"){
-									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->sgst=="Yes"){
-									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->igst=="Yes"){
-									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}
-								
-							}
-							
+					
+				<?php			
 					$total=0; $sum=0;
 					$q=0; foreach ($grn->grn_rows as $grn_rows):?>
 						<tr class="tr1" row_no='<?php echo @$grn_rows->id; ?>'>
@@ -324,10 +325,7 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 			</table>
 			</div>
 		</div>
-		
-		
-		
-					<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
+			<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
 				
 				<div class="row">
 					<div class="col-md-8">
@@ -762,6 +760,23 @@ $(document).ready(function() {
 		do_ref_total();
 	});
 	
+	$('.common_cgst_per').live("change",function() {
+	var common_cgst=$(this).find('option:selected').val();
+	$('.cgst_percent').val(common_cgst);
+	calculate_total();
+	});
+	
+	$('.common_sgst_per').live("change",function() {
+	var common_sgst=$(this).find('option:selected').val();
+	$('.sgst_percent').val(common_sgst);
+	calculate_total();
+	});
+	
+	$('.common_igst_per').live("change",function() {
+	var common_igst=$(this).find('option:selected').val();
+	$('.igst_percent').val(common_igst);
+	calculate_total();
+	});
 	$('.ref_type').live("change",function() {
 		var current_obj=$(this);
 		var ref_type=$(this).find('option:selected').val();

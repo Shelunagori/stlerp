@@ -492,7 +492,9 @@ if(!empty($copy))
 							echo $this->Form->input('dispatch_email', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email','value'=>$salesOrder->dispatch_email]); 
 							
 						}else{
-							echo $this->Form->input('dispatch_email', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email']); 
+							echo $this->Form->input('dispatch_email', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email 1']); 
+							echo $this->Form->input('dispatch_email2', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email 2']); 
+							echo $this->Form->input('dispatch_email3', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email 3']); 
 						}
 						 ?>
 					</div>
@@ -747,7 +749,15 @@ $(document).ready(function() {
 				maxlength: 10,
 			},
 			dispatch_email:{
-				required: true,
+				required: false,
+				email: true,
+			},
+			dispatch_email2:{
+				required: false,
+				email: true,
+			},
+			dispatch_email3:{
+				required: false,
 				email: true,
 			},
 			road_permit_required:{

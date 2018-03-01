@@ -132,6 +132,25 @@
 					</div>					
 				</div>
 				<div style="overflow: auto;">
+				
+					<?php
+							$cgst_options=array();
+							$sgst_options=array();
+							$igst_options=array();
+							foreach($GstTaxes as $GstTaxe){
+								if($GstTaxe->cgst=="Yes"){
+									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->sgst=="Yes"){
+									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->igst=="Yes"){
+									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}
+								
+							}
+				?>
 				<table class="table tableitm" id="main_tb" border="1" >
 				<thead>
 					<tr>
@@ -156,33 +175,16 @@
 						<th align="right">Rs</th>
 						<th align="right">%</th>
 						<th align="right">Rs</th>
-						<th class="cgst_display" align="right">%</th>
+						<th class="cgst_display">%<?php echo $this->Form->input('common_cgst_per', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm common_cgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="cgst_display" align="right">Rs</th>
-						<th class="sgst_display" align="right">%</th>
+						<th class="sgst_display">%<?php echo $this->Form->input('common_sgst_per', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm common_sgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="sgst_display" align="right">Rs</th>
-						<th class="igst_display" align="right">%</th>
+						<th class="igst_display">%<?php echo $this->Form->input('common_igst_per', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm common_igst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="igst_display" align="right">Rs</th>
 					</tr>
 				</thead>
 				<tbody>
-					<?php
-							$cgst_options=array();
-							$sgst_options=array();
-							$igst_options=array();
-							foreach($GstTaxes as $GstTaxe){
-								if($GstTaxe->cgst=="Yes"){
-									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->sgst=="Yes"){
-									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->igst=="Yes"){
-									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}
-								
-							}
-					
+				<?php
 					$q=0; foreach ($invoiceBooking->invoice_booking_rows as $invoice_booking_row): ?>
 						<tr class="tr1" row_no='<?php echo @$invoice_booking_row->id; ?>'>
 							<td rowspan="2"><?php echo ++$q; --$q; ?>
@@ -696,6 +698,23 @@ $(document).ready(function() {
 		add_ref_row();
 	});
 	
+	$('.common_cgst_per').live("change",function() {
+	var common_cgst=$(this).find('option:selected').val();
+	$('.cgst_percent').val(common_cgst);
+	calculate_total();
+	});
+	
+	$('.common_sgst_per').live("change",function() {
+	var common_sgst=$(this).find('option:selected').val();
+	$('.sgst_percent').val(common_sgst);
+	calculate_total();
+	});
+	
+	$('.common_igst_per').live("change",function() {
+	var common_igst=$(this).find('option:selected').val();
+	$('.igst_percent').val(common_igst);
+	calculate_total();
+	});
 	function add_ref_row(){
 		var tr=$("#sample_ref table.ref_table tbody tr").clone();
 		$("table.main_ref_table tbody").append(tr);

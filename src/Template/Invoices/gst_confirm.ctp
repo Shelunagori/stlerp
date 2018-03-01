@@ -146,6 +146,7 @@ $(document).ready(function() {
 			url: url,
 			type: "GET",
 		}).done(function(response) { 
+		alert(response);
 			alert("Email Send successfully")
 		}); 
 		

@@ -143,7 +143,7 @@
 						</tr>
 						
 						<?php } ?>
-						<?php if($to_date == date('d-m-Y') && !($stock_status== "All") ){ ?>
+						<?php if($to_date == date('d-m-Y') &&  !($stock_status=="Negative") ){ ?>
 						<?php $page_no1=$page_no; foreach($ItemDatas as $key=>$ItemData){ ?>
 						
 						<tr class="main_tr1" id="<?= h($key) ?>">

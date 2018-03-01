@@ -1485,7 +1485,22 @@ class InvoiceBookingsController extends AppController
 					$unit_rate = $this->updateIvsInItemRate($invoice_booking_row->item_id,$invoiceBooking->supplier_date);
 				}
 				//Reference Number coding
-					if(sizeof(@$ref_rows)>0){
+					if(sizeof(@$ref_rows)== 0){
+						$query = $this->InvoiceBookings->ReferenceDetails->query();
+							$query->insert(['ledger_account_id', 'invoice_booking_id', 'reference_no', 'credit', 'debit', 'reference_type','transaction_date'])
+							->values([
+								'ledger_account_id' => $v_LedgerAccount->id,
+								'invoice_booking_id' => $invoiceBooking->id,
+								'reference_no' =>$invoiceBooking->invoice_no,
+								'credit' => $invoiceBooking->total, 
+								'debit' => 0,
+								'reference_type' => 'New Reference',
+								'transaction_date' => $invoiceBooking->supplier_date
+							]);
+							
+							$query->execute();
+						
+					}else if(sizeof(@$ref_rows)>0){
 						
 						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;
@@ -1767,7 +1782,22 @@ class InvoiceBookingsController extends AppController
 				
 				//pr($invoiceBooking); exit;
 				//Reference Number coding 
-				if(sizeof(@$ref_rows)>0){
+				if(sizeof(@$ref_rows)== 0){
+						$query = $this->InvoiceBookings->ReferenceDetails->query();
+							$query->insert(['ledger_account_id', 'invoice_booking_id', 'reference_no', 'credit', 'debit', 'reference_type','transaction_date'])
+							->values([
+								'ledger_account_id' => $v_LedgerAccount->id,
+								'invoice_booking_id' => $invoiceBooking->id,
+								'reference_no' =>$invoiceBooking->invoice_no,
+								'credit' => $invoiceBooking->total, 
+								'debit' => 0,
+								'reference_type' => 'New Reference',
+								'transaction_date' => $invoiceBooking->supplier_date
+							]);
+							
+							$query->execute();
+						
+					}else if(sizeof(@$ref_rows)>0){
 						
 						foreach($ref_rows as $ref_row){ 
 							$ref_row=(object)$ref_row;

@@ -6247,7 +6247,10 @@ class InvoicesController extends AppController
 		//$email_to=$invoice->customer->customer_contacts[0]->email;
 		//
 		//pr($email_to); 
-		$email_to=$invoice->sales_order->dispatch_email; //pr($email_to); exit;
+		@$email_to[]=$invoice->sales_order->dispatch_email; //pr($email_to); exit;
+		$email_to[]=$invoice->sales_order->dispatch_email2;
+		$email_to[]=$invoice->sales_order->dispatch_email3;
+		//pr(@$email_to);exit;
 		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
 		$d=urlencode($invoice->company->name);
 		$sub='Dispatch Intimation - "'. h($d) .'"';
@@ -6359,10 +6362,10 @@ class InvoicesController extends AppController
 		$email = new Email('default');
 		$email->transport('gmail');
 		$from_name=$company_data->alias;	
-		$cc_mail=$invoice->creator->email;
+		//$cc_mail=$invoice->creator->email;
 		//$email_to="harkawat.priyanka0@gmail.com";
 		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="harkawat.priyanka0@gmail.com";
+		$cc_mail="harkawat.priyanka0@gmail.com";
 		//$cc_mail="priyankajinger143@gmail.com";
 		
 		$name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4)); 

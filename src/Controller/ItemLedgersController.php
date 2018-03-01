@@ -845,15 +845,16 @@ class ItemLedgersController extends AppController
 		
 		$itemSerialNumberStatus=[];
 		foreach($Items as $Item){ 
-			$ItemLedgersexists = $this->ItemLedgers->exists(['item_id' => $Item->id,'company_id'=>$st_company_id]);
-			$itemSerialNumberStatus[$Item->id]=@$Item->item_companies[0]->serial_number_enable;
-			
-			if(empty($ItemLedgersexists)){
-				$ItemDatas[$Item->id]=$Item->name;
-				$ItemUnits[$Item->id]=$Item->unit->name;
+			if(!empty($Item->item_companies)){
+				$ItemLedgersexists = $this->ItemLedgers->exists(['item_id' => $Item->id,'company_id'=>$st_company_id]);
+				$itemSerialNumberStatus[$Item->id]=@$Item->item_companies[0]->serial_number_enable;
+				
+				if(empty($ItemLedgersexists)){
+					$ItemDatas[$Item->id]=$Item->name;
+					$ItemUnits[$Item->id]=$Item->unit->name;
+				}
 			}
 		}
-
 		//pr($Items->toArray());
 	
 		//Stock valuation Start// disable   fhgdf

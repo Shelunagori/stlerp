@@ -275,6 +275,8 @@ $(document).ready(function() {
     });
     $('.deleterow').live("click",function() {
         $(this).closest("tr").remove();
+		do_mian_amount_total();
+		do_ref_total();
     });
     
     $('.addrefrow').live("click",function() {
