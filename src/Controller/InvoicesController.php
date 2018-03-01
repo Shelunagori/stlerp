@@ -6346,8 +6346,9 @@ class InvoicesController extends AppController
 					. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'
 					</p></td>
 				</tr>
-				<tr></tr>
-				<tr></tr>
+				<tr><td></td></tr>
+				<tr><td></td></tr>
+				
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><b>Regards,</b></td>
 				</tr>
