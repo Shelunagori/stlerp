@@ -3342,7 +3342,19 @@ class InvoicesController extends AppController
        // $this->set('_serialize', ['invoice','cgst_per','sgst_per','igst_per']);
     }
 	
-	
+	public function DispatchDownload($id = null)
+    {
+		$this->viewBuilder()->layout('');
+		
+		 $invoice = $this->Invoices->SendEmails->find()->contain(['Invoices'=>['Companies']])->first();
+		//pr($invoice);
+		//exit;
+		//pr($fright_ledger_igst); exit;
+	//pr($invoice); exit;
+        //$this->set('invoice', $invoice);
+		$this->set(compact('invoice'));
+       // $this->set('_serialize', ['invoice','cgst_per','sgst_per','igst_per']);
+    }
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');

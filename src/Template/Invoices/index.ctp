@@ -155,10 +155,11 @@
 								if($sales_return=="true" && $invoice->sale_return_status=='No'){
 								echo $this->Html->link('<i class="fa fa-repeat"></i>  Sale Return','/SaleReturns/Add?invoice='.$invoice->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								} ?>
-								
+								<?php echo $this->Html->link('<i class="fa fa-download"></i>',['action' => 'dispatch_download', $invoice->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'View Dispatch Document'));  
+								?>
 							</td>
 						</tr>
-						 <?php }  endforeach; ?>
+							<?php }  endforeach; ?>
 					</tbody>
 				</table>
 				</div>
