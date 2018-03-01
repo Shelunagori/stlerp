@@ -108,7 +108,7 @@ class ItemLedgersController extends AppController
 		
 		if($source_model=="Inventory Vouchers"){ //echo "IV"; exit;
 			$InventoryVoucher=$this->ItemLedgers->Ivs->get($source_id);
-			//pr($InventoryVoucher); exit;
+			pr($InventoryVoucher); 
 			return ['voucher_info'=>$InventoryVoucher,'party_type'=>'-','party_info'=>''];
 		}
 		if($source_model=="Invoices"){
@@ -1429,7 +1429,7 @@ class ItemLedgersController extends AppController
 		
 		$company_names=array_filter($company_name);
 	
-			foreach($company_names[0] as $names){   
+			foreach(@$company_names[0] as $names){   
 					$where1['SalesOrders.company_id IN'][]=$names;
 					$where2['JobCards.company_id IN'][]=$names;
 					$where3['PurchaseOrders.company_id IN'][]=$names;

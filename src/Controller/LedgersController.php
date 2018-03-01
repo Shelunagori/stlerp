@@ -616,47 +616,133 @@ class LedgersController extends AppController
 		$ReferenceBalance_due_date=[];
 		if($ledger_account_id)
 		{
-		$Ledger_Account_data = $this->Ledgers->LedgerAccounts->get($ledger_account_id, [
-        'contain' => ['AccountSecondSubgroups'=>['AccountFirstSubgroups'=>['AccountGroups'=>['AccountCategories']]]] ]);
-		$customer_data=0;
-		if($Ledger_Account_data->source_model=='Customers'){
-			$customer_data = $this->Ledgers->LedgerAccounts->Customers->get($Ledger_Account_data->source_id);
-			//pr($customer_data); exit;
-		}
-		if($Ledger_Account_data->source_model=='Vendors'){
-			$customer_data = $this->Ledgers->Vendors->get($Ledger_Account_data->source_id);
-			//pr($customer_data); exit;
-		}
-		
+			
 		$query = $this->Ledgers->ReferenceDetails->find();
-		$query->select(['total_debit' => $query->func()->sum('ReferenceDetails.debit'),'total_credit' => $query->func()->sum('ReferenceDetails.credit')])
+		$query
 		->where(['ReferenceDetails.ledger_account_id'=>$ledger_account_id])
-		->group(['ReferenceDetails.reference_no'])
 		->autoFields(true);
-		$referenceDetails=$query;
+		$referenceDetails=$query->order(['transaction_date' => 'ASC']);
+		$DueReferenceBalances=[];
+		$refInvoiceNo=[];
+		$refInvoiceBookingNo=[];
 		$ReferenceBalances=[];
 		$on_dr=0;
 		$on_cr=0;
-		$Invoice_data=[];
-		//pr($referenceDetails->toArray());
-		foreach($referenceDetails as $referenceDetail){ 
-			if($referenceDetail->invoice_id >0){
-				$Invoice_data[$referenceDetail->id] = $this->Ledgers->Invoices->get($referenceDetail->invoice_id);
-				//pr($Invoice_data); exit;	
+		$Voucher_data=[];
+	
+			//pr($referenceDetails->toArray()); exit;
+		$Ledger_Account_data = $this->Ledgers->LedgerAccounts->get($ledger_account_id, [
+        'contain' => ['AccountSecondSubgroups'=>['AccountFirstSubgroups'=>['AccountGroups'=>['AccountCategories']]]] ]);
+		$customer_data=0;
+		if($Ledger_Account_data->source_model=='Customers'){ //pr($referenceDetails->toArray()); exit;
+			$customer_data = $this->Ledgers->LedgerAccounts->Customers->get($Ledger_Account_data->source_id);
+			foreach($referenceDetails as $referenceDetail){
+			if($referenceDetail->debit > 0){ 
+				if($referenceDetail->invoice_id > 0){
+					$Invoice_data[$referenceDetail->invoice_id] = $this->Ledgers->Invoices->get($referenceDetail->invoice_id);
+					$refInvoiceNo[$referenceDetail->reference_no]=$referenceDetail->invoice_id;
+					$Invoice_data1 = $this->Ledgers->Invoices->get($referenceDetail->invoice_id);
+					$Voucher_data[$referenceDetail->reference_no] = @$Invoice_data1->in1.'/IN-'.str_pad(@$Invoice_data1->in2, 3, '0', STR_PAD_LEFT).'/'.@$Invoice_data1->in3.'/'.@$Invoice_data1->in4;
+				}
+				if($referenceDetail->receipt_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Ledgers->Receipts->get($referenceDetail->receipt_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->journal_voucher_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Ledgers->JournalVouchers->get($referenceDetail->journal_voucher_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->payment_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Ledgers->Payments->get($referenceDetail->payment_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->opening_balance == "Yes"){  //pr($referenceDetail->reference_no); 
+					$d="Opening balance"; 
+					$Voucher_data[$referenceDetail->reference_no]= $d;
+					 
+				}
+				
 			}
-			if($referenceDetail->total_debit!=$referenceDetail->total_credit){ //pr($referenceDetail);
-				$ReferenceBalances[$referenceDetail->id]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->total_debit,'credit' =>$referenceDetail->total_credit,'reference_type'=>$referenceDetail->reference_type];
+			if($referenceDetail->debit!=$referenceDetail->credit){ 
+				@$DueReferenceBalances[@$referenceDetail->reference_no]+=@$referenceDetail->debit-@$referenceDetail->credit;
+				$ReferenceBalances[$referenceDetail->reference_no]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type,'opening_balance'=>$referenceDetail->opening_balance,'invoice_id'=>$referenceDetail->invoice_id];
+				
+				//pr($referenceDetail->invoice_id);
 			}
 			
-			if($referenceDetail->reference_type=="On_account"){  
-				if($referenceDetail->total_debit > $referenceDetail->total_credit){
-					$on_dr+=$referenceDetail->total_debit-$referenceDetail->total_credit;
+			if($referenceDetail->reference_type=="On_account"){ 
+				if($referenceDetail->debit > $referenceDetail->credit){
+					$on_dr+=$referenceDetail->debit;
 				}else{
-					$on_cr+=$referenceDetail->total_credit-$referenceDetail->total_debit;
+					$on_cr+=$referenceDetail->credit;
 				}
 				
 			}
 		}
+			
+		}  
+	
+		if($Ledger_Account_data->source_model=='Vendors'){ //pr($referenceDetails->toArray()); exit;
+			$customer_data = $this->Ledgers->Vendors->get($Ledger_Account_data->source_id);
+			
+			foreach($referenceDetails as $referenceDetail){ 
+			if($referenceDetail->credit > 0){
+				if($referenceDetail->invoice_booking_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$refInvoiceBookingNo[$referenceDetail->reference_no] = $this->Ledgers->InvoiceBookings->get($referenceDetail->invoice_booking_id, [
+									'contain' => ['Grns'=>['PurchaseOrders']]
+								]);
+					$Invoice_booking_data = $this->Ledgers->InvoiceBookings->get($referenceDetail->invoice_booking_id);
+					//pr($Invoice_booking_data); exit;
+					$Voucher_data[$referenceDetail->reference_no]=@$Invoice_booking_data->invoice_no;
+					
+				}
+				if($referenceDetail->receipt_id > 0){  
+					$Invoice_booking_data = $this->Ledgers->Receipts->get($referenceDetail->receipt_id);
+					//pr($Invoice_booking_data); exit; 
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->journal_voucher_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Ledgers->JournalVouchers->get($referenceDetail->journal_voucher_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->payment_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Ledgers->Payments->get($referenceDetail->payment_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->opening_balance == "Yes"){  //pr($referenceDetail->reference_no); 
+					//$Invoice_booking_data = $this->Ledgers->Receipts->get($referenceDetail->receipt_id);
+					$d="Opening balance"; 
+					$Voucher_data[$referenceDetail->reference_no]= $d;
+					 
+				}
+				
+			}
+			if($referenceDetail->debit!=$referenceDetail->credit){ //pr($referenceDetail);
+				@$DueReferenceBalances[@$referenceDetail->reference_no]+=@$referenceDetail->debit-@$referenceDetail->credit;
+				$ReferenceBalances[$referenceDetail->reference_no]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type,'opening_balance'=>$referenceDetail->opening_balance];
+			}
+			
+			if($referenceDetail->reference_type=="On_account"){ 
+				if($referenceDetail->debit > $referenceDetail->credit){
+					$on_dr+=$referenceDetail->debit;
+				}else{
+					$on_cr+=$referenceDetail->credit;
+				}
+				
+			}
+		}
+		}
+		//pr($on_cr); exit;
+
+	
+	
+	//	pr($ReferenceBalances); exit;
 		$ledger=$this->Ledgers->LedgerAccounts->find('list',
 			['keyField' => function ($row) {
 				return $row['id'];
@@ -686,7 +772,7 @@ class LedgersController extends AppController
 			}])->where(['company_id'=>$st_company_id]);
 		}
 		
-		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data'));
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data','DueReferenceBalances','Voucher_data','refInvoiceNo','refInvoiceBookingNo','Invoice_booking_data'));
 	}
 	
 	public function excelExportAccountRef(){

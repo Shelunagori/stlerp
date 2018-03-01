@@ -14,25 +14,25 @@
 		<div class="actions">
 		<?php 
 			if(sizeof($company_name)==1 && in_array(166,$allowed_pages)){
-			foreach($company_name as $names){			
+			foreach($company_name as $names){	 
 						if(@$names == @$st_company_id){ ?>
 			<?= $this->Html->link(
 					'Add To Bucket',
 					'/MaterialIndents/AddToCart',
 					['class' => 'btn btn-success']
-			); }}}?>
+			); ?><?php  }}}?>
 			<!--<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/ItemLedgers/Excel-Metarial-Export/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>-->
 		</div>
 		<div class="portlet-body">
-					<form method="GET" >
+			<form method="GET" >
 			<table width="50%" class="table table-condensed">
 				<tbody>
 					<tr>
 						<td width="35%">
 						<?php if(!empty($company_name)){ ?>
-								<?php echo $this->Form->input('company_name', ['options' => $Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=> $company_name]); ?>
+								<?php echo $this->Form->input('company_name', ['hiddenField'=>false,'options' =>$Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=>$company_name]); ?>
 						<?php }else{ ?>  
-							<?php echo $this->Form->input('company_name', ['options' => $Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=> $st_company_id]); ?>
+							<?php echo $this->Form->input('company_name', ['hiddenField'=>false,'options' =>$Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=>$st_company_id]); ?>
 						<?php } ?>		
 						</td>
 						<td width="15%">
@@ -87,7 +87,7 @@
 						</tr>
 					</thead>
 					<tbody  >
-						<?php echo $stock;  $i=1; foreach($material_report as $data){
+						<?php  $i=1; foreach($material_report as $data){
 							$item_id=$data['item_id'];
 							$Current_Stock=$data['Current_Stock'];
 							$total_invoice_qty=@$invoice_qty[$data['item_id']]; 
@@ -227,7 +227,9 @@
 						?>
 						
 						<?php $i++; }  ?>
-						<?php foreach($ItemDatas as $key=>$ItemData){ ?>
+						<?php 
+						if(empty(@$item_name) || empty(@$item_category) || $stock=="All"){
+						foreach($ItemDatas as $key=>$ItemData){ ?>
 									<tr class="tr1" row_no='<?php echo @$i; ?>'>
 										<td ><?php echo $i++; ?> </td>
 										<td style="text-align:center"><?php echo $ItemData; ?></td>
@@ -245,13 +247,13 @@
 										<td align="center">
 											<label class="hello">
 											
-															<button type="button" id="item<?php echo $ItemData;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $ItemData; ?>" suggestindent="0"><i class="fa fa-plus"></i></button>
+															<button type="button" id="item<?php echo $key;?>" class="btn btn-primary btn-sm add_to_bucket" item_id="<?php echo $key; ?>" suggestindent="0"><i class="fa fa-plus"></i></button>
 											</label>
 										</td>
 									
 									
 									</tr>
-							<?php }
+						<?php }}
 							
 						?>
 						

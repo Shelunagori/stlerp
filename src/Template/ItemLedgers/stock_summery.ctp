@@ -228,7 +228,7 @@ var $rows = $('#main_tble tbody tr');
 		var from_date = $("#from_date").val();
 		var to_date = $("#to_date").val();
 		var url="<?php echo $this->Url->build(['controller'=>'ItemLedgers','action'=>'fetchLedger']); ?>";
-		url=url+'/'+item_id+'/'+from_date+'/'+to_date;
+		url=url+'/'+item_id+'/'+from_date+'/'+to_date; alert(url);
 	       $.ajax({
 				url: url,
 				type: 'GET',
