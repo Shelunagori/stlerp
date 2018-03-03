@@ -749,7 +749,7 @@ $(document).ready(function() {
 				maxlength: 10,
 			},
 			dispatch_email:{
-				required: false,
+				required: true,
 				email: true,
 			},
 			dispatch_email2:{

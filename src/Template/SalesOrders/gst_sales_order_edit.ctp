@@ -375,7 +375,9 @@
 				<div class="col-md-3">
 					<div class="form-group">
 						<label class="control-label">Email <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('dispatch_email', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email']); ?>
+						<?php echo $this->Form->input('dispatch_email', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email']); 
+						echo $this->Form->input('dispatch_email2', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email 2']); 
+						echo $this->Form->input('dispatch_email3', ['type'=>'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Email 3']); ?>
 					</div>
 				</div>
 				<div class="col-md-3">
@@ -599,6 +601,14 @@ $(document).ready(function() {
 			},
 			dispatch_email:{
 				required: true,
+				email: true,
+			},
+			dispatch_email2:{
+				required: false,
+				email: true,
+			},
+			dispatch_email3:{
+				required: false,
 				email: true,
 			},
 			road_permit_required:{

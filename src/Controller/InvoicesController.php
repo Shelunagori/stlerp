@@ -112,9 +112,9 @@ class InvoicesController extends AppController
 				
 			//pr($invoices);exit;
 		}else if($sales_return=='true'){
-			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
 		} 
 		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
@@ -3350,7 +3350,8 @@ class InvoicesController extends AppController
 							'Companies'=> ['CompanyBanks'=> function ($q) {
 								return $q
 								->where(['CompanyBanks.default_bank' => 1]);
-								}]]])->order(['SendEmails.id'=>'DESC'])->first();
+								}]]])->where(['SendEmails.invoice_id' => $id
+								])->order(['SendEmails.id'=>'DESC'])->first();
 		//pr($invoice);
 		//exit;
 		//pr($fright_ledger_igst); exit;
@@ -6264,8 +6265,12 @@ class InvoicesController extends AppController
 		//
 		//pr($email_to); 
 		@$email_to[]=$invoice->sales_order->dispatch_email; //pr($email_to); exit;
-		$email_to[]=$invoice->sales_order->dispatch_email2;
-		$email_to[]=$invoice->sales_order->dispatch_email3;
+		if(!empty($invoice->sales_order->dispatch_email2)){
+			$email_to[]=$invoice->sales_order->dispatch_email2;
+		}
+		if(!empty($invoice->sales_order->dispatch_email3)){
+			$email_to[]=$invoice->sales_order->dispatch_email3;
+		}
 		//pr(@$email_to);exit;
 		//pr($invoice->invoice_rows[0]->item->item_group->name); exit;
 		$d=urlencode($invoice->company->name);

@@ -38,12 +38,13 @@ class CreditNotesTable extends Table
         $this->table('credit_notes');
         $this->displayField('id');
         $this->primaryKey('id');
-		$this->belongsTo('Ledgers');
-		$this->belongsTo('VouchersReferences');
-		$this->belongsTo('FinancialYears');		
-		$this->belongsTo('ReferenceBalances');
-		$this->belongsTo('ReferenceDetails');
 		
+		$this->belongsTo('VouchersReferences');
+        $this->belongsTo('FinancialYears');
+        $this->belongsTo('FinancialMonths');
+        $this->belongsTo('ReferenceBalances');
+        $this->belongsTo('ReferenceDetails');
+        $this->belongsTo('Ledgers');
         $this->belongsTo('CustomerSuppilers', [
 			'className'=>'LedgerAccounts',
             'foreignKey' => 'customer_suppiler_id',
@@ -56,6 +57,11 @@ class CreditNotesTable extends Table
             'joinType' => 'INNER'
         ]);
 
+		$this->belongsTo('ReceivedFroms', [
+			'className' => 'LedgerAccounts',
+            'foreignKey' => 'received_from_id',
+            'propertyName' => 'ReceivedFrom',
+        ]);
 		$this->belongsTo('Creator', [
 			'className' => 'Employees',
 			'foreignKey' => 'created_by',

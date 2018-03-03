@@ -64,12 +64,38 @@ class CreditNotesController extends AppController
     public function add()
     {
 		$this->viewBuilder()->layout('index_layout');
-        $creditNote = $this->CreditNotes->newEntity();
+		
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-        $st_year_id = $session->read('st_year_id');
+		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->CreditNotes->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->CreditNotes->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->CreditNotes->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+		
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+			   $tody1 = date("Y-m-d");
+
+			   $fromdate = strtotime($fromdate1);
+			   $todate = strtotime($todate1); 
+			   $tody = strtotime($tody1);
+
+			  if($fromdate < $tody || $todate > $tody)
+			   {
+				 if($SessionCheckDate['status'] == 'Open')
+				 { $chkdate = 'Found'; }
+				 else
+				 { $chkdate = 'Not Found'; }
+
+			   }
+			   else
+				{
+					$chkdate = 'Not Found';	
+				}
+		
+        $creditNote = $this->CreditNotes->newEntity();
 		
 		if ($this->request->is('post')) {
 			$creditNote = $this->CreditNotes->patchEntity($creditNote, $this->request->data);
@@ -156,68 +182,39 @@ class CreditNotesController extends AppController
 		}
 		
 		
-			$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Purchase Account'])->first();
-			$CreditNotesSalesAccount=$vr->id;
-			$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
-				'contain' => ['VoucherLedgerAccounts']
-			]);
 			
-			$where=[];
-			foreach($vouchersReferences->voucher_ledger_accounts as $data){
-				$where[]=$data->ledger_account_id;
-			}
 			
-			if(sizeof($where)>0){
-				$customer_suppiler_id = $this->CreditNotes->CustomerSuppilers->find('list',
-					['keyField' => function ($row) {
-						return $row['id'];
-					},
-					'valueField' => function ($row) {
-						if(!empty($row['alias'])){
-							return  $row['name'] . ' (' . $row['alias'] . ')';
-						}else{
-							return $row['name'];
-						}
-						
-					}])->where(['CustomerSuppilers.id IN' => $where]);
-			}
-			else{
-				$ErrorsalesAccs='true';
-			}
-			
+		$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();
+		$ReceiptVouchersReceivedFrom=$vr->id;
+		$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
+            'contain' => ['VoucherLedgerAccounts']
+        ]);
+		$where=[];
+		foreach($vouchersReferences->voucher_ledger_accounts as $data){
+			$where[]=$data->ledger_account_id;
+		}
+		$ReceivedFroms_selected='yes';
+		if(sizeof($where)>0){
+			$receivedFroms = $this->CreditNotes->ReceivedFroms->find('list',
+				['keyField' => function ($row) {
+					return $row['id'];
+				},
+				'valueField' => function ($row) {
+					if(!empty($row['alias'])){
+						return  $row['name'] . ' (' . $row['alias'] . ')';
+					}else{
+						return $row['name'];
+					}
+					
+				}])->where(['ReceivedFroms.id IN' => $where]);
+		}else{
+			$ReceivedFroms_selected='no';
+		}
 		
-		
-			$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();	
-			$CreditNotesParty=$vr->id;
-			$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
-				'contain' => ['VoucherLedgerAccounts']
-			]);
-			$where=[];
-			foreach($vouchersReferences->voucher_ledger_accounts as $data){
-				  $where[]=$data->ledger_account_id;
 			
-			}
-			if(sizeof($where)>0){
-				$heads = $this->CreditNotes->Heads->find('list',
-					['keyField' => function ($row) {
-						return $row['id'];
-					},
-					'valueField' => function ($row) {
-						if(!empty($row['alias'])){
-							return  $row['name'] . ' (' . $row['alias'] . ')';
-						}else{
-							return $row['name'];
-						}
-						
-					}])->where(['Heads.id IN' => $where]);
-			
-			}
-			else{
-				$Errorparties='true';
-			}
 
 			$companies = $this->CreditNotes->Companies->find('all');
-			$this->set(compact('creditNote', 'customer_suppiler_id', 'heads', 'companies','ErrorsalesAccs','Errorparties','financial_year','CreditNotesParty','CreditNotesSalesAccount'));
+			$this->set(compact('creditNote', 'customer_suppiler_id', 'receivedFroms', 'companies','ErrorsalesAccs','Errorparties','financial_year','CreditNotesParty','CreditNotesSalesAccount','chkdate','financial_month_first','financial_month_last'));
 			$this->set('_serialize', ['creditNote']);
     }
 
@@ -427,7 +424,7 @@ class CreditNotesController extends AppController
 
         $customerSuppilers = $this->CreditNotes->CustomerSuppilers->find('list', ['limit' => 200]);
         $companies = $this->CreditNotes->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('creditNote', 'customerSuppilers', 'companies','heads','customer_suppiler_id','ReferenceDetails','financial_year'));
+        $this->set(compact('creditNote', 'customerSuppilers', 'companies','heads','customer_suppiler_id','ReferenceDetails','financial_year','chkdate','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['creditNote']);			
 
 	}	

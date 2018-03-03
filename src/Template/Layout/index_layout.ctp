@@ -532,7 +532,7 @@ select
 					</ul>
 				</li>
 				<?php } ?>
-				<?php if(in_array(118,$allowed_pages) ||in_array(119,$allowed_pages)||in_array(90,$allowed_pages)||in_array(91,$allowed_pages)|| in_array(92,$allowed_pages) ||in_array(93,$allowed_pages)||in_array(94,$allowed_pages)||in_array(95,$allowed_pages)|| in_array(96,$allowed_pages) ||in_array(97,$allowed_pages)||in_array(98,$allowed_pages)||in_array(99,$allowed_pages)|| in_array(100,$allowed_pages) ||in_array(101,$allowed_pages)||in_array(102,$allowed_pages)||in_array(103,$allowed_pages)|| in_array(104,$allowed_pages) ||in_array(105,$allowed_pages)||in_array(106,$allowed_pages)||in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)||in_array(110,$allowed_pages)||in_array(111,$allowed_pages)|| in_array(112,$allowed_pages) ||in_array(113,$allowed_pages)||in_array(114,$allowed_pages)||in_array(115,$allowed_pages)|| in_array(116,$allowed_pages) ||in_array(117,$allowed_pages)){ ?>
+				<?php if(in_array(118,$allowed_pages) ||in_array(119,$allowed_pages)||in_array(90,$allowed_pages)||in_array(91,$allowed_pages)|| in_array(92,$allowed_pages) ||in_array(93,$allowed_pages)||in_array(94,$allowed_pages)||in_array(95,$allowed_pages)|| in_array(96,$allowed_pages) ||in_array(97,$allowed_pages)||in_array(98,$allowed_pages)||in_array(99,$allowed_pages)|| in_array(100,$allowed_pages) ||in_array(101,$allowed_pages)||in_array(102,$allowed_pages)||in_array(103,$allowed_pages)|| in_array(104,$allowed_pages) ||in_array(105,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)||in_array(110,$allowed_pages)||in_array(111,$allowed_pages)|| in_array(112,$allowed_pages) ||in_array(113,$allowed_pages)||in_array(114,$allowed_pages)||in_array(115,$allowed_pages)|| in_array(116,$allowed_pages) ||in_array(117,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-puzzle-piece"></i>
@@ -627,40 +627,7 @@ select
 							</ul>
 						</li>
 						<?php } ?>
-						<!--<?php if(in_array(106,$allowed_pages)||in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
-						<li>
-							<a href="javascript:;">
-							<i class="icon-basket"></i>
-							<span class="title">Credit Note</span>
-							<span class="arrow "></span>
-							</a>
-							<ul class="sub-menu">
-							<?php if(in_array(106,$allowed_pages)){ ?>
-								<li><?php echo $this->Html->link( 'Add', '/CreditNotes/add' ); ?></li>
-							<?php } ?>
-							<?php if(in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
-								<li><?php echo $this->Html->link( 'View', '/CreditNotes' ); ?></li>
-							<?php } ?>
-							</ul>
-						</li>
-						<?php } ?>
-						<?php if(in_array(110,$allowed_pages)||in_array(111,$allowed_pages)|| in_array(112,$allowed_pages) ||in_array(113,$allowed_pages)){ ?>
-						<li>
-							<a href="javascript:;">
-							<i class="icon-basket"></i>
-							<span class="title">Debit Notes</span>
-							<span class="arrow "></span>
-							</a>
-							<ul class="sub-menu">
-							<?php if(in_array(110,$allowed_pages)){ ?>
-								<li><?php echo $this->Html->link( 'Add', '/DebitNotes/add' ); ?></li>
-							<?php } ?>
-							<?php if(in_array(111,$allowed_pages)|| in_array(112,$allowed_pages) ||in_array(113,$allowed_pages)){ ?>
-								<li><?php echo $this->Html->link( 'View', '/DebitNotes' ); ?></li>
-							<?php } ?>
-							</ul>
-						</li>
-						<?php } ?>-->
+						
 						<?php if(in_array(114,$allowed_pages)||in_array(115,$allowed_pages)|| in_array(116,$allowed_pages) ||in_array(117,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">

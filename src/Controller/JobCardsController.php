@@ -124,7 +124,7 @@ class JobCardsController extends AppController
 			foreach($jc->sales_order->sales_order_rows as $sales_order_row){ 
 					$Item_data=$this->JobCards->SalesOrders->SalesOrderRows->Items->get($sales_order_row->item_id);
 					if($Item_data->source=="Purchessed/Manufactured" or $Item_data->source=="Manufactured"){
-						if($sales_order_row->source_type=="Manufactured" or$sales_order_row->source_type==""){
+						if($sales_order_row->source_type=="Manufactured" or $sales_order_row->source_type==""){
 							@$SalesOrderQty[@$sales_order_row['sales_order_id']]+=@$sales_order_row['quantity'];
 						}	
 					}
@@ -138,7 +138,7 @@ class JobCardsController extends AppController
 				foreach($invoice->invoice_rows as $invoice_row){
 					$Item_details=$this->JobCards->SalesOrders->SalesOrderRows->Items->get($invoice_row->item_id);	
 						if($Item_details->source=="Purchessed/Manufactured" or $Item_details->source=="Manufactured" or $Item_details->source=="Assembled"){
-						if($sales_order_row->source_type=="Manufactured" or$sales_order_row->source_type==""){					
+						if($sales_order_row->source_type=="Manufactured" or $sales_order_row->source_type==""){					
 							@$InvoiceQty[@$invoice->sales_order_id]+=@$invoice_row->quantity;
 							$outExist = $this->JobCards->SalesOrders->Invoices->Ivs->exists(['Ivs.invoice_id' => $invoice->id]);
 							if($outExist > 0){

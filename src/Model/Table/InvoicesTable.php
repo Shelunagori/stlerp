@@ -111,7 +111,7 @@ class InvoicesTable extends Table
 		$this->belongsTo('InvoiceBookings');
 		$this->belongsTo('Filenames');
 		$this->belongsTo('DispatchDocuments');
-		$this->belongsTo('SendEmails');
+		$this->hasMany('SendEmails',['foreignKey' => 'invoice_id']);
 		
 		 $this->hasOne('Ivs', [
             'foreignKey' => 'invoice_id',
