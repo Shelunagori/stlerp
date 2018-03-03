@@ -10,7 +10,7 @@ $dompdf = new Dompdf($options);
 $dompdf = new Dompdf();
 
 
-//$description =  wordwrap($invoice->delivery_description,25,'<br/>');
+//$description =  wordwrap($invoice->invoice->delivery_description,25,'<br/>');
 //pr($description);exit;
 $html = '
 <html>
@@ -58,12 +58,12 @@ $html = '
 		page-break-inside: avoid;
 	}
 	.table_rows, .table_rows th, .table_rows td {
-	    border: 1px solid  #000; 
-		border-collapse: collapse;
+	    //border: 1px solid  #000; 
+		//border-collapse: collapse;
 		padding:2px; 
 	}
 	.itemrow tbody td{
-		border-bottom: none;border-top: none;
+		//border-bottom: none;border-top: none;
 	}
 	
 	.table2 td{
@@ -76,12 +76,12 @@ $html = '
 		border: 0px solid  #000;padding:0px; 
 	}
 	.table_rows th{
-		border: 1px solid  #000;
-		font-size:'. h($invoice->pdf_font_size).' !important;
+		
+		font-size:'. h($invoice->invoice->pdf_font_size).' !important;
 	}
 	.table_rows td{
-		border: 1px solid  #000;
-		font-size:'. h($invoice->pdf_font_size).' !important;
+		
+		font-size:'. h($invoice->invoice->pdf_font_size).' !important;
 	}
 	.avoid_break{
 		page-break-inside: avoid;
@@ -98,11 +98,6 @@ $html = '
 <body>
   <div id="header" ><br/>	
 		<table width="100%">
-			<tr>
-				<td colspan="3" align="right">
-				<span style="font-size: 13px;margin:0;"><b>'. h($invoice->pdf_to_print) .'</b></span>
-				</td>
-			</tr>
 			<tr>
 				<td width="35%" rowspan="2" valign="bottom">
 				<img src='.ROOT . DS  . 'webroot' . DS  .'logos/'.$invoice->invoice->company->logo.' height="80px" />
@@ -129,14 +124,84 @@ $html = '
 		</table>
   </div>
  
-<div id="content"> '
-.$invoice->send_data.'</div>
+
+  
+  <div id="content"> ';
+  
+  $html.='
+ 
+<table width="100%" class="table_rows itemrow" style="">
+	<thead>
+		<tr class="show">
+			<td align="">';
+				$html.='
+					<table  valign="center" width="100%"  class="table2">
+						<tr>
+							<td style="width: 1em; word-wrap: break-word;  font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">
+								<span><b>'. h($invoice->invoice->customer->customer_name) .'</b></span><br/>
+								
+								'. $this->Text->autoParagraph(h($invoice->invoice->customer_address));
+								
+                            $html.=' </td>
+						</tr>
+						<tr>
+						<td></td>
+						</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="padding-top:15px; font-family:Palatino Linotype;  font-size:'. h(($invoice->invoice->pdf_font_size)) .';">Attn
+			<span><b>:</b></span>
+			<span>'. h($invoice->invoice->sales_order->dispatch_name) .'</span><br/>
+			</td>
+		</tr>
+		<tr><td colspan="2"  style="padding-top:15px; font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';">Sub
+			<span><b>:</b></span>
+			<span>Dispatch Intimation</span><br/>
+			</td>
+		</tr>
+		<tr><td colspan="2"  style="padding-top:15px; font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';">Ref
+			<span><b>:</b></span>
+			<span>Your Purchase Order No.'. h($invoice->invoice->customer_po_no) .' dated '. h(date("d-m-Y",strtotime($invoice->invoice->po_date))) .'</span><br/>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"  style="padding-top:15px; font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';">Dear Sir, </td>
+		</tr>
+		<tr>
+			<td  colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br/>With reference to above, please find herewith following dispatch documents:</td>
+		</tr>
+		<tr>
+			<td  colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->invoice->in1."/"."IN-".str_pad($invoice->invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->invoice->in3."/".$invoice->invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->invoice->date_created))).' For Rs.'. h(number_format($invoice->invoice->grand_total,2)).'/- in duplicate.</td>
+		</tr>
+		<tr>
+			<td  colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->invoice->date_created))).' of '. h(($invoice->invoice->transporter->transporter_name)).' '. h(($invoice->invoice->delivery_description)).'.</td>
+		</tr>'  .$invoice->send_data . '
+		<tr>
+			<td  colspan="2" style="line-height:20px;padding-right:40px; text-align:justify; font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';">
+				<br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(number_format($invoice->invoice->grand_total,2)) .'/- In favour of '. h(($company_data->name)).'. In our account No '
+					. h(($invoice->invoice->company->company_banks[0]->account_no)).' of '.h($invoice->invoice->company->company_banks[0]->bank_name) .','. h( $invoice->invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->invoice->company->pan_no)).'
+			</td>
+		</tr>
+				
+				<tr>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br/><b>Regards,</b></td>
+				</tr>
+				<tr>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"></br>'.h($invoice->invoice->creator->name).'
+					<br><span>'.h($invoice->invoice->creator->designation->name).'</span>
+					</td>
+				</tr>
+				
+	</table>
+
 </body>
 </html>';
 
 	//echo $html; exit; 
 
-$name='Invoice';
+$name='Invoice-'.h(($invoice->invoice->in1.'_IN'.str_pad($invoice->invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->invoice->in3.'_'.$invoice->invoice->in4));
 
 $dompdf->loadHtml($html);
 $dompdf->set_paper('letter', 'landscape');

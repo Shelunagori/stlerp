@@ -3346,7 +3346,11 @@ class InvoicesController extends AppController
     {
 		$this->viewBuilder()->layout('');
 		
-		 $invoice = $this->Invoices->SendEmails->find()->contain(['Invoices'=>['Companies']])->first();
+		 $invoice = $this->Invoices->SendEmails->find()->contain(['Invoices'=>['Customers','SalesOrders','Creator'=>['Designations'],
+							'Companies'=> ['CompanyBanks'=> function ($q) {
+								return $q
+								->where(['CompanyBanks.default_bank' => 1]);
+								}]]])->order(['SendEmails.id'=>'DESC'])->first();
 		//pr($invoice);
 		//exit;
 		//pr($fright_ledger_igst); exit;
@@ -6318,12 +6322,13 @@ class InvoicesController extends AppController
 				'; $p=2; if($t > 0){ 
 					foreach($data as $d){
 						//$terms = $this->Invoices->DispatchDocuments->get($d);
-						$message_web.= '
+						@$message_web1.= '
 						<tr>
 							<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
 						</tr>
 						';
 						//pr($terms->text_line); 
+						$message_web.$message_web1;
 					}
 					
 					//pr($message_web); exit;
@@ -6331,11 +6336,12 @@ class InvoicesController extends AppController
 				
 				
 				if($otherData){
-						$message_web.= '
+						$message_web1.= '
 						<tr>
 							<td style=" font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($otherData)) .'</td>
 						</tr>
 					'; 
+					$message_web.$message_web1;
 				}
 				//pr($message_web); exit;
 				$message_web.= '
@@ -6350,15 +6356,15 @@ class InvoicesController extends AppController
 				<tr><td></td></tr>
 				
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><b>Regards,</b></td>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><b>Regards,</b></td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
-					<br><span>'.h($invoice->creator->designation->name).'</span>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
+					<br><span>'.h($invoice->invoice->creator->designation->name).'</span>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br>Email
 					<span><b>:</b></span>
 					<span><b>dispatch@mogragroup.com</b></span><br/>
 					<span>Website</span>
@@ -6399,9 +6405,9 @@ class InvoicesController extends AppController
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
 					->attachments($attachments);; 
 					$email->send($message_web);
-					
+					//pr($message_web1);
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
-				$SendEmail->send_data=$message_web;
+				$SendEmail->send_data=$message_web1;
 				$SendEmail->invoice_id=$id;
 				$this->Invoices->SendEmails->save($SendEmail); 
 		//$this->Flash->success(__('The Mail has been Sent.'));
