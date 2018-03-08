@@ -6382,7 +6382,7 @@ class InvoicesController extends AppController
 			</table>
 	   
 	';
-		 //pr($message_web);exit;
+		 //pr($email_to);exit;
 		$email = new Email('default');
 		$email->transport('gmail');
 		$from_name=$company_data->alias;	
