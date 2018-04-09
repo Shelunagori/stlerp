@@ -23,7 +23,7 @@ class IvsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$iv_no=$this->request->query('iv_no');
 		$invoice_no=$this->request->query('invoice_no');
 		$customer=$this->request->query('customer');
@@ -56,7 +56,7 @@ class IvsController extends AppController
             'contain' => ['Invoices'=>['Customers'],'IvRows', 'Companies']
         ];
 		 */
-		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows', 'Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']);
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows', 'Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id,'Ivs.financial_year_id'=>$st_year_id])->order(['Ivs.id' => 'DESC']);
         $this->set(compact('ivs','url'));
         $this->set('_serialize', ['ivs']);
     }
@@ -341,7 +341,7 @@ class IvsController extends AppController
 			$iv->invoice_id=$invoice_id;
 			$iv->company_id=$st_company_id	;
 			$transaction_date=$iv->transaction_date	;
-			$last_voucher_no=$this->Ivs->find()->select(['Ivs.voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no=$this->Ivs->find()->select(['Ivs.voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
 				$iv->voucher_no=$last_voucher_no->voucher_no+1;
 			}else{
@@ -349,6 +349,7 @@ class IvsController extends AppController
 			}
 			
 			$iv->created_by=$s_employee_id;
+			$iv->financial_year_id=$st_year_id;
 			
         //pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
@@ -409,7 +410,7 @@ class IvsController extends AppController
 							}
 							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
-							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs(@$iv_row_item->item_id); 
 						}
 						
 						$unit_rate = round($unit_rate,2);

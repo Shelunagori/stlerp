@@ -25,7 +25,7 @@ class InvoicesController extends AppController
 		$sales_return=$this->request->query('sales_return');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$where=[];
 		$invoice_no=$this->request->query('invoice_no');
 		$file=$this->request->query('file');
@@ -35,6 +35,10 @@ class InvoicesController extends AppController
 		$total_From=$this->request->query('total_From');
 		$page=$this->request->query('page');
 		$items=$this->request->query('items');
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		$fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		$todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		
 		$this->set(compact('customer','total_From','From','To','page','invoice_no','file','items'));
 		
 		if(!empty($invoice_no)){
@@ -88,7 +92,7 @@ class InvoicesController extends AppController
 							})
 				->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])
 				->autoFields(true)
-				->where(['Invoices.company_id'=>$st_company_id])
+				->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])
 				->where($where);
 		}
 		else if($inventory_voucher=='true'){
@@ -108,13 +112,14 @@ class InvoicesController extends AppController
 						$invoices[]=$invoice;
 					}
 				} 
-				
+		
+		//$last_in_no=$this->Invoices->find()->select(['in2'])->where(['company_id' => $sales_order->company_id,'date_created >='=>$fromdate1,'date_created <='=>$todate1])->order(['in2' => 'DESC'])->first();		
 				
 			//pr($invoices);exit;
 		}else if($sales_return=='true'){
 			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])->order(['Invoices.in2' => 'DESC']);
 		} 
 		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
@@ -2301,13 +2306,14 @@ class InvoicesController extends AppController
 	
 	
 	 public function gstAdd()
-    {
+    { 
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		//$st_year_id = $session->read('st_year_id');
+		//pr($session->read()); exit;
 		$sales_order_id=@(int)$this->request->query('sales-order');
 		$sales_order=array(); $process_status='New';
 		if(!empty($sales_order_id)){
@@ -2333,6 +2339,7 @@ class InvoicesController extends AppController
 		$st_year_id = $session->read('st_year_id');
 		
 			   $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+			 //  pr($SessionCheckDate); exit;
 			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
 			   $tody1 = date("Y-m-d");
@@ -2367,15 +2374,16 @@ class InvoicesController extends AppController
 				}
 			}			
 			////end code updated serial number add Oct17changes 
-			$last_in_no=$this->Invoices->find()->select(['in2'])->where(['company_id' => $sales_order->company_id])->order(['in2' => 'DESC'])->first();
+			$last_in_no=$this->Invoices->find()->select(['in2'])->where(['company_id' => $sales_order->company_id,'financial_year_id'=>$st_year_id])->order(['in2' => 'DESC'])->first();
 			if($last_in_no){
 				$invoice->in2=$last_in_no->in2+1;
 			}else{
 				$invoice->in2=1;
 			}
-			
+			//pr($invoice->in2); exit;
 			$invoice->in3=$sales_order->so3;
 			$invoice->created_by=$s_employee_id;
+			$invoice->financial_year_id=$st_year_id;
 			$invoice->company_id=$sales_order->company_id;
 			$invoice->employee_id=$sales_order->employee_id;
 			$invoice->customer_id=$sales_order->customer_id;
@@ -2609,7 +2617,7 @@ class InvoicesController extends AppController
 							->values([
 								'ledger_account_id' => $c_LedgerAccount->id,
 								'invoice_id' => $invoice->id,
-								'reference_no' => 'i'.$invoice->in2,
+								'reference_no' => 'i'.$invoice->in2.'('.$invoice->in4.')',
 								'credit' => 0,
 								'debit' => $invoice->grand_total,
 								'reference_type' => 'New Reference',
@@ -3344,28 +3352,57 @@ class InvoicesController extends AppController
 	
 	public function DispatchDownload($id = null)
     {
-		$this->viewBuilder()->layout('');
+		$this->viewBuilder()->layout('pdf_layout');
+		$invoice = $this->Invoices->get($id, [
+            'contain' => ['InvoiceRows']
+			]);
+			
+			if ($this->request->is(['patch', 'post', 'put'])) {
+			
+			if(!empty($this->request->data['dispatch_font_size'])){
+				$dispatch_font_size=$this->request->data['dispatch_font_size'];
+				$query = $this->Invoices->query();
+					$query->update()
+						->set(['dispatch_font_size' => $dispatch_font_size])
+						->where(['id' => $id])
+						->execute();
+				}
+				return $this->redirect(['action' => 'DispatchDownload/'.$id]);
+			}
 		
+		
+		$this->set(compact('id','invoice'));
+       // $this->set('_serialize', ['invoice','cgst_per','sgst_per','igst_per']);
+    }
+	public function GstDispatchPdf($id = null)
+    {
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->Invoices->Companies->get($st_company_id);
 		 $invoice = $this->Invoices->SendEmails->find()->contain(['Invoices'=>['Customers','SalesOrders','Creator'=>['Designations'],
 							'Companies'=> ['CompanyBanks'=> function ($q) {
 								return $q
 								->where(['CompanyBanks.default_bank' => 1]);
 								}]]])->where(['SendEmails.invoice_id' => $id
 								])->order(['SendEmails.id'=>'DESC'])->first();
-		//pr($invoice);
-		//exit;
-		//pr($fright_ledger_igst); exit;
-	//pr($invoice); exit;
-        //$this->set('invoice', $invoice);
-		$this->set(compact('invoice'));
-       // $this->set('_serialize', ['invoice','cgst_per','sgst_per','igst_per']);
+
+		$this->set(compact('invoice','company_data'));
     }
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->Invoices->Companies->get($st_company_id);
 		$invoice = $this->Invoices->get($id, [
-            'contain' => ['InvoiceRows']
+            'contain' => [
+							'Companies'=> ['CompanyBanks'=> function ($q) {
+								return $q
+								->where(['CompanyBanks.default_bank' => 1]);
+								}],'InvoiceRows']
 			]);
+		
 		//pr($invoice); exit;
 		if ($this->request->is(['patch', 'post', 'put'])) {
 			
@@ -3397,7 +3434,7 @@ class InvoicesController extends AppController
 			return $this->redirect(['action' => 'GstConfirm/'.$id]);
         }
 		$termsConditions = $this->Invoices->DispatchDocuments->find('all',['limit' => 200]);
-		$this->set(compact('invoice','id','termsConditions'));
+		$this->set(compact('invoice','id','termsConditions','company_data'));
     }
 	
 	public function gstSalesReport(){
@@ -5209,7 +5246,7 @@ class InvoicesController extends AppController
 		$From=$this->request->query('From');
 		$To=$this->request->query('To');
 		$salesman_id=$this->request->query('salesman_name');
-		
+		$Districts_id=$this->request->query('Districts_id');
 		$item_name=$this->request->query('item_name');
 		$item_category=$this->request->query('item_category');
 		$item_group=$this->request->query('item_group_id');
@@ -5223,22 +5260,25 @@ class InvoicesController extends AppController
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['Invoices.date_created >=']=$From;
 			$where1['SalesOrders.created_on >=']=$From;
+			$where2['Quotations.employee_id']=$From;
 			$where3['Quotations.created_on >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['Invoices.date_created <=']=$To;
 			$where1['SalesOrders.created_on <=']=$To;
+			$where2['Quotations.employee_id']=$To;
 			$where3['Quotations.created_on <=']=$To;
 		}
 		if(!empty($salesman_id)){
-			$where['Invoices.employee_id']=$salesman_id;
+			$where['Invoices.created_by']=$salesman_id;
 			$where1['SalesOrders.employee_id']=$salesman_id;
 			$where2['Quotations.employee_id']=$salesman_id;
 			$where3['Quotations.employee_id']=$salesman_id;
-		}
+		} 
 		
-		/* pr($where);exit; */
+		
+		
 		//$this->set(compact('From','To','salesman_id'));
 		
 		if(!empty($item_name)){ 
@@ -5251,6 +5291,7 @@ class InvoicesController extends AppController
 						->order(['Invoices.id' => 'DESC'])
 						->where($where)
 						->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST']);
+						
 			
 			$invoicesGst = $this->Invoices->SaleTaxes->find()->matching(
 					'SaleTaxCompanies', function ($q) use($st_company_id) {
@@ -5287,9 +5328,8 @@ class InvoicesController extends AppController
 									->order(['Quotations.created_on' => 'DESC'])
 									->where($where3)
 									->where(['Quotations.status IN'=>'Closed','company_id'=>$st_company_id]);
-		}else {
+		}else { 
 			if(!empty($item_category) && empty($item_group) && empty($item_sub_group)){  
-			
 				$invoices = 	$this->Invoices->find()
 									->contain(['Customers','InvoiceRows'])
 									->matching(
@@ -5596,17 +5636,120 @@ class InvoicesController extends AppController
 		$ItemCategories = $this->Invoices->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->Invoices->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->Invoices->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
+		$CustomerSegments = $this->Invoices->Customers->CustomerSegs->find('list')->order(['CustomerSegs.name' => 'ASC']);
+		$CustomerGroups = $this->Invoices->Customers->CustomerGroups->find('list')->order(['CustomerGroups.name' => 'ASC']);
 		$GstTaxes = $this->Invoices->SaleTaxes->find()->where(['SaleTaxes.account_second_subgroup_id'=>5,'cgst'=>'yes'])->orwhere(['SaleTaxes.account_second_subgroup_id'=>5,'igst'=>'yes'])->matching(
 					'SaleTaxCompanies', function ($q) use($st_company_id) {
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				);
-		//pr($GstTaxes->toArray());exit;		
+		//pr($CustomerSegments->toArray());exit;		
 		$Items = $this->Invoices->Items->find('list')->order(['Items.name' => 'ASC']);
-		$this->set(compact('invoices','SalesMans','SalesOrders','OpenQuotations','ClosedQuotations','ItemCategories','ItemGroups','ItemSubGroups','Items','GstTaxes','invoicesGst','url'));
+		$States = $this->Invoices->Customers->Districts->States->find('list')->order(['States.name' => 'ASC']);
+		$Districts = $this->Invoices->Customers->Districts->find('list')->order(['Districts.district' => 'ASC']);
+		//pr($States->toArray());exit;		
+		$this->set(compact('invoices','SalesMans','SalesOrders','OpenQuotations','ClosedQuotations','ItemCategories','ItemGroups','ItemSubGroups','Items','GstTaxes','invoicesGst','url','States','CustomerGroups','Districts','CustomerSegments'));
 	}
 	
 	
+	public function newSalesReport(){
+	
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$From=$this->request->query('From');
+		$To=$this->request->query('To');
+		$Customer_segment_id=$this->request->query('Customer_segment_id');
+		$Customer_group_id=$this->request->query('Customer_group_id');
+		$States_id=$this->request->query('States_id');
+		$Districts_id=$this->request->query('Districts_id');
+
+		$where=[];
+		$where1=[];
+		$where2=[];
+		$where3=[];
+		$District=[];
+		$States=[];
+		
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+			$where1['SalesOrders.created_on >=']=$From;
+			$where2['Quotations.employee_id']=$From;
+			$where3['Quotations.created_on >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+			$where1['SalesOrders.created_on <=']=$To;
+			$where2['Quotations.employee_id']=$To;
+			$where3['Quotations.created_on <=']=$To;
+
+		}
+		if(!empty($Districts_id)){
+			$District['Customers.district_id']=$Districts_id;
+		}
+		if(!empty($Customer_segment_id)){
+			$District['Customers.customer_seg_id']=$Customer_segment_id;
+		}
+		if(!empty($Customer_group_id)){
+			$District['Customers.customer_group_id']=$Customer_group_id;
+		}
+		if(!empty($States_id)){
+			$States['Districts.state_id']=$States_id;
+		}
+	//	pr($District); exit;
+		$invoices = $this->Invoices->find()->where($where)->contain(['Customers'=>['Districts'=>['States']],'InvoiceRows'])->order(['Invoices.id' => 'DESC'])->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST']);
+		$invoicesGst = $this->Invoices->SaleTaxes->find()
+				->where(['account_second_subgroup_id'=>5,'cgst'=>'Yes'])
+				->orWhere(['account_second_subgroup_id'=>5,'igst'=>'Yes']);	
+		
+		if($States_id){ 
+			$invoices->matching(
+						'Customers.Districts.States', function ($q) use($States) {
+							return $q->where($States);
+						} 
+					);
+			$invoices->matching(
+						'Customers.Districts', function ($q) use($District) {
+							return $q->where($District);
+						} 
+					);
+					//pr($invoices->toArray()); exit;
+			$invoicesGst->matching(
+						'SaleTaxCompanies', function ($q) use($st_company_id) {
+							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
+						} 
+					);
+		}else{
+			$invoices->matching(
+						'Customers.Districts', function ($q) use($District) {
+							return $q->where($District);
+						} 
+					);
+			$invoicesGst->matching(
+						'SaleTaxCompanies', function ($q) use($st_company_id) {
+							return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
+						} 
+					);
+		}
+		//pr($invoicesGst->toArray());exit;		
+		$CustomerSegments = $this->Invoices->Customers->CustomerSegs->find('list')->order(['CustomerSegs.name' => 'ASC']);
+		$CustomerGroups = $this->Invoices->Customers->CustomerGroups->find('list')->order(['CustomerGroups.name' => 'ASC']);
+		$States = $this->Invoices->Customers->Districts->States->find('list')->order(['States.name' => 'ASC']);
+		$Districts = $this->Invoices->Customers->Districts->find('list')->order(['Districts.district' => 'ASC']);
+		//pr($States->toArray());exit;		
+		$this->set(compact('States','Districts','CustomerSegments','CustomerGroups','States','Districts','invoices','invoicesGst','From','To','url','Districts_id','Customer_segment_id','States_id','Customer_group_id'));
+	}
+	public function SelectDistrict($state_id=null){
+		$this->viewBuilder()->layout('');
+		$Districts = $this->Invoices->Customers->Districts->find('list')->where(['Districts.state_id'=>$state_id])->order(['Districts.district' => 'ASC']);
+		//pr($Districts->toArray()); exit;
+		$this->set(compact('Districts'));
+		//pr($States_id); exit;
+	}
 	public function salesManExcelExport(){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -6250,7 +6393,7 @@ class InvoicesController extends AppController
 		
 		
 		$invoice = $this->Invoices->get($id, [
-			'contain' => ['SalesOrders','Customers'=>['CustomerContacts','Districts'=>['States']],
+			'contain' => ['SalesOrders','Customers'=>['Employees','CustomerContacts','Districts'=>['States']],
 							'Employees',
 							'Transporters',
 							'Creator'=>['Designations'],
@@ -6284,7 +6427,7 @@ class InvoicesController extends AppController
 					</td>
 				</tr>
 				<tr>
-					<td  style="width: 1em; word-wrap: break-word;  font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>
+					<td  style="width: 1em; font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>
 					'. h($invoice->customer->customer_name).'
 					
 					</td>
@@ -6321,55 +6464,54 @@ class InvoicesController extends AppController
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->in1."/"."IN-".str_pad($invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->in3."/".$invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' For Rs.'. h(number_format($invoice->grand_total,2)).'/- in duplicate.</td>
 				</tr>
-				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>2. Lorry receipt No. '. h(($invoice->lr_no)) .' dated '. h(date("d-m-Y",strtotime($invoice->date_created))).' of '. h(($invoice->transporter->transporter_name)).' '. h(($invoice->delivery_description)).'.</td>
-				</tr>
-				'; $p=2; if($t > 0){ 
+				
+				'; $message_web1=""; $p=1; if($t > 0){ 
 					foreach($data as $d){
 						//$terms = $this->Invoices->DispatchDocuments->get($d);
-						@$message_web1.= '
+						@$message_web2.= '
 						<tr>
-							<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
+							<td colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
 						</tr>
 						';
-						//pr($terms->text_line); 
-						$message_web.$message_web1;
+						
+						$message_web.=$message_web2;
+						$message_web1.=$message_web2;
+						$message_web2="";
+						
 					}
-					
-					//pr($message_web); exit;
+				
+					//pr($message_web1); exit;
 				} //exit;
-				
-				
+				//pr($message_web1); exit;
+				$message_web3="";
 				if($otherData){
-						$message_web1.= '
+						$message_web3.= '
 						<tr>
-							<td style=" font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($otherData)) .'</td>
+							<td style=" font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'. h(($otherData)) .'</td>
 						</tr>
 					'; 
-					$message_web.$message_web1;
+					$message_web.=$message_web3;
+					$message_web1.=$message_web3;
 				}
+				//pr($message_web1);  exit;
 				//pr($message_web); exit;
 				$message_web.= '
 				<tr>
-					<td>
-					<p style="text-align:justify;font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';">
-					<br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(number_format($invoice->grand_total,2)) .'/-<br> In favour of '. h(($company_data->name)).'. In our account No '
-					. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no)).'
-					</p></td>
+					
 				</tr>
 				<tr><td></td></tr>
 				<tr><td></td></tr>
 				
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><b>Regards,</b></td>
+					<td style=" font-family:Palatino Linotype; font-size:'.h(($invoice->pdf_font_size)) .';"><b>Regards,</b></td>
 				</tr>
 				<tr>
-					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
-					<br><span>'.h($invoice->invoice->creator->designation->name).'</span>
+					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"></br>'.h($invoice->creator->name).'
+					<br><span>'.h($invoice->creator->designation->name).'</span>
 					</td>
 				</tr>
 				<tr>
-					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->pdf_font_size)) .';"><br>Email
+					<td width="50%" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br>Email
 					<span><b>:</b></span>
 					<span><b>dispatch@mogragroup.com</b></span><br/>
 					<span>Website</span>
@@ -6385,19 +6527,28 @@ class InvoicesController extends AppController
 		 //pr($email_to);exit;
 		$email = new Email('default');
 		$email->transport('gmail');
-		$from_name=$company_data->alias;	
-		//$cc_mail=$invoice->creator->email;
+		$from_name=$company_data->alias;
+		
 		//$email_to="harkawat.priyanka0@gmail.com";
-		//$email_to="gopalkrishanp3@gmail.com";
-		$cc_mail="harkawat.priyanka0@gmail.com";
+		
 		//$cc_mail="priyankajinger143@gmail.com";
 		
 		$name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4)); 
 		$attachments='';
 		$attachments[]='Invoice_email/'.$name.'.pdf';
 		//$attachments[]="Invoice_email/Invoice-STL_IN515_BE-3421_17-18.pdf";
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="harkawat.priyanka0@gmail.com";
+		$cc_mail=[];
+		$cc_mail[]=$invoice->creator->email;
+		$cc_mail[]=$invoice->customer->employee->email;
+		//$cc_mail[]="harkawat.priyanka0@gmail.com";
+		//$cc_mail[]="priyankajinger143@gmail.com";
+		////pr($email_to);
 		
-		//pr($sub); exit;
+		
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="harkawat.priyanka0@gmail.com";
 		$member_name="Gopal";
 		
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])
@@ -6408,9 +6559,10 @@ class InvoicesController extends AppController
 					->template('notice_send_email')
 					->emailFormat('html')
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
-					->attachments($attachments);; 
+					->attachments($attachments);
 					$email->send($message_web);
-					//pr($message_web1);
+					//pr($cc_mail); exit;
+				$this->Invoices->SendEmails->deleteAll(['invoice_id' => $id]);
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web1;
 				$SendEmail->invoice_id=$id;

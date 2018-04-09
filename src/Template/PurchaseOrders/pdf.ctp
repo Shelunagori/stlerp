@@ -29,7 +29,7 @@ $html = '
 		src: url("https://fonts.googleapis.com/css?family=Lato");
 	}
 	p{
-		margin:0;font-family: Lato;font-weight: 100;line-height: 12px !important;margin-top:-9px;
+		margin:0;font-family: Lato;font-weight: 100;line-height: 18px !important;margin-top:-6px;
 	}
 	.addressshw p{
 		margin:0;font-family: Lato;font-weight: 100;line-height: 17px !important;margin-top:3px;
@@ -226,58 +226,32 @@ $html.='</table>';
 
 $html .= '	<table width="100%" class="table_rows table3">
   <tr>
-    <td valign="top"  width="39%" rowspan="2" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Material to be transported to :</b><br/>'. h(($purchaseOrder->material_to_be_transported)) .'</td>
-    <td valign="top" rowspan="2" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Sale Tax :</b><br/>'. h($purchaseOrder->sale_tax_per.'('.$purchaseOrder->sale_tax_description.')') .'</td>
-    <td valign="top" class="discount" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"> <p><b>Discount : </b><span style="padding-left:7px;">'. h($purchaseOrder->discount) .''. h(($purchaseOrder->discount_type)).'</span></p>
-   
-    </td>
-  </tr>
-  <tr>
-  <td class="pnf" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><p><b>P & F : </b><span style="padding-left:7px;">'. h($purchaseOrder->pnf) .'</span></p></td>
-  </tr>
-  <tr>
-    <td valign="top" style="text-align:center; padding-top:7px; padding-bottom:7px; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>LR to be prepared in favour of :<br/></b><span style="padding:17px;">'. h(($purchaseOrder->lr_to_be_prepared_in_favour_of)) .'</span></td>
-    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Payment Terms :</b><br/>'. h(($purchaseOrder->payment_terms)) .'</td>
-    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Excise Duty : </b><span style="padding-left:7px;">'. h(( $purchaseOrder->excise_duty)) .'</span></td>
-   
-  </tr>
-  <tr>
-    <td  style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Road Permit Form : </b><br/>'. h(($purchaseOrder->road_permit_form47)) .'</td>
-    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Transporter Name :</b><br/>'. h(($purchaseOrder->transporter->transporter_name)) .'</td>
-    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';" ><b>Delivery : </b><br/>'. h(($purchaseOrder->delivery)) .'</td>
-</tr>
-<tr>';
-	if($purchaseOrder->is_exceise_for_customer=='Yes'){
-	$html.='<td valign="top" style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" >
-		<b style="text-decoration: underline;">Excise Invoice Required in Favour of Consignee:</b>
-				'. h($purchaseOrder->customer->customer_name) .'<br/>
-				'. h($purchaseOrder->customer->customer_address[0]->address) .'<br/>
-				ECC : '. h($purchaseOrder->customer->ecc_no) .'<br/>
-				GST NO : '. h($purchaseOrder->customer->tin_no) .'<br/>
-		</td>';
-}else{ $html.='<td valign="top" style="font-size:13px;" >
-		
-		</td>'; }
-$html.='<td valign="top" colspan="2" style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';">
-		Please confirm that you have registered this order and request you to return back the duplicate copy duly signed in token of having accepted the order.<br/><br/>
-		<table width="100%" class="table2">
-			<tr>
-			<td width="10%"></td>
-			<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';">
-				<div  align="center">
-								<span>For <b>'. h($purchaseOrder->company->name) .'</b></span><br/>
+   <td valign="top"  style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Discount :</b><br/>'. h($purchaseOrder->discount) .''. h(($purchaseOrder->discount_type)).'</td>
+  <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>P & F :</b><br/>'. h(($purchaseOrder->pnf)) .'</td>
+	<td  rowspan="4" style="text-align:center;   font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><span style="text-align:left;">Please confirm that you have registered this order and request you to acknowledge.</span><br/><br/>
+	<span style="text-align:right;">For <b>'. h($purchaseOrder->company->name) .'</b></span><br/>
 									<img src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.$purchaseOrder->creator->signature.' height="50px" style="height:50px;"/>
 									<br/>
-									<span><b>Authorised Signatory</b></span><br/>
-									<span>'. h($purchaseOrder->creator->name) .'</span><br/>
-									
-							</div>
-			</td>
-			</tr>
-		</table>
-							
-		</td>
-	</tr>
+									<span style="text-align:right;"><b>Authorised Signatory</b></span><br/>
+									<span style="text-align:right;">'. h($purchaseOrder->creator->name) .'</span><br/></td>
+  </tr>
+  
+  <tr>
+     <td valign="top"  width="39%"  style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Material to be transported to :</b><br/>'. h(($purchaseOrder->material_to_be_transported)) .'</td>
+   <td valign="top"  style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>GST :</b><br/>'. h($purchaseOrder->sale_tax_per.'('.$purchaseOrder->sale_tax_description.')') .'</td>
+   </tr>
+    <tr>
+     <td valign="top" style="text-align:center; padding-top:7px; padding-bottom:7px; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>LR to be prepared in favour of :<br/></b><span style="padding:17px;">'. h(($purchaseOrder->lr_to_be_prepared_in_favour_of)) .'</span></td>
+    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Payment Terms :</b><br/>'. h(($purchaseOrder->payment_terms)) .'</td>
+   </tr>
+    <tr>
+     <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Transporter Name :</b><br/>'. h(($purchaseOrder->transporter->transporter_name)) .'</td>
+    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';" ><b>Delivery : </b><br/>'. h(($purchaseOrder->delivery)) .'</td>
+   </tr>
+ 
+    
+</tr>
+
 </table>
 ';
 

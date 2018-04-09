@@ -202,6 +202,9 @@ var $rows = $('#main_tble tbody tr');
 					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
 					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
 					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
+					total_nodue=round(total_nodue,2);
+					total_on_acc=round(total_on_acc,2);
+					total_closing_bal=round(total_closing_bal,2);
 					$("#main_tble #tf tr th.oa").html('');
 					$("#main_tble #tf tr th.os").html('');
 					$("#main_tble #tf tr th.nd").html('');
@@ -237,7 +240,9 @@ var $rows = $('#main_tble tbody tr');
 					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
 					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
 					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
-					
+					total_nodue=round(total_nodue,2);
+					total_on_acc=round(total_on_acc,2);
+					total_closing_bal=round(total_closing_bal,2);
 					
 					
 				

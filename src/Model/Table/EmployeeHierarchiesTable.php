@@ -36,10 +36,10 @@ class EmployeeHierarchiesTable extends Table
         $this->displayField('name');
         $this->primaryKey('id');
 		$this->addBehavior('Tree', [
-        'parent' => 'parent_id', // Use this instead of parent_id
-        'left' => 'lft', // Use this instead of lft
-        'right' => 'rght' // Use this instead of rght
-    ]);
+			'parent' => 'parent_id', // Use this instead of parent_id
+			'left' => 'lft', // Use this instead of lft
+			'right' => 'rght' // Use this instead of rght
+		]);
         $this->belongsTo('Employees', [
             'foreignKey' => 'employee_id',
             'joinType' => 'INNER'

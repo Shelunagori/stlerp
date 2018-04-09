@@ -23,6 +23,7 @@ class InvoiceBookingsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$purchase_return=$this->request->query('purchase-return');
 	    $where = [];
 		$book_no = $this->request->query('book_no');
@@ -77,7 +78,7 @@ class InvoiceBookingsController extends AppController
 			
 			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}else{ 
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}
 		//pr($invoiceBookings);exit;
         $this->set(compact('invoiceBookings','status','purchase_return'));
@@ -1327,12 +1328,12 @@ class InvoiceBookingsController extends AppController
 			
 			$vendor_ledger_acc_id=$v_LedgerAccount->id;
 		}
-		$last_ib_no=$this->InvoiceBookings->find()->select(['ib2'])->where(['company_id' => $st_company_id])->order(['ib2' => 'DESC'])->first();
+		$last_ib_no=$this->InvoiceBookings->find()->select(['ib2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['ib2' => 'DESC'])->first();
 		if($last_ib_no){
 			@$last_ib_no->ib2=$last_ib_no->ib2+1;
 		}else{
 			@$last_ib_no->ib2=1;
-			}
+			} //pr($last_ib_no->ib2); exit;
 		$q=0; $item_total_rate=0;
 		foreach ($grn->grn_rows as $grn_rows){
 			$dis=($discount*$grn->purchase_order->purchase_order_rows[$q]->amount)/$grn->purchase_order->total;
@@ -1346,7 +1347,8 @@ class InvoiceBookingsController extends AppController
         $ref_rows=@$this->request->data['ref_rows'];
 		
             $invoiceBooking = $this->InvoiceBookings->patchEntity($invoiceBooking, $this->request->data);
-			$invoiceBooking->grn_id=$grn_id; 
+			$invoiceBooking->grn_id=$grn_id;
+			$invoiceBooking->financial_year_id=$st_year_id;			
 			$invoiceBooking->created_on=date("Y-m-d");
 			$invoiceBooking->company_id=$st_company_id;
 			$invoiceBooking->supplier_date=date("Y-m-d",strtotime($invoiceBooking->supplier_date)); 
@@ -1582,7 +1584,7 @@ class InvoiceBookingsController extends AppController
         $companies = $this->InvoiceBookings->Companies->find('all');
         $grns = $this->InvoiceBookings->Grns->find('list');
 		//pr($ledger_account_details->toArray());exit;
-        $this->set(compact('invoiceBooking', 'grns','companies','ledger_account_details','v_LedgerAccount', 'ledger_account_vat','fromdate1','tody1','GstTaxes','st_company_id'));
+        $this->set(compact('invoiceBooking', 'grns','companies','ledger_account_details','v_LedgerAccount', 'ledger_account_vat','fromdate1','tody1','GstTaxes','st_company_id','todate1'));
         $this->set('_serialize', ['invoiceBooking']);
     }
 	

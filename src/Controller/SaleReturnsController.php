@@ -24,6 +24,7 @@ class SaleReturnsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		
 		$where = [];
 		
@@ -55,7 +56,7 @@ class SaleReturnsController extends AppController
 		if(!empty($total)){
 			$where['SaleReturns.total_after_pnf']=$total;
 		}
-		$saleReturns = $this->paginate($this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']));
+		$saleReturns = $this->paginate($this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']));
 		//pr($saleReturns); exit;
 
         $this->set(compact('saleReturns','url'));
@@ -97,7 +98,7 @@ class SaleReturnsController extends AppController
 		if(!empty($total)){
 			$where['SaleReturns.total_after_pnf']=$total;
 		}
-		$saleReturns = $this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']);
+		$saleReturns = $this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']);
 		//pr($saleReturns); exit;
 
         $this->set(compact('saleReturns','url'));
@@ -120,6 +121,41 @@ class SaleReturnsController extends AppController
         $this->set('_serialize', ['saleReturn']);
     }
 
+		
+	public function GstConfirm($id = null)
+    {
+		$this->viewBuilder()->layout('pdf_layout');
+		$SaleReturns = $this->SaleReturns->get($id, [
+            'contain' => ['SaleReturnRows']
+			]);
+		
+		$this->set(compact('SaleReturns','id','termsConditions'));
+    }
+	public function GstPdf($id = null)
+    {
+		$this->viewBuilder()->layout('');
+		
+		 $SaleReturn= $this->SaleReturns->get($id, [
+				'contain' => ['SaleReturnRows'=>['Items'],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator']
+			]); 
+			
+				$cgst_per=[];
+		$sgst_per=[];
+		$igst_per=[];
+		foreach($SaleReturn->sale_return_rows as $invoice_row){
+			if($invoice_row->cgst_percentage > 0){
+				$cgst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->cgst_percentage);
+			}
+			if($invoice_row->sgst_percentage > 0){
+				$sgst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->sgst_percentage);
+			}
+			if($invoice_row->igst_percentage > 0){
+				$igst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->igst_percentage);
+			}
+		}
+			//pr($SaleReturn); exit;
+			$this->set(compact('SaleReturn','fright_ledger_account','cgst_per','sgst_per','igst_per'));
+	}
     /**
      * Add method
      *
@@ -1075,18 +1111,27 @@ class SaleReturnsController extends AppController
 			$saleReturn = $this->SaleReturns->newEntity();
 		  if ($this->request->is('post')) {
 			 $data=$this->request->data; 
-			$saleReturn = $this->SaleReturns->patchEntity($saleReturn, $this->request->data);
+			$last_voucher_no_sr=$this->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
+			$last_voucher_no_credit_note=$this->SaleReturns->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			
-			$last_in_no=$this->SaleReturns->find()->select(['sr2'])->where(['company_id' => $invoice->company_id])->order(['sr2' => 'DESC'])->first();
-			if($last_in_no){
-				$saleReturn->sr2=$last_in_no->sr2+1;
+			if($last_voucher_no_credit_note->voucher_no > $last_voucher_no_sr->sr2){
+				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;
 			}else{
-				$saleReturn->sr2=1;
+				$last_voucher_no=$last_voucher_no_sr->sr2;
 			}
 			
+			if($last_voucher_no){
+				$voucher_no1=$last_voucher_no+1;
+			}else{
+				$voucher_no1=1;
+			}
+			
+			$saleReturn->financial_year_id=$st_year_id;
+			$saleReturn->sr2=$voucher_no1;
 			$saleReturn->sr1=$invoice->in1;
 			$saleReturn->sr3=$invoice->in3;
-			$saleReturn->sr4=$invoice->in4;
+			$saleReturn->sr4=$st_year_id;
+			$saleReturn->financial_year_id=$st_year_id;
 			$saleReturn->created_by=$s_employee_id;
 			$saleReturn->company_id=$invoice->company_id;
 			$saleReturn->invoice_id=$invoice->id;
@@ -1102,7 +1147,7 @@ class SaleReturnsController extends AppController
 			$saleReturn->sale_return_status="Yes";
 			$saleReturn->transaction_date=date("Y-m-d",strtotime($saleReturn->transaction_date)); 
 			
-		
+		pr($saleReturn); exit;
 
 			$ref_rows=@$saleReturn->ref_rows;
 			if ($this->SaleReturns->save($saleReturn)) {

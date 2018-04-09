@@ -51,6 +51,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</div>
 					</div>
 					<div class="col-md-4">
+					<?php if($sales_order->e_way_bill=="Yes"){ ?>
+							<label class="control-label">E-Way Bill No</label>
+							<div class="row">
+								<div class="col-md-12">
+									<?php echo $this->Form->input('e_way_bill_no', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'E-Way Bill No']); ?>
+								</div>
+							</div>
+							<?php } ?>
 					</div>
 					<div class="col-md-2">
 						<div class="form-group">
@@ -149,6 +157,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 									<?php echo @date("d-m-Y",strtotime($sales_order->po_date)); ?>
 								</div>
 							</div>
+							
 						</div>
 					</div>
 				</div>
@@ -600,6 +609,9 @@ $(document).ready(function() {
 				  required: true,
 			},
 			customer_po_no  : {
+				  required: true,
+			},
+			e_way_bill_no  : {
 				  required: true,
 			},
 			employee_id: {

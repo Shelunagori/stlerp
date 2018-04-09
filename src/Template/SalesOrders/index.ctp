@@ -108,7 +108,7 @@
 					</thead>
 					<tbody>
 						<?php 
-						//pr($salesOrders);exit;
+						//pr($allowed_emp); exit;
 						foreach ($salesOrders as $salesOrder):
 						
 							$TotalSalesOrderQuantity=0;
@@ -121,7 +121,7 @@
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
-							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){ 
+							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
 						?> > 
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
@@ -146,7 +146,9 @@
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">
-							<?php if(in_array($salesOrder->created_by,$allowed_emp)){ ?>
+							<?php if(in_array($salesOrder->created_by,$allowed_emp)){ 
+							
+							?>
 									<?php if(in_array(22,$allowed_pages)){
 										if($salesOrder->gst=="no")
 										{

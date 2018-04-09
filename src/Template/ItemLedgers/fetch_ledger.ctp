@@ -149,7 +149,7 @@
 			<td><?= h($party_name) ?></td>
 			<td><?= h($itemLedger->source_model) ?></td>
 			<td>
-			<?php if(in_array($created_by,$allowed_emp)){ 
+			<?php if(in_array(@$created_by,$allowed_emp)){ 
 					if(!empty($url_path)){
 						echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); 
 					}}else{

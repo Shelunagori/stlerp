@@ -43,6 +43,7 @@ class PaymentsTable extends Table
         $this->belongsTo('ReferenceBalances');
         $this->belongsTo('ReferenceDetails');
         $this->belongsTo('Ledgers');
+        $this->belongsTo('Vendors');
         $this->belongsTo('BankCashes', [
 			'className' => 'LedgerAccounts',
             'foreignKey' => 'bank_cash_id',

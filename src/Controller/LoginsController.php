@@ -39,7 +39,7 @@ class LoginsController extends AppController
 				
 				$emp_mobile = $Employee->mobile;
 
-				if($employee_id == 23){
+				if($employee_id){
 					return $this->redirect(['action' => 'Switch-Company']);
 				}
 				/*if(!empty($emp_mobile)){
@@ -325,6 +325,54 @@ class LoginsController extends AppController
 	   $quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
 	   $pending_quotation=$quotations->ct;
 	   
+		$first_day_this_month = date('Y-m-d',strtotime(date('01-m-Y'))); 
+		$last_day_this_month  = date('t-m-Y');
+		$last_day_this_month = date('Y-m-d',strtotime($last_day_this_month)); 
+		
+		$query=$this->Logins->Invoices->find();
+		$query->select(['sum' => $query->func()->sum('Invoices.grand_total')])
+			->where(['date_created >='=>$first_day_this_month,'date_created <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray(); 
+		 $monthelySaleForInvoice=$query->first()->sum;
+		 
+		$query=$this->Logins->SalesOrders->find();
+		$query->select(['sum' => $query->func()->sum('SalesOrders.total')])
+			->where(['created_on >='=>$first_day_this_month,'created_on <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray();
+		$monthelySaleForSO=$query->first()->sum;
+		
+		$query=$this->Logins->Quotations->find();
+		$query->select(['sum' => $query->func()->sum('Quotations.total')])
+			->where(['created_on >='=>$first_day_this_month,'created_on <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray();
+		$monthelySaleForQO=$query->first()->sum;
+		
+		
+		
+		
+		$query1=$this->Logins->Invoices->LedgerAccounts->find();
+		$query1->contain(['ReferenceDetails'=>function($q)use($query1){
+			return $q->select(['ledger_account_id','total_debit'=>$query1->func()->sum('debit'),'ledger_account_id','total_credit'=>$query1->func()->sum('credit')])->group(['ledger_account_id']);
+		}]);
+		$query1->where(['company_id'=>$st_company_id,'source_model'=>'Customers']);
+		
+		$Total_payble=0;
+		
+		foreach($query1 as $d){
+			@$Total_payble+=@$d->reference_details[0]->total_debit-@$d->reference_details[0]-total_credit;
+		}
+		
+		$query2=$this->Logins->Invoices->LedgerAccounts->find();
+		$query2->contain(['ReferenceDetails'=>function($q)use($query2){
+			return $q->select(['ledger_account_id','total_debit'=>$query2->func()->sum('debit'),'ledger_account_id','total_credit'=>$query2->func()->sum('credit')])->group(['ledger_account_id']);
+		}]);
+		$query2->where(['company_id'=>$st_company_id,'source_model'=>'Vendors']);
+		
+		$Total_recivable=0;
+		
+		foreach($query2 as $d){
+			@$Total_recivable+=@$d->reference_details[0]->total_debit-@$d->reference_details[0]-total_credit;
+		}
+	  // pr($Total_recivable);exit;
+	   
+	   
 	   $SalesOrderRows = $this->Logins->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->Logins->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -408,6 +456,7 @@ class LoginsController extends AppController
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['leave_status'=>'Pending'])->contain(['empData'])->toArray();
 			
 			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
+			//pr($PendingleaveRequests); exit;
 			
 		}else{
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['parent_employee_id'=>$employee_id,'leave_status'=>'Pending'])->contain(['empData'])->toArray();
@@ -422,7 +471,7 @@ class LoginsController extends AppController
 		$PendingTravelRequestStatus = $this->Logins->TravelRequests->find()->where(['TravelRequests.employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
 		/* pr($employee_id);
 		pr($PendingTravelRequestStatus); exit; */
-	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus'));
+	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus','monthelySaleForInvoice','monthelySaleForSO','monthelySaleForQO'));
 		
     }
 }

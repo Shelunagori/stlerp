@@ -146,7 +146,7 @@
 			<div class="form-actions">
 				<div class="row">
 					<div class="col-md-offset-3 col-md-9">
-							<?php if($chkdate == 'Not Found'){  ?>
+							<?php if(@$chkdate1 == 'Not Found'){  ?>
 					<label class="btn btn-danger"> You are not in Current Financial Year </label>
 				<?php } else { ?>
 					<button type="submit" class="btn btn-primary">ADD GRN</button>

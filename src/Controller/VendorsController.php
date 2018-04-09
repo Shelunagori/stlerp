@@ -80,6 +80,7 @@ class VendorsController extends AppController
 					$ledgerAccount->account_second_subgroup_id = $vendor->account_second_subgroup_id;
 					$ledgerAccount->name = $vendor->company_name;
 					$ledgerAccount->source_model = 'Vendors';
+					$ledgerAccount->bill_to_bill_account = 'Yes';
 					$ledgerAccount->source_id = $vendor->id;
 					$ledgerAccount->company_id = $data->id;
 					$this->Vendors->LedgerAccounts->save($ledgerAccount);
@@ -128,7 +129,7 @@ class VendorsController extends AppController
             if ($this->Vendors->save($vendor)) {
 				$query = $this->Vendors->LedgerAccounts->query();
 					$query->update()
-						->set(['account_second_subgroup_id' => $vendor->account_second_subgroup_id,'name'=>$vendor->company_name])
+						->set(['name'=>$vendor->company_name,'account_second_subgroup_id' => $vendor->account_second_subgroup_id,'name'=>$vendor->company_name])
 						->where(['source_model' =>'Vendors','source_id'=>$vendor->id])
 						->execute();
                 $this->Flash->success(__('The vendor has been saved.'));

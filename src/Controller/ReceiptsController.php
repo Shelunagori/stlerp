@@ -103,7 +103,7 @@ class ReceiptsController extends AppController
         $this->paginate = [
             'contain' => []
         ];
-        $receipts = $this->paginate($this->Receipts->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['ReceiptRows'=>function($q){
+        $receipts = $this->paginate($this->Receipts->find()->where($where)->where(['company_id'=>$st_company_id,'Receipts.financial_year_id'=>$st_year_id])->contain(['ReceiptRows'=>function($q){
 			$ReceiptRows = $this->Receipts->ReceiptRows->find();
 			$totalCrCase = $ReceiptRows->newExpr()
 				->addCase(
@@ -336,13 +336,13 @@ class ReceiptsController extends AppController
             $receipt = $this->Receipts->patchEntity($receipt, $this->request->data);
 			$receipt->company_id=$st_company_id;
 			//Voucher Number Increment
-			$last_voucher_no=$this->Receipts->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no=$this->Receipts->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'Receipts.financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
 				$receipt->voucher_no=$last_voucher_no->voucher_no+1;
 			}else{
 				$receipt->voucher_no=1;
 			}
-			
+			$receipt->financial_year_id=$st_year_id;
 			$receipt->created_on=date("Y-m-d");
 			$receipt->created_by=$s_employee_id;
 			$receipt->transaction_date=date("Y-m-d",strtotime($receipt->transaction_date));
@@ -489,7 +489,7 @@ class ReceiptsController extends AppController
 		}else{
 			$ReceivedFroms_selected='no';
 		}
-        $this->set(compact('receipt', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last'));
+        $this->set(compact('receipt', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last','fromdate1','todate1'));
         $this->set('_serialize', ['receipt']);
     }
 

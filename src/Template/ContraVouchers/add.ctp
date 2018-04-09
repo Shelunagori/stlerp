@@ -40,7 +40,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
             <div class="col-md-3">
                 <div class="form-group">
                     <label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y"),'data-date-start-date' 
+                    <?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => '','data-date-start-date' 
                     =>$start_date ,'data-date-end-date' => $end_date,'required']); ?>
                 </div>
                     <span style="color: red;">
@@ -555,8 +555,8 @@ $(document).ready(function() {
                     </div>
                     <div class="col-md-5  " style="padding-left: 0;">
                         <select name="cr_dr" class="form-control input-sm cr_dr" >
-                            <option value="Cr">Cr</option>
-                            <option value="Dr">Dr</option>
+							<option value="Dr">Dr</option>
+						   <option value="Cr">Cr</option>
                         </select>
                     </div>
                 </div>

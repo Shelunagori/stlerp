@@ -16,18 +16,20 @@
 						<th width="20%">Company Name</th>
 						<th width="10%">Action</th>
 						<th width="10%">Freeze</th>
-						<!--<th width="10%">Serial Number</th>-->
+						<th width="10%">Serial Number</th>
 						<th width='10%'>Min. Selling Factor</th>
 						<th width='10%'>Minimum Stock</th>
 					</tr>
 				</thead>
 				<tbody>
 				<?php $i=0; foreach ($Company_array as $key=>$Company_array){ $i++;
+				$Item_ledgers_exist=@$Item_ledgers_status[$key];
 				$c_namrr=$Company_array1[$key];
 				$bill_to_bill=@$Company_array2[$key];
 				$item_serial_no=@$Company_array3[$key];
 				$selling_factor=@$Company_array4[$key];
 				$stock=@$Company_array5[$key];
+				//echo $Item_ledgers_exist;
 				?>
 					<tr class='main_tr'>
 						<input type='hidden' class='form-control item_id' value='<?php echo $item_data->id ?>'>
@@ -78,8 +80,8 @@
 							) ?>
 							<?php }  ?>
 						</td>
-						<!--<td class="actions">
-						 	<?php if($item_serial_no ==0 && $Company_array=='Yes') { ?>
+						<td class="actions">
+						 	<?php if($item_serial_no ==0 && $Company_array=='Yes'  && empty(@$Item_ledgers_exist)) { ?>
 							 <?= $this->Html->link('Disabled ',
 								['action' => 'askSerialNumber',$item_id,$key],
 								[
@@ -88,7 +90,7 @@
 									
 								]
 							) ?>
-							<?php  } else if($Company_array=='Yes')  { ?>
+							<?php  } else if($Company_array=='Yes' && empty(@$Item_ledgers_exist))  { ?>
 							<?= $this->Form->postLink(' Enabled ',
 								['action' => 'SerialNumberEnabled', $key,$item_id,$item_serial_no="0"],
 								[
@@ -98,7 +100,7 @@
 								]
 							) ?>
 							<?php }  ?>
-						</td>-->	
+						</td>	
 						<td>
 						<?php if($Company_array=='Yes') {
 							 echo $this->Form->input('minimum_selling_price_factor', ['type' => 'text','style'=>'width:65%;','label' => false,'class' => 'form-control input-sm selling_factor','value'=>$selling_factor]); 

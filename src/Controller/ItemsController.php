@@ -21,7 +21,7 @@ class ItemsController extends AppController
          ];
 		 
     public function index()
-    {
+    {  
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
@@ -59,7 +59,7 @@ class ItemsController extends AppController
 				return $q->where(['company_id'=>$st_company_id]);
 				}])
 				->where($where)->order(['Items.name' => 'ASC']);
-		//pr( $items); exit;
+		
 
         $this->set(compact('items'));
         $this->set('_serialize', ['items']);
@@ -95,7 +95,7 @@ class ItemsController extends AppController
         $item = $this->Items->newEntity();
         if ($this->request->is('post')) {
             $item = $this->Items->patchEntity($item, $this->request->data);
-			//pr($this->request->data['companies']['serial_number_enable']);exit;
+			//pr($this->request->data['companies']);exit;
 			if ($this->Items->save($item)) {
 				foreach($this->request->data['companies']['serial_number_enable'] as $key=>$sr_nos){
 					if(!empty($sr_nos)){
@@ -493,16 +493,21 @@ class ItemsController extends AppController
 		$Company_array1=[];
 		$Company_array2=[];
 		$Company_array3=[];
+		$Item_ledgers_status=[];
 		foreach($Companies as $Company){
 			$Company_exist= $this->Items->ItemCompanies->exists(['item_id' => $item_id,'company_id'=>$Company->id]);
 			if($Company_exist){
 				$item_data= $this->Items->ItemCompanies->find()->where(['item_id' => $item_id,'company_id'=>$Company->id])->first();
+				
+				$Item_ledgers_data= $this->Items->ItemLedgers->exists(['item_id' => $item_id,'company_id'=>$Company->id]);
+				
 				$Company_array[$Company->id]='Yes';
 				$Company_array1[$Company->id]=$Company->name;
 				$Company_array2[$Company->id]=$item_data->freeze;
 				$Company_array3[$Company->id]=$item_data->serial_number_enable;
 				$Company_array4[$Company->id]=$item_data->minimum_selling_price_factor;
 				$Company_array5[$Company->id]=$item_data->minimum_stock;
+				$Item_ledgers_status[$Company->id]=$Item_ledgers_data;
 				
 			}else{
 
@@ -515,9 +520,10 @@ class ItemsController extends AppController
 			}
 
 		} 
+		//pr($Item_ledgers_status); exit;
 		$item_data= $this->Items->get($item_id);
 		
-		$this->set(compact('item_data','Companies','customer_Company','Company_array','item_id','Company_array1','Company_array2','Company_array3','Company_array4','Company_array5'));
+		$this->set(compact('item_data','Companies','customer_Company','Company_array','item_id','Company_array1','Company_array2','Company_array3','Company_array4','Company_array5','Item_ledgers_status'));
 
 	}
 	

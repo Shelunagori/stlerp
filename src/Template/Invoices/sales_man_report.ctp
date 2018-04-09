@@ -21,9 +21,7 @@
 						<td width="10%">
 							<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Transaction To" value="<?php echo @date('d-m-Y', strtotime($To));  ?>"  data-date-format="dd-mm-yyyy" >
 						</td>
-						<td width="10%">
-								<?php echo $this->Form->input('item_name', ['empty'=>'---Items---','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$item_name) ]); ?>
-						</td>
+						
 						<td width="10%">
 								<?php echo $this->Form->input('item_category', ['empty'=>'---Category---','options' => $ItemCategories,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$item_category) ]); ?>
 						</td>
@@ -36,7 +34,25 @@
 							<?php echo $this->Form->input('item_sub_group_id', ['empty'=>'---Sub-Group---','options' =>$ItemSubGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$item_sub_group)]); ?></div>
 						</td>
 						<td width="10%">
+								<?php echo $this->Form->input('item_name', ['empty'=>'---Items---','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$item_name) ]); ?>
+						</td>
+						
+					</tr>
+					<tr>
+						<td width="10%">
 							<?php echo $this->Form->input('salesman_name', ['empty'=>'---SalesMan---','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$salesman_id) ]); ?>
+						</td>
+						<td width="10%">
+							<?php echo $this->Form->input('Customer_segment_id', ['empty'=>'---Customer Segment---','options' => $CustomerSegments,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Customer_segment_id) ]); ?>
+						</td>
+						<td width="10%">
+							<?php echo $this->Form->input('Customer_group_id', ['empty'=>'---Customer Group---','options' => $CustomerGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Customer_group_id) ]); ?>
+						</td>
+						<td width="10%">
+							<?php echo $this->Form->input('States_id', ['empty'=>'---States---','options' => $States,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$States_id) ]); ?>
+						</td>
+						<td width="10%">
+							<?php echo $this->Form->input('Districts_id', ['empty'=>'---District---','options' => $Districts,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Districts_id) ]); ?>
 						</td>
 						<td width="5%">
 							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
@@ -80,10 +96,10 @@
 						{ 
 							 if($invoice_row['igst_percentage'] == 0){
 							
-							@$gstTotal[$invoice->id][$invoice_row['cgst_percentage']]+=@$gstTotal[$invoice->id][$invoice_row['cgst_percentage']]+(@$invoice_row->taxable_value);
+							@$gstTotal[$invoice->id][$invoice_row['cgst_percentage']]=@$gstTotal[$invoice->id][$invoice_row['cgst_percentage']]+(@$invoice_row->taxable_value);
 							}
 							else if($invoice_row['igst_percentage'] > 0){
-								@$SigstTotal[$invoice->id][$invoice_row['igst_percentage']]+=@$SigstTotal[$invoice->id][$invoice_row['igst_percentage']]+$invoice_row->taxable_value;
+								@$SigstTotal[$invoice->id][$invoice_row['igst_percentage']]=@$SigstTotal[$invoice->id][$invoice_row['igst_percentage']]+$invoice_row->taxable_value;
 							} 
 						}
 						

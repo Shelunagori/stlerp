@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Mailer\Email;
 
 /**
  * Payments Controller
@@ -57,7 +58,7 @@ class PaymentsController extends AppController
         ];
 		
 		
-		$payments = $this->paginate($this->Payments->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['PaymentRows'=>function($q){
+		$payments = $this->paginate($this->Payments->find()->where($where)->where(['company_id'=>$st_company_id,'Payments.financial_year_id'=>$st_year_id])->contain(['PaymentRows'=>function($q){
 			$PaymentRows = $this->Payments->PaymentRows->find();
 			$totalCrCase = $PaymentRows->newExpr()
 				->addCase(
@@ -280,6 +281,7 @@ class PaymentsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->Payments->Companies->get($st_company_id);
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Payments->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->Payments->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
@@ -339,7 +341,7 @@ class PaymentsController extends AppController
             $payment = $this->Payments->patchEntity($payment, $this->request->data);
 			$payment->company_id=$st_company_id;
 			//Voucher Number Increment
-			$last_voucher_no=$this->Payments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no=$this->Payments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
 				$payment->voucher_no=$last_voucher_no->voucher_no+1;
 			}else{
@@ -347,6 +349,7 @@ class PaymentsController extends AppController
 			}
 			
 			$payment->created_on=date("Y-m-d");
+			$payment->financial_year_id=$st_year_id;
 			$payment->created_by=$s_employee_id;
 			$payment->transaction_date=date("Y-m-d",strtotime($payment->transaction_date));
 			foreach($payment->payment_rows as $key => $payment_row)
@@ -354,9 +357,7 @@ class PaymentsController extends AppController
 				$payment_row->grn_ids = @$grnIds[$key];
 				$payment_row->invoice_ids =@$invoiceIds[$key];
 			}
-			
-			
-			if ($this->Payments->save($payment)) {
+		if ($this->Payments->save($payment)) {
 				
 				$total_cr=0; $total_dr=0;
 				foreach($payment->payment_rows as $key => $payment_row)
@@ -385,6 +386,40 @@ class PaymentsController extends AppController
 							->execute();
 						}
 					}
+					
+					$LedgerAccount=$this->Payments->PaymentRows->LedgerAccounts->get($payment_row->received_from_id);
+					if($LedgerAccount->source_model=="Vendors"){
+						$id=$payment->id;
+						 $payment = $this->Payments->get($id, [
+							'contain' => ['BankCashes','Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+						]);
+						$Vendor=$this->Payments->Vendors->get($LedgerAccount->source_id, ['contain' =>['VendorContactPersons']]);
+						//pr($payment->creator->email); exit;
+						$email = new Email('default');
+						$email->transport('gmail');
+						$email_to=$Vendor->vendor_contact_persons[0]->email;
+						$cc_mail=$payment->creator->email;
+						//pr($email_to);
+						//pr($cc_mail); exit;
+						$email_to="gopalkrishanp3@gmail.com";
+						$cc_mail="gopal@phppoets.in";
+						$member_name="Gopal";
+						$from_name=$company_data->alias;
+						$sub="For Payment";
+						
+						
+						$email->from(['dispatch@mogragroup.com' => $from_name])
+						->to($email_to)
+						->cc($cc_mail)
+						->replyTo('dispatch@mogragroup.com')
+						->subject($sub)
+						->template('send_payment_voucher')
+						->emailFormat('html')
+						->viewVars(['payment'=>$payment,'member_name'=>$member_name]);
+						$email->send();
+						 pr($payment); exit;
+					}
+					
 				}
 				$total_cr=0; $total_dr=0;
 				foreach($payment->payment_rows as $payment_row){ 
@@ -541,7 +576,18 @@ class PaymentsController extends AppController
      * @return \Cake\Network\Response|void Redirects on successful edit, renders view otherwise.
      * @throws \Cake\Network\Exception\NotFoundException When record not found.
      */
-    public function edit($id = null)
+    public function SendMail($id = null)
+    {
+		 $payment = $this->Payments->get($id, [
+            'contain' => ['BankCashes', 'Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+        ]);
+		?>
+		
+		
+		<?php 
+	pr($payment); exit;
+	}
+		public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
 		

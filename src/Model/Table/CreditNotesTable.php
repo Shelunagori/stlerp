@@ -44,6 +44,7 @@ class CreditNotesTable extends Table
         $this->belongsTo('FinancialMonths');
         $this->belongsTo('ReferenceBalances');
         $this->belongsTo('ReferenceDetails');
+        $this->belongsTo('SaleReturns');
         $this->belongsTo('Ledgers');
         $this->belongsTo('CustomerSuppilers', [
 			'className'=>'LedgerAccounts',
@@ -51,6 +52,11 @@ class CreditNotesTable extends Table
             'joinType' => 'INNER'
         ]);
 
+		 $this->belongsTo('BankCashes', [
+			'className' => 'LedgerAccounts',
+            'foreignKey' => 'bank_cash_id',
+            'propertyName' => 'BankCash',
+        ]);
         $this->belongsTo('Heads', [
 			'className'=>'LedgerAccounts',
             'foreignKey' => 'customer_suppiler_id',
@@ -72,10 +78,14 @@ class CreditNotesTable extends Table
             'foreignKey' => 'company_id',
             'joinType' => 'INNER'
         ]);
-        $this->hasMany('CreditNotesRows', [
+        $this->belongsTo('SaleTaxes'); 
+		
+		$this->hasMany('CreditNotesRows', [
             'foreignKey' => 'credit_note_id',
 			'saveStrategy' => 'replace'
         ]);
+		
+		
 		
     }
 

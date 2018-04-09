@@ -645,11 +645,31 @@ select
 							</ul>
 						</li>
 						<?php } ?>
+						
+						<?php if(in_array(106,$allowed_pages)||in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
+						<li>
+							<a href="javascript:;">
+							<i class="icon-basket"></i>
+							<span class="title">Credit Notes</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+							<?php if(in_array(106,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'Add', '/CreditNotes/add' ); ?></li>
+							<?php } ?>
+							<?php if(in_array(107,$allowed_pages)|| in_array(108,$allowed_pages) ||in_array(109,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'View', '/CreditNotes' ); ?></li>
+							<?php } ?>
+							</ul>
+						</li>
+						<?php } ?>
+						
+						
 					</ul>
 					</ul>
 				</li>
 				<?php } ?>
-				<?php if(in_array(141,$allowed_pages)||in_array(149,$allowed_pages)|| in_array(128,$allowed_pages) ||in_array(36,$allowed_pages) || in_array(37,$allowed_pages) || in_array(38,$allowed_pages) || in_array(41,$allowed_pages) || in_array(39,$allowed_pages) || in_array(40,$allowed_pages) || in_array(126,$allowed_pages) || in_array(162,$allowed_pages) || in_array(164,$allowed_pages)|| in_array(163,$allowed_pages)){ ?>
+				<?php if(in_array(141,$allowed_pages)|| in_array(128,$allowed_pages) ||in_array(36,$allowed_pages) || in_array(37,$allowed_pages) || in_array(38,$allowed_pages) || in_array(41,$allowed_pages) || in_array(39,$allowed_pages) || in_array(40,$allowed_pages) || in_array(126,$allowed_pages) || in_array(162,$allowed_pages) || in_array(164,$allowed_pages)|| in_array(163,$allowed_pages)|| in_array(175,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-bar-chart-o"></i>
@@ -722,11 +742,13 @@ select
 							<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Daily Report',array('controller'=>'Ledgers','action'=>'index','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php } ?>
+						<?php if(in_array(175,$allowed_pages)){?>
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> HSN Wise Sale',array('controller'=>'Invoices','action'=>'HsnWiseReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Invoice Wise HSN Details',array('controller'=>'Invoices','action'=>'InvoiceHsnWise','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
+						<?php } ?>
 						<?php if(in_array(39,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Material Indent Report','/Item-Ledgers/material-indent-report?stockstatus=Positive&company_name='.$st_company_id,array('escape'=>false)); ?></li>
 						<?php } ?>

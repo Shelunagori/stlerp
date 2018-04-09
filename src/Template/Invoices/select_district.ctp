@@ -1,0 +1,1 @@
+<?php echo $this->Form->input('Districts_id', ['empty'=>'--Select District--','options' => $Districts,'label' => false,'class' => 'form-control input-sm']); ?>

@@ -55,7 +55,7 @@ class NppaymentsController extends AppController
         ];
         
         
-        $nppayments = $this->paginate($this->Nppayments->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['NppaymentRows'=>function($q){
+        $nppayments = $this->paginate($this->Nppayments->find()->where($where)->where(['company_id'=>$st_company_id,'Nppayments.financial_year_id'=>$st_year_id])->contain(['NppaymentRows'=>function($q){
             $NppaymentRows = $this->Nppayments->NppaymentRows->find();
             $totalCrCase = $NppaymentRows->newExpr()
                 ->addCase(
@@ -386,13 +386,13 @@ class NppaymentsController extends AppController
             $nppayment = $this->Nppayments->patchEntity($nppayment, $this->request->data);
             $nppayment->company_id=$st_company_id;
             //Voucher Number Increment
-            $last_voucher_no=$this->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+            $last_voucher_no=$this->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
             if($last_voucher_no){
                 $nppayment->voucher_no=$last_voucher_no->voucher_no+1;
             }else{
                 $nppayment->voucher_no=1;
             }
-            
+            $nppayment->financial_year_id=$st_year_id;
             $nppayment->created_on=date("Y-m-d");
             $nppayment->created_by=$s_employee_id;
             $nppayment->transaction_date=date("Y-m-d",strtotime($nppayment->transaction_date));

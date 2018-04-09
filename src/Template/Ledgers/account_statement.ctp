@@ -57,11 +57,11 @@ $url_excel="/?".$url;
 									<?php echo $this->Form->input('ledger_account_id', ['empty'=>'--Select--','options' => $ledger,'empty' => "--Select Ledger Account--",'label' => false,'class' => 'form-control input-sm select2me','required','value'=>@$ledger_account_id]); ?>
 							</div>
 							<div class="col-md-4">
-								<?php echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($from)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+								<?php echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($from)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
 								
 							</div>
 							<div class="col-md-4">
-								<?php echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($To)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+								<?php echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($To)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
 							</div>
 						</div>
 					</td>
@@ -74,7 +74,13 @@ $url_excel="/?".$url;
 <?php if(!empty($Ledger_Account_data)){  ?>
 		<div class="row ">
 			<div class="col-md-12">
-				<div class="col-md-3"></div>
+				
+				<div class="col-md-2">
+				<?php if($Ledger_Account_data->source_model=="Customers" || $Ledger_Account_data->source_model=="Vendors") {?>
+					<button type="button" ledger_id="<?php echo $ledger_account_id;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
+				<?php } ?>
+				</div>
+				<div class="col-md-1"></div>
 				<div class="col-md-6">
 					<div class="col-md-12 " style="text-align:center; font-size: 20px;"><?php if(!empty(@$Ledger_Account_data->alias)){ echo @$Ledger_Account_data->name.'('.@$Ledger_Account_data->alias.')';
 					}else{ echo @$Ledger_Account_data->name; }?></div>
@@ -84,6 +90,7 @@ $url_excel="/?".$url;
 					<?php echo $Ledger_Account_data->account_second_subgroup->name; ?></div>
 				</div>
 				<div class="col-md-3"></div>
+				
 			</div>
 		</div><br/>
 
@@ -153,7 +160,6 @@ $url_excel="/?".$url;
 						<th>Transaction Date</th>
 						<th>Source</th>
 						<th>Voucher No</th>
-						<th>Reference</th>
 						<th>Party</th>
 						<th>GST</th>
 						<th>VAT</th>
@@ -404,3 +410,27 @@ $url_excel="/?".$url;
 <?php } ?>
 </div></div>
 </div>
+
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<script>
+$(document).ready(function() {
+	
+$('.send_mail').die().live("click",function() {
+	var ledger_id=$(this).attr('ledger_id');
+	var from_date=$('.from_date').val();
+	var to_date=$('.to_date').val();
+	
+	 var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'sendMail']); ?>";
+	url=url+'?id='+ledger_id+'&from='+from_date+'&to='+to_date;
+	
+	$.ajax({
+		url: url,
+		type: "GET",
+	}).done(function(response) { 
+	alert(response);
+		//alert("Email Send successfully")
+	}); 
+	
+});
+});
+</script>

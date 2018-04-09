@@ -32,7 +32,7 @@ border:none;
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Loan Application</span>
+			<span class="caption-subject font-blue-steel uppercase">Salary Advance</span>
 		</div>
 	</div>
 

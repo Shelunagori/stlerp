@@ -61,6 +61,7 @@
 								}else{
 									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
 								}
+									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstConfirm', $saleReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
 							} ?>
 							
 						</td>	

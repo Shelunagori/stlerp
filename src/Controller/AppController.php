@@ -38,7 +38,7 @@ class AppController extends Controller
      * @return void
      */
     public function initialize()
-    {
+    { 
         parent::initialize();
 
         $this->loadComponent('RequestHandler');
@@ -133,7 +133,7 @@ class AppController extends Controller
 			$employees_data= $this->EmployeeHierarchies->find()->where(['employee_id'=>$login_emp->employee_id])->first();
 			$allowed_emp=array();
 			
-			if($login_emp->employee_id==23){
+			if($login_emp->employee_id==23 || $login_emp->employee_id==16 || $login_emp->employee_id==17){
 				$employees_info= $this->Employees->find();
 				foreach($employees_info as $data1){ 
 					$allowed_emp[]=$data1->id; 
@@ -143,6 +143,7 @@ class AppController extends Controller
 				$children = $this->EmployeeHierarchies
 				->find('children', ['for' =>$employees_data->id])
 				->toArray();
+			//	pr($employees_data->id); 
 				//pr($children); exit;
 				if($children){ //exit;
 					$allowed_emp=array();
@@ -157,6 +158,25 @@ class AppController extends Controller
 					//pr($allowed_emp); exit;
 				}
 			}
+			
+		/* 	if($employees_data){
+				$children = $this->EmployeeHierarchies
+				->find('children', ['for' =>$employees_data->id])
+				->toArray();
+				pr($children); exit;
+				if($children){ //exit;
+					$allowed_emp=array();
+					foreach($children as $data){
+						$allowed_emp[]=$data->employee_id;
+					} 
+					$allowed_emp[]=$login_emp->employee_id; 
+					//pr($allowed_emp); exit;
+				}else{
+					
+					$allowed_emp[]=$login_emp->employee_id; 
+					//pr($allowed_emp); exit;
+				}
+			} */
 
 
 			//pr($allowed_emp); exit;
@@ -331,7 +351,7 @@ class AppController extends Controller
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
 				}else{
-					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
 				}
 				
 				foreach($StockLedgers as $StockLedger){
@@ -346,7 +366,7 @@ class AppController extends Controller
 				}
 				foreach($StockLedgers as $StockLedger){
 					$processed_on=date('Y-m-d',strtotime($StockLedger->processed_on));
-					if($StockLedger->in_out=='Out' and $processed_on<$date){
+					if($StockLedger->in_out=='Out'){
 						/* if(sizeof(@$stock[$Item->id])>0){
 							$stock[$Item->id] = array_slice($stock[$Item->id], $StockLedger->quantity*100); 
 						} */
@@ -386,12 +406,12 @@ class AppController extends Controller
 				if(strtotime($date)==strtotime('2017-04-01')){
 					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
 				}else{
-					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date < '=>$date])->toArray();
+					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
 				}
 				
 				foreach($ItemSerialNumbers as $ItemSerialNumber){ 		
 					if(@$ItemSerialNumber->grn_id > 0){ 
-					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]);
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
 						if($outExist == 0){ 
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->grn_id,'source_model'=>"Grns",'source_row_id'=>$ItemSerialNumber->grn_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
@@ -403,7 +423,7 @@ class AppController extends Controller
 						}
 					}
 					if(@$ItemSerialNumber->sales_return_id > 0){ 
-					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]);
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
 						if($outExist == 0){
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->sales_return_id,'source_model'=>"Sale Return",'source_row_id'=>$ItemSerialNumber->sales_return_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 						//	pr($ItemLedgerData); 
@@ -415,7 +435,7 @@ class AppController extends Controller
 						}
 					}
 					if(@$ItemSerialNumber->itv_id > 0){
-					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
 						if($outExist == 0){  
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_id'=>$ItemSerialNumber->itv_id,'source_model'=>"Inventory Transfer Voucher",'source_row_id'=>$ItemSerialNumber->itv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 							//pr($ItemLedgerData); 
@@ -427,7 +447,7 @@ class AppController extends Controller
 						}
 					}
 					if(@$ItemSerialNumber->iv_row_id > 0){
-					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
 						if($outExist == 0){  
 							$ItemLedgerData =$this->ItemLedgers->find()->where(['source_model'=>"Inventory Vouchers",'iv_row_id'=>$ItemSerialNumber->iv_row_id,'ItemLedgers.processed_on <='=>$date])->first();
 							//pr($ItemLedgerData); 
@@ -440,9 +460,9 @@ class AppController extends Controller
 					}
 					if(@$ItemSerialNumber->is_opening_balance == "Yes"){ //pr($ItemSerialNumber->id);
 						if(strtotime($date)==strtotime('2017-4-1')){
-							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
 						}else{
-							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date < '=>$date]); 
+							$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]); 
 						}
 					
 						if($outExist == 0){
@@ -457,16 +477,38 @@ class AppController extends Controller
 					}
 				}
 			
+			}
 		}
-		}
+		
 		//pr($sumValue); exit;
-		$closingValue=0;
+		/* $closingValue=0;
 		foreach($stockNew as $qw){
 			foreach($qw as $rt){
 				$closingValue+=$rt['qty']*$rt['rate'];
 			}
+		} */
+		
+		$closingValue=0; $itmQty=[]; $itemRate=[];
+		foreach($stockNew as $key=>$qw){
+			foreach($qw as $rt){
+				
+				@$itmQty[@$key]+=@$rt['qty'];
+				@$itemRate[@$key]+=@$rt['qty']*@$rt['rate'];
+				$closingValue+=$rt['qty']*$rt['rate'];
+			}
 		}
-		return $closingValue;
+//exit;	
+	$total_amt=0;	$unit_rrate=0;
+		foreach($Items as $Item){ //pr($Item->id);
+			if(@$itmQty[@$Item->id] > 0){
+				//echo @$itemRate[@$Item->id]."----".@$itmQty[@$Item->id].'----'.$Item->name.'<br/>';
+				$unit_rrate=@$itemRate[@$Item->id]/@$itmQty[@$Item->id];
+				$total_amt+=@$unit_rrate*@$itmQty[@$Item->id];
+			}
+		}
+		
+		
+		return $total_amt;
 		//return round($sumValue,2); 
 	}
 	
@@ -477,7 +519,7 @@ class AppController extends Controller
 		//pr($date);exit;
 		//$date=$this->request->query('date');
 		$date=date("Y-m-d",strtotime($date));
-	
+	//pr($date); exit;
 		$this->loadModel('ItemLedgers');
 		$Items =$this->ItemLedgers->Items->find()->contain(['ItemCompanies'=>function($p) use($st_company_id){
 		return $p->where(['ItemCompanies.company_id' => $st_company_id]);
@@ -487,7 +529,8 @@ class AppController extends Controller
 		$sumValue=0; $sumValue2=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
 			if(@$Item->item_companies[0]->serial_number_enable==0){ $stock=[];  
-				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+				$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC'])->toArray();
+				
 				foreach($StockLedgers as $StockLedger){ 
 					if($StockLedger->in_out=='In'){ 
 						//if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
@@ -501,7 +544,7 @@ class AppController extends Controller
 				
 				foreach($StockLedgers as $StockLedger){
 					$processed_on=date('Y-m-d',strtotime($StockLedger->processed_on));
-					if($StockLedger->in_out=='Out' and $processed_on<$date){
+					if($StockLedger->in_out=='Out' and $processed_on<=$date){
 						/* if(sizeof(@$stock[$Item->id])>0){
 							$stock[$Item->id] = array_slice($stock[$Item->id],  $StockLedger->quantity*100); 
 						} */
@@ -539,9 +582,16 @@ class AppController extends Controller
 				} */
 				
 			}else if(@$Item->item_companies[0]->serial_number_enable==1){
-				$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+			//	$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'SerialNumbers.status'=>'In','SerialNumbers.transaction_date <= '=>$date])->toArray();
 				
-				foreach($ItemSerialNumbers as $ItemSerialNumber){		
+				if(strtotime($date)==strtotime('2017-04-01')){
+					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+				}else{
+					$ItemSerialNumbers=$this->ItemLedgers->SerialNumbers->find()->where(['SerialNumbers.item_id'=>$Item->id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','transaction_date <= '=>$date])->toArray();
+				}
+			
+				
+				foreach($ItemSerialNumbers as $ItemSerialNumber){ 	
 					if(@$ItemSerialNumber->grn_id > 0){ 
 					$outExist = $this->ItemLedgers->Items->SerialNumbers->exists(['SerialNumbers.parent_id' => $ItemSerialNumber->id,'transaction_date <= '=>$date]);
 						if($outExist == 0){
@@ -611,13 +661,29 @@ class AppController extends Controller
 	//	pr($itemSerialQuantity); 
 	//	exit;
 		//$output=$sumValue+$sumValue2;
-		$closingValue=0;
-		foreach($stockNew as $qw){
+		$closingValue=0; $itmQty=[]; $itemRate=[];
+		foreach($stockNew as $key=>$qw){
 			foreach($qw as $rt){
+				
+				@$itmQty[@$key]+=@$rt['qty'];
+				@$itemRate[@$key]+=@$rt['qty']*@$rt['rate'];
 				$closingValue+=$rt['qty']*$rt['rate'];
 			}
 		}
-		return $closingValue;
+//exit;	
+	$total_amt=0;	$unit_rrate=0;
+		foreach($Items as $Item){ //pr($Item->id);
+			if(@$itmQty[@$Item->id] > 0){
+				//echo @$itemRate[@$Item->id]."----".@$itmQty[@$Item->id].'----'.$Item->name.'<br/>';
+				$unit_rrate=@$itemRate[@$Item->id]/@$itmQty[@$Item->id];
+				$total_amt+=@$unit_rrate*@$itmQty[@$Item->id];
+			}
+		}
+
+		//pr($closingValue);
+		//pr($total_amt); 
+		//exit;
+		return $total_amt;
 		//return round($sumValue,2);
 		//return 0; 
 	}
@@ -659,7 +725,7 @@ class AppController extends Controller
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date, 'Ledgers.company_id'=>$st_company_id])->first();
+							->where(['Ledgers.ledger_account_id'=>$ledger_account->id,'Ledgers.transaction_date >='=>$from_date, 'Ledgers.transaction_date <='=>$to_date, 'Ledgers.company_id'=>$st_company_id])->first();
 							@$groupForPrint[$account_group->id]['name']=@$account_group->name;
 							@$groupForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
 						}
@@ -677,11 +743,14 @@ class AppController extends Controller
 			}
 		}
 		
-		$openingValue= $this->StockValuationWithDate(date('Y-m-d',strtotime('2017-4-1')));
+		$openingValue= $this->StockValuationWithDate($from_date);
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		
 		$totalDr+=$openingValue;
 		$totalCr+=$closingValue;
+		//pr($totalCr-$totalDr);
+		//pr($closingValue); 
+		//exit;
 		return round($totalCr-$totalDr,2);
 	}
 

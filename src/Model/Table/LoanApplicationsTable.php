@@ -34,6 +34,12 @@ class LoanApplicationsTable extends Table
         $this->table('loan_applications');
         $this->displayField('id');
         $this->primaryKey('id');
+		 $this->belongsTo('Employees');
+		$this->belongsTo('empData', [
+			'className' => 'Employees',
+            'foreignKey' => 'parent_employee_id',
+            'joinType' => 'INNER'
+        ]);
     }
 
     /**

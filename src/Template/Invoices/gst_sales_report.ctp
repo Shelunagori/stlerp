@@ -508,7 +508,7 @@
 							if($voucherLedgerDetailsGst->ledger_account_id==$AllTax){ ?>
 								<?php if($voucherLedgerDetailsGst->debit == 0){ ?>
 							<td style="text-align:right;"><?php echo $voucherLedgerDetailsGst->credit;  echo "Cr"; 
-								$TotalAmountCr[@$AllTax]=$TotalAmountCr[@$AllTax]+$voucherLedgerDetailsGst->credit;
+								@$TotalAmountCr[@$AllTax]=@$TotalAmountCr[@$AllTax]+@$voucherLedgerDetailsGst->credit;
 								?>
 							</td>
 							<?php } else {?>
