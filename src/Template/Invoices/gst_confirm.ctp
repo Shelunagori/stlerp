@@ -20,8 +20,10 @@ $mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
 				if(!in_array(date("m-Y",strtotime($invoice->date_created)),$closed_month))
 				{ 
 				?>
+			<?php if($st_year_id==$invoice->financial_year) {?>	
 			<a href="<?php echo $Edit_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-edit"></i> Edit </a>
-			<?php } } ?>
+			
+			<?php } } } ?>
 			<a href="#" class="list-group-item" onclick="window.close()"><i class="fa fa-times"></i> Close </a>
 		</div>
 		

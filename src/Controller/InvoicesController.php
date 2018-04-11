@@ -3394,6 +3394,7 @@ class InvoicesController extends AppController
 		$this->viewBuilder()->layout('pdf_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$company_data=$this->Invoices->Companies->get($st_company_id);
 		$invoice = $this->Invoices->get($id, [
             'contain' => [
@@ -3434,7 +3435,7 @@ class InvoicesController extends AppController
 			return $this->redirect(['action' => 'GstConfirm/'.$id]);
         }
 		$termsConditions = $this->Invoices->DispatchDocuments->find('all',['limit' => 200]);
-		$this->set(compact('invoice','id','termsConditions','company_data'));
+		$this->set(compact('invoice','id','termsConditions','company_data','st_year_id'));
     }
 	
 	public function gstSalesReport(){

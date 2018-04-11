@@ -42,18 +42,7 @@
 						<td width="10%">
 							<?php echo $this->Form->input('salesman_name', ['empty'=>'---SalesMan---','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$salesman_id) ]); ?>
 						</td>
-						<td width="10%">
-							<?php echo $this->Form->input('Customer_segment_id', ['empty'=>'---Customer Segment---','options' => $CustomerSegments,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Customer_segment_id) ]); ?>
-						</td>
-						<td width="10%">
-							<?php echo $this->Form->input('Customer_group_id', ['empty'=>'---Customer Group---','options' => $CustomerGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Customer_group_id) ]); ?>
-						</td>
-						<td width="10%">
-							<?php echo $this->Form->input('States_id', ['empty'=>'---States---','options' => $States,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$States_id) ]); ?>
-						</td>
-						<td width="10%">
-							<?php echo $this->Form->input('Districts_id', ['empty'=>'---District---','options' => $Districts,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$Districts_id) ]); ?>
-						</td>
+						
 						<td width="5%">
 							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 						</td>
