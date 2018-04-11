@@ -517,6 +517,16 @@ fieldset legend {
 							</label>
 						</div>
 				</div>
+				<div class="col-md-3">
+					<div class="titletext"><b>HSN Wise Report</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(175,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.175.page_id', ['label' => 'View','class' => '','type'=>'checkbox','value'=>175,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
 				<div class="col-md-4">
 					<div class="titletext"><b>Bank Reconciliation Report</b></div>
 						<div class="checkbox-list">
@@ -534,6 +544,7 @@ fieldset legend {
 							
 						</div>
 				</div>
+				
 				
              </fieldset> 
 		</div>
@@ -965,6 +976,17 @@ fieldset legend {
 							</label>
 						</div>
 				</div>
+				
+				<div class="col-md-3">
+					<div class="titletext"><b>Employee Hierarchy</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(169,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.169.page_id', ['label' => 'Add','class' => '','type'=>'checkbox','value'=>169,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
                 
                 </div>
                 </fieldset>
@@ -1151,7 +1173,7 @@ fieldset legend {
 							</label>
 						</div>
 				</div>
-				<!--<div class="col-md-3">
+				<div class="col-md-3">
 					<div class="titletext"><b>CreditNotes</b></div>
 						<div class="checkbox-list">
 							<label class="checkbox-inline">
@@ -1229,7 +1251,7 @@ fieldset legend {
 								echo $this->Form->input('user_rights.113.page_id', ['label' => 'List','class' => '','type'=>'checkbox','value'=>113,$checked_status]); ?>
 							</label>
 						</div>
-				</div>-->
+				</div>
 				<div class="col-md-3">
 					<div class="titletext"><b>Journal Vouchers</b></div>
 						<div class="checkbox-list">
@@ -1266,6 +1288,45 @@ fieldset legend {
 								<?php
 								if(in_array(117,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
 								echo $this->Form->input('user_rights.117.page_id', ['label' => 'List','class' => '','type'=>'checkbox','value'=>117,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
+				<div class="col-md-3">
+					<div class="titletext"><b>Non Print Vouchers</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(171,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.171.page_id', ['label' => 'Add','class' => '','type'=>'checkbox','value'=>171,$checked_status]); ?>
+							</label>
+						</div>
+				</div><div class="col-md-3">
+					<div class="titletext"> &nbsp </div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(172,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.172.page_id', ['label' => 'Edit','class' => '','type'=>'checkbox','value'=>172,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
+				<div class="col-md-3">
+					<div class="titletext"> &nbsp </div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(173,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.173.page_id', ['label' => 'View','class' => '','type'=>'checkbox','value'=>173,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
+				<div class="col-md-3">
+					<div class="titletext"> &nbsp </div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php
+								if(in_array(174,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.174.page_id', ['label' => 'List','class' => '','type'=>'checkbox','value'=>174,$checked_status]); ?>
 							</label>
 						</div>
 				</div>

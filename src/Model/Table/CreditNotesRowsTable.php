@@ -42,11 +42,12 @@ class CreditNotesRowsTable extends Table
             'joinType' => 'INNER'
         ]);
 
-		$this->belongsTo('Heads', [
+		
+		$this->belongsTo('ReceivedFroms', [
 			'className' => 'LedgerAccounts',
-			'foreignKey' => 'head_id',
-			'propertyName' => 'heads',
-		]);
+            'foreignKey' => 'received_from_id',
+            'propertyName' => 'ReceivedFrom',
+        ]);
 
 
 	}
@@ -68,9 +69,7 @@ class CreditNotesRowsTable extends Table
             ->requirePresence('amount', 'create')
             ->notEmpty('amount');
 
-        $validator
-            ->requirePresence('narration', 'create')
-            ->notEmpty('narration');
+      
 
         return $validator;
     }
@@ -85,7 +84,7 @@ class CreditNotesRowsTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['credit_note_id'], 'CreditNotes'));
-        $rules->add($rules->existsIn(['head_id'], 'Heads'));
+       // $rules->add($rules->existsIn(['head_id'], 'Heads'));
 
         return $rules;
     }

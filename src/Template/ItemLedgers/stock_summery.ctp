@@ -1,6 +1,8 @@
 <?php
 //pr(@$itemSerialNumberStatus); exit;
- $url_excel="/?".$url; ?>
+ $url_excel="/?".$url;
+//$item_stocks=array_merge($item_stocks,$ItemDatas);
+ ?>
 
 <div class="portlet light bordered">
 	<div class="portlet-title">
@@ -95,8 +97,8 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php $total_inv=0; $totalColumn=0; $page_no=0;  $RowTotal=0;
-						foreach ($item_stocks as $key=>$item_stock){
+						<?php $total_inv=0; $totalColumn=0; $page_no=0;  $RowTotal=0; $unitRate=0;
+						foreach ($items_names as $key=> $items_name){ 
 						if(@$itmQty[$key]==0){
 							$unitRate=0;
 						}else{
@@ -109,23 +111,25 @@
 							<td><?= h(++$page_no) ?></td>
 							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide show_data" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
 								<button type="button" class="btn btn-xs tooltips revision_show" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
-								&nbsp;&nbsp;<?= h($items_names[$key]) ?><div class="show_ledger"></div></td>
-							<td><?= h($item_stock) ?></td>
+								&nbsp;&nbsp;<?= h($items_name) ?><div class="show_ledger"></div></td>
+							<td><?= h($item_stocks[$key]) ?></td>
 							<td><?= h($items_unit_names[$key]) ?></td>
 							<td align="right">
 								<?php 
 								 if(@$itemSerialNumberStatus[$key]==1){
-									if($item_stock > 0){
+									if($item_stocks[$key] > 0){
 										echo $this->Number->format(@$unitRate,['places'=>2]);
 										$RowTotal=@$unitRate*@$itmQty[$key];
+										$totalColumn+=@$unitRate*@$itmQty[$key];
 									}else{
 										echo '0';
 										$RowTotal=0;
 									}
 								}else{
-									if($item_stock > 0){
+									if($item_stocks[$key] > 0){
 										echo $this->Number->format(@$unitRate,['places'=>2]);
 										$RowTotal=@$unitRate*@$itmQty[$key];
+										$totalColumn+=@$unitRate*@$itmQty[$key];
 									}else{
 										echo '0';
 										$RowTotal=0;
@@ -137,28 +141,13 @@
 							<td align="right">
 								<?php
 								    echo $this->Number->format($RowTotal,['places'=>2]);
-									$totalColumn+=$RowTotal;
+									
 								?>
 							</td>
 						</tr>
 						
 						<?php } ?>
-						<?php if($to_date == date('d-m-Y') &&  !($stock_status=="Negative") ){ ?>
-						<?php $page_no1=$page_no; foreach($ItemDatas as $key=>$ItemData){ ?>
-						
-						<tr class="main_tr1" id="<?= h($key) ?>">
-							<td><?= h(++$page_no1) ?></td>
-							<td width="90%" id="<?= h($key) ?>" class="loop_class"><button type="button"  class="btn btn-xs tooltips revision_hide1 show_data1" id="<?= h($key) ?>" value="" style="margin-left:5px;margin-bottom:2px;"><i class="fa fa-plus-circle"></i></button>
-								<button type="button" class="btn btn-xs tooltips revision_show1" style="margin-left:5px;margin-bottom:2px; display:none;"><i class="fa fa-minus-circle"></i></button>
-								&nbsp;&nbsp;<?= h($ItemData) ?><div class="show_ledger1"></div></td>
-							
-							<td><?= h(0) ?></td>
-							
-							<td><?= h($ItemUnits[$key]) ?></td>
-							<td align="right"><?php echo $this->Number->format(0,['places'=>2]); ?></td>
-							<td align="right"><?php echo $this->Number->format(0,['places'=>2]); ?></td>
-						</tr>
-						<?php } } ?>
+					
 						<tr>
 							<td colspan="5" align="right">Total</td>
 							<td align="right"><?php echo $this->Number->format($totalColumn,['places'=>2]); ?></td>
@@ -228,7 +217,7 @@ var $rows = $('#main_tble tbody tr');
 		var from_date = $("#from_date").val();
 		var to_date = $("#to_date").val();
 		var url="<?php echo $this->Url->build(['controller'=>'ItemLedgers','action'=>'fetchLedger']); ?>";
-		url=url+'/'+item_id+'/'+from_date+'/'+to_date; alert(url);
+		url=url+'/'+item_id+'/'+from_date+'/'+to_date; 
 	       $.ajax({
 				url: url,
 				type: 'GET',

@@ -71,6 +71,7 @@ class SaleReturnsTable extends Table
         $this->belongsTo('Invoices', [
             'foreignKey' => 'invoice_id'
         ]);
+		$this->belongsTo('CreditNotes');
 		$this->belongsTo('LedgerAccounts');
 		$this->belongsTo('AccountReferences');
 		$this->belongsTo('AccountFirstSubgroups');
@@ -90,6 +91,12 @@ class SaleReturnsTable extends Table
             'foreignKey' => 'sale_return_id',
 			'saveStrategy'=>'replace'
         ]);
+		
+		$this->belongsTo('Creator', [
+			'className' => 'Employees',
+			'foreignKey' => 'created_by',
+			'propertyName' => 'creator',
+		]);
     }
 
     /**

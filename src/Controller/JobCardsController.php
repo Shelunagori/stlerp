@@ -348,7 +348,7 @@ class JobCardsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $jobCard = $this->JobCards->get($id, [
-            'contain' => ['SalesOrders'=>['SalesOrderRows'=>['Items'=>function ($q){
+            'contain' => ['SalesOrders'=>['Customers','SalesOrderRows'=>['Items'=>function ($q){
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
 				},'JobCardRows'=>['Items']]],'Creator', 'Companies','Customers']
         ]); 
@@ -481,7 +481,7 @@ class JobCardsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		$jobCard = $this->JobCards->get($id, [
-            'contain' => ['SalesOrders'=>['SalesOrderRows'=>['Items'=>function ($q){
+            'contain' => ['SalesOrders'=>['Customers','SalesOrderRows'=>['Items'=>function ($q){
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
 				},'JobCardRows'=>['Items']]],'Creator', 'Companies','Customers']
         ]);

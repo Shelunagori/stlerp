@@ -122,6 +122,24 @@
 			</div>
 			<br/>
 			<div style="overflow: auto;">
+			<?php 
+			$cgst_options=array();
+							$sgst_options=array();
+							$igst_options=array();
+							foreach($GstTaxes as $GstTaxe){
+								if($GstTaxe->cgst=="Yes"){
+									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->sgst=="Yes"){
+									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}else if($GstTaxe->igst=="Yes"){
+									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+								}
+								
+							}
+			?>
 			<table class="table tableitm" id="main_tb" border="1" style="width:1700px;">
 				<thead>
 					<tr>
@@ -144,32 +162,17 @@
 						<th><div align="center">Amt</div></th>
 						<th><div align="center">%</div></th>
 						<th><div align="center">Amt</div></th>
-						<th class="cgst_display" align="right">%</th>
+						<th class="cgst_display" align="right">%<?php echo $this->Form->input('common_cgst_per', ['label' => false,'empty'=>'Select','options'=>$cgst_options,'class' => 'form-control input-sm common_cgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="cgst_display" align="right">Rs</th>
-						<th class="sgst_display" align="right">%</th>
+						<th class="sgst_display" align="right">%<?php echo $this->Form->input('common_sgst_per', ['label' => false,'empty'=>'Select','options'=>$sgst_options,'class' => 'form-control input-sm common_sgst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="sgst_display" align="right">Rs</th>
-						<th class="igst_display" align="right">%</th>
+						<th class="igst_display" align="right">%<?php echo $this->Form->input('common_igst_per', ['label' => false,'empty'=>'Select','options'=>$igst_options,'class' => 'form-control input-sm common_igst_per','placeholder'=>'%','step'=>0.01]); ?></th>
 						<th class="igst_display" align="right">Rs</th>
 					</tr>
 				</thead>
 				<tbody id="main_tbody">
 					<?php 
-					$cgst_options=array();
-							$sgst_options=array();
-							$igst_options=array();
-							foreach($GstTaxes as $GstTaxe){
-								if($GstTaxe->cgst=="Yes"){
-									$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->sgst=="Yes"){
-									$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}else if($GstTaxe->igst=="Yes"){
-									$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
-									$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
-								}
-								
-							}
+					
 					
 					$item_ar=[];
 					foreach ($salesOrder->invoices as $invoice){
@@ -348,7 +351,12 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label">Expected Delivery Date <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->input('expected_delivery_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder' => 'Expected Delivery Date','data-date-format'=>'dd-mm-yyyy','data-date-start-date' => '+0d','data-date-end-date' => '+60d','value'=>date("d-m-Y",strtotime($salesOrder->expected_delivery_date))]); ?>
+						<?php echo $this->Form->input('expected_delivery_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder' => 'Expected Delivery Date','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>date("d-m-Y",strtotime($fromdate1)) ,'data-date-end-date' => date("d-m-Y",strtotime($todate1)),'value'=>date("d-m-Y",strtotime($salesOrder->expected_delivery_date))]); ?>
+					</div><br/>
+					<div class="form-group">
+						<label class="control-label">E-Way Bill <span class="required" aria-required="true">*</span></label>
+						<?php 
+							echo $this->Form->input('e_way_bill', ['empty' => "--Select--",'options'=>['Yes'=>'Yes','No'=>'No'],'label' => false,'class' => 'form-control input-sm  select2me','value'=>'Dr','style'=>'vertical-align: top !important;','value'=>$salesOrder->e_way_bill]); ?>
 					</div>
 				</div>
 				<div class="col-md-4">
@@ -614,6 +622,9 @@ $(document).ready(function() {
 			road_permit_required:{
 				required: true,
 			},
+			e_way_bill:{
+				required: true,
+			},
 			form49:{
 				required: true,
 			}
@@ -788,6 +799,25 @@ $(document).ready(function() {
 		$('#main_tb select').die().live("change",function() {
 			calculate_total();
 		});
+		
+		
+	$('.common_cgst_per').live("change",function() {
+	var common_cgst=$(this).find('option:selected').val();
+	$('.cgst_percent').val(common_cgst);
+	calculate_total();
+	});
+	
+	$('.common_sgst_per').live("change",function() {
+	var common_sgst=$(this).find('option:selected').val();
+	$('.sgst_percent').val(common_sgst);
+	calculate_total();
+	});
+	
+	$('.common_igst_per').live("change",function() {
+	var common_igst=$(this).find('option:selected').val();
+	$('.igst_percent').val(common_igst);
+	calculate_total();
+	});
 	
 	function rename_rows(){
 		var i=0; 

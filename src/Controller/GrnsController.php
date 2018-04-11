@@ -23,6 +23,7 @@ class GrnsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
        /*  $this->paginate = [
             'contain' => ['PurchaseOrders', 'Companies','Vendors']
         ]; */
@@ -65,9 +66,15 @@ class GrnsController extends AppController
 			$where['status']='Invoice-Booked';
 		}
 		
-
+		if($grn_pull_request=="true"){
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
+		}else{
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->order(['Grns.id' => 'DESC']);
+		}
 		
-		$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
+		
+		
+		
         $this->set(compact('grns','pull_request','status','grn_pull_request','url'));
         $this->set('_serialize', ['grns']);
     }
@@ -433,7 +440,7 @@ class GrnsController extends AppController
 		$grn = $this->Grns->newEntity();
         if ($this->request->is('post')) { 
 		   $grn->vendor_id=$purchase_order->vendor_id;
-			$last_grn_no=$this->Grns->find()->select(['grn2'])->where(['company_id' => $st_company_id])->order(['grn2' => 'DESC'])->first();
+			$last_grn_no=$this->Grns->find()->select(['grn2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['grn2' => 'DESC'])->first();
 			if($last_grn_no){
 				$grn->grn2=(int)$last_grn_no->grn2+1;
 			}else{
@@ -462,6 +469,7 @@ class GrnsController extends AppController
 			$transaction_date=date("Y-m-d",strtotime($grn->transaction_date));
 			$grn->purchase_order_id=$purchase_order_id;
 			$grn->company_id=$st_company_id;
+			$grn->financial_year_id=$st_year_id;
 			$grn->created_by=$this->viewVars['s_employee_id'];
 			
 			if ($this->Grns->save($grn)) {

@@ -55,7 +55,7 @@ class PettyCashVouchersController extends AppController
         $this->paginate = [
             'contain' => []
         ];
-        $pettycashvouchers = $this->paginate($this->PettyCashVouchers->find()->where(['company_id'=>$st_company_id])->where($where)->contain(['PettyCashVoucherRows'])->order(['voucher_no'=>'DESC']));
+        $pettycashvouchers = $this->paginate($this->PettyCashVouchers->find()->where(['company_id'=>$st_company_id,'PettyCashVouchers.financial_year_id'=>$st_year_id])->where($where)->contain(['PettyCashVoucherRows'])->order(['voucher_no'=>'DESC']));
         $this->set(compact('pettycashvouchers','url','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['pettycashvouchers']);
     }
@@ -316,7 +316,7 @@ class PettyCashVouchersController extends AppController
             $pettycashvoucher = $this->PettyCashVouchers->patchEntity($pettycashvoucher, $this->request->data);
             $pettycashvoucher->company_id=$st_company_id;
             //Voucher Number Increment
-            $last_voucher_no=$this->PettyCashVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+            $last_voucher_no=$this->PettyCashVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'PettyCashVouchers.financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
             if($last_voucher_no){
                 $pettycashvoucher->voucher_no=$last_voucher_no->voucher_no+1;
             }else{
@@ -325,6 +325,7 @@ class PettyCashVouchersController extends AppController
             
             $pettycashvoucher->created_on=date("Y-m-d");
             $pettycashvoucher->created_by=$s_employee_id;
+            $pettycashvoucher->financial_year_id=$st_year_id;
             $pettycashvoucher->transaction_date=date("Y-m-d",strtotime($pettycashvoucher->transaction_date));
             //pr($pettycashvoucher); exit;
 			foreach($pettycashvoucher->petty_cash_voucher_rows as $key => $petty_cash_voucher_row)

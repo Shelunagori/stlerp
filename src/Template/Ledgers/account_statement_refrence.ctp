@@ -63,7 +63,7 @@
 				
 				$default_date="2017-04-01";
 				//pr($key); 
-				//pr($Invoice_data[$key]->customer_po_no); exit;
+				//pr(); exit;
 					if($ReferenceBalance['reference_type']!="On_account"){
 						if(!empty($customer_data->payment_terms)){
 							$payment_terms=$customer_data->payment_terms;
@@ -81,7 +81,7 @@
 					if($Ledger_Account_data->source_model=="Vendors" && $ReferenceBalance['opening_balance']!="Yes" && !empty($refInvoiceBookingNo[$key])){
 								$due_date=date('Y-m-d', strtotime(@$refInvoiceBookingNo[$key]['supplier_date']. ' +'. $payment_terms .'days'));
 					}else if($Ledger_Account_data->source_model=="Customers" && $ReferenceBalance['opening_balance']!="Yes"){
-						$due_date=date('Y-m-d', strtotime($ReferenceBalance['transaction_date']. ' +'. $payment_terms .'days'));
+						$due_date=date('Y-m-d', strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']. ' +'. $payment_terms .'days'));
 					}else if($ReferenceBalance['opening_balance']=="Yes"){
 						$due_date=date('Y-m-d', strtotime($default_date. ' +'. $payment_terms .'days'));
 						
@@ -89,46 +89,53 @@
 						$due_date=date('Y-m-d', strtotime($default_date. ' +'. $ReferenceBalance['transaction_date'] .'days'));
 						
 					}
-				
-				if($DueReferenceBalances[$key] != 0){
+			$amt=$DueReferenceBalances[$key];
+				if($amt != 0){
+					$td=date('d-m-Y',strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']));
+					//pr($td);
 				?>
 				
 				<tr>
 						<td> <?php 
 							if($ReferenceBalance['opening_balance']=="Yes"){
 								echo "Opening Balance";
-							}else{
+							}else if($td =="01-01-1970"){ 
+								echo $ReferenceBalance['reference_no'];
+							}else if(@$Voucher_data[$key]){  
 								echo @$Voucher_data[$key];
 							}
 								 ?> </td>
 						<td><?php 
 							if($Ledger_Account_data->source_model=="Vendors" && $ReferenceBalance['opening_balance']!="Yes" && !empty($refInvoiceBookingNo[$key])){
 								echo (date('d-m-Y',strtotime(@$refInvoiceBookingNo[$key]['supplier_date']))); 
-							}else if($Ledger_Account_data->source_model=="Customers" && $ReferenceBalance['opening_balance']!="Yes"){
-								echo (date('d-m-Y',strtotime($ReferenceBalance['transaction_date'])));
-							}else if($ReferenceBalance['opening_balance']=="Yes"){
+							}else if($Ledger_Account_data->source_model=="Customers" && $ReferenceBalance['opening_balance']!="Yes" && $td !="01-01-1970"   ){ 
+								echo (date('d-m-Y',strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']))); 
+							}else if($ReferenceBalance['opening_balance']=="Yes" ){
 								echo (date('d-m-Y',strtotime($default_date)));
-							}else{
+							}else if($td =="01-01-1970"){ 
+								
+							}else{ 
 								echo (date('d-m-Y',strtotime($ReferenceBalance['transaction_date'])));
 							}
 						
 						 ?></td>
 						<td><?php 
-						if($Ledger_Account_data->source_model=="Vendors" && $DueReferenceBalances[$key] < 0 ){
+						 if($Ledger_Account_data->source_model=="Vendors" && $DueReferenceBalances[$key] < 0 && $td !="01-01-1970"){
 							echo (date('d-m-Y',strtotime($due_date))); 
-						}else if($Ledger_Account_data->source_model=="Customers" && $DueReferenceBalances[$key] > 0 ){
+						}else if($Ledger_Account_data->source_model=="Customers" && $DueReferenceBalances[$key] > 0 && $td !="01-01-1970"){
 							echo (date('d-m-Y',strtotime($due_date))); 
-						}else{
+						}else if($td =="01-01-1970"){ 
+								
+						}else if($due_date){
 							echo (date('d-m-Y',strtotime($due_date))); 
 						}
 						?></td>
 						<td>
-						<?php 
-							if(@$Ledger_Account_data->source_model=="Vendors" && !empty(@$refInvoiceBookingNo[$key]) && @$ReferenceBalance['opening_balance'] != "Yes"){
+						<?php if(@$Ledger_Account_data->source_model=="Vendors" && !empty(@$refInvoiceBookingNo[$key]) && @$ReferenceBalance['opening_balance'] != "Yes"){
 								echo @$refInvoiceBookingNo[$key]['grn']['purchase_order']->po1.'/PO-'.str_pad(@$refInvoiceBookingNo[$key]['grn']['purchase_order']->po2, 3, '0', STR_PAD_LEFT).'/'.@@$refInvoiceBookingNo[$key]['grn']['purchase_order']->po3.'/'.@$refInvoiceBookingNo[$key]['grn']['purchase_order']->po4;
 								//echo $refInvoiceBookingNo[$key]['grn']['purchase_order']; 
-							}else if($Ledger_Account_data->source_model=="Customers"&& @$ReferenceBalance['opening_balance'] != "Yes"){
-								echo $Invoice_data[$refInvoiceNo[$key]]['customer_po_no']; 
+							}else if($Ledger_Account_data->source_model=="Customers"&& @$ReferenceBalance['opening_balance'] != "Yes"){ 
+								echo @$Invoice_data[@$refInvoiceNo[$key]]['customer_po_no']; 
 								
 							}else{
 								
@@ -136,25 +143,33 @@
 						</td>
 						<td>
 						<?php	
-							if(@$Ledger_Account_data->source_model=="Vendors" && !empty(@$refInvoiceBookingNo[$key]) && @$ReferenceBalance['opening_balance'] != "Yes"){
+							 if(@$Ledger_Account_data->source_model=="Vendors" && !empty(@$refInvoiceBookingNo[$key]) && @$ReferenceBalance['opening_balance'] != "Yes"){
 								
 								echo (date('d-m-Y',strtotime($refInvoiceBookingNo[$key]['grn']['purchase_order']->date_created))); 
 							}else if($Ledger_Account_data->source_model=="Customers" && $ReferenceBalance['opening_balance'] != "Yes"){
-								echo (date('d-m-Y',strtotime($Invoice_data[$refInvoiceNo[$key]]['po_date']))); 
+								echo (date('d-m-Y',strtotime(@$Invoice_data[@$refInvoiceNo[$key]]['po_date']))); 
 							}else{
 								
 							}?>
 						</td>
 						<?php if($DueReferenceBalances[$key] > 0){
 							$total_debit+=$DueReferenceBalances[$key];
+							$bal_status='';
+							if($ReferenceBalance['credit'] > 0){
+								$bal_status="<span style='color:red'>(BAL)</span>";
+							}
 							?>
-							<td align="right"><?= $this->Number->format($DueReferenceBalances[$key],[ 'places' => 2]); ?></td>
+							<td align="right"><?php echo $bal_status; ?> <?= $this->Number->format($DueReferenceBalances[$key],[ 'places' => 2]); ?></td>
 							<td align="right"><?php echo "0"; ?></td>
 						<?php }else{
 							 $total_credit+=abs($DueReferenceBalances[$key]);
+							 $bal_status='';
+							if($ReferenceBalance['debit'] > 0){
+								$bal_status="<span style='color:red'>(BAL)</span>";
+							}
 							?>
 							<td align="right"><?php echo "0"; ?></td>
-							<td align="right"><?= $this->Number->format(abs($DueReferenceBalances[$key]),[ 'places' => 2]); ?></td>
+							<td align="right"><?php echo $bal_status; ?><?= $this->Number->format(abs($DueReferenceBalances[$key]),[ 'places' => 2]); ?></td>
 						<?php } ?>
 						
 						<?php 

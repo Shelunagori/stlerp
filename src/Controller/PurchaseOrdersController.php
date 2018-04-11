@@ -90,7 +90,20 @@ class PurchaseOrdersController extends AppController
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
-			if($pull_request=="true"){
+			if($pull_request=="true"){ 
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+				//pr($purchaseOrders); exit;
+			}
+			else if($status=="Converted-Into-GRN" ){    
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -102,7 +115,7 @@ class PurchaseOrdersController extends AppController
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
-			if($status==null || $status=="Converted-Into-GRN" ){
+			else { 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -110,19 +123,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where)
-				->order(['PurchaseOrders.id'=>'DESC']);
-			}
-			if($status==null || $status=="Pending" ){ 
-				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
-				$purchaseOrders = $this->PurchaseOrders->find();
-				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
-				->innerJoinWith('PurchaseOrderRows')
-				->group(['PurchaseOrders.id'])
-				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
-				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
@@ -149,7 +150,7 @@ class PurchaseOrdersController extends AppController
 		
 		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find()->toArray();
 		$Items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
-        $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales'));
+        $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales','st_year_id'));
         $this->set('_serialize', ['purchaseOrders']);
 		$this->set(compact('url'));
     }
@@ -372,7 +373,7 @@ class PurchaseOrdersController extends AppController
 		
         $purchaseOrder = $this->PurchaseOrders->newEntity();
         if ($this->request->is('post')) {
-			$last_po_no=$this->PurchaseOrders->find()->select(['po2'])->where(['company_id' => $st_company_id])->order(['po2' => 'DESC'])->first();
+			$last_po_no=$this->PurchaseOrders->find()->select(['po2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['po2' => 'DESC'])->first();
 			if($last_po_no){
 				$purchaseOrder->po2=$last_po_no->po2+1;
 			}else{
@@ -382,6 +383,7 @@ class PurchaseOrdersController extends AppController
 			$purchaseOrder->delivery_date=date("Y-m-d",strtotime($purchaseOrder->delivery_date));
 			$purchaseOrder->created_by=$s_employee_id; 
 			$purchaseOrder->company_id=$st_company_id;
+			$purchaseOrder->financial_year_id=$st_year_id;
 			$purchaseOrder->material_indent_id=$Material_indent_id;
 			$purchaseOrder->sale_tax_description=$purchaseOrder->sale_tax_description; 
 			$purchaseOrder->date_created=date("Y-m-d",strtotime($purchaseOrder->date_created));
@@ -449,7 +451,7 @@ class PurchaseOrdersController extends AppController
                 $this->Flash->success(__('The purchase order has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
-            } else { 
+            } else { pr($purchaseOrder); exit;
                 $this->Flash->error(__('The purchase order could not be saved. Please, try again.'));
             }
         }
@@ -702,7 +704,7 @@ class PurchaseOrdersController extends AppController
     {
 		$this->viewBuilder()->layout('');
          $purchaseOrder = $this->PurchaseOrders->get($id, [
-            'contain' => ['Companies','Customers'=>['CustomerAddress'],'Vendors','PurchaseOrderRows'=> ['Items'=>['Units']],'Transporters','Creator']
+            'contain' => ['Companies','Vendors','PurchaseOrderRows'=> ['Items'=>['Units']],'Transporters','Creator']
 			]);
 		//pr($purchaseOrder); exit;
         $this->set('purchaseOrder', $purchaseOrder);

@@ -63,6 +63,7 @@ table td, table th{
 				<th>Total Outstanding</th>
 				<th>No-Due</th>
 				<th>Closing Balance</th>
+				<th>Send Mail</th>
 			</tr>
 			</thead>
 			<tbody>
@@ -153,6 +154,13 @@ table td, table th{
 					@$ColumnClosingBalance+=$ClosingBalance;
 				?>
 				</td>
+				<td>
+					<?php 
+					if($ClosingBalance > 0){ ?>
+						
+						<a href="#" class="list-group-item send_mail" amt=<?php echo $ClosingBalance; ?> ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i>Send Email </a>
+				<?php	} ?>
+				</td>
 			</tr>
 			<?php } ?>
 			</tbody>
@@ -162,7 +170,8 @@ table td, table th{
 					<th class="oa"><?php echo round($ColumnOnAccount,2); ?></th>
 					<th class="os"><?php echo round($ColumnOutStanding,2); ?></th>
 					<th class="nd"><?php echo round($ColumnNoDue,2); ?></th>
-					<th class="cb"><?php echo round($ColumnClosingBalance,2); ?></th>
+					<th class="cb"><?php echo (number_format((float)$ColumnClosingBalance, 2, '.', '')); ?></th>
+					
 				</tr>
 			</tfoot>
 			</table>
@@ -172,6 +181,25 @@ table td, table th{
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
+	
+$('.send_mail').die().live("click",function() {
+	var amt=$(this).attr('amt');
+	var ledger_id=$(this).attr('ledger_id');
+	
+	var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'sendMail']); ?>";
+	url=url+'?id='+ledger_id+'&amount='+amt;
+	//alert(url);
+	$.ajax({
+		url: url,
+		type: "GET",
+	}).done(function(response) { 
+	//alert(response);
+		alert("Email Send successfully")
+	}); 
+	
+});	
+	
+
 var $rows = $('#main_tble tbody tr');
 	$('#search3').on('keyup',function() {
 	
@@ -210,6 +238,9 @@ var $rows = $('#main_tble tbody tr');
 					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
 					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
 					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
+					total_on_acc=round(total_on_acc,2);
+					total_closing_bal=round(total_closing_bal,2);
+					total_nodue=round(total_nodue,2);
 					$("#main_tble #tf tr th.oa").html('');
 					$("#main_tble #tf tr th.os").html('');
 					$("#main_tble #tf tr th.nd").html('');
@@ -245,7 +276,9 @@ var $rows = $('#main_tble tbody tr');
 					total_nodue=parseFloat(total_nodue)+parseFloat(no_due);
 					total_out=parseFloat(total_out)+parseFloat(total_outstanding);
 					total_on_acc=parseFloat(total_on_acc)+parseFloat(on_acc);
-					
+					total_nodue=round(total_nodue,2);
+					total_on_acc=round(total_on_acc,2);
+					total_closing_bal=round(total_closing_bal,2);
 					
 					
 				
@@ -285,8 +318,17 @@ var $rows = $('#main_tble tbody tr');
 				
 				
 			});
+			
+			rename_rows();
 		
 	});	
+
+	function rename_rows(){ 
+		var i=0;
+		$("#main_tble tbody tr").each(function(){ //alert(i);
+			$(this).find("td:nth-child(1)").val(i++);
+		});
+	}
 });
 		
 </script>

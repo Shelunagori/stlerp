@@ -172,7 +172,7 @@ With reference to your price list we are pleased to place an order for the follo
 					</div>
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Sale Tax <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">GST <span class="required" aria-required="true">*</span></label>
 							<?php 
 							$options=[];
 							foreach($sale_tax_ledger_accounts as $key=>$SaleTaxe){
@@ -228,34 +228,14 @@ With reference to your price list we are pleased to place an order for the follo
 					</div>
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Road permit form 47 <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">E-Way Bill <span class="required" aria-required="true">*</span></label>
 							<?php 
-							echo $this->Form->input('road_permit_form47',['label' => false,'class' => 'form-control input-sm','placeholder'=>'Road permit form 47']); ?>
+							echo $this->Form->input('road_permit_form47',['label' => false,'class' => 'form-control input-sm','placeholder'=>'E-Way Bill']); ?>
 						</div>
 					</div>
 				</div>
 				
-				<div class="row">
-					<div class="col-md-3">
-							<div class="form-group">
-								<label class="control-label">Excise Duty </label>
-								<?php 
-								echo $this->Form->input('excise_duty',['label' => false,'class' => 'form-control input-sm','placeholder'=>'Excise Duty']); ?>
-							</div>
-					</div>
-					<div class="col-md-3">
-						<div class="form-group">
-							<div class="radio-list" >
-							<label class="control-label">Excise for customer</label>
-							<?php echo $this->Form->radio('is_exceise_for_customer',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']],['value'=>'No']); ?>
-							</div>
-						</div>
-					</div>
-					
-					<div id="ex_div" style="display:none;">
-						<div id="qwert"></div>
-					</div>
-				</div>
+				
 				
 			</div>
 			<div class="form-actions">
@@ -328,9 +308,6 @@ $(document).ready(function() {
 		rules: {
 				company_id:{
 					required: true,
-				},
-				customer_id : {
-					  required: true,
 				},
 				po1 : {
 					  required: true,

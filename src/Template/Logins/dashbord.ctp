@@ -7,7 +7,8 @@
 			</div>
 			<div class="details">
 				<div class="number">
-					 <?php echo $pending_quotation; ?>
+				<?= h($this->Number->format($monthelySaleForQO,[ 'places' => 2])) ?>
+					 <?php //echo $monthelySaleForQO; ?>
 				</div>
 				<div class="desc">
 					 Quotations
@@ -24,7 +25,8 @@
 			</div>
 			<div class="details">
 				<div class="number">
-					<?php echo $pending_sales; ?>
+				<?= h($this->Number->format($monthelySaleForSO,[ 'places' => 2])) ?>
+					<?php //echo $monthelySaleForSO; ?>
 				</div>
 				<div class="desc">
 					 Sales Orders
@@ -40,10 +42,11 @@
 			</div>
 			<div class="details">
 				<div class="number">
-					 <?php echo $pending_invoice; ?>
+					<?= h($this->Number->format($monthelySaleForInvoice,[ 'places' => 2])) ?>
+					 <?php //echo $monthelySaleForInvoice; ?>
 				</div>
 				<div class="desc">
-					 Invoice For Inventory Vouchers
+					 Sales Invoice
 				</div>
 			</div>
 			<?php echo $this->Html->link('View more <i class="m-icon-swapright m-icon-white"></i>',['controller'=>'Invoices','action' => 'index'],array('escape'=>false,'target'=>'_blank','class'=>'more')); ?>
@@ -131,10 +134,10 @@
 									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Outstandings for Vendors',array('controller'=>'Customers','action'=>'Breakup-Range-Overdue-New','request'=>'vendor'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td width="25%">
-									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Non-GST Sales',array('controller'=>'Invoices','action'=>'salesReport','From'=>$fromdate1,'To'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Non-GST Sales',array('controller'=>'Invoices','action'=>'salesReport','From'=>$fromdate1,'To'=>@$todate1),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td width="25%">
-									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> GST Sales',array('controller'=>'Invoices','action'=>'gstSalesReport','From'=>$fromdate1,'To'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $firstday =date('01-m-Y'); $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> GST Sales',array('controller'=>'Invoices','action'=>'gstSalesReport','From'=>$fromdate1,'To'=>@$todate1),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 							</tr>
 							<tr>
@@ -143,16 +146,16 @@
 										$fromdate1 = date('d-m-Y',strtotime($fromdate1));
 										$todate1 = date('d-m-Y',strtotime($todate1));
 									?>
-									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>@$todate1),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td>
 									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Trial Balance',array('controller'=>'ledgers','action'=>'Trail-Balance'),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td>
-									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Profit & Loss ',array('controller'=>'Ledgers','action'=>'ProfitLossStatement','from_date'=>$fromdate1,'to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Profit & Loss ',array('controller'=>'Ledgers','action'=>'ProfitLossStatement','from_date'=>$fromdate1,'to_date'=>@$todate1),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td width="25%">
-									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Balance Sheet',array('controller'=>'Ledgers','action'=>'BalanceSheet','from_date'=>$fromdate1,'to_date'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Balance Sheet',array('controller'=>'Ledgers','action'=>'BalanceSheet','from_date'=>$fromdate1,'to_date'=>@$todate1),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 							</tr>
 							

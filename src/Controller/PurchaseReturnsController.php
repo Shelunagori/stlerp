@@ -23,6 +23,7 @@ class PurchaseReturnsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		
 		$where = [];
 		
@@ -49,11 +50,12 @@ class PurchaseReturnsController extends AppController
         $this->paginate = [
             'contain' => ['InvoiceBookings', 'Companies']
         ];
-        $purchaseReturns = $this->paginate($this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id])->order(['PurchaseReturns.id' => 'DESC']));
+        $purchaseReturns = $this->paginate($this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->order(['PurchaseReturns.id' => 'DESC']));
 
         $this->set(compact('purchaseReturns','url'));
         $this->set('_serialize', ['purchaseReturns']);
     }
+
 
 	
 	public function exportExcel(){
@@ -211,16 +213,17 @@ class PurchaseReturnsController extends AppController
 			$purchaseReturn->company_id=$st_company_id;
 			$purchaseReturn->created_on= date("Y-m-d");
 			$purchaseReturn->created_by=$s_employee_id;
-			$purchaseReturn->created_by=$s_employee_id;
+			$purchaseReturn->financial_year_id=$st_year_id;
 			$purchaseReturn->purchase_ledger_account=$invoiceBooking->purchase_ledger_account;
 			$purchaseReturn->vendor_id=$invoiceBooking->vendor_id;
-			$last_pr_no=$this->PurchaseReturns->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_pr_no=$this->PurchaseReturns->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_pr_no){
 				$purchaseReturn->voucher_no=$last_pr_no->voucher_no+1;
 			}else{
 				$purchaseReturn->voucher_no=1;
 			}
 			$purchaseReturn->transaction_date = date("Y-m-d",strtotime($this->request->data['transaction_date']));
+			
 			 if ($this->PurchaseReturns->save($purchaseReturn)) {   
 			
 			 foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
@@ -846,10 +849,11 @@ class PurchaseReturnsController extends AppController
 			$purchaseReturn->invoice_booking_id=$invoice_booking_id;
 			$purchaseReturn->created_on= date("Y-m-d");
 			$purchaseReturn->created_by=$s_employee_id;
+			$purchaseReturn->financial_year_id=$st_year_id;
 			$purchaseReturn->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 			$purchaseReturn->purchase_ledger_account=$invoiceBooking->purchase_ledger_account;
 			$purchaseReturn->vendor_id=$invoiceBooking->vendor_id;	
-			$last_pr_no=$this->PurchaseReturns->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_pr_no=$this->PurchaseReturns->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_pr_no){
 				$purchaseReturn->voucher_no=$last_pr_no->voucher_no+1;
 			}else{

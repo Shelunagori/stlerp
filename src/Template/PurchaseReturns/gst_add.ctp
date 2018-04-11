@@ -756,9 +756,7 @@ $(document).ready(function() {
 	
 		}
 	/////////
-	$('.rename_check').die().live("click",function() { 
-		rename_rows();   calculate_total();
-    });
+	
 	////////
 	
 	
@@ -782,8 +780,10 @@ $(document).ready(function() {
 		}
 		
     });	
-	///
-	rename_rows();
+	$('.rename_check').die().live("click",function() { 
+		rename_rows();   calculate_total();
+    });
+	//rename_rows();
 	function rename_rows(){
 		var i=0;
 		$("#main_tb tbody tr.tr1").each(function(){  
@@ -1032,7 +1032,7 @@ $(document).ready(function() {
 	});
 
 
-});
+
 
 </script>
 

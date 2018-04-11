@@ -32,6 +32,10 @@ class QuotationsController extends AppController
 		$pull_request=$this->request->query('pull-request');
 		$gst_pull_request=$this->request->query('gst-pull-request');
 		$close_status=$this->request->query('status');
+		$st_year_id = $session->read('st_year_id');
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		$fromdate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		$todate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_to)); 
 		$items=$this->request->query('items');
 		$this->set(compact('qt2','customer','salesman','product','From','To','q_dateFrom','q_dateTo','company_id','file','pull_request','gst_pull_request','close_status','items')); 
 		if(!empty($company_id)){
@@ -107,12 +111,14 @@ class QuotationsController extends AppController
 					}
 				)
 				);
-		}else{  
+		}else if($gst_pull_request=="true"){ 
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+		}else{   
 		
-			if(sizeof($max_ids)>0){ 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+			if(sizeof($max_ids)>0){
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 					
-			}else{ 
+			}else{  
 				$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 			}
 		
@@ -142,6 +148,7 @@ class QuotationsController extends AppController
 		$copy_request=$this->request->query('copy-request');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$company_id=$this->request->query('company_id');
 		$qt2=$this->request->query('qt2');
 		$file=$this->request->query('file');
@@ -157,6 +164,13 @@ class QuotationsController extends AppController
 		$gst_pull_request=$this->request->query('gst-pull-request');
 		$close_status=$this->request->query('status');
 		$items=$this->request->query('items');
+		
+		$st_year_id = $session->read('st_year_id');
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		$fromdate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		$todate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		$tody1 = DATE("Y-m-d");
+		
 		$this->set(compact('qt2','customer','salesman','product','From','To','q_dateFrom','q_dateTo','company_id','file','pull_request','gst_pull_request','close_status','items')); 
 		if(!empty($company_id)){
 			$where['company_id']=$company_id;
@@ -212,10 +226,10 @@ class QuotationsController extends AppController
 		} 
 		
 		if(sizeof($max_ids)>0){
-			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 				
 		}else{  
-			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']); 
 		}
 		 
 		/* if(sizeof($max_ids)>0){ echo"hello";
@@ -233,11 +247,11 @@ class QuotationsController extends AppController
 				);
 		}else{  
 		
-			if(sizeof($max_ids)>0){ 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+			if(sizeof($max_ids)>0){  
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 					
-			}else{ 
-				$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+			}else{
+				$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id,'created_on >='=>$fromdate1,'created_on <='=>$todate1])->order(['Quotations.id' => 'DESC']); 
 			}
 		
 										
@@ -430,12 +444,12 @@ class QuotationsController extends AppController
 			//pr($this->request->data); exit;
 			$quotation = $this->Quotations->newEntity();
             $quotation = $this->Quotations->patchEntity($quotation, $this->request->data);
-			$last_qt_no=$this->Quotations->find()->select(['qt2'])->where(['company_id' => $st_company_id])->order(['qt2' => 'DESC'])->first();
+			$last_qt_no=$this->Quotations->find()->select(['qt2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['qt2' => 'DESC'])->first();
 			
 			if($last_qt_no){
 				if(!empty($revision)){
 					
-					$last_qt_revision_no=$this->Quotations->find()->select(['qt2'])->where(['company_id' => $st_company_id,'id' => $revision])->order(['qt2' => 'DESC'])->first();
+					$last_qt_revision_no=$this->Quotations->find()->select(['qt2'])->where(['company_id' => $st_company_id,'id' => $revision,'financial_year_id'=>$st_year_id])->order(['qt2' => 'DESC'])->first();
 					
 					
 					$quotation->qt2=$last_qt_revision_no->qt2;
@@ -445,13 +459,13 @@ class QuotationsController extends AppController
 			}else{
 				$quotation->qt2=1;
 			}	
-			
+			//pr($quotation->qt2); exit;
 			if(!empty($revision)){
 			$quotation->revision=$add_revision;
 			$quotation->quotation_id=$quotation_id;
 			}
 			
-			
+			$quotation->financial_year_id=$st_year_id;
 			$quotation->created_by=$s_employee_id;
 			$quotation->created_on=date("Y-m-d",strtotime($quotation->created_on));
 			$quotation->finalisation_date=date("Y-m-d",strtotime($quotation->finalisation_date));

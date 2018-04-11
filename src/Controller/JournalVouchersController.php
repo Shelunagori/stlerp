@@ -55,7 +55,7 @@ class JournalVouchersController extends AppController
             'contain' => []
         ];
 		
-       $journalVouchers = $this->paginate($this->JournalVouchers->find()->where($where)->where(['company_id'=>$st_company_id])->order(['transaction_date' => 'DESC']));
+       $journalVouchers = $this->paginate($this->JournalVouchers->find()->where($where)->where(['company_id'=>$st_company_id,'JournalVouchers.financial_year_id'=>$st_year_id])->order(['transaction_date' => 'DESC']));
 
        
 		$this->set(compact('journalVouchers','url','financial_month_first','financial_month_last'));
@@ -273,14 +273,14 @@ class JournalVouchersController extends AppController
 					$invoiceIds[$key] =$invoiceString;
 				}
 			}
-			$last_ref_no=$this->JournalVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_ref_no=$this->JournalVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'JournalVouchers.financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_ref_no){
 				$journalVoucher->voucher_no=$last_ref_no->voucher_no+1;
 			}else{
 				$journalVoucher->voucher_no=1;
 			}
             $journalVoucher = $this->JournalVouchers->patchEntity($journalVoucher, $this->request->data);
-			
+			$journalVoucher->financial_year_id=$st_year_id;
 			$journalVoucher->created_by=$s_employee_id;
 			$journalVoucher->transaction_date=date("Y-m-d",strtotime($journalVoucher->transaction_date));
 			$journalVoucher->created_on=date("Y-m-d");

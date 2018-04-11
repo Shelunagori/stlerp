@@ -84,9 +84,9 @@ class LeaveApplicationsTable extends Table
             ->requirePresence('leave_reason', 'create')
             ->notEmpty('leave_reason');
 
-        $validator
+      /*   $validator
             ->requirePresence('leave_type', 'create')
-            ->notEmpty('leave_type');
+            ->notEmpty('leave_type'); */
 
 
         

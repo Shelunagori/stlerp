@@ -24,6 +24,7 @@ class SalesOrdersController extends AppController
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		
 		$copy_request=$this->request->query('copy-request');
 		$gst_copy_request=$this->request->query('gst-copy-request');
@@ -87,7 +88,7 @@ class SalesOrdersController extends AppController
 		if(!empty($items) && empty($Actionstatus)){ 
 			
 				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-				$salesOrders = $this->SalesOrders->find();
+				$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
 
 				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 				->innerJoinWith('SalesOrderRows')
@@ -116,7 +117,7 @@ class SalesOrdersController extends AppController
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-					$salesOrders = $this->SalesOrders->find();
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
@@ -152,15 +153,15 @@ class SalesOrdersController extends AppController
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					//pr($salesOrders->toArray()); exit;
 					$Actionstatus="GstCopy";
-				}else { //exit;   
+				}else { 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-					$salesOrders = $this->SalesOrders->find();
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
@@ -188,7 +189,7 @@ class SalesOrdersController extends AppController
 						return $q->where(['Departments.id' =>1]);
 					}
 				);
-	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty','Actionstatus'));
+	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty','Actionstatus','st_year_id'));
 		 $this->set('_serialize', ['salesOrders']);
 		$this->set(compact('url'));
 		
@@ -202,6 +203,7 @@ class SalesOrdersController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		if(empty($status)){ $status="Pending"; }
 		$copy_request=$this->request->query('copy-request');
 		$gst_copy_request=$this->request->query('gst-copy-request');
@@ -338,7 +340,7 @@ class SalesOrdersController extends AppController
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
@@ -1051,6 +1053,10 @@ class SalesOrdersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$Company = $this->SalesOrders->Companies->get($st_company_id);
+		$st_year_id = $session->read('st_year_id');
+		/* $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+	   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+	   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to));  */
 		
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->SalesOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
@@ -1121,14 +1127,22 @@ class SalesOrdersController extends AppController
 		else{
 			  $salesOrder_data = $this->SalesOrders->newEntity();
 			}
-		
+			
+		//$last_so_no=$this->SalesOrders->find()->select(['so2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['so2' => 'DESC'])->first();
+			 
+			/* if($last_so_no){
+				$salesOrder->so2=$last_so_no->so2+1;
+			}else{
+				$salesOrder->so2=1;
+			} */
+		//pr($last_so_no); exit;
       
         if ($this->request->is(['patch', 'post', 'put'])) {
 			
 			//$salesOrder = $this->SalesOrders->newEntity();
 			
             $salesOrder = $this->SalesOrders->patchEntity($salesOrder_data, $this->request->data);
-			$last_so_no=$this->SalesOrders->find()->select(['so2'])->where(['company_id' => $st_company_id])->order(['so2' => 'DESC'])->first();
+			$last_so_no=$this->SalesOrders->find()->select(['so2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['so2' => 'DESC'])->first();
 			$salesOrder->expected_delivery_date=date("Y-m-d",strtotime($salesOrder->expected_delivery_date)); 
 			$salesOrder->po_date=date("Y-m-d",strtotime($salesOrder->po_date)); 
 			$salesOrder->created_by=$s_employee_id; 
@@ -1137,13 +1151,14 @@ class SalesOrdersController extends AppController
 			}else{
 				$salesOrder->so2=1;
 			}
-			
+			//pr($salesOrder->so2); exit;
 			
 			$salesOrder->created_on=date("Y-m-d",strtotime($salesOrder->created_on));
 			$salesOrder->edited_on=date("Y-m-d",strtotime($salesOrder->edited_on));
 			$salesOrder->quotation_id=$quotation_id;
 			$salesOrder->created_on_time= date("Y-m-d h:i:sA");
 			$salesOrder->company_id=$st_company_id;
+			$salesOrder->financial_year_id=$st_year_id;
 			
 			
 			
@@ -1312,7 +1327,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 		//pr($salesOrder); exit; 
-        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','Items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData'));
+        $this->set(compact('salesOrder', 'customers', 'MaxQty','companies','quotationlists','Items','transporters','Filenames','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','copy','process_status','Company','chkdate','financial_year','sales_id','salesOrder_copy','job_id','salesOrder_data','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData','fromdate1','todate1'));
         $this->set('_serialize', ['salesOrder']);
     }
 	
@@ -1555,7 +1570,7 @@ class SalesOrdersController extends AppController
 				}
 			}
 			////end unique validation and procees qty
-			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData'));
+			$this->set(compact('salesOrder', 'customers', 'MaxQty', 'quotation_row_id', 'companies','quotationlists','items','transporters','termsConditions','serviceTaxs','exciseDuty','employees','SaleTaxes','Filenames','financial_year_data','chkdate','qt_data','qt_data1','financial_year','GstTaxes','sales_orders_qty','ItemsOptions','ItemsOptionsData','fromdate1','todate1'));
 			$this->set('_serialize', ['salesOrder']);
 		}
 		else

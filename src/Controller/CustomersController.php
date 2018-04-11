@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\I18n\Time;
 use Cake\I18n\Date;
+use Cake\Mailer\Email;
 
 
 /**
@@ -148,7 +149,7 @@ class CustomersController extends AppController
         if ($this->request->is(['patch', 'post', 'put'])) {
 			
             $customer = $this->Customers->patchEntity($customer, $this->request->data);
-			//pr(); exit;
+			//pr($customer); exit;
             if ($this->Customers->save($customer)) {
 				
 				$query = $this->Customers->LedgerAccounts->query();
@@ -1168,5 +1169,58 @@ class CustomersController extends AppController
 		
 		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
 		$this->set('_serialize', ['LedgerAccounts']);
+	}
+	public function sendMail($id = null){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$id=$this->request->query('id');
+		$amount=$this->request->query('amount');
+		$customerData=$this->Customers->LedgerAccounts->get($id);
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->Customers->Employees->get($s_employee_id,[
+		'contain'=> ['Designations']]);
+		$customerData=$this->Customers->get($customerData->source_id,[
+			'contain'=>['CustomerContacts']
+		]);
+		
+		$message_web='<html>
+		<table  valign="center" width="62%" >
+				<tr>
+					<td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;" align="left" style="font-size: 16px;">Dear '.  $customerData->customer_name.',</td>
+				</tr>
+				<tr>
+					<td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>	The purpose of this letter is to follow up with you regarding payment . As of date your outstanding past due balance is Rs '.h(number_format($amount,2)).' /-, as detailed on the enclosed statement of account.</td>
+				</tr>
+				
+				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>
+				Thank you for your prompt response to this matter. Also, I value you as a customer and hope to continue doing business with you in the future.
+				</td></tr>
+
+				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>Regards,</td></tr>
+				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>'.$empData->name.'</td></tr>
+				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;">'.$empData->designation->name.'</td></tr>
+					
+				</tr>
+			<html>';
+		$email = new Email('default');
+		$email->transport('gmail');
+		$company_data=$this->Customers->Companies->get($st_company_id);
+		$from_name=$company_data->alias;
+		$email_to=$customerData->customer_contacts[0]->email;
+		$cc_mail=$empData->email;
+		$sub="For Payments";
+		
+		$member_name="Gopal";
+		 	$email->from(['dispatch@mogragroup.com' => $from_name])
+					->to($email_to)
+					->cc($cc_mail)
+					->replyTo('dispatch@mogragroup.com')
+					->subject($sub)
+					->template('notice_send_email')
+					->emailFormat('html')
+					->viewVars(['content'=>$message_web,'member_name'=>$member_name]);
+					$email->send($message_web);
+		
+	exit;
 	}
 }

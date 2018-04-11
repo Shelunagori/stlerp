@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Mailer\Email;
 
 /**
  * Ledgers Controller
@@ -608,16 +609,16 @@ class LedgersController extends AppController
 		$To = date("Y-m-d"); 
 		$this->set(compact('ledger_account_id'));
 		//$status=$this->request->query('status');
-		//pr($ledger_account_id); exit;
-		
-		
+		$to = date("Y-m-d",strtotime($SessionCheckDate->date_to));
+	
 		//exit;
 		$ReferenceBalance_transaction_date=[];
 		$ReferenceBalance_due_date=[];
 		if($ledger_account_id)
 		{
 			
-		$query = $this->Ledgers->ReferenceDetails->find();
+		$query = $this->Ledgers->ReferenceDetails->find()->where(['ReferenceDetails.transaction_date <='=>$to]);
+		//pr($query->toArray()); exit;
 		$query
 		->where(['ReferenceDetails.ledger_account_id'=>$ledger_account_id])
 		->autoFields(true);
@@ -630,7 +631,7 @@ class LedgersController extends AppController
 		$on_cr=0;
 		$Voucher_data=[];
 	
-			//pr($referenceDetails->toArray()); exit;
+			//pr($referenceDetails->toArray()); exit; int
 		$Ledger_Account_data = $this->Ledgers->LedgerAccounts->get($ledger_account_id, [
         'contain' => ['AccountSecondSubgroups'=>['AccountFirstSubgroups'=>['AccountGroups'=>['AccountCategories']]]] ]);
 		$customer_data=0;
@@ -667,10 +668,20 @@ class LedgersController extends AppController
 				
 			}
 			if($referenceDetail->debit!=$referenceDetail->credit){ 
-				@$DueReferenceBalances[@$referenceDetail->reference_no]+=@$referenceDetail->debit-@$referenceDetail->credit;
-				$ReferenceBalances[$referenceDetail->reference_no]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type,'opening_balance'=>$referenceDetail->opening_balance,'invoice_id'=>$referenceDetail->invoice_id];
+				$x=(float)@$referenceDetail->debit;
+				$y=(float)@$referenceDetail->credit;
+				//pr($y); exit;
+				@$DueReferenceBalances[@$referenceDetail->reference_no]=@$DueReferenceBalances[@$referenceDetail->reference_no]+($x-$y);
+				/* if($referenceDetail->reference_no == 'Op.')
+				{
+				echo $DueReferenceBalances[@$referenceDetail->reference_no].' += '.abs($referenceDetail->debit).'-'.abs($referenceDetail->credit); echo '<br/>';
+				} */
 				
-				//pr($referenceDetail->invoice_id);
+				$ReferenceBalances[$referenceDetail->reference_no]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type,'opening_balance'=>$referenceDetail->opening_balance,'invoice_id'=>$referenceDetail->invoice_id];
+				//pr($referenceDetail->debit);
+				//pr($referenceDetail->credit);
+				//pr($DueReferenceBalances['Op.']);
+				//pr($DueReferenceBalances);
 			}
 			
 			if($referenceDetail->reference_type=="On_account"){ 
@@ -684,7 +695,7 @@ class LedgersController extends AppController
 		}
 			
 		}  
-	
+	//exit;
 		if($Ledger_Account_data->source_model=='Vendors'){ //pr($referenceDetails->toArray()); exit;
 			$customer_data = $this->Ledgers->Vendors->get($Ledger_Account_data->source_id);
 			
@@ -699,9 +710,9 @@ class LedgersController extends AppController
 					$Voucher_data[$referenceDetail->reference_no]=@$Invoice_booking_data->invoice_no;
 					
 				}
-				if($referenceDetail->receipt_id > 0){  
+				if($referenceDetail->receipt_id > 0){  //pr($referenceDetail->reference_no); exit; 
 					$Invoice_booking_data = $this->Ledgers->Receipts->get($referenceDetail->receipt_id);
-					//pr($Invoice_booking_data); exit; 
+					
 					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
 					
 				}
@@ -772,7 +783,7 @@ class LedgersController extends AppController
 			}])->where(['company_id'=>$st_company_id]);
 		}
 		
-		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data','DueReferenceBalances','Voucher_data','refInvoiceNo','refInvoiceBookingNo','Invoice_booking_data'));
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data','DueReferenceBalances','Voucher_data','refInvoiceNo','refInvoiceBookingNo'));
 	}
 	
 	public function excelExportAccountRef(){
@@ -921,7 +932,7 @@ class LedgersController extends AppController
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		
 		//$closingValue= $this->StockValuation();
-		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url'));
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url','st_year_id'));
 	}
 	
 	public function excelTb (){ 
@@ -1653,11 +1664,12 @@ class LedgersController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY); 
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
+        $st_year_id = $session->read('st_year_id');
 		$from_date=$this->request->query('from_date');
 		$to_date=$this->request->query('to_date');
 		$from_date = date("Y-m-d",strtotime($from_date));
 		$to_date= date("Y-m-d",strtotime($to_date));
-		
+		//pr($s_year_from); exit;
 		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
 		->where(['AccountCategories.id In'=>[3,4]])
 		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
@@ -1683,7 +1695,7 @@ class LedgersController extends AppController
 		$closingValue= $this->StockValuationWithDate2($to_date);
 		
 		//$closingValue= $this->StockValuation();
-		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url'));
+		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url','st_year_id'));
 		
     }
 	
@@ -1699,7 +1711,7 @@ class LedgersController extends AppController
 		$from_date = date("Y-m-d",strtotime($from_date));
 		$to_date= date("Y-m-d",strtotime($to_date));
 		
-		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
+		 $AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
 		->where(['AccountCategories.id In'=>[1,2]])
 		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
 		
@@ -1718,7 +1730,7 @@ class LedgersController extends AppController
 					}
 				}
 			}
-		}
+		} 
 		
 		$GrossProfit= $this->GrossProfit($from_date,$to_date);
 		$closingValue= $this->StockValuationWithDate2($to_date);
@@ -1957,6 +1969,182 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 				
 	$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue',
 'ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
+	}
+	
+	public function sendMail(){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$ledger_account_id=$this->request->query('id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->Ledgers->Customers->Employees->get($s_employee_id);
+		$from=date('Y-m-d',strtotime($this->request->query('from')));
+		$To=date('Y-m-d',strtotime($this->request->query('to')));
+		$email = new Email('default');
+		$email->transport('gmail');
+		
+		$data=$this->Ledgers->LedgerAccounts->get($ledger_account_id);
+		if($data->source_model=="Customers"){
+			$customerData=$this->Ledgers->Customers->get($data->source_id,[
+				'contain'=>['CustomerContacts']
+			]);
+			$email_to=$customerData->customer_contacts[0]->email;
+		}else{
+			$VendorsData=$this->Ledgers->Vendors->get($data->source_id,[
+				'contain'=>['VendorContactPersons']
+			]);
+			$email_to=$VendorsData->vendor_contact_persons[0]->email;
+		}
+		//pr($email_to); exit;
+		$company_data=$this->Ledgers->Customers->Companies->get($st_company_id);
+		$from_name=$company_data->alias;
+		if($ledger_account_id){
+			$transaction_from_date= date('Y-m-d', strtotime($from));
+			$transaction_to_date= date('Y-m-d', strtotime($To));
+			$company = $this->Companies->get($st_company_id);
+			//pr($transaction_from_date);pr($from);exit;
+			if($from == date("Y-m-d",strtotime($company->accounting_book_date))){ 
+				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
+				$opening_balance_ar=[];
+			foreach($OB as $Ledger)
+				{
+					if($Ledger->voucher_source== "Opening Balance"){
+						@$opening_balance_ar['debit']+=$Ledger->debit;
+						@$opening_balance_ar['credit']+=$Ledger->credit;
+					}
+				}	
+			}else{  
+				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <'=>$transaction_from_date]);
+		//pr($transaction_from_date); exit;
+		//pr($OB->toArray()); exit;
+				$opening_balance_ar=[];
+				foreach($OB as $Ledger)
+					{
+						
+							@$opening_balance_ar['debit']+=$Ledger->debit;
+							@$opening_balance_ar['credit']+=$Ledger->credit;
+					}	
+			}
+			
+			$Ledgers = $this->Ledgers->find()
+				->where(['ledger_account_id'=>$ledger_account_id,'company_id'=>$st_company_id])
+				->where(function($exp) use($transaction_from_date,$transaction_to_date){
+					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
+				})->order(['transaction_date' => 'DESC']);
+		//		pr($opening_balance_ar); exit;
+		
+		}
+		
+		$transaction_from_date=date("d-m-Y",strtotime($transaction_from_date));
+		$transaction_to_date=date("d-m-Y",strtotime($transaction_to_date));
+		//pr($transaction_from_date); exit;
+			
+			$message_web='<table border="1">
+				<tr>
+					
+					'; $message_web.='<td colspan="2">'.h($company_data->name).  ' </td>';
+					$message_web.='<td colspan="2">'.h($transaction_from_date).  ' To'.h($transaction_to_date).'</td>';
+						
+						
+				$message_web.='
+				<tr>
+					<td colspan="2" align="right">Opening Balance</td>
+					'; 
+						if($opening_balance_ar['credit'] > $opening_balance_ar['debit']){
+							$t=$opening_balance_ar['credit'] - $opening_balance_ar['debit'];
+							$message_web.='<td colspan="2" align="right">'.h($t).  ' Cr.</td>';
+							
+						}else{ 
+							$t=$opening_balance_ar['credit'] - $opening_balance_ar['debit'];
+							$message_web.='<td colspan="2" align="right">'.h(abs($t)).  ' Dr.</td>';
+						}
+						
+				$message_web.='</tr>
+					<tr>
+						<th>Transaction Date</th>
+						<th>Source</th>
+						
+						<th style="text-align:right;">Dr</th>
+						<th style="text-align:right;">Cr</th>
+					</tr>';
+					$total_debit=0;
+					$total_credit=0;
+					foreach($Ledgers as $ledger){ 
+					if($ledger->voucher_source != "Opening Balance"){
+						$total_debit+=$ledger->debit;
+						$total_credit+=$ledger->credit;
+					@$message_web.= '
+						<tr>
+						<td>'.h( date("d-m-Y",strtotime($ledger->transaction_date))). '</td>
+						<td>'.h( $ledger->voucher_source). '</td>
+						<td>'.h( $ledger->debit). '</td>
+						<td>'.h( $ledger->credit). '</td>
+						</tr>';
+					
+					}}
+					@$message_web.= '
+						<tr>
+						<td colspan="2" align="right">Total</td>
+						<td align="right">'.h( $total_debit). '</td>
+						<td align="right">'.h( $total_credit). '</td>
+						</tr>';
+					$closeDr=0;
+					$closeCr=0;
+					if($t < 0){
+						$closeDr=(abs($t)+$total_debit);
+						//pr($closeDr);
+						$closeCr=$total_credit;
+					}else{
+						$closeCr=(abs($t)+$total_credit);
+						$closeDr=$total_debit;
+					}
+					@$message_web.= '
+						<tr>
+						<td colspan="2" align="right">Closing Balance</td>
+						'; 
+						if($closeDr > $closeCr){
+							$p=abs($closeDr)-abs($closeCr);
+							$message_web.='<td colspan="2" align="right">'.h(abs($p)).  ' Dr.</td>';
+							
+						}else{ 
+							$p=abs($closeCr)-abs($closeDr);
+							$message_web.='<td colspan="2" align="right">'.h(abs($p)).  ' Cr.</td>';
+						}
+						
+				$message_web.='</tr></table>';
+		
+		
+	//	pr($message_web); exit;
+		
+		
+		$email_to=$customerData->customer_contacts[0]->email;
+		//$cc_mail=$empData->email;
+		$sub="Account Statement";
+		
+		//$data="<table><tr><td>Table with single row has single data.</td></tr></table>";
+		file_put_contents('excel.xls', $message_web);
+		$attachments[]='excel.xls';
+		//$to=$this->request->query('to');
+	//	pr($attachments); exit;
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="gopalkrishanp3@gmail.com";
+		
+		$cc_mail=$empData->email;
+	//	pr($email_to);
+		//pr($cc_mail); exit;
+		$heading="PFA";
+		$member_name="Gopal";
+		$email->from(['dispatch@mogragroup.com' => $from_name])
+					->to($email_to)
+					->cc($cc_mail)
+					->replyTo('dispatch@mogragroup.com')
+					->subject($sub)
+					->template('notice_send_email')
+					->emailFormat('html')
+					->viewVars(['content'=>$heading,'member_name'=>$member_name])
+					->attachments($attachments);; 
+					$email->send($heading);
+		echo "Email Send successfully ";
+		exit;
 	}
 	
 }

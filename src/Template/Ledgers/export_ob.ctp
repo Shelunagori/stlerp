@@ -5,7 +5,7 @@
 
 	$filename="Accountant_statement_".$date.'_'.$time;
 
-	  header ("Expires: 0");
+	header ("Expires: 0");
 	header ("Last-Modified: " . gmdate("D,d M YH:i:s") . " GMT");
 	header ("Cache-Control: no-cache, must-revalidate");
 	header ("Pragma: no-cache");

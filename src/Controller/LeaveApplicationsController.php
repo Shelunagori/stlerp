@@ -65,6 +65,8 @@ class LeaveApplicationsController extends AppController
 			$leaveApplication->supporting_attached = $files['name'];
 			$attache = $this->request->data['supporting_attached'];
 			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
+			
+			//pr($EmployeeHierarchies); exit;
 			$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
 			$leaveApplication->employee_id=$s_employee_id;
 			$leaveApplication->submission_date=date('Y-m-d');
@@ -86,7 +88,7 @@ class LeaveApplicationsController extends AppController
 					$this->Flash->success(__('The leave application has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				}
-            } else {
+            } else { pr($leaveApplication); exit;
 					$this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }

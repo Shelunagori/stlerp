@@ -49,7 +49,7 @@
 					</div>
 					<div id="collapse_<?php echo $accountGroup->id;?>" class="panel-collapse collapse" aria-expanded="false">
 						<div class="panel-body">
-							<!--Account first Sub group Start-->
+							<!--Account first Sub hide group Start-->
 							<div class="panel-group accordion" id="accordion<?php echo $accountGroup->id;?>">
 							<?php foreach($accountGroup->account_first_subgroups as $account_first_subgroup){ ?>
 							<div class="panel panel-default">

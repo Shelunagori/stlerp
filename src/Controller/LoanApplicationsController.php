@@ -51,6 +51,9 @@ class LoanApplicationsController extends AppController
     public function add()
     {
 		$this->viewBuilder()->layout('index_layout');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		//pr($empData); exit;
         $loanApplication = $this->LoanApplications->newEntity();
         if ($this->request->is('post')) {
             $loanApplication = $this->LoanApplications->patchEntity($loanApplication, $this->request->data);
@@ -62,7 +65,7 @@ class LoanApplicationsController extends AppController
                 $this->Flash->error(__('The loan application could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('loanApplication'));
+        $this->set(compact('loanApplication','empData'));
         $this->set('_serialize', ['loanApplication']);
     }
 

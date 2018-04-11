@@ -67,7 +67,7 @@ class EmployeeHierarchiesController extends AppController
 			$employeeHierarchy->name=$employeesData->name;
 			$employeeHierarchy->company_id=$st_company_id;
 			
-			$Employeexists = $this->EmployeeHierarchies->exists(['employee_id' => $employeeHierarchy->employee_id]);
+			$Employeexists = $this->EmployeeHierarchies->exists(['employee_id' => $employeeHierarchy->employee_id,'parent_id'=>$employeeHierarchy->parent_id]);
 			if($Employeexists !=1 ){
             if ($this->EmployeeHierarchies->save($employeeHierarchy)) {
                 $this->Flash->success(__('The employee hierarchy has been saved.'));

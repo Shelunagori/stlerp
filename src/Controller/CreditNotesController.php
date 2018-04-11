@@ -45,14 +45,29 @@ class CreditNotesController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $creditNotes = $this->CreditNotes->get($id, [
-            'contain' => ['CustomerSuppilers', 'Companies','Creator','CreditNotesRows'=>['Heads']]
+            'contain' => ['Creator','Companies','CreditNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
 		
-		//pr($debitNote);exit;
-		$ReferenceDetails=$this->CreditNotes->ReferenceDetails->find()->where(['ReferenceDetails.credit_note_id' => $id])->toArray();
+		$cgst_per=[];
+		$sgst_per=[];
+		$igst_per=[];
+		foreach($creditNotes->credit_notes_rows as $credit_notes_row){
+			if($credit_notes_row->cgst_percentage > 0){
+				$cgst_per[$credit_notes_row->id]=$this->CreditNotes->SaleTaxes->get(@$credit_notes_row->cgst_percentage);
+			}
+			if($credit_notes_row->sgst_percentage > 0){
+				$sgst_per[$credit_notes_row->id]=$this->CreditNotes->SaleTaxes->get(@$credit_notes_row->sgst_percentage);
+			}
+			if($credit_notes_row->igst_percentage > 0){
+				$igst_per[$credit_notes_row->id]=$this->CreditNotes->SaleTaxes->get(@$credit_notes_row->igst_percentage);
+			}
+		}
+		
+		
+		//$ReferenceDetails=$this->CreditNotes->ReferenceDetails->find()->where(['ReferenceDetails.credit_note_id' => $id])->toArray();
 		
 		$this->set('creditNotes', $creditNotes);
-		 $this->set(compact('ReferenceDetails'));
+		 $this->set(compact('ReferenceDetails','cgst_per','sgst_per','igst_per'));
         $this->set('_serialize', ['creditNotes']);
     }
 
@@ -94,7 +109,22 @@ class CreditNotesController extends AppController
 				{
 					$chkdate = 'Not Found';	
 				}
-		
+				
+			$last_voucher_no_sr=$this->CreditNotes->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
+			$last_voucher_no_credit_note=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+			
+			if($last_voucher_no_credit_note->voucher_no > $last_voucher_no_sr->sr2){
+				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;
+			}else{
+				$last_voucher_no=$last_voucher_no_sr->sr2;
+			}
+			
+			if($last_voucher_no){
+				$voucher_no=$last_voucher_no+1;
+			}else{
+				$voucher_no=1;
+			}
+		//pr($voucher_no); exit;
         $creditNote = $this->CreditNotes->newEntity();
 		
 		if ($this->request->is('post')) {
@@ -103,84 +133,193 @@ class CreditNotesController extends AppController
 			$creditNote->transaction_date=date("Y-m-d");
 			$creditNote->company_id=$st_company_id;
 			$creditNote->created_by=$s_employee_id;
-			$last_voucher_no=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
-			if($last_voucher_no){
-				$creditNote->voucher_no=$last_voucher_no->voucher_no+1;
+			$creditNote->financial_year_id=$st_year_id;
+			
+			$last_voucher_no_sr=$this->CreditNotes->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
+			
+			$last_voucher_no_credit_note=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+			
+			if($last_voucher_no_credit_note->voucher_no > $last_voucher_no_sr->sr2){
+				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;
 			}else{
-				$creditNote->voucher_no=1;
+				$last_voucher_no=$last_voucher_no_sr->sr2;
 			}
-			//pr($creditNote->ref_rows);exit;
+			
+			if($last_voucher_no){
+				$voucher_no1=$last_voucher_no+1;
+			}else{
+				$voucher_no1=1;
+			}
+			
+			$creditNote->voucher_no=$voucher_no1;
+			
+		//	exit;
+			
            if ($this->CreditNotes->save($creditNote)) {
-				$total_cr=0; $total_dr=0;
+				if($creditNote->cr_dr=="Dr"){
+				$ledger = $this->CreditNotes->Ledgers->newEntity();
+				$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
+				$ledger->debit = $creditNote->grand_total;
+				$ledger->credit = 0; 
+				$ledger->voucher_id = $creditNote->id;
+				$ledger->voucher_source = 'Credit Notes';
+				$ledger->company_id = $st_company_id; 
+				$ledger->transaction_date = $creditNote->transaction_date;
+				$this->CreditNotes->Ledgers->save($ledger); 
+				
 				foreach($creditNote->credit_notes_rows as $credit_notes_row){
-
 					$ledger = $this->CreditNotes->Ledgers->newEntity();
-					$ledger->company_id=$st_company_id;
-					$ledger->ledger_account_id = $credit_notes_row->head_id;
-					$ledger->credit = 0;
-					$ledger->debit = $credit_notes_row->amount;
+					$ledger->ledger_account_id = $credit_notes_row->received_from_id;
+					$ledger->credit = $credit_notes_row->amount;
+					$ledger->debit = 0; 
 					$ledger->voucher_id = $creditNote->id;
-					$ledger->voucher_source = 'Credit Note';
+					$ledger->voucher_source = 'Credit Notes';
+					$ledger->company_id = $st_company_id; 
 					$ledger->transaction_date = $creditNote->transaction_date;
-					$this->CreditNotes->Ledgers->save($ledger);
+					$this->CreditNotes->Ledgers->save($ledger); 
 					
-					$total_dr = $total_dr + $credit_notes_row->amount;
+					if($credit_notes_row->cgst_amount > 0){
+						$cg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->cgst_percentage])->first();
+					
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->cgst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->sgst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->sgst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->sgst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->igst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->igst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->igst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+				}
+			}else{
+				$ledger = $this->CreditNotes->Ledgers->newEntity();
+				$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
+				$ledger->credit = $creditNote->grand_total;
+				$ledger->debit = 0; 
+				$ledger->voucher_id = $creditNote->id;
+				$ledger->voucher_source = 'Credit Notes';
+				$ledger->company_id = $st_company_id; 
+				$ledger->transaction_date = $creditNote->transaction_date;
+				$this->CreditNotes->Ledgers->save($ledger); 
+				
+				foreach($creditNote->credit_notes_rows as $credit_notes_row){
+					$ledger = $this->CreditNotes->Ledgers->newEntity();
+					$ledger->ledger_account_id = $credit_notes_row->received_from_id;
+					$ledger->debit = $credit_notes_row->amount;
+					$ledger->credit = 0; 
+					$ledger->voucher_id = $creditNote->id;
+					$ledger->voucher_source = 'Credit Notes';
+					$ledger->company_id = $st_company_id; 
+					$ledger->transaction_date = $creditNote->transaction_date;
+					$this->CreditNotes->Ledgers->save($ledger); 
+					
+					if($credit_notes_row->cgst_amount > 0){
+						$cg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->cgst_percentage])->first();
+					
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->cgst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->sgst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->sgst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->sgst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->igst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->igst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->igst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+				}
 				}
 				
-				$ledger = $this->CreditNotes->Ledgers->newEntity();
-				$ledger->company_id=$st_company_id;
-				$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
-				$ledger->debit = 0;
-				$ledger->credit = $total_dr;
-				$ledger->voucher_id = $creditNote->id;
-				$ledger->voucher_source = 'Credit Note';
-				$ledger->transaction_date = $creditNote->transaction_date;
-				$this->CreditNotes->Ledgers->save($ledger);
+				 $this->Flash->success(__('The Credit Note has been saved.'));
+                return $this->redirect(['action' => 'Index']);
 			}
 			
 			//pr($creditNote); exit;
 		}
 
-		if(sizeof(@$creditNote->ref_rows)>0){
-			
-			foreach($creditNote->ref_rows as $ref_row){
-
-			
-				$ref_row=(object)$ref_row;
-				if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-					$query = $this->CreditNotes->ReferenceBalances->query();
-					
-					$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-					->values([
-						'ledger_account_id' => $creditNote->customer_suppiler_id,
-						'reference_no' => $ref_row->ref_no,
-						'credit' => $ref_row->ref_amount,
-						'debit' => 0
-					]);
-					$query->execute();
-				}else{
-					$ReferenceBalance=$this->CreditNotes->ReferenceBalances->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'reference_no'=>$ref_row->ref_no])->first();
-					$ReferenceBalance=$this->CreditNotes->ReferenceBalances->get($ReferenceBalance->id);
-					$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-					
-					$this->CreditNotes->ReferenceBalances->save($ReferenceBalance);
-				}
-				
-				$query = $this->CreditNotes->ReferenceDetails->query();
-				$query->insert(['ledger_account_id', 'credit_note_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-				->values([
-					'ledger_account_id' => $creditNote->customer_suppiler_id,
-					'credit_note_id' => $creditNote->id,
-					'reference_no' => $ref_row->ref_no,
-					'credit' => $ref_row->ref_amount,
-					'debit' => 0,
-					'reference_type' => $ref_row->ref_type
-				]);
-			
-				$query->execute();
-			}
+		
+		 $vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Purchase Account'])->first();
+		
+		$ReceiptVouchersCashBank=$vr->id;
+		$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
+            'contain' => ['VoucherLedgerAccounts']
+        ]);
+		
+		$where=[];
+		foreach($vouchersReferences->voucher_ledger_accounts as $data){
+			$where[]=$data->ledger_account_id;
 		}
 		
+		$BankCashes_selected='yes';
+		if(sizeof($where)>0){ 
+			$bankCashes = $this->CreditNotes->BankCashes->find('list',
+				['keyField' => function ($row) {
+					return $row['id'];
+				},
+				'valueField' => function ($row) {
+					if(!empty($row['alias'])){
+						return  $row['name'] . ' (' . $row['alias'] . ')';
+					}else{
+						return $row['name'];
+					}
+					
+				}])->where(['BankCashes.id IN' => $where]);
+		}else{
+			$BankCashes_selected='no';
+		}
 		
 			
 			
@@ -211,10 +350,35 @@ class CreditNotesController extends AppController
 			$ReceivedFroms_selected='no';
 		}
 		
+		
+		$gst_type=[6,5];
+		
+		$GstTaxes = $this->CreditNotes->SaleTaxes->find()->where(['SaleTaxes.account_second_subgroup_id IN'=>$gst_type])->matching(
+					'SaleTaxCompanies', function ($q) use($st_company_id) {
+						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
+					} 
+				);
+				//pr($GstTaxes->toArray()); exit;
+		$cgst_options=array();
+					$sgst_options=array();
+					$igst_options=array();
+					foreach($GstTaxes as $GstTaxe){
+						if($GstTaxe->cgst=="Yes"){
+							$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}else if($GstTaxe->sgst=="Yes"){
+							$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}else if($GstTaxe->igst=="Yes"){
+							$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}
+						
+					}
 			
 
 			$companies = $this->CreditNotes->Companies->find('all');
-			$this->set(compact('creditNote', 'customer_suppiler_id', 'receivedFroms', 'companies','ErrorsalesAccs','Errorparties','financial_year','CreditNotesParty','CreditNotesSalesAccount','chkdate','financial_month_first','financial_month_last'));
+			$this->set(compact('creditNote', 'customer_suppiler_id', 'receivedFroms', 'companies','ErrorsalesAccs','Errorparties','financial_year','CreditNotesParty','CreditNotesSalesAccount','chkdate','financial_month_first','financial_month_last','bankCashes','cgst_options','sgst_options','igst_options','voucher_no'));
 			$this->set('_serialize', ['creditNote']);
     }
 
@@ -232,10 +396,37 @@ class CreditNotesController extends AppController
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
-		$creditNote = $this->CreditNotes->get($id, [
-            'contain' => ['CreditNotesRows']
+		 $creditNote = $this->CreditNotes->get($id, [
+            'contain' => ['Creator','Companies','CreditNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
+		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->CreditNotes->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->CreditNotes->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->CreditNotes->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+		
+		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+			   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+			   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+			   $tody1 = date("Y-m-d");
+
+			   $fromdate = strtotime($fromdate1);
+			   $todate = strtotime($todate1); 
+			   $tody = strtotime($tody1);
+
+			  if($fromdate < $tody || $todate > $tody)
+			   {
+				 if($SessionCheckDate['status'] == 'Open')
+				 { $chkdate = 'Found'; }
+				 else
+				 { $chkdate = 'Not Found'; }
+
+			   }
+			   else
+				{
+					$chkdate = 'Not Found';	
+				}
+				
+		
 
 	//pr($creditNote->credit_notes_rows); exit;
 	
@@ -245,186 +436,229 @@ class CreditNotesController extends AppController
 					$creditNote->transaction_date=date("Y-m-d");
 					$creditNote->company_id=$st_company_id;
 					$creditNote->created_by=$s_employee_id;
-					$last_voucher_no=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
-					if($last_voucher_no){
-						$creditNote->voucher_no=$last_voucher_no->voucher_no+1;
-					}else{
-						$creditNote->voucher_no=1;
-					}
-			
-           if ($this->CreditNotes->save($creditNote)) {
-			   
-			   $this->CreditNotes->Ledgers->deleteAll(['voucher_id' => $creditNote->id, 'voucher_source' => 'Credit Note']);
-				$total_cr=0; $total_dr=0;
-					foreach($creditNote->credit_notes_rows as $credit_notes_row){
-						$ledger = $this->CreditNotes->Ledgers->newEntity();
-						$ledger->company_id=$st_company_id;
-						$ledger->ledger_account_id = $credit_notes_row->head_id;
-						$ledger->credit = 0;
-						$ledger->debit = $credit_notes_row->amount;
-						$ledger->voucher_id = $creditNote->id;
-						$ledger->voucher_source = 'Credit Note';
-						$ledger->transaction_date = $creditNote->transaction_date;
-						$this->CreditNotes->Ledgers->save($ledger);
-						$total_dr = $total_dr + $credit_notes_row->amount;
-					}
-				
-					$ledger = $this->CreditNotes->Ledgers->newEntity();
-					$ledger->company_id=$st_company_id;
-					$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
-					$ledger->debit = 0;
-					$ledger->credit = $total_dr;
-					$ledger->voucher_id = $creditNote->id;
-					$ledger->voucher_source = 'Credit Note';
-					$ledger->transaction_date = $creditNote->transaction_date;
-					$this->CreditNotes->Ledgers->save($ledger);
-
-					if(sizeof(@$creditNote->ref_rows)>0){
-						
-						
 					
-					$ref_rows=@$this->request->data['ref_rows'];
-					$i=0;
-					//pr($ref_rows); exit;
-					if(sizeof(@$ref_rows)>0){
-						foreach($ref_rows as $ref_row){
-							$ref_row=(object)$ref_row;
-							$ReferenceDetail=$this->CreditNotes->ReferenceDetails->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'reference_no'=>$ref_row->ref_no,'credit_note_id'=>$creditNote->id])->first();
-							
-							if($ReferenceDetail){   
-								$ReferenceBalance=$this->CreditNotes->ReferenceBalances->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'reference_no'=>$ref_row->ref_no])->first();
-								
-								$ReferenceBalance=$this->CreditNotes->ReferenceBalances->get($ReferenceBalance->id);
-								//pr($ref_row->ref_amount); exit;
-								$ReferenceBalance->credit=$ReferenceBalance->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								
-								$this->CreditNotes->ReferenceBalances->save($ReferenceBalance);
-								
-								$ReferenceDetail=$this->CreditNotes->ReferenceDetails->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'reference_no'=>$ref_row->ref_no,'credit_note_id'=>$creditNote->id])->first();
-								
-								
-								$ReferenceDetail=$this->CreditNotes->ReferenceDetails->get($ReferenceDetail->id);
-								
-								$ReferenceDetail->credit=$ReferenceDetail->credit-$ref_row->ref_old_amount+$ref_row->ref_amount;
-								
-								$this->CreditNotes->ReferenceDetails->save($ReferenceDetail);
-							}else{  //pr($ref_row); exit;
-								if($ref_row->ref_type=='New Reference' or $ref_row->ref_type=='Advance Reference'){
-									//pr($ref_row); exit;
-									$query = $this->CreditNotes->ReferenceBalances->query();
-									$query->insert(['ledger_account_id', 'reference_no', 'credit', 'debit'])
-									->values([
-										'ledger_account_id' => $creditNote->customer_suppiler_id,
-										'reference_no' => $ref_row->ref_no,
-										'credit' =>$ref_row->ref_amount,
-										'debit' => 0
-									])
-									->execute();
-									
-								}else{ 
-									$ReferenceBalance=$this->CreditNotes->ReferenceBalances->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'reference_no'=>$ref_row->ref_no])->first();
-									$ReferenceBalance=$this->CreditNotes->ReferenceBalances->get($ReferenceBalance->id);
-									$ReferenceBalance->credit=$ReferenceBalance->credit+$ref_row->ref_amount;
-									
-									$this->CreditNotes->ReferenceBalances->save($ReferenceBalance);
-								}
-								
-								$query = $this->CreditNotes->ReferenceDetails->query();
-								$query->insert(['ledger_account_id', 'credit_note_id', 'reference_no', 'credit', 'debit', 'reference_type'])
-								->values([
-									'ledger_account_id' => $creditNote->customer_suppiler_id,
-									'credit_note_id' => $creditNote->id,
-									'reference_no' => $ref_row->ref_no,
-									'credit' => $ref_row->ref_amount,
-									'debit' => 0,
-									'reference_type' => $ref_row->ref_type
-								])
-								->execute();
-								
-							}
-						}
+			//pr($creditNote); exit;
+           if ($this->CreditNotes->save($creditNote)) {
+			   $this->CreditNotes->Ledgers->deleteAll(['voucher_id' => $creditNote->id, 'voucher_source' => 'Credit Notes']);
+				if($creditNote->cr_dr=="Dr"){
+				$ledger = $this->CreditNotes->Ledgers->newEntity();
+				$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
+				$ledger->debit = $creditNote->grand_total;
+				$ledger->credit = 0; 
+				$ledger->voucher_id = $creditNote->id;
+				$ledger->voucher_source = 'Credit Notes';
+				$ledger->company_id = $st_company_id; 
+				$ledger->transaction_date = $creditNote->transaction_date;
+				$this->CreditNotes->Ledgers->save($ledger); 
+				
+				foreach($creditNote->credit_notes_rows as $credit_notes_row){
+					$ledger = $this->CreditNotes->Ledgers->newEntity();
+					$ledger->ledger_account_id = $credit_notes_row->received_from_id;
+					$ledger->credit = $credit_notes_row->amount;
+					$ledger->debit = 0; 
+					$ledger->voucher_id = $creditNote->id;
+					$ledger->voucher_source = 'Credit Notes';
+					$ledger->company_id = $st_company_id; 
+					$ledger->transaction_date = $creditNote->transaction_date;
+					$this->CreditNotes->Ledgers->save($ledger); 
+					
+					if($credit_notes_row->cgst_amount > 0){
+						$cg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->cgst_percentage])->first();
+					
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->cgst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
 					}
-						
-					}				
+					
+					if($credit_notes_row->sgst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->sgst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->sgst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->igst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->igst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->credit = $credit_notes_row->igst_amount;
+						$ledger->debit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+				}
+			}else{
+				$ledger = $this->CreditNotes->Ledgers->newEntity();
+				$ledger->ledger_account_id = $creditNote->customer_suppiler_id;
+				$ledger->credit = $creditNote->grand_total;
+				$ledger->debit = 0; 
+				$ledger->voucher_id = $creditNote->id;
+				$ledger->voucher_source = 'Credit Notes';
+				$ledger->company_id = $st_company_id; 
+				$ledger->transaction_date = $creditNote->transaction_date;
+				$this->CreditNotes->Ledgers->save($ledger); 
+				
+				foreach($creditNote->credit_notes_rows as $credit_notes_row){
+					$ledger = $this->CreditNotes->Ledgers->newEntity();
+					$ledger->ledger_account_id = $credit_notes_row->received_from_id;
+					$ledger->debit = $credit_notes_row->amount;
+					$ledger->credit = 0; 
+					$ledger->voucher_id = $creditNote->id;
+					$ledger->voucher_source = 'Credit Notes';
+					$ledger->company_id = $st_company_id; 
+					$ledger->transaction_date = $creditNote->transaction_date;
+					$this->CreditNotes->Ledgers->save($ledger); 
+					
+					if($credit_notes_row->cgst_amount > 0){
+						$cg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->cgst_percentage])->first();
+					
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->cgst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->sgst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->sgst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->sgst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					
+					if($credit_notes_row->igst_amount > 0){
+						$sg_LedgerAccount=$this->CreditNotes->Ledgers->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'SaleTaxes','source_id'=>$credit_notes_row->igst_percentage])->first();
+						$ledger = $this->CreditNotes->Ledgers->newEntity();
+						$ledger->ledger_account_id = $cg_LedgerAccount->id;
+						$ledger->debit = $credit_notes_row->igst_amount;
+						$ledger->credit = 0; 
+						$ledger->voucher_id = $creditNote->id;
+						$ledger->voucher_source = 'Credit Notes';
+						$ledger->company_id = $st_company_id; 
+						$ledger->transaction_date = $creditNote->transaction_date; 
+						$this->CreditNotes->Ledgers->save($ledger); 
+					}
+					}
+				}
+				$this->Flash->success(__('The Credit Note has been saved.'));
+                return $this->redirect(['action' => 'Index']);
 				}
 			}
 
-			$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Purchase Account'])->first();
-			
-			$CreditNotesSalesAccount=$vr->id;
-			$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
-				'contain' => ['VoucherLedgerAccounts']
-			]);
-			//pr($vouchersReferences); exit;
-			$where=[];
-			foreach($vouchersReferences->voucher_ledger_accounts as $data){
-				$where[]=$data->ledger_account_id;
-			}
-			
-			if(sizeof($where)>0){
-				$customer_suppiler_id = $this->CreditNotes->CustomerSuppilers->find('list',
-					['keyField' => function ($row) {
-						return $row['id'];
-					},
-					'valueField' => function ($row) {
-						if(!empty($row['alias'])){
-							return  $row['name'] . ' (' . $row['alias'] . ')';
-						}else{
-							return $row['name'];
-						}
-						
-					}])->where(['CustomerSuppilers.id IN' => $where]);
-			}
-			else{
-				$ErrorsalesAccs='true';
-			}
-			
-			$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();	
-			$CreditNotesParty=$vr->id;
-			$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
-				'contain' => ['VoucherLedgerAccounts']
-			]);
-			$where=[];
-			foreach($vouchersReferences->voucher_ledger_accounts as $data){
-				  $where[]=$data->ledger_account_id;
-			
-			}
-			if(sizeof($where)>0){
-				$heads = $this->CreditNotes->Heads->find('list',
-					['keyField' => function ($row) {
-						return $row['id'];
-					},
-					'valueField' => function ($row) {
-						if(!empty($row['alias'])){
-							return  $row['name'] . ' (' . $row['alias'] . ')';
-						}else{
-							return $row['name'];
-						}
-						
-					}])->where(['Heads.id IN' => $where]);
-			
-			}
-			else{
-				$Errorparties='true';
-			}
-
-			$ReferenceDetails = $this->CreditNotes->ReferenceDetails->find()->where(['ledger_account_id'=>$creditNote->customer_suppiler_id,'credit_note_id'=>$id]);
-	
-		if(!empty($ReferenceDetails))
-		{
-			foreach($ReferenceDetails as $ReferenceDetail)
-			{
-				$ReferenceBalances[] = $this->CreditNotes->ReferenceBalances->find()->where(['ledger_account_id'=>$ReferenceDetail->ledger_account_id,'reference_no'=>$ReferenceDetail->reference_no]);
-			}
+			 $vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Purchase Account'])->first();
+		
+		$ReceiptVouchersCashBank=$vr->id;
+		$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
+            'contain' => ['VoucherLedgerAccounts']
+        ]);
+		
+		$where=[];
+		foreach($vouchersReferences->voucher_ledger_accounts as $data){
+			$where[]=$data->ledger_account_id;
 		}
-		else{
-			$ReferenceBalances='';
-		}	
+		
+		$BankCashes_selected='yes';
+		if(sizeof($where)>0){ 
+			$bankCashes = $this->CreditNotes->BankCashes->find('list',
+				['keyField' => function ($row) {
+					return $row['id'];
+				},
+				'valueField' => function ($row) {
+					if(!empty($row['alias'])){
+						return  $row['name'] . ' (' . $row['alias'] . ')';
+					}else{
+						return $row['name'];
+					}
+					
+				}])->where(['BankCashes.id IN' => $where]);
+		}else{
+			$BankCashes_selected='no';
+		}
+		
+			
+			
+		$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();
+		$ReceiptVouchersReceivedFrom=$vr->id;
+		$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
+            'contain' => ['VoucherLedgerAccounts']
+        ]);
+		$where=[];
+		foreach($vouchersReferences->voucher_ledger_accounts as $data){
+			$where[]=$data->ledger_account_id;
+		}
+		$ReceivedFroms_selected='yes';
+		if(sizeof($where)>0){
+			$receivedFroms = $this->CreditNotes->ReceivedFroms->find('list',
+				['keyField' => function ($row) {
+					return $row['id'];
+				},
+				'valueField' => function ($row) {
+					if(!empty($row['alias'])){
+						return  $row['name'] . ' (' . $row['alias'] . ')';
+					}else{
+						return $row['name'];
+					}
+					
+				}])->where(['ReceivedFroms.id IN' => $where]);
+		}else{
+			$ReceivedFroms_selected='no';
+		}
+		
+		
+		$gst_type=[6,5];
+		
+		$GstTaxes = $this->CreditNotes->SaleTaxes->find()->where(['SaleTaxes.account_second_subgroup_id IN'=>$gst_type])->matching(
+					'SaleTaxCompanies', function ($q) use($st_company_id) {
+						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
+					} 
+				);
+							//pr($GstTaxes->toArray()); exit;
+					$cgst_options=array();
+					$sgst_options=array();
+					$igst_options=array();
+					foreach($GstTaxes as $GstTaxe){
+						if($GstTaxe->cgst=="Yes"){
+							$merge_cgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$cgst_options[]=['text' =>$merge_cgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}else if($GstTaxe->sgst=="Yes"){
+							$merge_sgst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$sgst_options[]=['text' =>$merge_sgst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}else if($GstTaxe->igst=="Yes"){
+							$merge_igst=$GstTaxe->tax_figure.' ('.$GstTaxe->invoice_description.')';
+							$igst_options[]=['text' =>$merge_igst, 'value' => $GstTaxe->id,'percentage'=>$GstTaxe->tax_figure];
+						}
+						
+					}
 
 
         $customerSuppilers = $this->CreditNotes->CustomerSuppilers->find('list', ['limit' => 200]);
         $companies = $this->CreditNotes->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('creditNote', 'customerSuppilers', 'companies','heads','customer_suppiler_id','ReferenceDetails','financial_year','chkdate','financial_month_first','financial_month_last'));
+        $this->set(compact('creditNote', 'customerSuppilers', 'companies','heads','customer_suppiler_id','ReferenceDetails','financial_year','chkdate','financial_month_first','financial_month_last','voucher_no','receivedFroms','bankCashes','cgst_options','sgst_options','igst_options'));
         $this->set('_serialize', ['creditNote']);			
 
 	}	

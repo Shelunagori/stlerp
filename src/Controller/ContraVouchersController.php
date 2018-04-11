@@ -56,7 +56,7 @@ class ContraVouchersController extends AppController
         ];
         
         
-        $contravouchers = $this->paginate($this->ContraVouchers->find()->where($where)->where(['company_id'=>$st_company_id])->contain(['ContraVoucherRows'=>function($q){
+        $contravouchers = $this->paginate($this->ContraVouchers->find()->where($where)->where(['company_id'=>$st_company_id,'ContraVouchers.financial_year_id'=>$st_year_id])->contain(['ContraVoucherRows'=>function($q){
             $ContraVoucherRows = $this->ContraVouchers->ContraVoucherRows->find();
             $totalCrCase = $ContraVoucherRows->newExpr()
                 ->addCase(
@@ -288,16 +288,16 @@ class ContraVouchersController extends AppController
             $contravoucher = $this->ContraVouchers->patchEntity($contravoucher, $this->request->data);
             
 
-			
+			 $contravoucher->financial_year_id=$st_year_id;
 			$contravoucher->company_id=$st_company_id;
             //Voucher Number Increment
-            $last_voucher_no=$this->ContraVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id])->order(['voucher_no' => 'DESC'])->first();
+            $last_voucher_no=$this->ContraVouchers->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'ContraVouchers.financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
             if($last_voucher_no){
                 $contravoucher->voucher_no=$last_voucher_no->voucher_no+1;
             }else{
                 $contravoucher->voucher_no=1;
             }
-            
+           // $payment->financial_year_id=$st_year_id;
             $contravoucher->created_on=date("Y-m-d");
             $contravoucher->created_by=$s_employee_id;
             $contravoucher->transaction_date=date("Y-m-d",strtotime($contravoucher->transaction_date));

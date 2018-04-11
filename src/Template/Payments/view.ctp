@@ -25,7 +25,7 @@ margin-bottom: 0;
 <div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 55%;font-size: 12px;" class="maindiv">	
 	<table width="100%" class="divHeader">
 		<tr>
-			<td width="30%"><?php echo $this->Html->image('/logos/'.$payment->company->logo, ['width' => '40%']); ?></td>
+			<td width="30%"><?php echo $this->Html->image('/logos/'.$payment->company->logo, ['width' => '40%','fullBase' => true]); ?></td>
 			<td align="center" width="30%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">PAYMENT VOUCHER</div></td>
 			<td align="right" width="40%" style="font-size: 12px;">
 			<span style="font-size: 14px;"><?= h($payment->company->name) ?></span>

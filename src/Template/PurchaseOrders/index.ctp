@@ -134,7 +134,7 @@
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 							<?php } ?>
 							<?php
-								if($status != 'Converted-Into-GRN') { 
+								if($status != 'Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id) { 
 								if($pull_request!="true" and in_array(14,$allowed_pages)){ 
 								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } } ?>
 							
@@ -151,7 +151,7 @@
 						<?php }} endforeach; ?>
 						
 						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
-						<tr <?php if($status=='Converted-Into-GRN'){ echo 'style="background-color:#f4f4f4"';   
+						<tr <?php if($status=='Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id){ echo 'style="background-color:#f4f4f4"';   
 							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){
 						?>>
 							<td><?= h(++$page_no) ?></td>
