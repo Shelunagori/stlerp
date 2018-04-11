@@ -51,7 +51,7 @@
 						
 						<td><?= h(($saleReturn->invoice->in1.'/IN-'.str_pad($saleReturn->invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->invoice->in3.'/'.$saleReturn->invoice->in4)) ?></td>
 						
-						<td><?php echo date("d-m-Y",strtotime($saleReturn->date_created)); ?></td>
+						<td><?php echo date("d-m-Y",strtotime($saleReturn->transaction_date)); ?></td>
 						<td align="right"><?= h($this->Number->format($saleReturn->total_after_pnf,[ 'places' => 2])) ?></td>
 						
 						<td class="actions">
