@@ -102,6 +102,7 @@
 							<th width="15%">Customer</th>
 							<th width="10%">PO No.</th>
 							<th width="10%">Items Name</th>
+							<th width="10%">Amount</th>
 							<th width="10%">Created Date</th>
 							<th width="10%">Actions</th>
 						</tr>
@@ -186,6 +187,7 @@
 										</ul>
 								</div>
 							</td>
+							<td><?= ($salesOrder->total)?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 						<td class="actions">

@@ -123,6 +123,7 @@ if(!empty($status)){
 							<th width="15%">Salesman</th>
 							<th width="15%">Product</th>
 							<th width="10%">Items Name</th>
+							<th width="10%">Amount</th>
 							<?php if($pull_request=="true"){ ?>
 							<th width="10%">Quotation Date</th>
 							<?php }else{ ?>
@@ -164,6 +165,7 @@ if(!empty($status)){
 										</ul>
 								</div>
 							</td>
+							<td><?= h($quotation->total)?> </td>
 							<?php if($pull_request=="true" ){ ?>
 							<td><?php echo date("d-m-Y",strtotime($quotation->created_on)); ?></td>
 							<?php }else{ ?>
