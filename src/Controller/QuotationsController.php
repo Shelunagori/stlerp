@@ -116,7 +116,7 @@ class QuotationsController extends AppController
 		}else{   
 		
 			if(sizeof($max_ids)>0){
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
 					
 			}else{  
 				$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
@@ -135,7 +135,7 @@ class QuotationsController extends AppController
 		$companies = $this->Quotations->Companies->find('list');
 		$Items = $this->Quotations->QuotationRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$closeReasons = $this->Quotations->QuotationCloseReasons->find('all');
-        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last'));
+        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id'));
         $this->set('_serialize', ['quotations']);
 		$this->set(compact('url'));
 	}
@@ -306,7 +306,8 @@ class QuotationsController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
-		
+		$session = $this->request->session();
+		$st_year_id = $session->read('st_year_id');
 		$quotation = $this->Quotations->get($id, [
             'contain' => ['QuotationRows','Customers'=>['CustomerContacts'=>function ($q) {
 						   return $q
@@ -340,7 +341,7 @@ class QuotationsController extends AppController
         }
 		
 		
-		$this->set(compact('quotation','id','email','revision'));
+		$this->set(compact('quotation','id','email','revision','st_year_id'));
         
     }
 	

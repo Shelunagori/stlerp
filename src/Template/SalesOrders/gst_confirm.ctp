@@ -10,7 +10,7 @@ $edit_url=$this->Url->build(['controller'=>'SalesOrders','action'=>'gstSalesOrde
 			<a href="<?php echo $list_url; ?>" class="list-group-item"><i class="fa fa-chevron-left"></i> Back to Sales Orders </a>
 			<?php foreach($salesorder->sales_order_rows as $sales_order_row){
 			if($sales_order_row->processed_quantity != $sales_order_row->quantity AND in_array(4,$allowed_pages)){ 
-			if(!in_array(date("m-Y",strtotime($salesorder->created_on)),$closed_month))
+			if(!in_array(date("m-Y",strtotime($salesorder->created_on)),$closed_month) && $st_year_id==$salesorder->financial_year_id)
 			{ 
 			?>
 			<a href="<?php echo $edit_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-edit"></i> Edit </a>

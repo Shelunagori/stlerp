@@ -199,8 +199,8 @@
 								}elseif($Actionstatus=='GstCopy'){ 
 									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}else{
-								 if(in_array($salesOrder->created_by,$allowed_emp)){ 
-									if(in_array(4,$allowed_pages)){
+								 if(in_array($salesOrder->created_by,$allowed_emp) ){ 
+									if(in_array(4,$allowed_pages) && $st_year_id==$salesOrder->financial_year_id){
 										if($salesOrder->gst=="no")
 										{
 										echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salesOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 

@@ -183,7 +183,7 @@ if(!empty($status)){
 							<?php if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date && date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  { ?>
 								<?php if($quotation->status=='Pending' and $gst_pull_request!="true" and in_array(2,$allowed_pages) and $pull_request!="true" && $copy_request!="copy"){ ?>
 								<?php
-								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month))
+								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id)
 								 { ?>
 								<div class="btn-group dropup" >
 									<button type="button" class="btn btn-xs blue dropdown-toggle" data-toggle="dropdown"><i class="fa fa-pencil-square-o"></i></button>
@@ -221,7 +221,7 @@ if(!empty($status)){
 								<?php if(in_array($quotation->created_by,$allowed_emp)){ ?>
 								<?php 
 								if(in_array(30,$allowed_pages)){
-								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true"){
+								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true" && $st_year_id==$quotation->financial_year_id){
 								echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Close','role'=>'button','quote_id'=>$quotation->id));
 								} }?>
 								<?php if($copy_request=="copy"){

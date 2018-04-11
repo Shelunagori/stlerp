@@ -19,7 +19,7 @@ $edit_url=$this->Url->build(['controller'=>'Quotations','action'=>'Add']);
 			
 			<?php if($quotation->status=='Pending' AND $quotation->revision==$revision AND in_array(2,$allowed_pages) ){ ?>
 			<?php
-						if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month))
+						if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id)
 						{ ?>
 				<div class="btn-group dropup" style=" width: 100%; ">
 					<button type="button" class="list-group-item dropdown-toggle" data-toggle="dropdown" style=" width: 100%; text-align: left; "><i class="fa fa-pencil-square-o" width="100%"></i>Edit</button>

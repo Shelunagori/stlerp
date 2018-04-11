@@ -161,7 +161,7 @@ class SalesOrdersController extends AppController
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
+					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
@@ -1583,6 +1583,8 @@ class SalesOrdersController extends AppController
 	public function gstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$session = $this->request->session();
+		$st_year_id = $session->read('st_year_id');
 		$salesorder = $this->SalesOrders->get($id, [
             'contain' => ['SalesOrderRows']
 			]);
@@ -1595,7 +1597,7 @@ class SalesOrdersController extends AppController
 			return $this->redirect(['action' => 'confirm/'.$id]);
         }
 		
-		$this->set(compact('salesorder','id'));
+		$this->set(compact('salesorder','id','st_year_id'));
     }
 	
 

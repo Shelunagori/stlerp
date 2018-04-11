@@ -92,7 +92,7 @@
 			$amt=$DueReferenceBalances[$key];
 				if($amt != 0){
 					$td=date('d-m-Y',strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']));
-					//pr($td);
+					
 				?>
 				
 				<tr>
@@ -125,7 +125,10 @@
 						}else if($Ledger_Account_data->source_model=="Customers" && $DueReferenceBalances[$key] > 0 && $td !="01-01-1970"){
 							echo (date('d-m-Y',strtotime($due_date))); 
 						}else if($td =="01-01-1970"){ 
-								
+								if(date('d-m-Y',strtotime($due_date))=="01-01-1970"){
+								}else{
+								echo (date('d-m-Y',strtotime($due_date)));
+								}
 						}else if($due_date){
 							echo (date('d-m-Y',strtotime($due_date))); 
 						}
