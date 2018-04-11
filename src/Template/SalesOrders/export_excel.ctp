@@ -27,6 +27,7 @@
 							<th>Sales Order No</th>
 							<th>Customer</th>
 							<th>Quotation No</th>
+							<th>Amount</th>
 							<th>Date</th>
 							<th>PO No.</th>
 							<th>Status</th>
@@ -45,6 +46,7 @@
 							<td>
 							<?php echo $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4; ?>
 							</td><?php }else{ ?><td>-</td><?php } ?>
+							<td><?= h($salesOrder->total) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							<td><?= h($salesOrder->customer_po_no) ?></td>
 							
@@ -65,6 +67,7 @@
 							<td>
 							<?php echo $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4; ?>
 							</td><?php }else{ ?><td>-</td><?php } ?>
+							<td><?= h($salesOrder->total) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							<td><?= h($salesOrder->customer_po_no) ?></td>
 							

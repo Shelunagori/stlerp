@@ -269,7 +269,7 @@ class SalesOrdersController extends AppController
 				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 				$salesOrders = $this->SalesOrders->find();
 
-				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 				->innerJoinWith('SalesOrderRows')
 				->group(['SalesOrders.id'])
 				->matching('SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
@@ -284,7 +284,7 @@ class SalesOrdersController extends AppController
 				if($gst=="true" || $Actionstatus=="GstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
@@ -297,7 +297,7 @@ class SalesOrdersController extends AppController
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
@@ -310,7 +310,7 @@ class SalesOrdersController extends AppController
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
@@ -322,7 +322,7 @@ class SalesOrdersController extends AppController
 				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
@@ -335,7 +335,7 @@ class SalesOrdersController extends AppController
 				}else { //exit;   
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
