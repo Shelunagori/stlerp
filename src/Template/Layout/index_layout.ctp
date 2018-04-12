@@ -714,7 +714,12 @@ select
 							</ul>
 						</li>
 					<?php if(in_array(163,$allowed_pages)){ ?>	
-					<li>
+						<li>
+							<?php $today =date('d-m-Y');
+							echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Purchase Report',array('controller'=>'ItemLedgers','action'=>'inventoryDailyReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?>
+						</li>
+					
+						<li>
 					
 						<?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Inventory Daily Report',array('controller'=>'ItemLedgers','action'=>'inventoryDailyReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
