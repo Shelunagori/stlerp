@@ -4,6 +4,12 @@ namespace App\Controller;
 use App\Controller\AppController;
 use Cake\Datasource\ConnectionManager;
 use Cake\Mailer\Email;
+use Dompdf\Dompdf;
+use Dompdf\Options;
+use Cake\View\Helper\TextHelper;
+use Cake\View\Helper\NumberHelper;
+use Cake\View\Helper\HtmlHelper;
+
 /**
  * SalesOrders Controller
  *
@@ -1157,10 +1163,11 @@ class SalesOrdersController extends AppController
 			$salesOrder->company_id=$st_company_id;
 			$salesOrder->financial_year_id=$st_year_id;
 			
-			$salesOrder->id=724;
-			$status=$this->sendEmail($salesOrder->id);
+			//$salesOrder->id=724;
+			
 			
 			if ($this->SalesOrders->save($salesOrder)) {
+				$status=$this->sendEmail($salesOrder->id);
 				$status_close=$this->request->query('status');
 				$totalSalesOrderIDs=[];
 				foreach($salesOrder->sales_order_rows as $sales_order_row)
@@ -1217,7 +1224,7 @@ class SalesOrdersController extends AppController
 				$this->Flash->success(__('The sales order has been saved.'));
 				return $this->redirect(['action' => 'gstConfirm/'.$salesOrder->id]);
 
-            } else {
+            } else { pr($salesOrder); exit;
                 $this->Flash->error(__('The sales order could not be saved. Please, try again.'));
             }
         }
@@ -1330,31 +1337,42 @@ class SalesOrdersController extends AppController
 
 	public function sendEmail($id=null){ 
 		$salesOrder = $this->SalesOrders->get($id, [
-            'contain' => ['Quotations'=>['QuotationRows'],'SalesOrderRows' => ['Items','JobCardRows'],'Invoices' => ['InvoiceRows']]
+            'contain' => ['Carrier','Creator','Courier','Customers'=>['CustomerAddress']]
         ]);
+		
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->SalesOrders->Companies->get($st_company_id);
+		//$x=$this->pdfDownload($id);
 		$email = new Email('default');
 		$email->transport('gmail');
 		//$email_to=$Vendor->vendor_contact_persons[0]->email;
 		//$cc_mail=$payment->creator->email;
 		//pr($email_to);
 		//pr($cc_mail); exit;
+
+		$name='last_so'; 
+		$attachments='';
+		$attachments='Invoice_email/'.$name.'.pdf';
+		
+
 		$email_to="gopalkrishanp3@gmail.com";
-		$cc_mail="gopal@phppoets.in";
+		//$cc_mail="gopal@phppoets.in";
 		$member_name="Gopal";
 		$from_name=$company_data->alias;
-		$sub="For Payment";
+		$sub="Purchase order acknowledgement";
 		
 		
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
-		->cc($cc_mail)
 		->replyTo('dispatch@mogragroup.com')
 		->subject($sub)
-		->template('send_payment_voucher')
+		->template('send_sales_order')
 		->emailFormat('html')
-		->viewVars(['payment'=>$payment,'member_name'=>$member_name]);
+		->viewVars(['salesOrder'=>$salesOrder,'member_name'=>$member_name])
+		->attachments($attachments); // pr($salesOrder); exit;
 		$email->send();
-		exit;
+		return;
 	}
 	
 	public function gstSalesOrderEdit($id = null)
@@ -1655,11 +1673,34 @@ class SalesOrdersController extends AppController
 		pr($data);exit;
 	}
 	
-	public function pdfDownload($id=null){
-		require_once(ROOT . DS  .'vendor' . DS  . 'dompdf' . DS . 'autoload.inc.php');
-		use Dompdf\Dompdf;
-		use Dompdf\Options;
+	public function pdfDownload($id=null){ //echo "sdfds"; exit;
+		$Number = new NumberHelper(new \Cake\View\View());
+		$Html = new HtmlHelper(new \Cake\View\View());
+		$Text = new TextHelper(new \Cake\View\View());
 
+		 $salesOrder = $this->SalesOrders->get($id, [
+            'contain' => ['Customers', 'Companies','Carrier','Creator','Editor','Courier','Employees','SalesOrderRows' => function($q){
+				return $q->order(['SalesOrderRows.id' => 'ASC'])->contain(['Items'=>['Units']]);
+			}]
+        ]);
+		
+		$cgst_per=[];
+		$sgst_per=[];
+		$igst_per=[];
+		foreach($salesOrder->sales_order_rows as $sales_order_row){
+			if($sales_order_row->cgst_per){
+				$cgst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->cgst_per);
+			}
+			if($sales_order_row->sgst_per){
+				$sgst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->sgst_per);
+			}
+			if($sales_order_row->igst_per){
+				$igst_per[$sales_order_row->id]=$this->SalesOrders->SaleTaxes->get(@$sales_order_row->igst_per);
+			}
+		}
+	
+require_once(ROOT . DS  .'vendor' . DS  . 'dompdf' . DS . 'autoload.inc.php');
+		
 		$options = new Options();
 		$options->set('defaultFont', 'Lato-Hairline');
 		$dompdf = new Dompdf($options);
@@ -1763,7 +1804,7 @@ class SalesOrdersController extends AppController
 						<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;">SALES ORDER</div>
 						</td>
 						<td align="right" width="35%" style="font-size: 12px;">
-						<span>'. $this->Text->autoParagraph(h($salesOrder->company->address)) .'</span>
+						<span>'. $Text->autoParagraph(h($salesOrder->company->address)) .'</span>
 						<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/telephone.gif height="11px" style="height:11px;margin-top:5px;"/> '. h($salesOrder->company->mobile_no).'</span> | 
 						<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/email.png height="15px" style="height:15px;margin-top:4px;"/> '. h($salesOrder->company->email).'</span>
 						</td>
@@ -1788,7 +1829,7 @@ class SalesOrdersController extends AppController
 								<tr>
 									<td width="50%" valign="top" text-align="right" >
 										<span><b>'. h(($salesOrder->customer->customer_name)) .'</b></span><br/>
-										'. $this->Text->autoParagraph(h($salesOrder->customer_address)) .'
+										'. $Text->autoParagraph(h($salesOrder->customer_address)) .'
 										
 									</td>
 									<td style="white-space:nowrap" width="30%" valign="top" text-align="right">
@@ -1890,21 +1931,21 @@ class SalesOrdersController extends AppController
 				$html.='</td>
 				<td align="right" valign="top"  style="padding-top:10px;">'. h($salesOrderRows->item->unit->name) .'</td>
 				<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($salesOrderRows->quantity) .'</td>
-				<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->rate,[ 'places' => 2]) .'</td>
-				<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->amount,[ 'places' => 2]) .'</td>';
+				<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->rate,[ 'places' => 2]) .'</td>
+				<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->amount,[ 'places' => 2]) .'</td>';
 				if($salesOrderRows->discount==0){
 				$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>
 				<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>';
 				}else{
 					$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->discount_per) .'</td>
-				<td align="center" valign="top" style="padding-top:10px;">'. $this->Number->format($salesOrderRows->discount,[ 'places' => 2]) .'</td>';
+				<td align="center" valign="top" style="padding-top:10px;">'. $Number->format($salesOrderRows->discount,[ 'places' => 2]) .'</td>';
 				}
 				if($salesOrderRows->pnf==0){
 				$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>
 				<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>';
 				}else{
 					$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->pnf_per) .'</td>
-				<td align="center" valign="top" style="padding-top:10px;">'. $this->Number->format($salesOrderRows->pnf,[ 'places' => 2]) .'</td>';
+				<td align="center" valign="top" style="padding-top:10px;">'. $Number->format($salesOrderRows->pnf,[ 'places' => 2]) .'</td>';
 				}
 				
 				$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->taxable_value) .'</td>';
@@ -1914,7 +1955,7 @@ class SalesOrdersController extends AppController
 					{
 						$html.=$cgst_per[$salesOrderRows->id]['tax_figure'].'%';
 					}
-					$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->cgst_amount,['places'=>2]) .'</td>';
+					$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->cgst_amount,['places'=>2]) .'</td>';
 				}
 				
 				if($salesOrderRows->sgst_per > 0){ 
@@ -1923,7 +1964,7 @@ class SalesOrdersController extends AppController
 					{
 						$html.=$sgst_per[$salesOrderRows->id]['tax_figure'].'%';
 					}
-				$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->sgst_amount,['places'=>2]) .'</td>';
+				$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->sgst_amount,['places'=>2]) .'</td>';
 				}
 				
 				if($salesOrderRows->igst_per > 0){ 
@@ -1932,10 +1973,10 @@ class SalesOrdersController extends AppController
 					{
 						$html.=$igst_per[$salesOrderRows->id]['tax_figure'].'%';
 					}
-					$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->igst_amount,['places'=>2]) .'</td>';
+					$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->igst_amount,['places'=>2]) .'</td>';
 				}
 				
-				$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->total,['places'=>2]) .'</td>
+				$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $Number->format($salesOrderRows->total,['places'=>2]) .'</td>
 			</tr>';
 			
 		endforeach;
@@ -1949,17 +1990,17 @@ class SalesOrdersController extends AppController
 				if(!empty($salesOrder->discount)){
 				$html.='<tr>
 							<td style="text-align:right;">'.$discount_text.'</td>
-							<td style="text-align:right;" width="104">'. $this->Number->format($salesOrder->discount,[ 'places' => 2]).'</td>
+							<td style="text-align:right;" width="104">'. $this->Number($salesOrder->discount,[ 'places' => 2]).'</td>
 						</tr>';
 				}
 				$html.='<tr>
 						<td style="text-align:right;">Total</td>
-						<td style="text-align:right;" width="125">'. $this->Number->format($salesOrder->total,[ 'places' => 2]).'</td>
+						<td style="text-align:right;" width="125">'. $Number->format($salesOrder->total,[ 'places' => 2]).'</td>
 					</tr>';
 				if(!empty($salesOrder->pnf)){
 				$html.='<tr>
 							<td style="text-align:right;">Total after P&F</td>
-							<td style="text-align:right;" width="104">'. $this->Number->format($salesOrder->total_after_pnf,[ 'places' => 2]).'</td>
+							<td style="text-align:right;" width="104">'. $Number->format($salesOrder->total_after_pnf,[ 'places' => 2]).'</td>
 						</tr>';
 				}
 					
@@ -2015,7 +2056,7 @@ class SalesOrdersController extends AppController
 			<table width="100%" class="table_rows ">
 				<tr>
 					<td valign="top" width="18%">Additional Note</td>
-					<td  valign="top" class="topdata">'. $this->Text->autoParagraph($salesOrder->additional_note).'</td>
+					<td  valign="top" class="topdata">'. $Text->autoParagraph($salesOrder->additional_note).'</td>
 
 				</tr>
 			</table>
@@ -2085,12 +2126,14 @@ class SalesOrdersController extends AppController
 		</html>';
 		  
 		//echo $html; exit;
-		 
-		$name='Sales_Order-'.h(($salesOrder->so1.'_'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'_'.$salesOrder->so3.'_'.$salesOrder->so4));
+		
+		$name='last_so';
 		$dompdf->loadHtml($html);
 		$dompdf->setPaper('A4', 'landscape');
 		$dompdf->render();
-		$dompdf->stream($name,array('Attachment'=>0));
-		exit(0);
+		$output = $dompdf->output(); //echo $name; exit;
+		file_put_contents('Invoice_email/'.$name.'.pdf', $output);
+		//$dompdf->stream($name,array('Attachment'=>0));
+		return;
 	}
 }
