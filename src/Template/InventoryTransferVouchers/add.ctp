@@ -47,7 +47,7 @@
 		<div class="col-md-3">
 		<label>Transaction Date</label>
 		<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control  date-picker','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd-mm-yyyy','data-date-start-date' 
-										=>$start_date ,'data-date-end-date' => $end_date,'value'=>date('d-m-Y')]); ?>
+										=>$start_date ,'data-date-end-date' => $end_date]); ?>
 		
 		
 		

@@ -356,7 +356,7 @@
 					<div class="form-group">
 						<label class="control-label">E-Way Bill <span class="required" aria-required="true">*</span></label>
 						<?php 
-							echo $this->Form->input('e_way_bill', ['empty' => "--Select--",'options'=>['Yes'=>'Yes','No'=>'No'],'label' => false,'class' => 'form-control input-sm  select2me','value'=>'Dr','style'=>'vertical-align: top !important;','value'=>$salesOrder->e_way_bill]); ?>
+							echo $this->Form->input('e_way_bill', ['options'=>['Yes'=>'Yes','No'=>'No'],'label' => false,'class' => 'form-control input-sm  select2me','style'=>'vertical-align: top !important;','value'=>$salesOrder->e_way_bill]); ?>
 					</div>
 				</div>
 				<div class="col-md-4">
@@ -396,32 +396,12 @@
 				</div>
 			</div>
 			<div class="row">
-				
-				<div class="col-md-4">
-					<div class="form-group">
-						<div class="radio-list" data-error-container="#road_permit_required_error">
-						<label class="control-label">Road Permit Required <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
-						</div>
-						<div id="road_permit_required_error"></div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="form-group">
-						<div class="radio-list" data-error-container="#form49_error">
-						<label class="control-label">Form-49 Required <span class="required" aria-required="true">*</span></label>
-						<?php echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); ?>
-						</div>
-						<div id="form49_error"></div>
-					</div>
-				</div>
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label">Additional Note  <span class="required" aria-required="true">*</span></label>
 						<?php echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note']); ?>
 					</div>
 				</div>
-				
 			</div>
 			<!--<label>Commercial Terms & Conditions:</label> <a href="#" role="button" class="select_term_condition">Select </a>
 			<?php echo $this->Form->input('terms_conditions', ['label' => false,'class' => 'form-control','value' => @$quotation->terms_conditions]); ?>-->

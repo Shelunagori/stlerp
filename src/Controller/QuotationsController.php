@@ -426,18 +426,14 @@ class QuotationsController extends AppController
 			   $todate = strtotime($todate1); 
 			   $tody = strtotime($tody1);
 
-			  if($fromdate < $tody || $todate > $tody)
-			   {
-				 if($SessionCheckDate['status'] == 'Open')
-				 { $chkdate = 'Found'; }
-				 else
-				 { $chkdate = 'Not Found'; }
-
-			   }
-			   else
-				{
-					$chkdate = 'Not Found 1';	
-				}
+				if($fromdate > $tody || $todate < $tody)
+				   {
+					   $chkdate = 'Not Found';
+				   }
+				   else
+				   {
+					  $chkdate = 'Found';
+				   }
 
 				
 				
