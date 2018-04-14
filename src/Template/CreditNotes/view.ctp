@@ -88,57 +88,75 @@ margin-bottom: 0;
 		
 			<tr >
 				<th rowspan="2" style="text-align: center; width:2%;">S.N.</th>
-				<th rowspan="2" style="text-align: center; width:25%;">Paid To</th>
+				<th rowspan="2" style="text-align: center; width:25%;">Narration</th>
 				<th rowspan="2" style="text-align: center; width:10%;">Taxable Value</th>
+				<?php if($creditNotes->igst_total_amount==0){ ?>
 				<th style=" text-align: center; width:15%;" colspan="2" width="15%">CGST</th>
 				<th style=" text-align: center; width:15%;" colspan="2" width="15%">SGST</th>
+				<?php }else{ ?>
 				<th  style=" text-align: center; width:15%;" colspan="2" width="15%">IGST</th>
+				<?php } ?>
 				<th rowspan="2" style="text-align: center; width:10%;"  width="10%">Total</th>
 				
 			</tr>
 			<tr> 
+				<?php if($creditNotes->igst_total_amount==0){ ?>
 				<th style="text-align: center;" >%</th>
 				<th style="text-align: center;" >Amt</th>
 				<th style="text-align: center;" >%</th>
 				<th style="text-align: center;" >Amt</th>
+				<?php }else{ ?>
 				<th style="text-align: center;">%</th>
 				<th style="text-align: center;">Amt</th>
+				<?php } ?>
 			</tr>
 		
-		<?php $total_cr=0; $total_dr=0; foreach ($creditNotes->credit_notes_rows as $credit_notes_row): ?>
+		<?php $i=1; $total_cr=0; $total_dr=0; foreach ($creditNotes->credit_notes_rows as $credit_notes_row): ?>
 		<tr>
-			<td>1</td>
-			<td  style="text-align: center;"><?= h($credit_notes_row->ReceivedFrom->name) ?></td>
+			<td><?php echo $i++; ?></td>
+			<td  style="text-align: left;"><?= h($credit_notes_row->narration) ?></td>
 			<td align="right"><?= h($this->Number->format($credit_notes_row->amount,[ 'places' => 2])) ?> </td>
+			<?php if($creditNotes->igst_total_amount==0){ ?>
 			<td align="right"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
 			<td align="right"><?= h($credit_notes_row->cgst_amount) ?></td>
 			<td align="right"><?= h(@$sgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
 			<td align="right"><?= h($credit_notes_row->sgst_amount) ?></td>
+			<?php }else{ ?>
 			<td align="right"><?= h(@$igst_per[$credit_notes_row->id]['tax_figure']) ?></td>
 			<td align="right"><?= h($credit_notes_row->igst_amount) ?></td>
-			<td align="right"><?= h($credit_notes_row->total_amount) ?></td>
+			<?php } ?>
+			
+			<td align="right"><?= h($this->Number->format($credit_notes_row->total_amount,[ 'places' => 2])) ?></td>
 		</tr>
-		<tr>
-			<td></td>
-			<td  colspan="9"  style="text-align: left; line-height:40px; valign:top;"><?= h($credit_notes_row->narration) ?></td>
-		</tr>
+		
 		<?php endforeach; ?>
+		
+		<?php if($creditNotes->igst_total_amount==0){ ?>
 		<tr>
-			<td colspan="9" align="right" style="border-bottom-style:none;">CGST Total</td>
-			<td align="right"><?php echo $creditNotes->cgst_total_amount ?></td>
+			<td colspan="7" align="right" style="border-bottom-style:none;">CGST Total</td>
+			<td align="right"><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></td>
+			
 		</tr>
 		<tr>
-			<td colspan="9" align="right">SGST Total</td>
-			<td align="right"><?php echo $creditNotes->sgst_total_amount ?></td>
+			<td colspan="7" align="right">SGST Total</td>
+			<td align="right"><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></td>
+			
 		</tr>
 		<tr>
-			<td colspan="9" align="right">IGST Total</td>
-			<td align="right"><?php echo $creditNotes->igst_total_amount ?></td>
+			<td colspan="7" align="right">Grand Total</td>
+			<td align="right"><?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></td>
+		</tr>
+		<?php }else{ ?>
+		<tr>
+			<td colspan="5" align="right">IGST Total</td>
+			<td align="right"><?= h($this->Number->format($creditNotes->igst_total_amount,[ 'places' => 2])) ?></td>
 		</tr>
 		<tr>
-			<td colspan="9" align="right">Grand Total</td>
-			<td align="right"><?php echo $creditNotes->grand_total ?></td>
+			<td colspan="5" align="right">Grand Total</td>
+			<td align="right"><?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></td>
 		</tr>
+		<?php } ?>
+		
 <?php 
 	$grand_total=explode('.',$creditNotes->grand_total);
 	$rupees=$grand_total[0];
@@ -152,9 +170,19 @@ margin-bottom: 0;
 	} 
 ?>
 		
+	
 	</table>
 	
-	
+	<div >
+		<table  >
+			<tr>
+				<td><b>Additional Note</b></td>
+				<td width="20" align="center">:</td>
+				<td align="right"><?php echo $creditNotes->additional_note; ?></td>
+			</tr>
+						
+		</table>
+	</div>
 	<br/>
 	<div style="border:solid 1px ;"></div>
 	<table width="100%" class="divFooter">
@@ -162,12 +190,10 @@ margin-bottom: 0;
 			<td align="left" valign="top">
 				<table>
 					<tr>
-						<td style="font-size: 16px;font-weight: bold;">
-						Rs: <?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></td>
+						<td style="font-size: 12px;">
+						<b>Amount in words:</b> <?= h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text) ?></td>
 					</tr>
-					<tr>
-						<td align="right" style="font-size: 12px;"><?=   h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text) ?></td>
-					</tr>
+					
 					<tr>
 						<td style="font-size: 12px;">
 						

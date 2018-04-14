@@ -587,7 +587,8 @@ class PaymentsController extends AppController
 		<?php 
 	pr($payment); exit;
 	}
-		public function edit($id = null)
+	
+	public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
 		

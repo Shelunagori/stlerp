@@ -56,7 +56,7 @@ class CreditNotesController extends AppController
             'contain' => ['']]);
 			//pr($partyData); exit;
 		}
-pr($creditNotes); exit;
+//spr($creditNotes->financial_year->date_from); exit;
 		$cgst_per=[];
 		$sgst_per=[];
 		$igst_per=[];

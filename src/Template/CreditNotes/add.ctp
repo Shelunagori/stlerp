@@ -127,7 +127,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<div class="col-md-6">
 								<div class="form-group">
 									<label class="control-label">Additional Note<span class="required" aria-required="true">*</span></label><br/>
-									<?php echo $this->Form->input('text', ['type'=>'textarea','label' => false,'class' => 'form-control']); ?>
+									<?php echo $this->Form->input('additional_note', ['type'=>'textarea','label' => false,'class' => 'form-control']); ?>
 								</div>
 							</div>
 						</div>
@@ -215,7 +215,7 @@ $(document).ready(function() {
 		
 			messages: {
 			on_account:{
-					equalTo: "Must be equal to Debit Amount",
+					equalTo: "Must be equal to Total Amount",
 					
 				}
 		},
@@ -303,15 +303,18 @@ $(document).ready(function() {
 			$(this).find("select.received_from").select2().attr({name:"credit_notes_rows["+i+"][received_from_id]"}).rules("add", "required");
 			$(this).find(".amount").attr({name:"credit_notes_rows["+i+"][amount]", id:"credit_notes_rows-"+i+"-amount"}).rules("add", "required");
 			
-			
-			$(this).find("select.cgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][cgst_percentage]"});
-			$(this).find(".cgst_amount").attr({name:"credit_notes_rows["+i+"][cgst_amount]", id:"credit_notes_rows-"+i+"-cgst_amount"}).rules("add", "required");
-			
-			$(this).find("select.sgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][sgst_percentage]"});
-			$(this).find(".sgst_amount").attr({name:"credit_notes_rows["+i+"][sgst_amount]", id:"credit_notes_rows-"+i+"-sgst_amount"}).rules("add", "required");
-			
-			$(this).find("select.igst_percentage").select2().attr({name:"credit_notes_rows["+i+"][igst_percentage]"});
-			$(this).find(".igst_amount").attr({name:"credit_notes_rows["+i+"][igst_amount]", id:"credit_notes_rows-"+i+"-igst_amount"}).rules("add", "required");
+			if(state_id==8){
+				$(this).find("select.cgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][cgst_percentage]"});
+				$(this).find(".cgst_amount").attr({name:"credit_notes_rows["+i+"][cgst_amount]", id:"credit_notes_rows-"+i+"-cgst_amount"}).rules("add", "required");
+				
+				$(this).find("select.sgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][sgst_percentage]"});
+				$(this).find(".sgst_amount").attr({name:"credit_notes_rows["+i+"][sgst_amount]", id:"credit_notes_rows-"+i+"-sgst_amount"}).rules("add", "required");
+				
+				$(this).find("select.igst_percentage").select2().attr({readonly:"readonly"});
+				//$(this).find("select.igst_percentage").select2().attr({name:"credit_notes_rows["+i+"][igst_percentage]"});
+				$(this).find(".igst_amount").attr({name:"credit_notes_rows["+i+"][igst_amount]", id:"credit_notes_rows-"+i+"-igst_amount"}).rules("add", "required");
+			}	
+
 			
 			$(this).find(".total_amount").attr({name:"credit_notes_rows["+i+"][total_amount]", id:"credit_notes_rows-"+i+"-total_amount"}).rules("add", "required");
 			
