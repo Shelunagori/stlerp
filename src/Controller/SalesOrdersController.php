@@ -1337,7 +1337,7 @@ class SalesOrdersController extends AppController
 
 	public function sendEmail($id=null){ 
 		$salesOrder = $this->SalesOrders->get($id, [
-            'contain' => ['Carrier','Creator','Courier','Customers'=>['CustomerAddress']]
+            'contain' => ['Companies','Carrier','Creator','Courier','Customers'=>['CustomerAddress']]
         ]);
 		
 		$session = $this->request->session();
@@ -1346,7 +1346,7 @@ class SalesOrdersController extends AppController
 		$x=$this->pdfDownload($id);
 		$email = new Email('default');
 		$email->transport('gmail');
-		//$email_to=$Vendor->vendor_contact_persons[0]->email;
+		$email_to=$salesOrder->dispatch_email;
 		$cc_mail=$salesOrder->creator->email;
 		//pr($email_to);
 		//pr($cc_mail); exit;
@@ -1355,8 +1355,9 @@ class SalesOrdersController extends AppController
 		$attachments='';
 		$attachments='Invoice_email/'.$name.'.pdf';
 		
-
-		$email_to="gopalkrishanp3@gmail.com";
+		//pr($email_to);
+		//pr($cc_mail); exit;
+		//$email_to="gopalkrishanp3@gmail.com";
 		//$cc_mail="gopal@phppoets.in";
 		$member_name="Gopal";
 		$from_name=$company_data->alias;

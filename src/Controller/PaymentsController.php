@@ -387,38 +387,7 @@ class PaymentsController extends AppController
 						}
 					}
 					
-					$LedgerAccount=$this->Payments->PaymentRows->LedgerAccounts->get($payment_row->received_from_id);
-					if($LedgerAccount->source_model=="Vendors"){
-						$id=$payment->id;
-						 $payment = $this->Payments->get($id, [
-							'contain' => ['BankCashes','Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
-						]);
-						$Vendor=$this->Payments->Vendors->get($LedgerAccount->source_id, ['contain' =>['VendorContactPersons']]);
-						//pr($payment->creator->email); exit;
-						$email = new Email('default');
-						$email->transport('gmail');
-						$email_to=$Vendor->vendor_contact_persons[0]->email;
-						$cc_mail=$payment->creator->email;
-						//pr($email_to);
-						//pr($cc_mail); exit;
-						$email_to="gopalkrishanp3@gmail.com";
-						$cc_mail="gopal@phppoets.in";
-						$member_name="Gopal";
-						$from_name=$company_data->alias;
-						$sub="For Payment";
-						
-						
-						$email->from(['dispatch@mogragroup.com' => $from_name])
-						->to($email_to)
-						->cc($cc_mail)
-						->replyTo('dispatch@mogragroup.com')
-						->subject($sub)
-						->template('send_payment_voucher')
-						->emailFormat('html')
-						->viewVars(['payment'=>$payment,'member_name'=>$member_name]);
-						$email->send();
-						 pr($payment); exit;
-					}
+
 					
 				}
 				$total_cr=0; $total_dr=0;
@@ -441,7 +410,7 @@ class PaymentsController extends AppController
 					$this->Payments->Ledgers->save($ledger);
 					if(!empty($payment_row->ref_rows))
 					{
-					foreach($payment_row->ref_rows as $ref_rows){
+					foreach($payment_row->ref_rows as $ref_rows){ 
 						$ReferenceDetail = $this->Payments->ReferenceDetails->newEntity();
 						$ReferenceDetail->company_id=$st_company_id;
 						$ReferenceDetail->reference_type=$ref_rows['ref_type'];
@@ -480,6 +449,41 @@ class PaymentsController extends AppController
 					}
 						
 					
+				}
+				
+				foreach($payment->payment_rows as $payment_row){
+					$LedgerAccount=$this->Payments->PaymentRows->LedgerAccounts->get($payment_row->received_from_id);
+					if($LedgerAccount->source_model=="Vendors"){
+						$id=$payment->id;
+						 $paymentData = $this->Payments->PaymentRows->get($payment_row->id, [
+							'contain' => ['ReferenceDetails','ReceivedFroms']
+						]);
+						$Vendor=$this->Payments->Vendors->get($LedgerAccount->source_id, ['contain' =>['VendorContactPersons']]);
+						//pr($payment->creator->email); exit;
+						$email = new Email('default');
+						$email->transport('gmail');
+						$email_to=$Vendor->vendor_contact_persons[0]->email;
+						//ss$cc_mail=$payment->creator->email;
+						//pr($email_to);
+						//pr($cc_mail); exit;
+						$email_to="gopalkrishanp3@gmail.com";
+						$cc_mail="gopal@phppoets.in";
+						$member_name="Gopal";
+						$from_name=$company_data->alias;
+						$sub="Payment advice";
+						
+						
+						$email->from(['dispatch@mogragroup.com' => $from_name])
+						->to($email_to)
+						->cc($cc_mail)
+						->replyTo('dispatch@mogragroup.com')
+						->subject($sub)
+						->template('send_payment_voucher')
+						->emailFormat('html')
+						->viewVars(['payment'=>$paymentData,'member_name'=>$paymentData->ReceivedFrom->name,'company'=>$company_data->name,'vendorAddress'=>$Vendor->address]);  //pr($company_data->name); exit;
+						$email->send(); 
+						
+					}
 				}
 				
 				$bankAmt=$total_dr-$total_cr;

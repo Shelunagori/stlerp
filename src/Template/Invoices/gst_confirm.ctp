@@ -20,7 +20,7 @@ $mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
 				if(!in_array(date("m-Y",strtotime($invoice->date_created)),$closed_month))
 				{ 
 				?>
-			<?php if($st_year_id==$invoice->financial_year) {?>	
+			<?php if($st_year_id==$invoice->financial_year_id) {?>	
 			<a href="<?php echo $Edit_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-edit"></i> Edit </a>
 			
 			<?php } } } ?>
@@ -143,12 +143,12 @@ $(document).ready(function() {
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'sendMail']); ?>";
 		url=url+'?id='+id+'&data='+json_data+'&otherData='+textdata;
-		alert(url);
+	
 		$.ajax({
 			url: url,
 			type: "GET",
 		}).done(function(response) { 
-		alert(response);
+		
 			alert("Email Send successfully")
 		}); 
 		

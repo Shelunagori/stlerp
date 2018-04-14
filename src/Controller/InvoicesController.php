@@ -6547,7 +6547,7 @@ class InvoicesController extends AppController
 		//$cc_mail[]="priyankajinger143@gmail.com";
 		////pr($email_to);
 		
-		
+		pr($message_web); exit;
 		//$email_to="gopalkrishanp3@gmail.com";
 		//$cc_mail="harkawat.priyanka0@gmail.com";
 		$member_name="Gopal";
@@ -6562,7 +6562,7 @@ class InvoicesController extends AppController
 					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
 					->attachments($attachments);
 					$email->send($message_web);
-					//pr($cc_mail); exit;
+					//pr($message_web); exit;
 				$this->Invoices->SendEmails->deleteAll(['invoice_id' => $id]);
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web1;
