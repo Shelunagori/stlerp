@@ -86,6 +86,63 @@ class InvoiceBookingsController extends AppController
 		$this->set(compact('url'));
     }
 	
+	
+	public function purchaseBookingReport($status=null)
+    {
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+	    $where = [];
+		$book_no = $this->request->query('book_no');
+		$in_no = $this->request->query('in_no');
+		$file = $this->request->query('file');
+		$From = $this->request->query('From');
+		$To = $this->request->query('To');
+		$vendor_id = $this->request->query('vendor_id');
+		
+		
+		$this->set(compact('book_no','From','To','in_no','file','vendor_id'));
+		
+		if(!empty($book_no))
+		{
+			$where['InvoiceBookings.ib2 LIKE']=$book_no;
+		}
+		
+		if(!empty($in_no)){
+			$where['InvoiceBookings.invoice_no LIKE']='%'.$in_no.'%';
+		}
+		
+		if(!empty($vendor_id)){
+			$where['InvoiceBookings.vendor_id LIKE']=$vendor_id;
+		}
+		
+		if(!empty($file)){
+			$where['InvoiceBookings.ib3 LIKE']='%'.$file.'%';
+		}
+		
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['InvoiceBookings.created_on >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['InvoiceBookings.created_on <=']=$To;
+		}
+		//pr($where); exit;
+       
+			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id,'InvoiceBookings.gst' =>'yes'])->contain(['Vendors'])->order(['InvoiceBookings.id' => 'DESC']);
+		
+			$vendor = $this->InvoiceBookings->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);
+		//pr($invoiceBookings);exit;
+        $this->set(compact('invoiceBookings','status','purchase_return','url','vendor'));
+      
+    }
 	/* public function DataMigrate()
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -432,6 +489,7 @@ class InvoiceBookingsController extends AppController
 		
 			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC'])->contain(['Grns','Vendors']);
 		
+			
 		//pr($invoiceBookings);exit;
         $this->set(compact('invoiceBookings','status','purchase_return'));
         $this->set('_serialize', ['invoiceBookings']);

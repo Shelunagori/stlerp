@@ -337,9 +337,9 @@ $html.='
 			<td valign="top">
 				<table class="table2" width="100%">
 					<tr>
-						<td style="white-space: nowrap;" valign="top">Form-49 Required</td>
+						<td style="white-space: nowrap;" valign="top">E-Way Bill</td>
 						<td style="white-space: nowrap;">:</td>
-						<td style="white-space: nowrap;">'. h($salesOrder->form49).'</td>
+						<td style="white-space: nowrap;">'. h($salesOrder->e_way_bill).'</td>
 					</tr>
 					<tr>
 						<td style="white-space: nowrap;" valign="top">Expected Delivery Date</td>
@@ -348,9 +348,7 @@ $html.='
 						
 					</tr>
 					<tr>
-						<td style="white-space: nowrap;" valign="top">Road Permit Required</td>
-						<td style="white-space: nowrap;">:</td>
-						<td style="white-space: nowrap;"> '. h($salesOrder->road_permit_required).'</td>
+						
 					</tr>
 				</table>
 			</td>
