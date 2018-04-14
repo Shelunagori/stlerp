@@ -56,29 +56,28 @@ margin-bottom: 0;
 			<td width="70%" valign="top" align="left">
 				<table>
 					<tr>
-						<td>Customer/Supplier</td>
-						<td width="20" align="center">:</td>
-						<td><?= h($creditNotes->head->name.'('.$creditNotes->head->alias.')') ?></td>
+						<?php  ?>
+						<td><?= h($creditNotes->head->name.'('.$creditNotes->head->alias.')') ?>
+						<?php echo "<br/>"; echo $partyData->customer_address[0]->address; ?></td>
 					</tr>
-					<tr>
-						<td>Voucher No</td>
-						<td width="20" align="center">:</td>
-						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
-					</tr>
+					
 				</table>
 			</td>
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
+						<td>Voucher No</td>
+						<td width="20" align="center">:</td>
+						<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
+						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$FY) ?></td>
+					</tr>
+					
+					<tr>
 						<td>Transaction Date</td>
 						<td width="20" align="center">:</td>
 						<td><?= h(date("d-m-Y",strtotime($creditNotes->transaction_date))) ?></td>
 					</tr>
-					<tr>
-						<td>Created On</td>
-						<td width="20" align="center">:</td>
-						<td><?= h(date("d-m-Y",strtotime($creditNotes->created_on))) ?></td>
-					</tr>
+					
 				</table>
 			</td>
 		</tr>

@@ -1,19 +1,16 @@
 <?php
-/**
- * @Author: PHP Poets IT Solutions Pvt. Ltd.
- */
-$this->set('title', 'Balance Sheet');
+$this->set('title', 'Profit & Loss Statement');
 $url_excel="/?".$url; 
 ?>
 <div class="row">
-	<div class="col-md-12">
+	<div class="col-md-8">
 		<div class="portlet light bordered">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-cogs"></i>Balance Sheet
+					<i class="fa fa-cogs"></i>Profit & Loss Statement
 				</div>
 				<div class="actions">
-					<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/excelBs/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+					<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/excelPnl/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 				</div>
 			</div>
 			<div class="portlet-body">
@@ -34,194 +31,172 @@ $url_excel="/?".$url;
 				</form>
 				<?php if($from_date){ 
 				$LeftTotal=0; $RightTotal=0; ?>
+				
 				<div class="row">
-					<table class="table table-bordered">
+					<table class="table table-bordered" width="60%">
 						<thead>
 							<tr style="background-color: #c4ffbd;">
-								<td style="width: 50%;">
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><b>Particulars</b></td>
-												<td align="right"><b>Balance</b></td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
-								<td>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><b>Particulars</b></td>
-												<td align="right"><b>Balance</b></td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
+									<td width="50%"><b>Particulars</b></td>
+									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+										<td width="25%" align="right"><b>As at 31st March, 2018</b></td>
+									<?php }else{ ?>
+										<td width="25%" align="right"><b>As at 31st March, 2019</b></td>
+										<td width="25%" align="right"><b>As at 31st March, 2018</b></td>
+									<?php } ?>
 							</tr>
 						</thead>
 						<tbody>
-							<tr>
-								<td>
-									<table width="100%">
-										<tbody>
-											<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
-												if(($groupForPrintRow['balance']<0)){ ?>
-												<tr>
-													<td>
-													<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
-														<?php echo $groupForPrintRow['name']; ?>
-															 </a>
-													</td>
-													<td align="right">
-														<?php if($groupForPrintRow['balance']!=0){
-															echo round(abs($groupForPrintRow['balance']),2);
-															$LeftTotal+=abs($groupForPrintRow['balance']);
-														} ?>
-													</td>
-												</tr>
-												<?php } ?>
-											<?php } ?>
-										</tbody>
-									</table>
-								</td>
-								<td>
-									<table width="100%">
-										<tbody>
-											<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
-												if(($groupForPrintRow['balance']>0)){ ?>
-												<tr>
-													<td>
-													<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
-														<?php echo $groupForPrintRow['name']; ?>
-															 </a>
-													</td>
-													<td align="right">
-														<?php if($groupForPrintRow['balance']!=0){
-															echo round(abs($groupForPrintRow['balance']),2); 
-															$RightTotal+=abs($groupForPrintRow['balance']); 
-														} ?>
-													</td>
-												</tr>
-												<?php } ?>
-											<?php } ?>
-												<tr>
-													<td>Closing Stock</td>
-													<td align="right">
-														<?php 
-														echo round($closingValue,2); 
-														$RightTotal+=$closingValue; 
-														?>
-													</td>
-												</tr>
-										</tbody>
-									</table>
-								</td>
-							</tr>
-							<?php if($GrossProfit!=0){ ?>
-							<tr>
-								<td>
-									<?php 
-									if($GrossProfit>0){ ?>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td>Profit & Loss A/c</td>
-												<td align="right">
-													<?php 
-													echo round($GrossProfit,2);
-													$LeftTotal+=abs($GrossProfit);
-													?>
-												</td>
-											</tr>
-										</tbody>
-									</table>
+							
+							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
+								if($groupForPrintRow['balance']<0){ ?>
+								<tr>
+									<td>
+										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
+										<?php echo $groupForPrintRow['name']; ?>
+											 </a>  
+										
+									</td>
+									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+										<td align="right">
+										<?php if($groupForPrintRow['balance']!=0){
+											echo abs($groupForPrintRow['balance']); 
+											$LeftTotal+=abs($groupForPrintRow['balance']); 
+										} ?>
+									</td>
+									<?php }else{ ?>
+									<td align="right">
+										<?php if($groupForPrintRow['balance']!=0){
+											echo abs($groupForPrintRow['balance']); 
+											$LeftTotal+=abs($groupForPrintRow['balance']); 
+										} ?>
+									</td>
+									<td></td>
 									<?php } ?>
-								</td>
-								<td>
-									<?php if($GrossProfit<0){ ?>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td>Profit & Loss A/c</td>
-												<td align="right">
-													<?php 
-													echo abs($GrossProfit); 
-													$RightTotal+=abs($GrossProfit);
-													?>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-									<?php } ?>
-								</td>
-							</tr>
+								</tr>
+								<?php } ?>
 							<?php } ?>
-							<?php if($differenceInOpeningBalance!=0){ ?>
+							<?php 
+							if($GrossProfit>0){ ?>
 							<tr>
-								<td>
-									<?php if($differenceInOpeningBalance>0){ ?>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><span style="color:red;">Difference In Opening Balance</span></td>
-												<td align="right">
-													<?php 
-													echo abs($differenceInOpeningBalance); 
-													$LeftTotal+=abs($differenceInOpeningBalance);
-													?>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-									<?php } ?>
-								</td>
-								<td>
-									<?php if($differenceInOpeningBalance<0){ ?>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><span style="color:red;">Difference In Opening Balance</span></td>
-												<td align="right">
-													<?php 
-													echo abs($differenceInOpeningBalance); 
-													$RightTotal+=abs($differenceInOpeningBalance);
-													?>
-												</td>
-											</tr>
-										</tbody>
-									</table>
-									<?php } ?>
-								</td>
+								<td><b>Profit & Loss A/c</b></td>
+								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+									<td align="right"><b><?php echo round($GrossProfit,2); $LeftTotal+=abs($GrossProfit); ?></b></td>
+								<?php }else{ ?>
+									<td align="right"><b><?php echo round($GrossProfit,2); $LeftTotal+=abs($GrossProfit); ?></b></td>
+									<td></td>
+								<?php } ?>
 							</tr>
 							<?php } ?>
 						</tbody>
 						<tfoot>
 							<tr>
-								<td>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><b>Total</b></td>
-												<td align="right"><b><?php echo round($LeftTotal,2); ?></b></td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
-								<td>
-									<table width="100%">
-										<tbody>
-											<tr>
-												<td><b>Total</b></td>
-												<td align="right"><b><?php echo round($RightTotal,2); ?></b></td>
-											</tr>
-										</tbody>
-									</table>
-								</td>
+								<td><b>Total</b></td>
+								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+									<td align="right"><b><?php echo round($LeftTotal,2); ?></b></td>
+								<?php }else{ ?>
+									<td align="right"><b><?php echo round($LeftTotal,2); ?></b></td>
+									<td></td>
+								<?php } ?>
 							</tr>
 						</tfoot>
 					</table>
 				</div>
+				
+				<div class="row">
+					<table class="table table-bordered" width="60%">
+						<thead>
+							<tr style="background-color: #c4ffbd;">
+									<td width="50%"><b>Particulars</b></td>
+									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+										<td width="25%" align="right"><b>As at 31st March, 2018</b></td>
+									<?php }else{ ?>
+										<td width="25%" align="right"><b>As at 31st March, 2019</b></td>
+										<td width="25%" align="right"><b>As at 31st March, 2018</b></td>
+									<?php } ?>
+							</tr>
+						</thead>
+						<tbody>
+							
+							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
+								if($groupForPrintRow['balance']>0){ ?>
+								<tr>
+									<td>
+										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
+										<?php echo $groupForPrintRow['name']; ?>
+											 </a>  
+										
+									</td>
+									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+									<td align="right">
+										<?php if($groupForPrintRow['balance']!=0){
+														
+											echo abs($groupForPrintRow['balance']);
+											$RightTotal+=abs($groupForPrintRow['balance']);
+										} ?>
+									</td>
+									<?php }else{ ?>
+									<td align="right">
+										<?php if($groupForPrintRow['balance']!=0){
+														
+											echo abs($groupForPrintRow['balance']);
+											$RightTotal+=abs($groupForPrintRow['balance']);
+										} ?>
+									</td>
+									<td></td>
+									<?php } ?>
+								</tr>
+								<?php } ?>
+							<?php } ?>
+							<tr>
+								<td>Closing Stock</td>
+								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+								<td align="right">
+									<?php 
+									echo round($closingValue,2); 
+									$RightTotal+=$closingValue; 
+									?>
+								</td>
+								<?php }else{ ?>
+								<td align="right">
+									<?php 
+									echo round($closingValue,2); 
+									$RightTotal+=$closingValue; 
+									?>
+								</td>
+								<td></td>
+								<?php } ?>
+							</tr>
+							
+							<?php if($GrossProfit<0){ ?>
+							<tr>
+								<td><b>Profit & Loss A/c</b></td>
+								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+									<td align="right"><b><?php echo round($GrossProfit,2); $RightTotal+=abs($GrossProfit); ?></b></td>
+								<?php }else{ ?>
+									<td align="right"><b><?php echo round($GrossProfit,2); $RightTotal+=abs($GrossProfit); ?></b></td>
+									<td></td>
+								<?php } ?>
+							</tr>
+							<?php } ?>
+							
+						</tbody>
+						<tfoot>
+							<tr>
+								<td><b>Total</b></td>
+								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
+									<td align="right"><b><?php echo round($RightTotal,2); ?></b></td>
+								<?php }else{ ?>
+									<td align="right"><b><?php echo round($RightTotal,2); ?></b></td>
+									<td></td>
+								<?php } ?>
+							</tr>
+						</tfoot>
+					</table>
+				</div>
+				
+				
+				
+				
 				<?php } ?>
 				</ul>
 			</div>

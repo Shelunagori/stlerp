@@ -31,7 +31,6 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				//pr($start_date); exit;
 		?>
         <div class="row">
-		
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Voucher no<span class="required" aria-required="true">*</span></label><br/>
@@ -53,12 +52,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					</span>				
 
 			</div>
+			<div class="col-md-6"></div>
+		</div>
+		 <div class="row">
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Supplier/Customer<span class="required" aria-required="true">*</span></label>
 					<?php 
 					
-					echo $this->Form->input('customer_suppiler_id', ['empty'=>'--Select-','options'=>$bankCashes,'label' => false,'class' => 'form-control input-sm select2me']); ?>
+					echo $this->Form->input('customer_suppiler_id', ['empty'=>'--Select-','options'=>$bankCashes,'label' => false,'class' => 'form-control input-sm select2me customer_suppiler']); ?>
 				</div>
 			</div>
 			<div class="col-md-2">
@@ -69,10 +71,16 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					echo $this->Form->input('cr_dr', ['options'=>$options,'label' => false,'class' => 'form-control input-sm  cr_dr_amount','style'=>'vertical-align: top !important;','empty'=>'--Select--',]); ?>
 				</div>
 			</div>
-			
-			
-			
+			<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
+			<div class="col-md-6" style="display:">
+				<div class="col-md-12" id="main_ref_table">
+					
+					</div>
+					
+			</div>
 		</div>
+		 
+		
 		<div style="overflow: auto;">
 		<table  class="table tableitm" id="main_table" border="1">
 				<thead>
@@ -114,9 +122,19 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						<td colspan="2"><?php echo $this->Form->input('igst_total_amount', ['label' => false,'class' => 'form-control input-sm igst_total_amount','readonly']); ?></td>
 					</tr>
 					<tr>
-						<td colspan="7"></td>
+						<td colspan="7">
+						<div class="row">
+							<div class="col-md-6">
+								<div class="form-group">
+									<label class="control-label">Additional Note<span class="required" aria-required="true">*</span></label><br/>
+									<?php echo $this->Form->input('text', ['type'=>'textarea','label' => false,'class' => 'form-control']); ?>
+								</div>
+							</div>
+						</div>
+			
+		</div></td>
 						<td colspan="1">Total Amount</td>
-						<td colspan="2"><?php echo $this->Form->input('grand_total', ['label' => false,'class' => 'form-control input-sm grand_total','readonly']); ?></td>
+						<td colspan="2"><?php echo $this->Form->input('grand_total', ['label' => false,'class' => 'form-control input-sm grand_total','readonly','id'=>'grand_total']); ?></td>
 					</tr>
 					<tr>
 						<td colspan="10">
@@ -185,7 +203,22 @@ $(document).ready(function() {
 				customer_supplier_id:{
 					required: true,
 				},
+				grand_total:{
+					
+				},
+				on_account:{
+					
+					equalTo: "#grand_total",
+					
+				}
 			},
+		
+			messages: {
+			on_account:{
+					equalTo: "Must be equal to Debit Amount",
+					
+				}
+		},
 
 		errorPlacement: function (error, element) { // render error placement for each input type
 			if (element.parent(".input-group").size() > 0) {
@@ -228,6 +261,7 @@ $(document).ready(function() {
 		submitHandler: function (form) {
 			$('#submitbtn').prop('disabled', true);
 			$('#submitbtn').text('Submitting.....');
+			
 			success3.show();
 			error3.hide();
 			form[0].submit(); // submit the form
@@ -265,8 +299,10 @@ $(document).ready(function() {
 	function rename_rows(){  
 		var i=0; 
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+			var state_id=$('select.customer_suppiler').find('option:selected').attr('state_id');
 			$(this).find("select.received_from").select2().attr({name:"credit_notes_rows["+i+"][received_from_id]"}).rules("add", "required");
 			$(this).find(".amount").attr({name:"credit_notes_rows["+i+"][amount]", id:"credit_notes_rows-"+i+"-amount"}).rules("add", "required");
+			
 			
 			$(this).find("select.cgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][cgst_percentage]"});
 			$(this).find(".cgst_amount").attr({name:"credit_notes_rows["+i+"][cgst_amount]", id:"credit_notes_rows-"+i+"-cgst_amount"}).rules("add", "required");
@@ -285,6 +321,7 @@ $(document).ready(function() {
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr1").each(function(){
 			$(this).find(".narration").attr({name:"credit_notes_rows["+i+"][narration]", id:"credit_notes_rows-"+i+"-narration"}).rules("add", "required");
+			$(this).find("td:eq(0) .row_id").val(i);
 			i++;
 		});
 		calculate_total();
@@ -402,7 +439,124 @@ $(document).ready(function() {
 		} 
 	});
 	
+	$("select.customer_suppiler").die().live("change",function(){
+		var sel=$(this);
+		var bill_to_bill_account=$(this).find('option:selected').attr('bill_to_bill_account');
+		$('#main_ref_table .main_ref_table2').html('');
+		if(bill_to_bill_account=="Yes"){
+			$('#main_ref_table .main_ref_table2').html('');
+			//$("table.main_ref_table2 ").html('');
+			add_ref_row();
+		}
+		rename_rows();
+	});
 	
+	
+	
+	function add_ref_row(){  
+		var tr=$("#sample_ref table.main_ref_table2 ").clone();
+		$("#main_ref_table").append(tr);
+		rename_ref_rows();
+	}
+	
+	$('.ref_type').live("change",function() {
+		var current_obj=$(this);
+		
+		//var sel=$(this).closest('tr.main_tr');
+		//var cr_dr=$(this).closest('tr.main_tr').find('td:nth-child(2) select').val();
+		var ref_type=$(this).find('option:selected').val();
+		var received_from_id=$("select.customer_suppiler").find('option:selected').val();
+	//	var received_from_id=$(this).closest('tr.main_tr').find('td select:eq(0)').val();
+		if(ref_type=="Against Reference"){
+			var url="<?php echo $this->Url->build(['controller'=>'ReferenceDetails','action'=>'listRef']); ?>";
+			url=url+'/'+received_from_id, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {
+				current_obj.closest('tr').find('td:eq(1)').html(response);
+				rename_ref_rows();
+			});
+		}else if(ref_type=="New Reference" || ref_type=="Advance Reference"){
+			current_obj.closest('tr').find('td:eq(1)').html('<input type="text" class="form-control input-sm" placeholder="Ref No." >');
+			rename_ref_rows();
+		}else{
+			current_obj.closest('tr').find('td:eq(1)').html('');
+		}
+	});
+	
+	$('.ref_list').live("change",function() {
+		var current_obj=$(this);
+		var due_amount=$(this).find('option:selected').attr('amt');
+		$(this).closest('tr').find('td:eq(2) input').val(due_amount);
+		
+	});
+	
+	$('.addrefrow').live("click",function() {
+		add_ref_row1();
+	});
+	
+	function add_ref_row1(){  
+		var tr=$("#sample_ref table.main_ref_table2 tbody tr").clone();
+		$("#main_ref_table table.main_ref_table2 tbody").append(tr);
+		rename_ref_rows();
+	}
+	function rename_ref_rows(){  
+		var i=0;
+		$("#main_ref_table table.main_ref_table2 tbody tr").each(function(){  
+			$(this).find("td:nth-child(1) select").attr({name:"ref_rows["+i+"][ref_type]", id:"ref_rows-"+i+"-ref_type"}).rules("add", "required");
+			var is_select=$(this).find("td:nth-child(2) select").length;
+			var is_input=$(this).find("td:nth-child(2) input").length;
+			
+			if(is_select){
+				$(this).find("td:nth-child(2) select").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no"}).rules("add", "required");
+			}else if(is_input){
+				$(this).find("td:nth-child(2) input").attr({name:"ref_rows["+i+"][ref_no]", id:"ref_rows-"+i+"-ref_no", class:"form-control input-sm ref_number"}).rules('add', {
+							required: true
+						});
+			}
+			
+			$(this).find("td:nth-child(3) input").attr({name:"ref_rows["+i+"][ref_amount]", id:"ref_rows-"+i+"-ref_amount"}).rules("add", "required");
+			
+			i++;
+		});
+	}
+
+$('.ref_amount_textbox').live("keyup",function() { 
+		do_ref_total();
+	});
+$('.ref_list').live("change",function() {
+			do_ref_total();
+	});
+	
+
+	function do_ref_total(){
+		var main_amount=123;
+		
+		if(!main_amount){ main_amount=0; }
+		
+		var total_ref=0;
+		var total_ref_cr=0;
+		var total_ref_dr=0;
+		$("#main_ref_table table.main_ref_table2 tbody tr").each(function(){  
+			var am=parseFloat($(this).find('td:nth-child(3) input').val());
+			var ref_cr_dr=$(this).find('td:nth-child(4) select').val();
+			
+			if(!am){ am=0; }
+			if(ref_cr_dr=='Dr')
+			{
+				total_ref_dr=total_ref_dr+am;
+			}
+			else
+			{
+				total_ref_cr=total_ref_cr+am;
+			}
+		});
+		
+		if(total_ref_cr>=0){
+				$("#main_ref_table table.main_ref_table2 tfoot tr:nth-child(1) td:nth-child(3) input.on_account").val(round(total_ref_cr,2));
+		}
+	}
 });
 </script>
 
@@ -410,7 +564,7 @@ $(document).ready(function() {
 	<tbody>
 		<tr class="main_tr preimp">
 			<td width="25%"><?php echo $this->Form->input('received_from_id', ['empty'=>'--Select-','options'=>$receivedFroms,'label' => false,'class' => 'form-control input-sm received_from']); ?>
-			<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+			
 			</td>
 			<td width="5%" ><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm amount','placeholder'=>'Amount']); ?></td>
 			
@@ -426,14 +580,93 @@ $(document).ready(function() {
 			<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 		</tr>
 		<tr class="main_tr1 preimp">
-				<td  colspan="9" class="main"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration','placeholder'=>'Narration','required']); ?></td>
+				<td  colspan="9" class="main"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration','placeholder'=>'Narration','required']); ?>
+				<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+				</td>
 			
-			<td></td>
+				<td colspan="1" class=""></td>
 		</tr>
 		
 	</tbody>
 	
 </table>
 
+<div id="sample_ref" style="display:none;">
+	<table width="100%" class="main_ref_table2">
+		<thead>
+			<tr>
+				<th width="25%">Ref Type</th>
+				<th width="25%">Ref No.</th>
+				<th width="30%">Amount</th>
+				<th width="10%"></th>
+				<th width="5%"></th>
+			</tr>
+		</thead>
+		<tbody class="main_tbody">
+			<tr>
+				<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type']); ?></td>
+				<td class="ref_no"></td>
+				<td><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				
+				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td align="center" style="vertical-align: middle !important;">Total Amount</td>
+				<td></td>
+				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+				
+			</tr>
+			<tr>
+				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tfoot>
+		
+	</table>
+</div>
+
+<?php $ref_types=['New Reference'=>'New Ref','Against Reference'=>'Agst Ref','Advance Reference'=>'Advance']; ?>
+<div id="sample_ref1" style="display:none;">
+	<div class="ref" style="padding:4px;">
+	<table width="100%" class="ref_table1">
+		<thead>
+			<tr>
+				<th>Ref Type</th>
+				<th>Ref No.</th>
+				<th>Amount</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td width="25%"><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type_row']); ?></td>
+				<td class="ref_no"></td>
+				<td width="25%"><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm ref_amount_textbox','placeholder'=>'Amount']); ?></td>
+				<td width="25%" style="padding-left:0px; vertical-align: top !important;">
+				<?php 
+				echo $this->Form->input('ref_cr_dr', ['options'=>['Dr'=>'Dr','Cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Dr','style'=>'vertical-align: top !important;']); ?>
+			    </td>
+				<td><a class="btn btn-xs btn-default deleterefrow" href="#" role="button"><i class="fa fa-times"></i></a></td>
+			</tr>
+		</tbody>
+		<tfoot>
+			<tr>
+				<td align="center" style="vertical-align: middle !important;">On Account</td>
+				<td></td>
+				<td><?php echo $this->Form->input('on_account', ['label' => false,'class' => 'form-control input-sm on_account','placeholder'=>'Amount','readonly']); ?></td>
+				
+			</tr>
+			<tr>
+				<td colspan="2"><a class="btn btn-xs btn-default addrefrow" href="#" role="button"><i class="fa fa-plus"></i> Add row</a></td>
+				<td></td>
+				<td></td>
+			</tr>
+		</tfoot>
+	</table>
+	</div>
+</div>
 
 <?php last: ?>

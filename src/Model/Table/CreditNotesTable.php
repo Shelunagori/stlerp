@@ -46,6 +46,7 @@ class CreditNotesTable extends Table
         $this->belongsTo('ReferenceDetails');
         $this->belongsTo('SaleReturns');
         $this->belongsTo('Ledgers');
+        $this->belongsTo('Vendors');
         $this->belongsTo('CustomerSuppilers', [
 			'className'=>'LedgerAccounts',
             'foreignKey' => 'customer_suppiler_id',

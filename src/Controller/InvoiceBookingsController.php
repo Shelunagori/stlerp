@@ -2075,7 +2075,7 @@ class InvoiceBookingsController extends AppController
 		$this->set(compact('LedgerAccount', 'ReferenceDetails','purchase_acc','cgst_per','sgst_per','igst_per'));
         $this->set('_serialize', ['invoiceBooking']);
     }
-	public function purchaseReport(){
+	public function NonGstpurchaseReport(){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
