@@ -1095,18 +1095,14 @@ class SaleReturnsController extends AppController
 			$todate = strtotime($todate1); 
 			$tody = strtotime($tody1);
 
-			if($fromdate < $tody || $todate > $tody)
-			{
-				if($SessionCheckDate['status'] == 'Open')
-				{ $chkdate = 'Found'; }
-				else
-				{ $chkdate = 'Not Found'; }
-
-			}
-			else
-			{
-				$chkdate = 'Not Found';	
-			}
+			if($fromdate > $tody || $todate < $tody)
+				   {
+					   $chkdate = 'Not Found';
+				   }
+				   else
+				   {
+					  $chkdate = 'Found';
+				   }
 			
 			$saleReturn = $this->SaleReturns->newEntity();
 		  if ($this->request->is('post')) {
@@ -1147,7 +1143,7 @@ class SaleReturnsController extends AppController
 			$saleReturn->sale_return_status="Yes";
 			$saleReturn->transaction_date=date("Y-m-d",strtotime($saleReturn->transaction_date)); 
 			
-		pr($saleReturn); exit;
+		//pr($saleReturn); exit;
 
 			$ref_rows=@$saleReturn->ref_rows;
 			if ($this->SaleReturns->save($saleReturn)) {

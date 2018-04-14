@@ -51,10 +51,12 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					</div>
 					<div class="col-md-2">
 						<div class="form-group">
-							<label class="control-label">Transaction Date</label>
-							<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y")]); ?>					
+							<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label><br/>
+							<?php echo $this->Form->input('transaction_date', ['type'=>'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder'=>'Transaction Date','data-date-format'=>'dd-mm-yyyy','value'=>date('d-m-Y'),'required']); ?>
 						</div>
-					</div>
+						<span style="color: red;"><?php if($chkdate == 'Not Found'){  ?>
+							You are not in Current Financial Year
+						<?php } ?></span>	
 				</div>
 				
 				<div class="row">
