@@ -526,48 +526,6 @@ if(!empty($copy))
 				
 			</div>
 			<div class="row">
-				
-				<div class="col-md-4">
-					<div class="form-group">
-						<div class="radio-list" data-error-container="#road_permit_required_error">
-						<label class="control-label">Road Permit Required <span class="required" aria-required="true">*</span></label>
-						<?php 
-						if(!empty($copy)){
-							if($salesOrder->road_permit_required == 'Yes'){
-								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]);
-							}else if($salesOrder->road_permit_required == 'No'){
-								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No','checked']]);
-							}else{
-								echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
-							}
-							
-						}else{
-							echo $this->Form->radio('road_permit_required',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
-						}	?>
-						</div>
-						<div id="road_permit_required_error"></div>
-					</div>
-				</div>
-				<div class="col-md-4">
-					<div class="form-group">
-						<div class="radio-list" data-error-container="#form49_error">
-						<label class="control-label">Form-49 Required <span class="required" aria-required="true">*</span></label>
-						<?php 
-						if(!empty($copy)){
-							if($salesOrder->form49 == 'Yes'){
-								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes','checked'],['value' => 'No', 'text' => 'No']]);
-							}else if($salesOrder->form49 == 'No'){
-								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No','checked']]);
-							}else{
-								echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
-							}
-						}else{
-							echo $this->Form->radio('form49',[['value' => 'Yes', 'text' => 'Yes'],['value' => 'No', 'text' => 'No']]); 
-						}	?>
-						</div>
-						<div id="form49_error"></div>
-					</div>
-				</div>
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label">Additional Note  <span class="required" aria-required="true">*</span></label>
