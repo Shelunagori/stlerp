@@ -304,9 +304,11 @@ $(document).ready(function() {
 			$(this).find(".amount").attr({name:"credit_notes_rows["+i+"][amount]", id:"credit_notes_rows-"+i+"-amount"}).rules("add", "required");
 			
 			if(state_id==8){
+				$(this).find("select.cgst_percentage").select2().removeAttr('readonly');
 				$(this).find("select.cgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][cgst_percentage]"});
 				$(this).find(".cgst_amount").attr({name:"credit_notes_rows["+i+"][cgst_amount]", id:"credit_notes_rows-"+i+"-cgst_amount"}).rules("add", "required");
 				
+				$(this).find("select.sgst_percentage").select2().removeAttr('readonly');
 				$(this).find("select.sgst_percentage").select2().attr({name:"credit_notes_rows["+i+"][sgst_percentage]"});
 				$(this).find(".sgst_amount").attr({name:"credit_notes_rows["+i+"][sgst_amount]", id:"credit_notes_rows-"+i+"-sgst_amount"}).rules("add", "required");
 				
@@ -314,6 +316,18 @@ $(document).ready(function() {
 				//$(this).find("select.igst_percentage").select2().attr({name:"credit_notes_rows["+i+"][igst_percentage]"});
 				$(this).find(".igst_amount").attr({name:"credit_notes_rows["+i+"][igst_amount]", id:"credit_notes_rows-"+i+"-igst_amount"}).rules("add", "required");
 			}	
+			else{
+				$(this).find("select.cgst_percentage").select2().attr({readonly:"readonly"});
+				$(this).find(".cgst_amount").attr({name:"credit_notes_rows["+i+"][cgst_amount]", id:"credit_notes_rows-"+i+"-cgst_amount"}).rules("add", "required");
+				
+				$(this).find("select.sgst_percentage").select2().attr({readonly:"readonly"});
+				$(this).find(".sgst_amount").attr({name:"credit_notes_rows["+i+"][sgst_amount]", id:"credit_notes_rows-"+i+"-sgst_amount"}).rules("add", "required");
+				
+				$(this).find("select.igst_percentage").select2().removeAttr('readonly');
+				$(this).find("select.igst_percentage").select2().attr({name:"credit_notes_rows["+i+"][igst_percentage]"});
+				//$(this).find("select.igst_percentage").select2().attr({name:"credit_notes_rows["+i+"][igst_percentage]"});
+				$(this).find(".igst_amount").attr({name:"credit_notes_rows["+i+"][igst_amount]", id:"credit_notes_rows-"+i+"-igst_amount"}).rules("add", "required");
+			}
 
 			
 			$(this).find(".total_amount").attr({name:"credit_notes_rows["+i+"][total_amount]", id:"credit_notes_rows-"+i+"-total_amount"}).rules("add", "required");
