@@ -1343,11 +1343,11 @@ class SalesOrdersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->SalesOrders->Companies->get($st_company_id);
-		//$x=$this->pdfDownload($id);
+		$x=$this->pdfDownload($id);
 		$email = new Email('default');
 		$email->transport('gmail');
 		//$email_to=$Vendor->vendor_contact_persons[0]->email;
-		//$cc_mail=$payment->creator->email;
+		$cc_mail=$salesOrder->creator->email;
 		//pr($email_to);
 		//pr($cc_mail); exit;
 
@@ -1365,6 +1365,7 @@ class SalesOrdersController extends AppController
 		
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
+		->cc($cc_mail)
 		->replyTo('dispatch@mogragroup.com')
 		->subject($sub)
 		->template('send_sales_order')
