@@ -102,7 +102,7 @@ class InvoiceBookingsController extends AppController
 		$From = $this->request->query('From');
 		$To = $this->request->query('To');
 		$vendor_id = $this->request->query('vendor_id');
-		
+		$items = $this->request->query('items');
 		
 		$this->set(compact('book_no','From','To','in_no','file','vendor_id'));
 		
@@ -132,15 +132,32 @@ class InvoiceBookingsController extends AppController
 			$where['InvoiceBookings.created_on <=']=$To;
 		}
 		//pr($where); exit;
-       
-			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id,'InvoiceBookings.gst' =>'yes'])->contain(['Vendors'])->order(['InvoiceBookings.id' => 'DESC']);
+			if(!empty($items))
+			{ 
 		
+				$InvoiceBookingRows = $this->InvoiceBookings->InvoiceBookingRows->find();
+				$invoiceBookings = $this->InvoiceBookings->find();
+				$invoiceBookings->select(['id','total_sales'=>$InvoiceBookingRows->func()->sum('InvoiceBookingRows.quantity')])
+				->innerJoinWith('InvoiceBookingRows')
+				->group(['InvoiceBookings.id'])
+				->matching('InvoiceBookingRows.Items', function ($q) use($items,$st_company_id) {
+											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+							})
+				->contain(['Vendors','InvoiceBookingRows'=>['Items']])
+				->autoFields(true)
+				->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])
+				->where($where);
+			}
+			else{
+			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id,'InvoiceBookings.gst' =>'yes'])->contain(['Vendors'])->order(['InvoiceBookings.id' => 'DESC']);
+			}
 			$vendor = $this->InvoiceBookings->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
 						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
 					}
 				);
-		//pr($invoiceBookings);exit;
-        $this->set(compact('invoiceBookings','status','purchase_return','url','vendor'));
+			$Items = $this->InvoiceBookings->InvoiceBookingRows->Items->find('list')->order(['Items.name' => 'ASC']);
+		//pr($Items->toArray());exit;
+        $this->set(compact('invoiceBookings','status','purchase_return','url','vendor','Items'));
       
     }
 	/* public function DataMigrate()

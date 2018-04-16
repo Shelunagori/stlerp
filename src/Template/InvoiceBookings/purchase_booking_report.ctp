@@ -28,7 +28,7 @@
 									</div>
 								</td>
 								
-								<td width="30%">
+								<td width="20%">
 									<?php 
 										$options=array();
 										//pr($vendor); exit();
@@ -47,6 +47,9 @@
 												
 									?>
 								</td>
+								<td width="20%"><?php
+								echo $this->Form->input('items', ['empty' => "--Select Item--",'label' => false,'options' => $Items,'class' => 'form-control input-sm select2me','value' => @$Items->id]); 
+								?>
 								<td width="10%">
 									<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
 								</td>
