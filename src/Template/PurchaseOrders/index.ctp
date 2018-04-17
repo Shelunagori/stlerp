@@ -194,7 +194,7 @@
 						<?php }} endforeach; ?>
 						
 						<?php foreach ($purchaseOrders as $purchaseOrder): 
-								$totalPo = implode(",", @$supplier_total_po[$purchaseOrder->vendor_id]);
+								@$totalPo = implode(",", @$supplier_total_po[@$purchaseOrder->vendor_id]);
 								//pr($text); 
 						//pr(@$supplier_total_po[$purchaseOrder->vendor_id]);   ?>
 						<tr <?php if($status=='true' || $status==null){ echo 'style="background-color:#f4f4f4"';  
@@ -229,7 +229,14 @@
 								<?php
 									if($status != 'Converted-Into-GRN') {
 									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} } 
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} 
+									?>
+									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
+									
+									<?php
+									} 
+									
+									
 									
 							}?>
 							
@@ -237,7 +244,7 @@
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 							} ?>
 								
-								<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
+								
 								
 
 							</td>
@@ -261,7 +268,7 @@ $('.send_mail').die().live("click",function() {
 	
 	 var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'sendMail']); ?>";
 	url=url+'?totalPo='+totalPo;
-	alert(url);
+	//alert(url);
 	$.ajax({
 		url: url,
 		type: "GET",

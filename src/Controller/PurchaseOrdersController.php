@@ -794,8 +794,8 @@ class PurchaseOrdersController extends AppController
 			//pr($Po); exit;
 		}
 		
-		$email_to="gopalkrishanp3@gmail.com";
-		$cc_mail="gopal@phppoets.in";
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="gopal@phppoets.in";
 		$member_name="Gopal";
 		$from_name=$company_data->alias;
 		$sub="Purchase order delivery reminder ";

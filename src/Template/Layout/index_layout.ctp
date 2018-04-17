@@ -711,6 +711,9 @@ select
 									<li><?php $today =date('d-m-Y');
 										echo $this->Html->link('GST Sales Man Report',array('controller'=>'Invoices','action'=>'salesManReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); ?>
 									</li>
+									<li><?php $today =date('d-m-Y');
+										echo $this->Html->link('Sales Report Segment Wise',array('controller'=>'Invoices','action'=>'salesManReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); ?>
+									</li>
 							</ul>
 						</li>
 					<?php if(in_array(163,$allowed_pages)){ ?>	

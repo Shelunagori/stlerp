@@ -165,7 +165,8 @@ if(!empty($status)){
 										</ul>
 								</div>
 							</td>
-							<td><?= h($quotation->total)?> </td>
+							<td align="center"><?= h($this->Number->format($quotation->total,['places'=>2])) ?></td>
+							
 							<?php if($pull_request=="true" ){ ?>
 							<td><?php echo date("d-m-Y",strtotime($quotation->created_on)); ?></td>
 							<?php }else{ ?>
