@@ -3,6 +3,9 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Mailer\Email;
+use Cake\View\Helper\TextHelper;
+use Cake\View\Helper\NumberHelper;
+use Cake\View\Helper\HtmlHelper;
 
 /**
  * Payments Controller
@@ -472,7 +475,7 @@ class PaymentsController extends AppController
 						$cc_mail="gopal@phppoets.in";
 						$member_name="Gopal";
 						$from_name=$company_data->alias;
-						$sub="Payment advice";
+						$sub="Payment advice - Shilpa Udr";
 						//pr($email_to);
 						//pr($cc_mail); exit;
 						

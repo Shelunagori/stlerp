@@ -3,6 +3,9 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Mailer\Email;
+use Cake\View\Helper\TextHelper;
+use Cake\View\Helper\NumberHelper;
+use Cake\View\Helper\HtmlHelper;
 
 /**
  * PurchaseOrders Controller
@@ -143,13 +146,13 @@ class PurchaseOrdersController extends AppController
 						}
 				}
 			}
-			$supplier_total_po[$salesorder->vendor_id][]=$salesorder->id;
+			//$supplier_total_po[$salesorder->vendor_id][]=$salesorder->id;
 		}
-		/* foreach($purchaseOrders as $purchaseOrder){
+		foreach($purchaseOrders as $purchaseOrder){
 			if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){
 				$supplier_total_po[$purchaseOrder->vendor_id][]=$purchaseOrder->id;
 			}
-		} */
+		}
 		//pr($supplier_total_po); exit;
 		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find()->toArray();
 		$Items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
@@ -795,7 +798,7 @@ class PurchaseOrdersController extends AppController
 		$cc_mail="gopal@phppoets.in";
 		$member_name="Gopal";
 		$from_name=$company_data->alias;
-		$sub="Purchase order acknowledgement";
+		$sub="Purchase order delivery reminder ";
 		
 		//pr($PurchaseOrders);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
