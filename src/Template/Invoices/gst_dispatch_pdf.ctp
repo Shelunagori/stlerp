@@ -218,12 +218,7 @@ $html = '
 			<td  colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->invoice->in1."/"."IN-".str_pad($invoice->invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->invoice->in3."/".$invoice->invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->invoice->date_created))).' For Rs.'. h(number_format($invoice->invoice->grand_total,2)).'/- in duplicate.</td>
 		</tr>
 		'  .$invoice->send_data . '
-		<tr>
-			<td  colspan="2" style="line-height:20px;padding-right:40px; text-align:justify; font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';">
-				<br/>We now request you to collect the material from transporter and process our invoice for payment of Rs '. h(number_format($invoice->invoice->grand_total,2)) .'/- in favour of '. h(($company_data->name)).' in our account No '
-					. h(($invoice->invoice->company->company_banks[0]->account_no)).' of '.h($invoice->invoice->company->company_banks[0]->bank_name) .','. h( $invoice->invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->invoice->company->pan_no)).'
-			</td>
-		</tr>
+		
 				
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';"><br/><b>Regards,</b></td>

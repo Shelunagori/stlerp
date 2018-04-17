@@ -5,8 +5,8 @@
 		</tr>
 		<tr>
 			<td width="50%" valign="top" align="left">
-				<?php echo $member_name; echo "<br/>"; ?>
-				<?php echo $vendorAddress; echo "<br/>" ?>
+				<?php echo $PurchaseOrders->vendor->company_name; echo "<br/>"; ?>
+				<?php echo $PurchaseOrders->vendor->address; echo "<br/>" ?>
 				
 			</td>
 		</tr>
@@ -15,7 +15,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Sub : Payment advice <?php echo "<br/>"; ?></td>
+			<td>Sub : Purchase order delivery reminder <?php echo "<br/>"; ?></td>
 			
 		</tr>
 		<tr>
@@ -30,7 +30,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>We have initiated payment to your account for your following invoices :-</td>
+			<td>Our delivery for following purchase orders is due and we request to confirm the delivery at earliest. We are in immediate requirement of the material.</td>
 		</tr>
 		<tr>
 			<td><?php echo "<br/>"; ?>
@@ -41,19 +41,18 @@
 					<table border="1">
 						<tr>
 								<th>S. No.</th>
-								<th>Invoice No.</th>
+								<th>Our PO No.</th>
 								<th>Date</th>
-								<th>Dr</th>
-								<th>Cr</th>
+								<th>Overdue Days</th>
 								
 						</tr>
-						<?php $i=1; foreach($payment->reference_details as $reference_detail){  ?>
+						<?php $i=1; foreach($po_no as $key=>$po_no){  ?>
 							<tr>
 								<td><?php echo $i++; ?></td>
-								<td><?php echo $reference_detail->reference_no; ?></td>
-								<td><?php echo date("d-m-Y",strtotime($reference_detail->transaction_date)) ?></td>
-								<td><?= h($this->Number->format($reference_detail->debit,['places'=>2])) ?>
-								<td><?= h($this->Number->format($reference_detail->credit,['places'=>2])) ?>
+								<td><?php echo $po_no; ?></td>
+								<td><?php echo $delevery_date[$key]; ?></td>
+								<td><?php echo $due_day[$key]; ?></td>
+								
 						</tr>
 						<?php } ?>
 					</table>
@@ -64,7 +63,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>We request you to kindly acknowledge on receipt of the same.. <?php echo "<br/>"; ?>
+			<td>In case you have any further delay please write back to us.<?php echo "<br/>"; ?>
 			</td>
 		</tr>
 		<tr>
@@ -77,7 +76,7 @@
 			</td>
 		</tr>
 		<tr>
-			<td>Accounts Executive <?php echo "<br/>"; ?>
+			<td>Purchase Executive <?php echo "<br/>"; ?>
 			</td>
 		</tr>
 		

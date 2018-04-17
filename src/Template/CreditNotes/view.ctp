@@ -89,25 +89,25 @@ margin-bottom: 0;
 			<tr >
 				<th rowspan="2" style="text-align: center; width:2%;">S.N.</th>
 				<th rowspan="2" style="text-align: center; width:25%;">Narration</th>
-				<th rowspan="2" style="text-align: center; width:10%;">Taxable Value</th>
+				<th rowspan="2" style="text-align: center; width:8%;">Taxable Value</th>
 				<?php if($creditNotes->igst_total_amount==0){ ?>
-				<th style=" text-align: center; width:15%;" colspan="2" width="15%">CGST</th>
-				<th style=" text-align: center; width:15%;" colspan="2" width="15%">SGST</th>
+				<th style=" text-align: center; width:15%;" colspan="2" width="12%">CGST</th>
+				<th style=" text-align: center; width:15%;" colspan="2" width="12%">SGST</th>
 				<?php }else{ ?>
-				<th  style=" text-align: center; width:15%;" colspan="2" width="15%">IGST</th>
+				<th  style=" text-align: center; width:15%;" colspan="2" width="12%">IGST</th>
 				<?php } ?>
-				<th rowspan="2" style="text-align: center; width:10%;"  width="10%">Total</th>
+				<th rowspan="2" style="text-align: center; width:8%;"  width="8%">Total</th>
 				
 			</tr>
 			<tr> 
 				<?php if($creditNotes->igst_total_amount==0){ ?>
-				<th style="text-align: center;" >%</th>
-				<th style="text-align: center;" >Amt</th>
-				<th style="text-align: center;" >%</th>
-				<th style="text-align: center;" >Amt</th>
+				<th style="text-align: center;" width="6%">%</th>
+				<th style="text-align: center;" width="6%">Amt</th>
+				<th style="text-align: center;" width="6%">%</th>
+				<th style="text-align: center;" width="6%">Amt</th>
 				<?php }else{ ?>
-				<th style="text-align: center;">%</th>
-				<th style="text-align: center;">Amt</th>
+				<th style="text-align: center;" width="6%">%</th>
+				<th style="text-align: center;" width="6%">Amt</th>
 				<?php } ?>
 			</tr>
 		
@@ -117,13 +117,14 @@ margin-bottom: 0;
 			<td  style="text-align: left;"><?= h($credit_notes_row->narration) ?></td>
 			<td align="right"><?= h($this->Number->format($credit_notes_row->amount,[ 'places' => 2])) ?> </td>
 			<?php if($creditNotes->igst_total_amount==0){ ?>
-			<td align="right"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
-			<td align="right"><?= h($credit_notes_row->cgst_amount) ?></td>
-			<td align="right"><?= h(@$sgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
-			<td align="right"><?= h($credit_notes_row->sgst_amount) ?></td>
+			<td align="center"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
+			<td align="right"><?= h($this->Number->format($credit_notes_row->cgst_amount,[ 'places' => 2])) ?> </td>
+			
+			<td align="center"><?= h(@$sgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
+			<td align="right"><?= h($this->Number->format($credit_notes_row->sgst_amount,[ 'places' => 2])) ?> </td>
 			<?php }else{ ?>
-			<td align="right"><?= h(@$igst_per[$credit_notes_row->id]['tax_figure']) ?></td>
-			<td align="right"><?= h($credit_notes_row->igst_amount) ?></td>
+			<td align="center"><?= h(@$igst_per[$credit_notes_row->id]['tax_figure']) ?></td>
+			<td align="right"><?= h($this->Number->format($credit_notes_row->igst_amount,[ 'places' => 2])) ?> </td>
 			<?php } ?>
 			
 			<td align="right"><?= h($this->Number->format($credit_notes_row->total_amount,[ 'places' => 2])) ?></td>

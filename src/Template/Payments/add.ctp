@@ -455,7 +455,7 @@ $(document).ready(function() {
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
 			var total_ref=0;
-			var main_cr_dr=$(this).find('td:nth-child(2) select').val();
+			var main_cr_dr=$(this).find('td:nth-child(2) select').val(); 
 			var total_ref_cr=0;
 			var total_ref_dr=0;
 			$(this).find("table.ref_table tbody tr").each(function(){

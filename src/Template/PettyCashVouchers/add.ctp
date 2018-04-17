@@ -65,21 +65,15 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
                         <?php echo $this->Form->radio(
                             'payment_mode',
                             [
-                                ['value' => 'Cheque', 'text' => 'Cheque','checked'],
-                                ['value' => 'Cash', 'text' => 'Cash'],
-                                ['value' => 'NEFT/RTGS', 'text' => 'NEFT/RTGS']
+                                ['value' => 'Cash', 'text' => 'Cash','checked'],
+                                
                             ]
                         ); ?>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-group" id="chq_no">
-                    <label class="control-label">Cheque No<span class="required" aria-required="true">*</span></label>
-                    <?php echo $this->Form->input('cheque_no', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Cheque No']); ?>
-                </div>
-            </div>
+            
         </div>
         
         <div style="overflow: auto;">
@@ -214,15 +208,7 @@ $(document).ready(function() {
 	});
 	//--	 END OF VALIDATION
 	
-	$('input[name="payment_mode"]').die().live("click",function() {
-		var payment_mode=$(this).val();
-		
-		if(payment_mode=="Cheque"){
-			$("#chq_no").show();
-		}else{
-			$("#chq_no").hide();
-		}
-	});
+	
 	
 	add_row();
 	function add_row(){
@@ -501,6 +487,7 @@ $(document).ready(function() {
 	function do_ref_total(){
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
 			var main_amount=$(this).find('td:nth-child(2) input').val();
+			var main_dr_cr=$(this).find('td:nth-child(2) select').val();
 			var total_ref_cr=0;
 			var total_ref_dr=0;
 			
@@ -517,7 +504,7 @@ $(document).ready(function() {
 			});
 			
 			
-			var main_dr_cr=$(this).closest("#main_table tbody#main_tbody tr.main_tr").find('.cr_dr').val();
+			//var main_dr_cr=$(this).closest("#main_table tbody#main_tbody tr.main_tr").find('.cr_dr').val();
 			var onAcc_dr_cr="";
 			var onAcc=0;
 			var afterCal=0;
@@ -650,8 +637,9 @@ $(document).ready(function() {
 					</div>
 					<div class="col-md-5  " style="padding-left: 0;">
 						<select name="cr_dr" class="form-control input-sm cr_dr_amount" >
-							<option value="Cr">Cr</option>
-							<option value="Dr">Dr</option>
+								<option value="Dr">Dr</option>
+								<option value="Cr">Cr</option>
+							
 						</select>
 					</div>
 				</div>

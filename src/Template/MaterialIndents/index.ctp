@@ -9,21 +9,6 @@
 		<div class="actions">
 			
 			<div class="btn-group">
-			<?php
-			if($status==null or $status=='Open'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
-			if($status=='Close'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
-			?>
-			<?= $this->Html->link(
-					'Open',
-					'/MaterialIndents/index?status=Open',
-					['class' => $class1]
-				); ?>
-			<?= $this->Html->link(
-					'Close',
-					'/MaterialIndents/index?status=Close',
-					['class' => $class2 ]
-				); ?>
-				
 			
 			</div>
 			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/MaterialIndents/Excel-Export/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>

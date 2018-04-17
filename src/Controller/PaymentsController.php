@@ -282,6 +282,7 @@ class PaymentsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->Payments->Companies->get($st_company_id);
+		
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Payments->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->Payments->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
@@ -460,18 +461,20 @@ class PaymentsController extends AppController
 						]);
 						$Vendor=$this->Payments->Vendors->get($LedgerAccount->source_id, ['contain' =>['VendorContactPersons']]);
 						//pr($payment->creator->email); exit;
+						$emp_data=$this->Payments->Creator->get($s_employee_id);
 						$email = new Email('default');
 						$email->transport('gmail');
 						$email_to=$Vendor->vendor_contact_persons[0]->email;
-						//ss$cc_mail=$payment->creator->email;
-						//pr($email_to);
-						//pr($cc_mail); exit;
+						$cc_mail=$emp_data->email;
+						
+						
 						$email_to="gopalkrishanp3@gmail.com";
 						$cc_mail="gopal@phppoets.in";
 						$member_name="Gopal";
 						$from_name=$company_data->alias;
 						$sub="Payment advice";
-						
+						//pr($email_to);
+						//pr($cc_mail); exit;
 						
 						$email->from(['dispatch@mogragroup.com' => $from_name])
 						->to($email_to)

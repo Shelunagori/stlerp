@@ -66,21 +66,14 @@ if($transaction_date <  $start_date ) {
                         <?php echo $this->Form->radio(
                             'payment_mode',
                             [
-                                ['value' => 'Cheque', 'text' => 'Cheque','checked'],
-                                ['value' => 'Cash', 'text' => 'Cash'],
-                                ['value' => 'NEFT/RTGS', 'text' => 'NEFT/RTGS']
+                                 ['value' => 'Cash', 'text' => 'Cash','checked'],
                             ]
                         ); ?>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
-                <div class="form-group" id="chq_no">
-                    <label class="control-label">Cheque No<span class="required" aria-required="true">*</span></label>
-                    <?php echo $this->Form->input('cheque_no', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Cheque No']); ?>
-                </div>
-            </div>
+            
         </div>
         
         <div style="overflow: auto;">
@@ -352,21 +345,7 @@ $(document).ready(function() {
 
 	});
 	//--	 END OF VALIDATION
-	$('input[name="payment_mode"]').die().live("click",function() {
-		var payment_mode=$(this).val();
-		if(payment_mode=="Cheque"){
-			$("#chq_no").show();
-		}else{
-			$("#chq_no").hide();
-		}
-	});
 	
-	var payment_mode=$('input[name="payment_mode"]:checked').val();
-	if(payment_mode=="Cheque"){
-		$("#chq_no").show();
-	}else{
-		$("#chq_no").hide();
-	}
 	
 	//rename_rows();
 	$('.addrow').live("click",function() {

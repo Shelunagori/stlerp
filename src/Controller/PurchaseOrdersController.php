@@ -2,6 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
+use Cake\Mailer\Email;
 
 /**
  * PurchaseOrders Controller
@@ -131,26 +132,28 @@ class PurchaseOrdersController extends AppController
 		} 
 		//pr($purchaseOrders->toArray()); exit;
 		//pr($status); exit;
-		
+		$supplier_total_po=[];
 		$total_sales=[]; $total_qty=[];
-		foreach($purchaseOrders as $salesorder){
+		foreach($purchaseOrders as $salesorder){ //pr($salesorder); exit; 
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->purchase_order_rows as $sales_order_row){
 				foreach($sales_order_row->grn_rows as $invoice_row){ 
-						if(sizeof($invoice_row) > 0){
+						if(sizeof($invoice_row) > 0){ 
 							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
 						}
 				}
 			}
+			$supplier_total_po[$salesorder->vendor_id][]=$salesorder->id;
 		}
-		//pr($total_sales); 
-		//pr($total_qty); 
-		
-		//exit;
-		
+		/* foreach($purchaseOrders as $purchaseOrder){
+			if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){
+				$supplier_total_po[$purchaseOrder->vendor_id][]=$purchaseOrder->id;
+			}
+		} */
+		//pr($supplier_total_po); exit;
 		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find()->toArray();
 		$Items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
-        $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales','st_year_id'));
+        $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales','st_year_id','supplier_total_po'));
         $this->set('_serialize', ['purchaseOrders']);
 		$this->set(compact('url'));
     }
@@ -760,5 +763,51 @@ class PurchaseOrdersController extends AppController
 			$data[$purchaseorderrow->id]=$purchaseorderrow->purchase_order_id;
 		}
 		pr($data);exit;
+	}
+	
+	public function sendMail(){
+		$totalPo=$this->request->query('totalPo');
+		$totalPo = explode(",", $totalPo); 
+		$PurchaseOrders = $this->PurchaseOrders->get($totalPo[0], [
+            'contain' => ['Creator','Vendors'=>['VendorContactPersons']]]);
+		//pr($PurchaseOrders);exit;
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$company_data=$this->PurchaseOrders->Companies->get($st_company_id);
+		
+		$email = new Email('default');
+		$email->transport('gmail');
+		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
+		$cc_mail=$PurchaseOrders->creator->email;
+		
+
+		
+		$delevery_date=[]; $po_no=[]; $due_day=[];
+		foreach($totalPo as $data){
+			$purchaseOrder = $this->PurchaseOrders->get($data);
+			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->date_created));
+			$po_no[$purchaseOrder->id]= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4));
+			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->date_created));
+			//pr($Po); exit;
+		}
+		
+		$email_to="gopalkrishanp3@gmail.com";
+		$cc_mail="gopal@phppoets.in";
+		$member_name="Gopal";
+		$from_name=$company_data->alias;
+		$sub="Purchase order acknowledgement";
+		
+		//pr($PurchaseOrders);exit; 
+		$email->from(['dispatch@mogragroup.com' => $from_name])
+		->to($email_to)
+		->cc($cc_mail)
+		->replyTo('dispatch@mogragroup.com')
+		->subject($sub)
+		->template('send_purchase_order')
+		->emailFormat('html')
+		->viewVars(['PurchaseOrders'=>$PurchaseOrders,'company'=>$company_data->name,'due_day'=>$due_day,'delevery_date'=>$delevery_date,'po_no'=>$po_no]);  
+		$email->send();
+		echo "Email Send successfully ";
+		exit;
 	}
 }

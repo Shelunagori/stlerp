@@ -50,15 +50,15 @@ class MaterialIndentsController extends AppController
 			$where['MaterialIndents.created_on <=']=$To;
 		}
 		
-		
+		$mi_id=[];
 		$MaterialIndents = $this->MaterialIndents->find()->contain(['MaterialIndentRows'=>['PurchaseOrderRows']])->where(['MaterialIndents.company_id'=>$st_company_id])->where($where);
-		
-	//pr($MaterialIndents->toArray()); exit;
+		$mi_id=@$MaterialIndents;
+	//pr($mi_id->toArray()); exit;
 	
 	$mi_qty=[];
 	$po_qty=[];
-	$mi_id=[];
-	 if($status==null or $status=='Open' ){
+	//$mi_id=[];
+/* 	 if($status==null or $status=='Open' ){
 		foreach($MaterialIndents as $MaterialIndent){ $sales_qty=[];
 			foreach($MaterialIndent->material_indent_rows as $purchase_order){
 				foreach($purchase_order->purchase_order_rows as $purchase_order_row){ 
@@ -72,7 +72,7 @@ class MaterialIndentsController extends AppController
 				@$sales_qty[$material_indent_row['id']]+=$material_indent_row['required_quantity'];
 			}
 			foreach(@$sales_qty as $key=>$sales_order_qt){
-				if(@$sales_order_qt > @$po_qty[$key] ){
+				if(@$sales_order_qt > @$po_qty[$key] ){ 
 				$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
 				@$mi_id[$MaterialIndent->id]=@$materialIn;
 				}
@@ -92,13 +92,13 @@ class MaterialIndentsController extends AppController
 					@$sales_qty[$material_indent_row['id']]+=$material_indent_row['required_quantity'];
 				}
 				foreach(@$sales_qty as $key=>$sales_order_qt){
-					if(@$sales_order_qt <= @$po_qty[$key] ){
+					if(@$sales_order_qt <= @$po_qty[$key] ){ 
 					$materialIn = $this->MaterialIndents->get($MaterialIndent->id);
 					@$mi_id[$MaterialIndent->id]=@$materialIn;
 					}
 				}
 			}
-		}
+		} */
 	//pr($mi_id)
 	
         $this->set(compact('materialIndents','url','status','mi_id'));

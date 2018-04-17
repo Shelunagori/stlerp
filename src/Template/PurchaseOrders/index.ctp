@@ -193,7 +193,10 @@
 						</tr>
 						<?php }} endforeach; ?>
 						
-						<?php foreach ($purchaseOrders as $purchaseOrder):  ?>
+						<?php foreach ($purchaseOrders as $purchaseOrder): 
+								$totalPo = implode(",", @$supplier_total_po[$purchaseOrder->vendor_id]);
+								//pr($text); 
+						//pr(@$supplier_total_po[$purchaseOrder->vendor_id]);   ?>
 						<tr <?php if($status=='true' || $status==null){ echo 'style="background-color:#f4f4f4"';  
 							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ //exit;
 						?>>
@@ -234,7 +237,7 @@
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 							} ?>
 								
-								
+								<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
 								
 
 							</td>
@@ -248,3 +251,25 @@
 			
 </div>
 </div>
+
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<script>
+$(document).ready(function() {
+	
+$('.send_mail').die().live("click",function() {
+	var totalPo=$(this).attr('totalPo');
+	
+	 var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'sendMail']); ?>";
+	url=url+'?totalPo='+totalPo;
+	alert(url);
+	$.ajax({
+		url: url,
+		type: "GET",
+	}).done(function(response) { 
+	alert(response);
+		//alert("Email Send successfully")
+	}); 
+	
+});
+});
+</script>

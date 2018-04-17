@@ -60,12 +60,20 @@ if($transaction_date <  $start_date ) {
 							</tr>
 						</thead>
 					<tbody id="maintbody">
-						<?php $options1= [];	foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
+						<?php $options1= [];	
+						$item_option=[];
+						foreach($display_items as $Item){  
+							if(sizeof($Item->item_companies) > 0 ){
+								$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)@$Item->item_companies[0]->serial_number_enable];
+							}
+						}
+						
+						foreach($inventoryTransferVouchersout->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){ 
 										?>
 								<tr class="main">
 									<td width="25%">
-										<?php echo $inventory_transfer_voucher_row->item->name;
-										echo $this->Form->input('q', ['type'=>'hidden','readonly','value'=>$inventory_transfer_voucher_row->item->id,'label' => false,'class' => 'form-control input-sm  ']); ?>
+										<?php //echo $inventory_transfer_voucher_row->item->name;
+										echo $this->Form->input('q', ['value'=>$inventory_transfer_voucher_row->item->id,'label' => false,'class' => 'form-control input-sm select_item_out','options'=>$item_option]); ?>
 									</td>
 									<td width="10%">
 										<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'value'=>$inventory_transfer_voucher_row->quantity,'class' => 'form-control input-sm qty_bx','placeholder' => 'Quantity']); ?>
