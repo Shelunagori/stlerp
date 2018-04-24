@@ -26,13 +26,21 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				$last="31";
 				$start_date=$first.'-'.$financial_month_first->month;
 				$end_date=$last.'-'.$financial_month_last->month;
-				//pr($start_date); exit;
+				$default_date='';
+				$cur_date=date('Y-m-d');
+				$start_date1=date('Y-m-d',strtotime($start_date));
+				$end_date1=date('Y-m-d',strtotime($end_date));
+				if($start_date1 <= $cur_date && $end_date1 >= $cur_date){
+					$default_date=date('d-m-Y');
+				}else{
+					$default_date=date('d-m-Y',strtotime($end_date));
+				}
 		?>
         <div class="row">
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => '','data-date-start-date'=>date("d-m-Y",strtotime($fromdate1)) ,'data-date-end-date' => date("d-m-Y",strtotime($todate1)),'required']); ?>
+					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => $default_date,'data-date-start-date'=>date("d-m-Y",strtotime($fromdate1)) ,'data-date-end-date' => date("d-m-Y",strtotime($todate1)),'required']); ?>
 				</div>
 
 					<span style="color: red;">
