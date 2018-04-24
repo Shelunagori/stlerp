@@ -60,6 +60,9 @@ if($transaction_date <  $start_date ) {
 						</tr>
 					</thead>
 					<tbody id="maintbody_1">
+						<tr>
+								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'>Add row</a></td>
+							</tr>
 						<?php $options1= [];	foreach($inventoryTransferVouchers->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ 
 						?>
 							<tr class="main">
@@ -106,9 +109,16 @@ if($transaction_date <  $start_date ) {
 								<td width="30%">
 									<?php echo $this->Form->input('amount', ['type' => 'textarea','label' => false,'value'=>$inventory_transfer_voucher_row_in->narration,'class' => 'form-control input-sm ','placeholder' => 'Narration']); ?>
 								</td>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a>
+								<td>
 								<?php if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
-								<a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a>
+								<?= $this->Html->link('<i class="fa fa-trash"></i> ',
+														['action' => 'DeleteRow', $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
+														[
+															'escape' => false,
+															'class' => 'btn btn-xs red',
+															'confirm' => __('Are you sure, you want to delete {0}?', $inventory_transfer_voucher_row_in->item->name)
+														]
+													) ?>
 								<?php } ?>
 								</td>
 							</tr>

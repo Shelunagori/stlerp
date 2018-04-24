@@ -696,7 +696,6 @@ class InventoryTransferVouchersController extends AppController
 							
 				}else if($inventory_transfer_voucher_row_data['status'] == 'In')
 				{ 
-			       
 					$serial_data=0;
 					$serial_data=sizeof(@$inventory_transfer_voucher_row_data['sr_no']);
 					
@@ -743,14 +742,21 @@ class InventoryTransferVouchersController extends AppController
 												'in_out'=>'In',
 												'company_id'=>$st_company_id,
 												'source_id'=>$inventoryTransferVoucher->id,
-												'source_row_id'=>1
+												'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']
 											])
 							->execute();
 				
+					}else{
+						
+						$query1 = $this->InventoryTransferVouchers->ItemLedgers->query();
+						$query1->update()
+						->set(['rate' =>$inventory_transfer_voucher_row_data['amount'],'quantity'=>$inventory_transfer_voucher_row_data['quantity'],'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']])
+						->where(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','item_id'=>$inventory_transfer_voucher_row_data['item_id'],'in_out'=>'In'])
+						->execute();
 					}
 			
 				} 
-				}
+				} 
 				$this->Flash->success(__('The inventory transfer voucher has been saved.'));
 				return $this->redirect(['action' => 'index']);
             } else {
@@ -776,9 +782,9 @@ class InventoryTransferVouchersController extends AppController
 			}
 		}
 		
-		
+	
         $companies = $this->InventoryTransferVouchers->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo','id'));
+        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo','id','item_option1'));
         $this->set('_serialize', ['inventoryTransferVoucher']);
     }
 
@@ -1534,40 +1540,48 @@ class InventoryTransferVouchersController extends AppController
 		//exit;	
 	}
 	
-	public function itvData(){
-		$this->viewBuilder()->layout('');
+	public function DeleteRow($row_id=null,$id=null,$item_id=null){
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
-		$InventoryTransferVoucher=$this->InventoryTransferVouchers->find()->where(['company_id'=>$st_company_id]);
+		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->deleteAll(['id'=>$row_id]); 
+		$this->InventoryTransferVouchers->Items->SerialNumbers->deleteAll(['itv_id'=>$id,'company_id'=>$st_company_id,'SerialNumbers.status'=>'In','SerialNumbers.item_id'=>$item_id]); 
+		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->Items->ItemLedgers->deleteAll(['source_id'=>$id,'item_id'=>$item_id,'in_out'=>'In','source_model'=>'Inventory Transfer Voucher']);
+		return $this->redirect(['action' => 'edit/'.$id]);
+	}
+	public function itvData(){
+	$this->viewBuilder()->layout('');
+	$session = $this->request->session();
+	$st_company_id = $session->read('st_company_id');
+	
+	$InventoryTransferVoucher=$this->InventoryTransferVouchers->find()->where(['company_id'=>$st_company_id]);
+	?>
+	<table border="1">
+		<tr>
+			<th>ID</th>
+			<th>No</th>
+			<th>Transaction Date</th>
+			<th>itemledgers</th>
+		</tr>
+		<?php foreach($InventoryTransferVoucher as $InventoryTransferVoucher){
+			$itemledgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_model LIKE'=>'%Inventory Transfer Voucher%','source_id'=>$InventoryTransferVoucher->id]);
 		?>
-		<table border="1">
-			<tr>
-				<th>ID</th>
-				<th>No</th>
-				<th>Transaction Date</th>
-				<th>itemledgers</th>
-			</tr>
-			<?php foreach($InventoryTransferVoucher as $InventoryTransferVoucher){
-				$itemledgers=$this->InventoryTransferVouchers->ItemLedgers->find()->where(['source_model LIKE'=>'%Inventory Transfer Voucher%','source_id'=>$InventoryTransferVoucher->id]);
-			?>
-			<tr>
-				<td><?php echo $InventoryTransferVoucher->id; ?></td>
-				<td><?= h('#'.$InventoryTransferVoucher->voucher_no) ?></td>
-				<td><?php echo strtotime($InventoryTransferVoucher->transaction_date); ?></td>
-				<td>
-					<?php 
-					$q=0;
-					foreach($itemledgers as $itemledger){ 
-						$q+=strtotime($itemledger->processed_on);
-					}
-					echo $q/sizeof($itemledgers->toArray());
-					?>
-				</td>
-			</tr>
-			<?php } ?>
-		</table>
-		<?php
-		exit;
+		<tr>
+			<td><?php echo $InventoryTransferVoucher->id; ?></td>
+			<td><?= h('#'.$InventoryTransferVoucher->voucher_no) ?></td>
+			<td><?php echo strtotime($InventoryTransferVoucher->transaction_date); ?></td>
+			<td>
+				<?php 
+				$q=0;
+				foreach($itemledgers as $itemledger){ 
+					$q+=strtotime($itemledger->processed_on);
+				}
+				echo $q/sizeof($itemledgers->toArray());
+				?>
+			</td>
+		</tr>
+		<?php } ?>
+	</table>
+	<?php
+	exit;
 	}
 }
