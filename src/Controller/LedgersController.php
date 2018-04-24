@@ -1764,6 +1764,70 @@ class LedgersController extends AppController
 		$this->set(compact('from_date','to_date', 'groupForPrint', 'GrossProfit', 'closingValue', 'differenceInOpeningBalance','url','st_year_id'));
 	}
 	
+	public function BalanceForAccountGroup()
+    {
+		$this->viewBuilder()->layout('');
+		
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		 $st_year_id = $session->read('st_year_id');
+		$account_group_id=$this->request->query('account_group_id');
+		$from_date=$this->request->query('from_date');
+		$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		
+		 $AccountGroups=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->find()
+		->where(['AccountGroups.id'=>$account_group_id])
+		->contain(['AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
+		
+		$groupForPrint=[];
+		foreach($AccountGroups as $account_group){
+			foreach($account_group->account_first_subgroups as $account_first_subgroup){
+				foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
+					foreach($account_second_subgroup->ledger_accounts as $ledger_account){
+						$query=$this->Ledgers->find();
+						$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+						->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+						@$groupForPrint['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+					}
+				}
+			}
+		}
+		
+		echo abs($groupForPrint['balance']); exit;
+	}
+	
+	public function ClosingStockBack() 
+    {
+		$this->viewBuilder()->layout('');
+		$from_date=$this->request->query('from_date');
+		$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		echo $ClosingStockBack= $this->StockValuationWithDate2($to_date);
+	}
+	
+	public function OpeningStockBack() 
+    {
+		$this->viewBuilder()->layout('');
+		$from_date=$this->request->query('from_date');
+		$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		echo $ClosingStockBack= $this->StockValuationWithDate($to_date);
+	}
+	
+	public function GrossProfitBack()
+    {
+		$this->viewBuilder()->layout('');
+		$from_date=$this->request->query('from_date');
+		$to_date=$this->request->query('to_date');
+		$from_date = date("Y-m-d",strtotime($from_date));
+		$to_date= date("Y-m-d",strtotime($to_date));
+		echo $GrossProfit= $this->GrossProfit($from_date,$to_date);
+	}
+	
 	public function firstSubGroupsPnl($group_id,$from_date,$to_date)
 	{ 
 		$session = $this->request->session();

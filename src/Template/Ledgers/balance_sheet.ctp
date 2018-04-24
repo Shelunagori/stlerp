@@ -7,7 +7,7 @@ $url_excel="/?".$url;
 		<div class="portlet light bordered">
 			<div class="portlet-title">
 				<div class="caption">
-					<i class="fa fa-cogs"></i>Profit & Loss Statement
+					<i class="fa fa-cogs"></i>BalanceSheet
 				</div>
 				<div class="actions">
 					<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Ledgers/excelPnl/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
@@ -33,7 +33,7 @@ $url_excel="/?".$url;
 				$LeftTotal=0; $RightTotal=0; ?>
 				
 				<div class="row">
-					<table class="table table-bordered" width="60%">
+					<table class="table table-bordered firstTable" width="60%">
 						<thead>
 							<tr style="background-color: #c4ffbd;">
 									<td width="50%"><b>Particulars</b></td>
@@ -49,7 +49,7 @@ $url_excel="/?".$url;
 							
 							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
 								if($groupForPrintRow['balance']<0){ ?>
-								<tr>
+								<tr account_group_id="<?php  echo $key; ?>" class="qw">
 									<td>
 										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
 										<?php echo $groupForPrintRow['name']; ?>
@@ -77,7 +77,7 @@ $url_excel="/?".$url;
 							<?php } ?>
 							<?php 
 							if($GrossProfit>0){ ?>
-							<tr>
+							<tr class="pnfac">
 								<td><b>Profit & Loss A/c</b></td>
 								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
 									<td align="right"><b><?php echo round($GrossProfit,2); $LeftTotal+=abs($GrossProfit); ?></b></td>
@@ -103,7 +103,7 @@ $url_excel="/?".$url;
 				</div>
 				
 				<div class="row">
-					<table class="table table-bordered" width="60%">
+					<table class="table table-bordered firstTable" width="60%">
 						<thead>
 							<tr style="background-color: #c4ffbd;">
 									<td width="50%"><b>Particulars</b></td>
@@ -119,7 +119,7 @@ $url_excel="/?".$url;
 							
 							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
 								if($groupForPrintRow['balance']>0){ ?>
-								<tr>
+								<tr account_group_id="<?php  echo $key; ?>" class="qw">
 									<td>
 										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
 										<?php echo $groupForPrintRow['name']; ?>
@@ -147,7 +147,7 @@ $url_excel="/?".$url;
 								</tr>
 								<?php } ?>
 							<?php } ?>
-							<tr>
+							<tr class="csbck"> 
 								<td>Closing Stock</td>
 								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
 								<td align="right">
@@ -204,6 +204,10 @@ $url_excel="/?".$url;
 	</div>
 </div>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<?php $current_year=date('Y', strtotime($from_date)); 
+$back_from_year=($current_year-1).'-4-1';
+$back_to_year=$current_year.'-3-31';
+?>
 <script>
 $(document).ready(function() {
 	$(".group_name").die().live('click',function(e){
@@ -295,5 +299,41 @@ $(document).ready(function() {
 			});			   
 		}   
 	});
+	
+	$(".firstTable tbody tr.qw").each(function(){
+		var thiss=$(this);
+		var account_group_id=$(this).attr("account_group_id");
+		//$(this).find("td:nth-child(3)").html(account_group_id);
+		var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'BalanceForAccountGroup']); ?>";
+		url=url+'?account_group_id='+account_group_id+'&from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+		$(this).find("td:nth-child(3)").html("Loading...");
+		$.ajax({
+			url: url,
+		}).done(function(response){
+			thiss.find("td:nth-child(3)").html(response);
+		});
+	});
+	
+	
+	var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'GrossProfitBack']); ?>";
+	url=url+'?from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+	$("tr.pnfac td:nth-child(3)").html("Loading1...");
+	console.log(url); 
+	$.ajax({
+		url: url,
+	}).done(function(response){
+		$("tr.pnfac td:nth-child(3)").html(response);
+	});
+	
+	var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'ClosingStockBack']); ?>";
+	url=url+'?from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+	$("tr.csbck td:nth-child(3)").html("Loading1...");
+	console.log(url); 
+	$.ajax({
+		url: url,
+	}).done(function(response){
+		$("tr.csbck td:nth-child(3)").html(response);
+	});
+	
 });	
 </script>

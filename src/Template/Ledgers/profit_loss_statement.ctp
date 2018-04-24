@@ -33,7 +33,7 @@ $url_excel="/?".$url;
 				$LeftTotal=0; $RightTotal=0; ?>
 				
 				<div class="row">
-					<table class="table table-bordered" width="60%">
+					<table class="table table-bordered firstTable" width="60%">
 						<thead>
 							<tr style="background-color: #c4ffbd;">
 									<td width="50%"><b>Particulars</b></td>
@@ -59,9 +59,9 @@ $url_excel="/?".$url;
 									<td></td>
 								</tr>
 							<?php } ?>
-							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
+							<?php foreach($groupForPrint as $key=>$groupForPrintRow){  
 								if($groupForPrintRow['balance']<0){ ?>
-								<tr>
+								<tr class="qw" account_group_id="<?php  echo $key; ?>">
 									<td>
 										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
 										<?php echo $groupForPrintRow['name']; ?>
@@ -87,7 +87,7 @@ $url_excel="/?".$url;
 								</tr>
 								<?php } ?>
 							<?php } ?>
-							<tr>
+							<tr class="csbck">
 								<td>Closing Stock</td>
 								<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
 								<td align="right">
@@ -122,7 +122,7 @@ $url_excel="/?".$url;
 				</div>
 				
 				<div class="row">
-					<table class="table table-bordered" width="60%">
+					<table class="table table-bordered firstTable" width="60%">
 						<thead>
 							<tr style="background-color: #c4ffbd;">
 									<td width="50%"><b>Particulars</b></td>
@@ -137,7 +137,7 @@ $url_excel="/?".$url;
 						<tbody>
 							
 							<?php if($openingValue>=0) { ?>
-								<tr>
+								<tr class="osbck">
 									<td>Opening Stock</td>
 									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
 										<td align="right">
@@ -159,7 +159,7 @@ $url_excel="/?".$url;
 							<?php } ?>
 							<?php foreach($groupForPrint as $key=>$groupForPrintRow){ 
 								if($groupForPrintRow['balance']>0){ ?>
-								<tr>
+								<tr class="qw" account_group_id="<?php  echo $key; ?>">
 									<td>
 										<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
 										<?php echo $groupForPrintRow['name']; ?>
@@ -241,6 +241,10 @@ $url_excel="/?".$url;
 	</div>
 </div>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<?php $current_year=date('Y', strtotime($from_date)); 
+$back_from_year=($current_year-1).'-4-1';
+$back_to_year=$current_year.'-3-31';
+?>
 <script>
 $(document).ready(function() {
 	$(".group_name").die().live('click',function(e){
@@ -331,6 +335,40 @@ $(document).ready(function() {
 				$('<tr class="append_tr row_for_'+second_grp_id+'"><td colspan="2">'+response+'</td></tr>').insertAfter(current_obj.closest('tr'));
 			});			   
 		}   
+	});
+	
+	$(".firstTable tbody tr.qw").each(function(){
+		var thiss=$(this);
+		var account_group_id=$(this).attr("account_group_id");
+		//$(this).find("td:nth-child(3)").html(account_group_id);
+		var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'BalanceForAccountGroup']); ?>";
+		url=url+'?account_group_id='+account_group_id+'&from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+		$(this).find("td:nth-child(3)").html("Loading...");
+		$.ajax({ 
+			url: url,
+		}).done(function(response){
+			thiss.find("td:nth-child(3)").html(response);
+		});
+	});
+	
+	var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'ClosingStockBack']); ?>";
+	url=url+'?from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+	$("tr.csbck td:nth-child(3)").html("Loading1...");
+	console.log(url); 
+	$.ajax({
+		url: url,
+	}).done(function(response){
+		$("tr.csbck td:nth-child(3)").html(response);
+	});
+	
+	var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'OpeningStockBack']); ?>";
+	url=url+'?from_date=<?php echo $back_from_year ?>&to_date=<?php echo $back_to_year ?>';
+	$("tr.osbck td:nth-child(3)").html("Loading1...");
+	console.log(url); 
+	$.ajax({
+		url: url,
+	}).done(function(response){
+		$("tr.osbck td:nth-child(3)").html(response);
 	});
 });	
 </script>
