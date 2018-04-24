@@ -408,7 +408,8 @@ $(document).ready(function() {
 	$('input[name="total_pnf"]').die().live("keyup",function() {
 		totalpnf=parseFloat($(this).val());
 		var total_amount=$('input[name="total_amount"]').val();
-		console.log(total_amount);
+		var total_discount=$('input[name="total_discount"]').val();
+		var total_amount=total_amount-total_discount;
 		
 		$("#main_tb tbody tr.tr1").each(function(){ 
 			var amt=parseFloat($(this).find("td:nth-child(6) input").val());	

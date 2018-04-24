@@ -274,7 +274,7 @@
 						<td><?php echo $this->Form->input('total_amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td><td></td>
 						<td><?php echo $this->Form->input('total_discount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
 						<td></td>
-						<td><?php echo $this->Form->input('total_pnf', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
+						<td><?php echo $this->Form->input('total_pnf', ['type' => 'text','label' => false,'class' => 'form-control input-sm']); ?></td>
 						<td><?php echo $this->Form->input('taxable_value', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
 						<td class="cgst_display" ></td>
 						<td class="cgst_display" ><?php echo $this->Form->input('total_cgst', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
@@ -399,7 +399,8 @@ $(document).ready(function() {
 	$('input[name="total_pnf"]').die().live("keyup",function() {
 		totalpnf=parseFloat($(this).val());
 		var total_amount=$('input[name="total_amount"]').val();
-		console.log(total_amount);
+		var total_discount=$('input[name="total_discount"]').val();
+		var total_amount=total_amount-total_discount;
 		
 		$("#main_tb tbody tr.tr1").each(function(){ 
 			var amt=parseFloat($(this).find("td:nth-child(6) input").val());	
