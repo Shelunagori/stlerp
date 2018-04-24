@@ -32,7 +32,6 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 	<?php if(!empty($grn)) { ?>
 	<div class="portlet-body form">
 		<?= $this->Form->create($invoiceBooking,['id'=> 'form_sample_3']) ?>
-		
 			<div class="form-body">
 				<div class="row">
 					<div class="col-md-3">
@@ -408,22 +407,19 @@ $(document).ready(function() {
 	
 	$('input[name="total_pnf"]').die().live("keyup",function() {
 		totalpnf=parseFloat($(this).val());
-		var total=0;
-		$("#main_tb tbody tr.tr1").each(function(){
-			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
-			var discount=parseFloat($(this).find("td:nth-child(8) input").val()); 
-			var amount_after_discount=amout-discount;
-			total=total+amount_after_discount;
+		var total_amount=$('input[name="total_amount"]').val();
+		console.log(total_amount);
+		
+		$("#main_tb tbody tr.tr1").each(function(){ 
+			var amt=parseFloat($(this).find("td:nth-child(6) input").val());	
+			var dis=parseFloat($(this).find("td:nth-child(8) input").val());
+			var famt=amt-dis;
+			var pf=round(famt/total_amount*totalpnf,2);
+			$(this).find("td:nth-child(10) input").val(pf);
+			
+			var pfper=round(pf*100/famt,4);
+			$(this).find("td:nth-child(9) input").val(pfper);
 		});
-		$("#main_tb tbody tr.tr1").each(function(){
-			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
-			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
-			var amount_after_discount=amout-discount;
-			var pnf=(amount_after_discount/total)*totalpnf;
-			var x=(pnf/amount_after_discount)*100;
-			$(this).find("td:nth-child(9) input").val(round(x,2))
-		});
-		//calculate_total();
 	});
 	
 

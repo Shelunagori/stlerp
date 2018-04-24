@@ -395,6 +395,25 @@
 $(document).ready(function() {
 	//--------- FORM VALIDATION
 	
+	
+	$('input[name="total_pnf"]').die().live("keyup",function() {
+		totalpnf=parseFloat($(this).val());
+		var total_amount=$('input[name="total_amount"]').val();
+		console.log(total_amount);
+		
+		$("#main_tb tbody tr.tr1").each(function(){ 
+			var amt=parseFloat($(this).find("td:nth-child(6) input").val());	
+			var dis=parseFloat($(this).find("td:nth-child(8) input").val());
+			var famt=amt-dis;
+			var pf=round(famt/total_amount*totalpnf,2);
+			$(this).find("td:nth-child(10) input").val(pf);
+			
+			var pfper=round(pf*100/famt,4);
+			$(this).find("td:nth-child(9) input").val(pfper);
+		});
+	});
+	
+	
 	$('.dis_per').die().live("blur",function() {
 		calculate_pnf_discount(); 
 	});
