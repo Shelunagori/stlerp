@@ -61,7 +61,7 @@ $url_excel="/?".$url;
 								
 							</div>
 							<div class="col-md-4">
-								<?php echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($To)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+								<?php echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_to)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
 							</div>
 						</div>
 					</td>
