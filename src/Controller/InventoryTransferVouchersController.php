@@ -733,7 +733,7 @@ class InventoryTransferVouchersController extends AppController
 				
 				
 					$query= $this->InventoryTransferVouchers->ItemLedgers->query();
-							$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','company_id','processed_on','source_id'])
+							$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','company_id','processed_on','source_id','source_row_id'])
 								  ->values([
 												'item_id' => $inventory_transfer_voucher_row_data['item_id'],
 												'quantity' => $inventory_transfer_voucher_row_data['quantity'],
@@ -742,7 +742,8 @@ class InventoryTransferVouchersController extends AppController
 												'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
 												'in_out'=>'In',
 												'company_id'=>$st_company_id,
-												'source_id'=>$inventoryTransferVoucher->id
+												'source_id'=>$inventoryTransferVoucher->id,
+												'source_row_id'=>1
 											])
 							->execute();
 				
@@ -777,7 +778,7 @@ class InventoryTransferVouchersController extends AppController
 		
 		
         $companies = $this->InventoryTransferVouchers->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo'));
+        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo','id'));
         $this->set('_serialize', ['inventoryTransferVoucher']);
     }
 

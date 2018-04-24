@@ -61,7 +61,7 @@ if($transaction_date <  $start_date ) {
 					</thead>
 					<tbody id="maintbody_1">
 						<?php $options1= [];	foreach($inventoryTransferVouchers->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ 
-									?>
+						?>
 							<tr class="main">
 								<td  width="25%">
 									<?php echo $inventory_transfer_voucher_row_in->item->name;
@@ -78,12 +78,12 @@ if($transaction_date <  $start_date ) {
 										
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+									$i=1; $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ ?>
 											<?php echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]); ?>
-										<?php
-										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ ?>
+										<?php 
+										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ $p++; ?>
 											<?=  $this->Html->link('<i class="fa fa-trash"></i> ',
 														['action' => 'DeleteSerialNumberIn', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 														[
@@ -106,7 +106,11 @@ if($transaction_date <  $start_date ) {
 								<td width="30%">
 									<?php echo $this->Form->input('amount', ['type' => 'textarea','label' => false,'value'=>$inventory_transfer_voucher_row_in->narration,'class' => 'form-control input-sm ','placeholder' => 'Narration']); ?>
 								</td>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a></td>
+								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a>
+								<?php if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
+								<a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a>
+								<?php } ?>
+								</td>
 							</tr>
 						<?php }?>
 						</tbody>

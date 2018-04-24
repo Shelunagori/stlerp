@@ -88,7 +88,9 @@ if($transaction_date <  $start_date ) {
 									<td width="20%">
 								<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control','placeholder' => 'Narration','style' => 'width:100%;','value'=>$inventory_transfer_voucher_row->narration]); ?>
 								</td>
-									<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a></td>
+									<td><a class="btn btn-xs btn-default addrow" href="#" role='button'><i class="fa fa-plus"></i></a>
+									<a class="btn btn-xs btn-default deleterow" href="#" role='button'><i class="fa fa-times"></i></a>
+									</td>
 							</tr>
 							<?php } ?>
 						</tbody>
@@ -110,7 +112,7 @@ if($transaction_date <  $start_date ) {
 						</tr>
 					</thead>
 					<tbody id="maintbody_1">
-						<?php $options1= [];	foreach($inventoryTransferVouchersins->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ 
+						<?php $options1= [];	foreach($inventoryTransferVouchersins->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ pr($inventory_transfer_voucher_row_in->id); 
 									?>
 							<tr class="main">
 								<td  width="25%">
@@ -127,14 +129,14 @@ if($transaction_date <  $start_date ) {
 										
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+									$i=1;  $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ 
 											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]); ?>
 											
 											<?php
-										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ ?>
+										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ $p++; ?>
 												<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 														['action' => 'DeleteSerialNumbers', $item_serial_number->id, $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 														[
@@ -152,7 +154,11 @@ if($transaction_date <  $start_date ) {
 								<td width="20%">
 									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'style'=>'width: 79px;','value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
 								</td>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a></td>
+								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a>
+								<?php if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
+								<a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a>
+								<?php } ?>
+								</td>
 							</tr>
 						<?php }?>
 						</tbody>
@@ -294,11 +300,20 @@ $(document).ready(function() {
 	});
 	
 	$('.deleterow_1').live("click",function() {
-		var l=$(this).closest("table tbody").find("tr").length;
+		var l=$(this).closest("#main_table_1 tbody#maintbody_1").find("tr").length;
+		var item_id=$(this).closest("tr").find('td:nth-child(1)').val();
+		//var item_id=$(this).closest("#main_table_1 tbody#maintbody_1 tr").find("input");
+		//var item_id=tr_obj.find('td:nth-child(1)').val();
+		//var item_id=$(this).closest("#main_table_1 tbody#maintbody_1 tr").find('td:nth-child(1)').val();
+		alert(item_id);
 		if (confirm("Are you sure to remove row ?") == true) {
 			if(l>1){
 				var row_no=$(this).closest("tr").attr("row_no");
+				
 				var del=$(this).closest("tr");
+				var id=<?php echo $id; ?>;
+				alert(id);
+				delete_from_db(id);
 				$(del).remove();
 				rename_rows_in();
 			}
@@ -333,6 +348,7 @@ $(document).ready(function() {
 			var len=tr_obj.find("td:nth-child(1) select").length;
 			if(len>0){
 			var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
+			
 			var item_id=tr_obj.find('td:nth-child(1) select option:selected').val();
 			var old_qty=0;
 			}else{
@@ -359,6 +375,7 @@ $(document).ready(function() {
 	
 	
 	function sr_nos(tr_obj,serial_number_enable,old_qty){  
+		var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');
 		if(serial_number_enable==1){ 
 			var OriginalQty=tr_obj.find('td:nth-child(2) input').val();
 			Quantity = OriginalQty.split('.'); qty=Quantity[0];
@@ -510,7 +527,7 @@ $(document).ready(function() {
 				$item_option=[];
 				foreach($display_items as $Item){ 
 					if(sizeof($Item->item_companies) > 0 ){
-						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
+						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)@$Item->item_companies[0]->serial_number_enable];
 					}
 				}	
 				echo $this->Form->input('q', ['empty'=>'Select','options' => $item_option,'label' => false,'style'=>'width: 200px; display: block;','class' => 'form-control input-sm select_item_out item_id']); ?>
@@ -534,7 +551,7 @@ $(document).ready(function() {
 				$item_option=[];
 				foreach($display_items as $Item){ 
 					if(sizeof($Item->item_companies) > 0 ){
-						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)$Item->serial_number_enable];
+						$item_option[]=['text' =>$Item->name, 'value' => $Item->id, 'serial_number_enable' => (int)@$Item->item_companies[0]->serial_number_enable];
 					}	
 				}
 				echo $this->Form->input('q', ['empty'=>'Select','options' => $item_option,'label' => false,'style'=>'width: 150px; display: block;','class' => 'form-control input-sm select_item_in item_id']); ?>
