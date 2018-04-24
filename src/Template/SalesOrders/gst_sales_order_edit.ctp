@@ -250,7 +250,7 @@
 						<?php if($sales_order_rows->quotation_row_id == 0){ ?>
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
 						<?php } else {  ?>
-							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'max'=>@$MaxQty[@$sales_order_rows->quotation_row_id],'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
+							<?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity','placeholder' => 'Quantity','value'=>$sales_order_rows->quantity,'min'=>@$sales_orders_qty[$sales_order_rows->id]]); ?>
 						<?php } ?>
 
 						

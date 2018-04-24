@@ -73,7 +73,8 @@
 						</tr>
 					</thead>
 					<tbody>
-					<?php $i=0;foreach ($invoiceBookings as $invoiceBooking):
+					<?php $total=0; $i=0;foreach ($invoiceBookings as $invoiceBooking):
+					$total+=$invoiceBooking->taxable_value;
 					?>
 						<tr>
 							<td><?= h(++$i) ?></td>
@@ -84,9 +85,14 @@
 							<?php  } ?></td>
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
-							<td><?= h($invoiceBooking->taxable_value) ?></td>
+							<td align="center"><?= h($this->Number->format($invoiceBooking->taxable_value,['places'=>2])) ?></td>
+							
 						</tr>
 							<?php endforeach; ?>
+						<tr>
+							<td colspan="5" align="right">Total</td>
+							<td align="center"><?= h($this->Number->format($total,['places'=>2])) ?></td>
+						</tr>
 						</tbody>
 					</table>
 				

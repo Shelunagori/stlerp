@@ -3,7 +3,13 @@
 			<td align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;"><?php echo $salesOrder->company->name ?>
 			</td>
 		</tr>
-		
+		<tr>
+			<td><?php echo "<br/>"; ?>
+			</td>
+		</tr><tr>
+			<td><?php echo "<br/>"; ?>
+			</td>
+		</tr>
 		<tr>
 			<td width="50%" valign="top" align="left">
 				<?php echo $salesOrder->customer->customer_name;  ?>
@@ -76,6 +82,14 @@
 		</tr>
 		<tr>
 			<td>Regards, <?php echo "<br/>"; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo "<br/>"; ?>
+			</td>
+		</tr>
+		<tr>
+			<td><?php echo "<br/>"; ?>
 			</td>
 		</tr>
 		<tr>

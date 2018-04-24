@@ -309,7 +309,7 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 						<td><?php echo $this->Form->input('total_amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td><td></td>
 						<td><?php echo $this->Form->input('total_discount', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
 						<td></td>
-						<td><?php echo $this->Form->input('total_pnf', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
+						<td><?php echo $this->Form->input('total_pnf', ['type' => 'text','label' => false,'class' => 'form-control input-sm']); ?></td>
 						<td><?php echo $this->Form->input('taxable_value', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
 						<td class="cgst_display" ></td>
 						<td class="cgst_display" ><?php echo $this->Form->input('total_cgst', ['type' => 'text','label' => false,'class' => 'form-control input-sm','readonly']); ?></td>
@@ -404,6 +404,28 @@ foreach($grn->purchase_order->purchase_order_rows as $purchase_order_row){
 
 <script>
 $(document).ready(function() {
+	
+	
+	$('input[name="total_pnf"]').die().live("keyup",function() {
+		totalpnf=parseFloat($(this).val());
+		var total=0;
+		$("#main_tb tbody tr.tr1").each(function(){
+			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
+			var discount=parseFloat($(this).find("td:nth-child(8) input").val()); 
+			var amount_after_discount=amout-discount;
+			total=total+amount_after_discount;
+		});
+		$("#main_tb tbody tr.tr1").each(function(){
+			var amout=parseFloat($(this).find("td:nth-child(6) input").val());
+			var discount=parseFloat($(this).find("td:nth-child(7) input").val());
+			var amount_after_discount=amout-discount;
+			var pnf=(amount_after_discount/total)*totalpnf;
+			var x=(pnf/amount_after_discount)*100;
+			$(this).find("td:nth-child(9) input").val(round(x,2))
+		});
+		//calculate_total();
+	});
+	
 
 	$('.dis_per').die().live("blur",function() { 
 		calculate_pnf_discount(); 
