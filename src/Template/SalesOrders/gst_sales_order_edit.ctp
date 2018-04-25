@@ -402,6 +402,13 @@
 						<?php echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note']); ?>
 					</div>
 				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label">Payment Terms <span class="required" aria-required="true">*</span></label>
+						<?php 
+							echo $this->Form->textarea('payment_terms', ['label' => false,'class' => 'form-control input-sm ','placeholder'=>'Payment Terms']);  ?>
+					</div>
+					</div>
 			</div>
 			<!--<label>Commercial Terms & Conditions:</label> <a href="#" role="button" class="select_term_condition">Select </a>
 			<?php echo $this->Form->input('terms_conditions', ['label' => false,'class' => 'form-control','value' => @$quotation->terms_conditions]); ?>-->

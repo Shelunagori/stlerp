@@ -194,9 +194,8 @@ With reference to your price list we are pleased to place an order for the follo
 					
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Delivery <span class="required" aria-required="true">*</span></label>
-							<?php 
-							echo $this->Form->input('delivery',['label' => false,'class' => 'form-control input-sm','placeholder'=>'Delivery']); ?>
+							<label class="control-label">Delivery Date<span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('delivery_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' =>'','data-date-start-date' =>date('d-m-Y',strtotime($financial_year->date_from)) ,'data-date-end-date' =>date('d-m-Y',strtotime($financial_year->date_to)),'required']); ?>
 						</div>
 					</div>
 					<div class="col-md-3">
@@ -319,6 +318,8 @@ $(document).ready(function() {
 					required: true,
 				},
 				excise_duty:{
+					required: true,
+				},delivery_date:{
 					required: true,
 				},
 			},

@@ -113,7 +113,7 @@
 									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Daily Report',array('controller'=>'Ledgers','action'=>'Index','from'=>@$today,'to'=>@$today),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td>
-									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Material Indent',array('controller'=>'Item-Ledgers','action'=>'material-indent-report','stockstatus'=>'Positives','company_name%5B%5D'=>@$st_company_id),array('escape'=>false,'class'=>'btn default btn-block')); ?>
+									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Material Indent',array('controller'=>'Item-Ledgers','action'=>'material-indent-report','stockstatus'=>'Positives','company_name'=>@$st_company_id),array('escape'=>false,'class'=>'btn default btn-block')); ?>
 								</td>
 								<td>
 									<?php $today =date('d-m-Y'); echo $this->Html->link('<i class="fa "></i> Account Statement',array('controller'=>'Ledgers','action'=>'Account-Statement'),array('escape'=>false,'class'=>'btn default btn-block')); ?>

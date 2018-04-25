@@ -96,6 +96,7 @@
 								<th>Supplier Name</th>
 								<th>Items Name</th>
 								<th>Created Date</th>
+								<th>Delivery Date</th>
 								<th style="text-align:right">Total</th>
 								
 								<th class="actions"><?= __('Actions') ?></th>
@@ -124,7 +125,8 @@
 										</ul>
 								</div>
 							</td>
-							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)); 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -171,6 +173,7 @@
 								</div>
 							</td>
 							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -217,6 +220,7 @@
 								</div>
 							</td>
 							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -231,10 +235,11 @@
 									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
 									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} 
 									?>
+									<?php if(date("d-m-Y") > date("d-m-Y",strtotime($purchaseOrder->delivery_date))){?>
 									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
 									
 									<?php
-									} 
+									}} 
 									
 									
 									

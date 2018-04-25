@@ -461,6 +461,7 @@ if(!empty($copy))
 						
 						?>
 					</div>
+					
 				</div>
 			</div>
 			<h4>Dispatch Details</h4>
@@ -536,6 +537,14 @@ if(!empty($copy))
 							echo $this->Form->input('additional_note', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Additional Note','value' => @$quotation->additional_note]);
 						}	
 							?>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label">Payment Terms <span class="required" aria-required="true">*</span></label>
+						<?php 
+							echo $this->Form->textarea('payment_terms', ['label' => false,'class' => 'form-control input-sm ','placeholder'=>'Payment Terms']);  ?>
+					</div>
 					</div>
 				</div>
 			</div>

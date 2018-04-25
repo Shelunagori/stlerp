@@ -58,7 +58,8 @@ margin-bottom: 0;
 					<tr>
 						<?php  ?>
 						<td><?= h($creditNotes->head->name.'('.$creditNotes->head->alias.')') ?>
-						<?php echo "<br/>"; echo $partyData->customer_address[0]->address; ?></td>
+						<?= $this->Text->autoParagraph(h($partyData->customer_address[0]->address)) ?>
+						</td>
 					</tr>
 					
 				</table>

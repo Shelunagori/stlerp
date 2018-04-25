@@ -58,7 +58,7 @@ class LedgersController extends AppController
 				}else if($ledger->voucher_source=="Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
-					$url_link[$ledger->id]="/petty-cash-vouchers/view/".$ledger->voucher_id;
+					$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Contra Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Receipt Voucher"){

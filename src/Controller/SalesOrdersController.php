@@ -32,7 +32,7 @@ class SalesOrdersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
-		
+		$financial_year = $this->SalesOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$copy_request=$this->request->query('copy-request');
 		$gst_copy_request=$this->request->query('gst-copy-request');
 		$job_card=$this->request->query('job-card');
@@ -109,7 +109,9 @@ class SalesOrdersController extends AppController
 				->where($where);
 		
 		}else{
-				if($gst=="true" || $Actionstatus=="GstInvoice"){ 
+				if($gst=="true" || $Actionstatus=="GstInvoice"){
+					$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
+					//pr($tdate); exit;
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
 					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
@@ -119,7 +121,7 @@ class SalesOrdersController extends AppController
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where)
-					->where(['gst'=>'yes'])
+					->where(['SalesOrders.gst'=>'yes','SalesOrders.created_on <= '=>$tdate])
 					->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 

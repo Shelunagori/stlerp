@@ -72,7 +72,7 @@
 					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label">Date</label>
-							<?php echo $this->Form->input('date_created', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y"),'readonly']); ?>
+							<?php echo $this->Form->input('date_created', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y",strtotime($purchaseOrder->date_created)),'readonly']); ?>
 						</div>
 					</div>
 				</div>
@@ -228,9 +228,8 @@
 					
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Delivery <span class="required" aria-required="true">*</span></label>
-							<?php 
-							echo $this->Form->input('delivery',['label' => false,'class' => 'form-control input-sm','placeholder'=>'Delivery']); ?>
+							<label class="control-label">Delivery Date<span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('delivery_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' =>date('d-m-Y',strtotime($purchaseOrder->delivery_date)),'data-date-start-date' =>date('d-m-Y',strtotime($financial_year->date_from)) ,'data-date-end-date' =>date('d-m-Y',strtotime($financial_year->date_to)),'required']); ?>
 						</div>
 					</div>
 					<div class="col-md-3">

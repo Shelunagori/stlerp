@@ -1451,12 +1451,13 @@ class ItemLedgersController extends AppController
 		$where1=[];$where2=[];$where3=[];
 		$where4=[];$where5=[];$where6=[];
 		$where7=[];
+		$dr=sizeof(@$company_name[0]); 
 		
-		if(!empty($company_name)){
-		
-		$company_names=array_filter($company_name);
+		if($dr > 1){
+		 
+		$company_names=array_filter($company_name[0]);
 			
-			foreach(@$company_names as $names){   
+			foreach(@$company_names[0] as $names){ 
 					$where1['SalesOrders.company_id IN'][]=$names;
 					$where2['JobCards.company_id IN'][]=$names;
 					$where3['PurchaseOrders.company_id IN'][]=$names;
@@ -1465,7 +1466,7 @@ class ItemLedgersController extends AppController
 					$where6['ItemLedgers.company_id IN'][]=$names;
 					$where7['ItemCompanies.company_id IN'][]=$names;
 			}
-		}else{ $names=$st_company_id;
+		}else if(@$company_name[0][0]==$st_company_id){ $names=$st_company_id;
 				$where1['SalesOrders.company_id IN'][]=$names;
 				$where2['JobCards.company_id IN'][]=$names;
 				$where3['PurchaseOrders.company_id IN'][]=$names;
@@ -1473,7 +1474,17 @@ class ItemLedgersController extends AppController
 				$where5['Quotations.company_id IN'][]=$names;
 				$where6['ItemLedgers.company_id IN'][]=$names;
 				$where7['ItemCompanies.company_id IN'][]=$names;
+		}else{ 	$names=array_filter($company_name[0]);
+				
+				$where1['SalesOrders.company_id IN'][]=$names[0];
+				$where2['JobCards.company_id IN'][]=$names[0];
+				$where3['PurchaseOrders.company_id IN'][]=$names[0];
+				$where4['MaterialIndents.company_id IN'][]=$names[0];
+				$where5['Quotations.company_id IN'][]=$names[0];
+				$where6['ItemLedgers.company_id IN'][]=$names[0];
+				$where7['ItemCompanies.company_id IN'][]=$names[0];
 		}
+		
 	$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'])->where($where2)->toArray();
 	
 	$job_card_qty=[];

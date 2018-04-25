@@ -72,13 +72,14 @@
 								
 						</tr>
 						<?php $i=1; foreach($po_no as $key=>$po_no){  ?>
+							<?php if($due_day[$key] >= 0){ ?>
 							<tr>
 								<td width="15%"><?php echo $i++; ?></td>
 								<td><?php echo $po_no; ?></td>
 								<td  width="20%"  align="center"><?php echo $delevery_date[$key]; ?></td>
 								<td   width="20%" align="center"><?php echo $due_day[$key]; ?></td>
-								
-						</tr>
+							</tr>
+							<?php } ?>	
 						<?php } ?>
 					</table>
 			</td>

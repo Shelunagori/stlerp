@@ -24,6 +24,7 @@ class GrnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->Grns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
        /*  $this->paginate = [
             'contain' => ['PurchaseOrders', 'Companies','Vendors']
         ]; */
@@ -65,17 +66,18 @@ class GrnsController extends AppController
 		}elseif($status=='Invoice-Booked'){
 			$where['status']='Invoice-Booked';
 		}
-		
+		//$tdate=date('d-m-Y',strtotime($financial_year->date_to)); 
 		if($grn_pull_request=="true"){
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
-		}else{
+		}else{ 
+			
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->order(['Grns.id' => 'DESC']);
 		}
 		
 		
 		
 		
-        $this->set(compact('grns','pull_request','status','grn_pull_request','url'));
+        $this->set(compact('grns','pull_request','status','grn_pull_request','url','financial_year'));
         $this->set('_serialize', ['grns']);
     }
 	

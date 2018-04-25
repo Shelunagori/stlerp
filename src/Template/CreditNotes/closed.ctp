@@ -9,8 +9,8 @@
 		
 		
 		<?= $this->Html->link(
-			'Cancle CR',
-			'/CreditNotes/closed',
+			'Back',
+			'/CreditNotes/',
 			['class' => 'btn btn-primary']
 		); ?>
 		
@@ -39,12 +39,7 @@
 						
                             <td class="actions">
                             <?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $creditNote->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
-                             <?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $creditNote->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-							 
-							 echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Cancle','role'=>'button','id'=>'close_popup_btn','quote_id'=>$creditNote->id));
-							 
-							 ?>
-                            </td>
+                             </td>
                         </tr>
                         <?php endforeach; ?>
                     </tbody>

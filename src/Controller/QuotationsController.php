@@ -33,6 +33,7 @@ class QuotationsController extends AppController
 		$gst_pull_request=$this->request->query('gst-pull-request');
 		$close_status=$this->request->query('status');
 		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->Quotations->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
 		$fromdate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		$todate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_to)); 
@@ -112,7 +113,8 @@ class QuotationsController extends AppController
 				)
 				);
 		}else if($gst_pull_request=="true"){ 
-			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+			$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
 		}else{   
 		
 			if(sizeof($max_ids)>0){

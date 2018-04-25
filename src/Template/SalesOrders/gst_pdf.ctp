@@ -348,7 +348,9 @@ $html.='
 						
 					</tr>
 					<tr>
-						
+						<td style="white-space: nowrap;" valign="top">Payment Terms</td>
+						<td style="white-space: nowrap;">:</td>
+						<td style="white-space: nowrap;"> '. h($salesOrder->payment_terms).'</td>
 					</tr>
 				</table>
 			</td>

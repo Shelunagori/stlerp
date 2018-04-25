@@ -95,6 +95,7 @@ class PurchaseOrdersController extends AppController
 				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
 			if($pull_request=="true"){ 
+				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -102,7 +103,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.date_created <='=>$tdate])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 				//pr($purchaseOrders); exit;
@@ -337,7 +338,7 @@ class PurchaseOrdersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$Company = $this->PurchaseOrders->Companies->get($st_company_id);
 		$st_year_id = $session->read('st_year_id');
-
+		$financial_year = $this->PurchaseOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
        $SessionCheckDate = $this->FinancialYears->get($st_year_id);
        $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
        $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
@@ -506,7 +507,7 @@ class PurchaseOrdersController extends AppController
 //pr($sale_tax_ledger_accounts); exit;
 
 		$transporters = $this->PurchaseOrders->Transporters->find('list')->order(['Transporters.transporter_name' => 'ASC']);
-        $this->set(compact('purchaseOrder', 'materialIndents','Company', 'vendor','filenames','items','SaleTaxes','transporters','customers','chkdate','to_be_send2','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','itemoptions'));
+        $this->set(compact('purchaseOrder', 'materialIndents','Company', 'vendor','filenames','items','SaleTaxes','transporters','customers','chkdate','to_be_send2','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','itemoptions','financial_year'));
         $this->set('_serialize', ['purchaseOrder']);
     }
 
@@ -537,7 +538,7 @@ class PurchaseOrdersController extends AppController
 		$financial_year = $this->PurchaseOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->PurchaseOrders->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->PurchaseOrders->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
-		
+		//pr($financial_year); exit;
         $purchaseOrder = $this->PurchaseOrders->get($id, [
             'contain' => ['PurchaseOrderRows'=>['Items'=>['ItemCompanies'],'GrnRows']]
         ]);
@@ -599,8 +600,8 @@ class PurchaseOrdersController extends AppController
 
 
         if ($this->request->is(['patch', 'post', 'put'])) {
-            $purchaseOrder = $this->PurchaseOrders->patchEntity($purchaseOrder, $this->request->data);
 			
+            $purchaseOrder = $this->PurchaseOrders->patchEntity($purchaseOrder, $this->request->data);
 			$purchaseOrder->date_created=date("Y-m-d",strtotime($purchaseOrder->date_created));
 			$purchaseOrder->delivery_date=date("Y-m-d",strtotime($purchaseOrder->delivery_date));
 			$purchaseOrder->company_id=$st_company_id;
@@ -682,7 +683,7 @@ class PurchaseOrdersController extends AppController
 		
 		$transporters = $this->PurchaseOrders->Transporters->find('list')->order(['Transporters.transporter_name' => 'ASC']);
        
-        $this->set(compact('purchaseOrder', 'Company', 'vendor','filenames','customers','SaleTaxes','transporters','items','financial_year_data','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','financial_month_first','financial_month_last','max_item_qty','minItemQty','mi_qty','po_qty'));
+        $this->set(compact('purchaseOrder', 'Company', 'vendor','filenames','customers','SaleTaxes','transporters','items','financial_year_data','sale_tax_ledger_accounts','sale_tax_ledger_accounts1','financial_month_first','financial_month_last','max_item_qty','minItemQty','mi_qty','po_qty','financial_year'));
         $this->set('_serialize', ['purchaseOrder']);
     }
 
@@ -788,19 +789,19 @@ class PurchaseOrdersController extends AppController
 		$delevery_date=[]; $po_no=[]; $due_day=[];
 		foreach($totalPo as $data){
 			$purchaseOrder = $this->PurchaseOrders->get($data);
-			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->date_created));
+			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->delivery_date));
 			$po_no[$purchaseOrder->id]= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4));
-			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->date_created));
+			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->delivery_date));
 			//pr($Po); exit;
 		}
 		
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
+		$email_to="gopalkrishanp3@gmail.com";
+		$cc_mail="gopal@phppoets.in";
 		$member_name="Gopal";
 		$from_name=$company_data->alias;
 		$sub="Purchase order delivery reminder ";
 		
-		//pr($PurchaseOrders);exit; 
+		//pr($due_day);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
 		->cc($cc_mail)
