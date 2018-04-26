@@ -37,9 +37,6 @@ border:none;
 	</div>
 <?php echo $this->Form->create($travelRequest, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 	<div class="portlet-body form">
-		
-				
-	
 			<div class="form-body">
 				<div class="col-md-2"></div>
 				<div class="col-md-10" style="padding-bottom:10px;">
@@ -130,49 +127,39 @@ border:none;
 					
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php echo $this->Form->input('return_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
-						</div>
-					</div>
-					<div class="col-md-3">
-						<div class="form-group">
-							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php echo $this->Form->input('return_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-2"></div>
-				<div class="col-md-10" style="padding-bottom:10px;">
-					<div class="col-md-4">
-						<div class="form-group">
 							<label class="control-label  label-css">Advance Amount</label>
 							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
 						</div>
 					</div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label  label-css">Comment</label>
+							<?php echo $this->Form->input('comment', ['label' => false,'placeholder'=>'comment','class'=>'form-control input-sm']); ?>
+						</div>
+					</div>
 				</div>
-				
+				<div class="col-md-2"></div>
 		
-		<fieldset style="margin-left: 6px;margin-right: 16px;">
-			<legend><b>Travel Schedule Date wise only </b></legend>
-			<table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
-				<thead>
-					<tr align="center">
-					   <td><label>S.n.<label></td>
-					   <td><label>Date<label></td>
-					   <td><label>Party Name<label></td>
-					   <td><label>Destination<label></td>
-					   <td><label>Person whom to meet<label></td>
-					   <td><label>Reporting time<label></td>
-					   <td></td>
-					</tr>
-				</thead>
-				<tbody id='main_tbody' class="tab">
-					
-				</tbody>
-			</table>
-		</fieldset>
-		
-			</div>
+			<fieldset style="margin-left: 6px;margin-right: 16px;">
+				<legend><b>Travel Schedule Date wise only </b></legend>
+				<table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
+					<thead>
+						<tr align="center">
+						   <td><label>S.n.<label></td>
+						   <td><label>Date<label></td>
+						   <td><label>Party Name<label></td>
+						   <td><label>Destination<label></td>
+						   <td><label>Person whom to meet<label></td>
+						   <td><label>Reporting time<label></td>
+						   <td></td>
+						</tr>
+					</thead>
+					<tbody id='main_tbody' class="tab">
+						
+					</tbody>
+				</table>
+			</fieldset>
+		</div>
 		</div>
 			<div class="box-footer">
 				<center>
@@ -225,10 +212,10 @@ $(document).ready(function()
 			caste  : {
 				  required: true,
 			},
-			religion: {
+			travel_mode_from_date: {
 				  required: true,
 			},
-			home_state: {
+			travel_mode_to_date: {
 				  required: true,
 			}
 			
@@ -280,10 +267,35 @@ $(document).ready(function()
 		},
 	
 		submitHandler: function (form) {
+			var p =$('input[name=travel_mode_from_date]').val().split('-');
+			var travel_mode_from_date = new Date(p[2], p[1] - 1, p[0]);
 			
-			success3.show();
-			error3.hide();
-			form[0].submit();
+			var p =$('input[name=travel_mode_to_date]').val().split('-');
+			var travel_mode_to_date = new Date(p[2], p[1] - 1, p[0]);
+			
+			var submt=true;
+			$("#main_table tbody#main_tbody tr.main_tr").each(function(){
+				var parts =$(this).find('td:nth-child(2) input').val().split('-');
+				var mydate = new Date(parts[2], parts[1] - 1, parts[0]);
+				
+				var c1=mydate>=travel_mode_from_date;
+				var c2=mydate<=travel_mode_to_date;
+				
+				if(c1==true && c2==true){
+					
+				}else{
+					submt=false;
+				}
+				
+			});
+			if(submt==true){
+				success3.show();
+				error3.hide();
+				form[0].submit();
+			}else{
+				alert('Mentioned date of visit/meeting should be in between starting and ending date of travel.');
+			}
+			
 		}
 
 	});
@@ -349,7 +361,7 @@ $(document).ready(function()
 		<tr class="main_tr" class="tab">
 			<td style="width:3%;"></td>
 			<td style="vertical-align: top !important;width:12%;" >
-				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker datepic','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd/mm/yyyy']); ?>
+				<?php echo $this->Form->input('date', ['label' => false,'class' => 'form-control input-sm date-picker datepic','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd-mm-yyyy']); ?>
 			</td>
 			<td width="18%" style="vertical-align: top !important;">
 				<?php echo $this->Form->input('party_name', ['label' => false,'class' => 'form-control input-sm count_value','id'=>'check']); ?>
