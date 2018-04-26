@@ -1380,20 +1380,20 @@ class ItemLedgersController extends AppController
 				$salesOrders[]=$this->ItemLedgers->SalesOrders->find()->where(['SalesOrders.id'=>$id])->first();
 			}
 			else if($status == 'jobcard'){
-				$salesOrders[]=$this->ItemLedgers->JobCards->find()->where(['JobCards.id'=>$id,'company_id'=>$st_company_id])->first();
+				$salesOrders[]=$this->ItemLedgers->JobCards->find()->where(['JobCards.id'=>$id])->first();
 			}
 			else if($status == 'purchaseorder'){
-				$salesOrders[]=$this->ItemLedgers->PurchaseOrders->find()->where(['PurchaseOrders.id'=>$id,'company_id'=>$st_company_id])->first();
+				$salesOrders[]=$this->ItemLedgers->PurchaseOrders->find()->where(['PurchaseOrders.id'=>$id])->first();
 			}
 			else if($status == 'quotation'){
 				$salesOrders[]=$this->ItemLedgers->Quotations->find()->where(['Quotations.id'=>$id])->first();
 			}
 			else if($status == 'mi'){
-				$salesOrders[]=$this->ItemLedgers->MaterialIndents->find()->where(['MaterialIndents.id'=>$id,'company_id'=>$st_company_id])->first();
+				$salesOrders[]=$this->ItemLedgers->MaterialIndents->find()->where(['MaterialIndents.id'=>$id])->first();
 			}
 		}
 		
-		$this->set(compact('salesOrders','status'));
+		$this->set(compact('salesOrders','status','st_company_id'));
 		
 	}
 	
@@ -1452,12 +1452,12 @@ class ItemLedgersController extends AppController
 		$where4=[];$where5=[];$where6=[];
 		$where7=[];
 		$dr=sizeof(@$company_name[0]); 
-		
+		$selected_company=[];
 		if($dr > 1){
 		 
 		$company_names=array_filter($company_name[0]);
-			
-			foreach(@$company_names[0] as $names){ 
+			//pr($company_names); exit;
+			foreach(@$company_names as $names){ 
 					$where1['SalesOrders.company_id IN'][]=$names;
 					$where2['JobCards.company_id IN'][]=$names;
 					$where3['PurchaseOrders.company_id IN'][]=$names;
@@ -1465,6 +1465,7 @@ class ItemLedgersController extends AppController
 					$where5['Quotations.company_id IN'][]=$names;
 					$where6['ItemLedgers.company_id IN'][]=$names;
 					$where7['ItemCompanies.company_id IN'][]=$names;
+					$selected_company[]=$names;
 			}
 		}else if(@$company_name[0][0]==$st_company_id){ $names=$st_company_id;
 				$where1['SalesOrders.company_id IN'][]=$names;
@@ -1474,8 +1475,19 @@ class ItemLedgersController extends AppController
 				$where5['Quotations.company_id IN'][]=$names;
 				$where6['ItemLedgers.company_id IN'][]=$names;
 				$where7['ItemCompanies.company_id IN'][]=$names;
-		}else{ 	$names=array_filter($company_name[0]);
-				
+				$selected_company[]=$names;
+		}else if($company_name[0]==$st_company_id){ $names=$st_company_id;
+				$where1['SalesOrders.company_id IN'][]=$names;
+				$where2['JobCards.company_id IN'][]=$names;
+				$where3['PurchaseOrders.company_id IN'][]=$names;
+				$where4['MaterialIndents.company_id IN'][]=$names;
+				$where5['Quotations.company_id IN'][]=$names;
+				$where6['ItemLedgers.company_id IN'][]=$names;
+				$where7['ItemCompanies.company_id IN'][]=$names;
+				$selected_company[]=$names;
+		
+		}else{ 
+				$names=array_filter($company_name[0]); 
 				$where1['SalesOrders.company_id IN'][]=$names[0];
 				$where2['JobCards.company_id IN'][]=$names[0];
 				$where3['PurchaseOrders.company_id IN'][]=$names[0];
@@ -1483,9 +1495,10 @@ class ItemLedgersController extends AppController
 				$where5['Quotations.company_id IN'][]=$names[0];
 				$where6['ItemLedgers.company_id IN'][]=$names[0];
 				$where7['ItemCompanies.company_id IN'][]=$names[0];
+				$selected_company[]=$names[0];
 		}
-		
-	$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'])->where($where2)->toArray();
+	//	pr($selected_company); exit;
+	$JobCards = $this->ItemLedgers->JobCards->find()->contain(['JobCardRows'])->where($where2)->where(['JobCards.status'=>'Pending'])->toArray();
 	
 	$job_card_qty=[];
 	$job_id=[];
@@ -1731,7 +1744,7 @@ class ItemLedgersController extends AppController
 		$Items = $this->ItemLedgers->Items->find('list')->order(['Items.name' => 'ASC']);
 		$Companies = $this->ItemLedgers->Companies->find('list')->order(['Companies.name' => 'ASC']);
 			
-		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock','invoice_qty','sales_order_qty','sales_id','purchase_order_qty','grn_qty','purchase_id','qotation_id','qo_qty','so_qty','mi_qty','po_qty','mi_id','job_id','job_card_qty'));
+		$this->set(compact('material_report','mit','url','ItemCategories','ItemGroups','ItemSubGroups','Items','Companies','st_company_id','total_indent','stockstatus','jobCardQty','ItemDatas','stock','ItemMiniStock','invoice_qty','sales_order_qty','sales_id','purchase_order_qty','grn_qty','purchase_id','qotation_id','qo_qty','so_qty','mi_qty','po_qty','mi_id','job_id','job_card_qty','selected_company'));
 			
 	 }
 	

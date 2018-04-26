@@ -29,8 +29,8 @@
 				<tbody>
 					<tr>
 						<td width="35%">
-						<?php if(!empty($company_name)){ ?>
-								<?php echo $this->Form->input('company_name', ['hiddenField'=>false,'options' =>$Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=>$company_name]); ?>
+						<?php if(!empty($company_name)){ //pr($company_name[0]); ?>
+								<?php echo $this->Form->input('company_name', ['hiddenField'=>false,'options' =>$Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=>$selected_company]); ?>
 						<?php }else{ ?>  
 							<?php echo $this->Form->input('company_name', ['hiddenField'=>false,'options' =>$Companies,'label' => false,'class'=>'form-control input-sm select2me','multiple'=>'multiple','value'=>$st_company_id]); ?>
 						<?php } ?>		
@@ -228,7 +228,7 @@
 						
 						<?php $i++; }  ?>
 						<?php 
-						if(empty(@$item_name) || empty(@$item_category) || $stock=="All"){
+						if(empty(@$item_name) && empty(@$item_category) && $stock=="All"){
 						foreach($ItemDatas as $key=>$ItemData){ ?>
 									<tr class="tr1" row_no='<?php echo @$i; ?>'>
 										<td ><?php echo $i++; ?> </td>

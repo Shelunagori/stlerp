@@ -1179,48 +1179,111 @@ class CustomersController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->Customers->Employees->get($s_employee_id,[
 		'contain'=> ['Designations']]);
-		$customerData=$this->Customers->get($customerData->source_id,[
-			'contain'=>['CustomerContacts']
+		$cust_info=$this->Customers->get($customerData->source_id,[
+			'contain'=>['CustomerContacts','CustomerAddress','Employees']
 		]);
+		//pr($cust_info->employee); exit;
+		$to_date=date('Y-m-d');
+		$message_web=$this->findInvoice($id,$to_date);
+		$DueReferenceBalances=$message_web[0];
+		$ReferenceBalances=$message_web[1];
+		$refInvoiceNo=$message_web[2];
+		$Invoice_data=$message_web[3];
+		$Voucher_data=$message_web[4];
+		$invoicePO=$message_web[5];
 		
-		$message_web='<html>
-		<table  valign="center" width="62%" >
-				<tr>
-					<td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;" align="left" style="font-size: 16px;">Dear '.  $customerData->customer_name.',</td>
-				</tr>
-				<tr>
-					<td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>	The purpose of this letter is to follow up with you regarding payment . As of date your outstanding past due balance is Rs '.h(number_format($amount,2)).' /-, as detailed on the enclosed statement of account.</td>
-				</tr>
-				
-				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>
-				Thank you for your prompt response to this matter. Also, I value you as a customer and hope to continue doing business with you in the future.
-				</td></tr>
-
-				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>Regards,</td></tr>
-				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;"><br/>'.$empData->name.'</td></tr>
-				<tr><td style="width: 10em; word-wrap: break-word; font-family:Palatino Linotype;">'.$empData->designation->name.'</td></tr>
-					
-				</tr>
-			<html>';
+		$customerAdd=$cust_info->customer_address[0]->address;
 		$email = new Email('default');
 		$email->transport('gmail');
 		$company_data=$this->Customers->Companies->get($st_company_id);
 		$from_name=$company_data->alias;
-		$email_to=$customerData->customer_contacts[0]->email;
-		$cc_mail=$empData->email;
-		$sub="For Payments";
-		
+		$email_to=$cust_info->customer_contacts[0]->email;
+		$cc_mail=$cust_info->employee->email;
+		$sub="Payment reminder ";
 		$member_name="Gopal";
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])
 					->to($email_to)
 					->cc($cc_mail)
 					->replyTo('dispatch@mogragroup.com')
 					->subject($sub)
-					->template('notice_send_email')
+					->template('send_payment_reminder')
 					->emailFormat('html')
-					->viewVars(['content'=>$message_web,'member_name'=>$member_name]);
-					$email->send($message_web);
+					->viewVars(['ReferenceBalances'=>$ReferenceBalances,'DueReferenceBalances'=>$DueReferenceBalances,'member_name'=>$member_name,'company'=>$company_data->name,'address'=>$customerAdd,'customer_data'=>$cust_info,'refInvoiceNo'=>$refInvoiceNo,'Voucher_data'=>$Voucher_data,'invoicePO'=>$invoicePO,'Invoice_data'=>$Invoice_data,'salesmaninfo'=>$cust_info->employee]);
+					$email->send();
 		
-	exit;
+	}
+	
+	public function findInvoice($id = null,$to_date = null){
+		$query = $this->Customers->Ledgers->ReferenceDetails->find()->where(['ReferenceDetails.transaction_date <='=>$to_date]);
+		$query->where(['ReferenceDetails.ledger_account_id'=>$id])
+		->autoFields(true);
+		$referenceDetails=$query->order(['transaction_date' => 'ASC']);
+		
+		$DueReferenceBalances=[];
+		$refInvoiceNo=[];
+		$refInvoiceBookingNo=[];
+		$ReferenceBalances=[];
+		$invoicePO=[];
+		$on_dr=0;
+		$on_cr=0;
+		$Voucher_data=[];
+		foreach($referenceDetails as $referenceDetail){
+			if($referenceDetail->debit > 0){ 
+				if($referenceDetail->invoice_id > 0){
+					$Invoice_data[$referenceDetail->invoice_id] = $this->Customers->Ledgers->Invoices->get($referenceDetail->invoice_id);
+					$refInvoiceNo[$referenceDetail->reference_no]=$referenceDetail->invoice_id;
+					$Invoice_data1 = $this->Customers->Ledgers->Invoices->get($referenceDetail->invoice_id);
+					$Voucher_data[$referenceDetail->reference_no] = @$Invoice_data1->in1.'/IN-'.str_pad(@$Invoice_data1->in2, 3, '0', STR_PAD_LEFT).'/'.@$Invoice_data1->in3.'/'.@$Invoice_data1->in4;
+					$invoicePO[$referenceDetail->reference_no] = @$Invoice_data1->customer_po_no;
+				}
+				if($referenceDetail->receipt_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Customers->Ledgers->Receipts->get($referenceDetail->receipt_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->journal_voucher_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Customers->Ledgers->JournalVouchers->get($referenceDetail->journal_voucher_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->payment_id > 0){  //pr($referenceDetail->reference_no); exit; 
+					$Invoice_booking_data = $this->Customers->Ledgers->Payments->get($referenceDetail->payment_id);
+					$Voucher_data[$referenceDetail->reference_no]= h('#'.str_pad($Invoice_booking_data->voucher_no,4,'0',STR_PAD_LEFT)); 
+					
+				}
+				if($referenceDetail->opening_balance == "Yes"){  //pr($referenceDetail->reference_no); 
+					$d="Opening balance"; 
+					$Voucher_data[$referenceDetail->reference_no]= $d;
+					 
+				}
+				
+			}
+			if($referenceDetail->debit!=$referenceDetail->credit){ 
+				$x=(float)@$referenceDetail->debit;
+				$y=(float)@$referenceDetail->credit;
+				
+				@$DueReferenceBalances[@$referenceDetail->reference_no]=@$DueReferenceBalances[@$referenceDetail->reference_no]+($x-$y);
+				
+				$ReferenceBalances[$referenceDetail->reference_no]=['reference_no' =>$referenceDetail->reference_no, 'transaction_date' => $referenceDetail->transaction_date,'due_date' =>$referenceDetail->transaction_date, 'debit' => $referenceDetail->debit,'credit' =>$referenceDetail->credit,'reference_type'=>$referenceDetail->reference_type,'opening_balance'=>$referenceDetail->opening_balance,'invoice_id'=>$referenceDetail->invoice_id];
+				
+			}
+			
+			if($referenceDetail->reference_type=="On_account"){ 
+				if($referenceDetail->debit > $referenceDetail->credit){
+					$on_dr+=$referenceDetail->debit;
+				}else{
+					$on_cr+=$referenceDetail->credit;
+				}
+				
+			}
+		}
+		$a=[];
+		$a[]=$DueReferenceBalances;
+		$a[]=$ReferenceBalances; 
+		$a[]=$refInvoiceNo; 
+		$a[]=$Invoice_data; 
+		$a[]=$Voucher_data; 
+		$a[]=$invoicePO; 
+		return($a);
 	}
 }

@@ -57,9 +57,9 @@
 						</tr>
 						<?php $total_dr=0;  $total_cr=0;  $i=1; foreach($payment->reference_details as $reference_detail){  ?>
 							<tr>
-									<td><?php echo $i++; ?></td>
-									<td width="25%"><?php echo $reference_detail->reference_no; ?></td>
-									<td align="center"><?php echo date("d-m-Y",strtotime($reference_detail->transaction_date)) ?></td>
+									<td align="center"><?php echo $i++; ?></td>
+									<td width="25%" align="center"><?php echo $reference_detail->reference_no; ?></td>
+									<td align="center"><?php echo date("d-m-Y",strtotime($transaction_date[$reference_detail->id])) ?></td>
 								<?php if($reference_detail->debit > 0){ $total_dr+=$reference_detail->debit; ?>
 									<td align="center"><?= h($this->Number->format($reference_detail->debit,['places'=>2])) ?></td>
 									<td align="center"></td>

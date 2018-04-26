@@ -470,6 +470,16 @@ class PaymentsController extends AppController
 						$email_to=$Vendor->vendor_contact_persons[0]->email;
 						$cc_mail=$emp_data->email;
 						
+						$transaction_date=[];
+						foreach($paymentData->reference_details as $d){
+							if($d->reference_type=="Against Reference"){
+								$rd=$this->Payments->PaymentRows->ReferenceDetails->find()->where(['ledger_account_id'=>$d->ledger_account_id,'reference_no'=>$d->reference_no,'reference_type'=>'New Reference'])->first();
+								$transaction_date[$d->id]=$rd->transaction_date;
+							}else{
+								$transaction_date[$d->id]=$d->transaction_date;
+							}
+							
+						}//pr($transaction_date); exit;
 						
 						//$email_to="gopalkrishanp3@gmail.com";
 						//$cc_mail="gopal@phppoets.in";
@@ -486,7 +496,7 @@ class PaymentsController extends AppController
 						->subject($sub)
 						->template('send_payment_voucher')
 						->emailFormat('html')
-						->viewVars(['payment'=>$paymentData,'member_name'=>$paymentData->ReceivedFrom->name,'company'=>$company_data->name,'vendorAddress'=>$Vendor->address]);  //pr($company_data->name); exit;
+						->viewVars(['payment'=>$paymentData,'member_name'=>$paymentData->ReceivedFrom->name,'company'=>$company_data->name,'vendorAddress'=>$Vendor->address,'transaction_date'=>$transaction_date]);  //pr($company_data->name); exit;
 						$email->send(); 
 						
 					}

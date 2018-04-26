@@ -50,7 +50,11 @@
 								
 									} 
 							}else if($status == 'jobcard'){
+								if($st_company_id==$salesOrder->company_id){
 								 echo $this->Html->link($salesOrder->jc1.'/JC-'.str_pad($salesOrder->jc2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->jc3.'/'.$salesOrder->jc4,['controller'=>'JobCards','action' => 'view', $salesOrder->id],array('escape'=>false,'target'=>'blank','data-original-title'=>'View')); 
+								}else{
+									 echo ($salesOrder->jc1.'/JC-'.str_pad($salesOrder->jc2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->jc3.'/'.$salesOrder->jc4);
+								}
 							}else if($status == 'purchaseorder'){
 								 echo $this->Html->link($salesOrder->po1.'/PO-'.str_pad($salesOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->po3.'/'.$salesOrder->po4,['controller'=>'PurchaseOrders','action' => 'confirm', $salesOrder->id],array('escape'=>false,'target'=>'blank','data-original-title'=>'View')); 
 							}else if($status == 'quotation'){
