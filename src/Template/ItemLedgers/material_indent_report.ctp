@@ -13,6 +13,10 @@
 		</div>
 		<div class="actions">
 		<?php 
+			$options = [];
+			$options = [['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
+			echo $this->Form->input('total', ['empty'=>'--Select Job Card/Sales Order--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me stock','placeholder'=>'Sub-Group','value'=> h(@$stock)]); 
+			
 			if(sizeof($company_name)==1 && in_array(166,$allowed_pages)){
 			foreach($company_name as $names){	 
 						if(@$names == @$st_company_id){ ?>
@@ -21,11 +25,14 @@
 					'/MaterialIndents/AddToCart',
 					['class' => 'btn btn-success']
 			); ?><?php  }}}?>
+			
+			
+			
 			<!--<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/ItemLedgers/Excel-Metarial-Export/'.$url_excel.'',['class' =>'btn btn-sm green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>-->
 		</div>
 		<div class="portlet-body">
 			<form method="GET" >
-			<table width="50%" class="table table-condensed">
+			<table width="50%" class="table table-condensed" >
 				<tbody>
 					<tr>
 						<td width="35%">
@@ -56,6 +63,7 @@
 								$options = [['text'=>'All','value'=>'All'],['text'=>'Positive','value'=>'Positive']];
 							echo $this->Form->input('stock', ['empty'=>'--Indent--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Indent','value'=> h(@$stock)]); ?></div>
 						</td>
+						
 						<td width="10%">
 							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 						</td>
@@ -278,6 +286,15 @@
 <script>
 $(document).ready(function() {
 	////////
+	$('.stock').die().live("change",function(){
+		var stock = $(this).val();
+		$("#main_tb tbody tr").each(function(){
+			//var no_due = $(this).find("td:nth-child(4)").html();
+		});
+		alert();
+	});
+	
+	
 	$('select[name="item_category"]').on("change",function() {
 		$('#item_group_div').html('Loading...');
 		var itemCategoryId=$('select[name="item_category"] option:selected').val();

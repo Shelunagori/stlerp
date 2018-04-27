@@ -273,7 +273,7 @@ $('.send_mail').die().live("click",function() {
 	
 	 var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'sendMail']); ?>";
 	url=url+'?totalPo='+totalPo;
-	alert(url);
+
 	$.ajax({
 		url: url,
 		type: "GET",
