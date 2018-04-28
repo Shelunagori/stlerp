@@ -73,7 +73,7 @@ border:none;
 							<label class="control-label  label-css">Date of Birth</label>
 							<?php echo $this->Form->input('date_of_birth', ['label' => false,'placeholder'=>'Date of Joining','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','placeholder'=>'dd-mm-yyyy']); ?>
 						</div>
-				</div>
+				</div> 
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Member Type</label><br/>

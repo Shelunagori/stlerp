@@ -8,7 +8,9 @@
 	<div class="portlet-body form">
 		<!-- BEGIN FORM-->
 		 <?= $this->Form->create($employee,['type' => 'file','class'=>'form-horizontal','id'=>'form_sample_3']) ?>
-			<div class="form-body">
+		<div class="form-body">
+			<fieldset style="margin-left:  0px;margin-right: 0px;">	
+			<legend><b>Personal Information </b></legend>
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -41,7 +43,6 @@
 						</div>
 					</div>
 				</div>
-				
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -65,6 +66,61 @@
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
+							<label class="control-label">Identity Mark </label>
+							<?php echo $this->Form->input('identity_mark', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Identity Mark']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Caste</label>
+							<?php echo $this->Form->input('caste', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Caste']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Religion</label>
+							<?php echo $this->Form->input('religion', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Religion']); ?>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Home State </label>
+							<?php echo $this->Form->input('home_state', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm state_change','options'=>@$states,'div_id'=>'1','district'=>'home_district']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Home District</label>
+							<?php echo $this->Form->input('home_district', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Home District']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Adhar Card No</label>
+							<?php echo $this->Form->input('adhar_card_no', ['label' => false,'placeholder'=>'Adhar Card No','class'=>'form-control input-sm','maxlength'=>12,'minlength'=>12]); ?>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Passport No</label>
+							<?php echo $this->Form->input('passport_no', ['label' => false,'placeholder'=>'Passport No','class'=>'form-control input-sm','type'=>'text','style'=>'resize:none;','rows'=>'2']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Height (in feet)</label>
+							<?php
+							echo $this->Form->input('height', ['data-placeholder'=>'Height','label' => false,'class'=>'form-control input-sm','placeholder'=>'Height']); ?>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
 							<label class="control-label">Blood Group </label>
 							<?php 
 							
@@ -72,14 +128,12 @@
 							echo $this->Form->input('blood_group', ['options'=>$arrblood,'label' => false,'class' => 'form-control select2me','placeholder'=>'Blood Group']);?>
 						</div>
 					</div>
-				
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Education Qualification</label>
 							<?php echo $this->Form->input('qualification', ['label' => false,'class' => 'form-control input-sm','maxlength'=>100,'placeholder'=>'Education Qualification']); ?>
 						</div>
 					</div>
-					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label"> Last Company worked</label>
@@ -87,8 +141,6 @@
 						</div>
 					</div>
 				</div>
-					
-					
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -96,24 +148,19 @@
 							<?php echo $this->Form->input('dipartment_id', ['empty' => 'Select Department','options' => $departments,'label' => false,'class' => 'form-control select2me']); ?>
 						</div>
 					</div>
-					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Designation <span class="required" aria-required="true">*</span></label>
 							<?php echo $this->Form->input('designation_id', ['empty' => 'Select Designation','options'=>$designations,'label' => false,'class' => 'form-control select2me','placeholder'=>'Designation']); ?>
 						</div>
 					</div>
-					
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Date Of Joining<span class="required" aria-required="true">*</span></label>
 							<?php echo $this->Form->input('join_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Joining']); ?>
+						</div>
 					</div>
-					</div>
-					
 				</div>
-				
-				
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -130,7 +177,8 @@
 											'marital_status',
 											[
 												['value' => 'Single', 'text' => 'Single', 'id'=>'id_radio1'],
-												['value' => 'Married', 'text' => 'Married', 'id'=>'id_radio2']
+												['value' => 'Married', 'text' => 'Married', 'id'=>'id_radio2'],
+												['value' => 'Divorced', 'text' => 'Divorced', 'id'=>'id_radio3']
 											]
 									); ?>
 								</div>
@@ -193,7 +241,6 @@
 						</div>
 					</div>
 				</div>
-					
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -215,11 +262,9 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-md-4">
-					<h4 style="font-size:13px'">Create Ledger</h4>
-					</div>
-				</div>
+			</fieldset>	
+			<fieldset style="margin-left:  0px;margin-right: 0px;">		
+				<legend><b>Create Ledger </b></legend>	
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -254,101 +299,281 @@
 						</div>
 					</div>
 				</div>
+			</fieldset>	
+			<fieldset style="margin-left:  0px;margin-right: 0px;">	
+			<legend><b>Present Address details  </b></legend>
+			<div class="col-md-12 pad">
 				
-				<h4 style="font-size:13px'">Emergency Contact Persons</h4>
-				<table class="table table-condensed tableitm">
-					<thead>
-						<tr>
-							<th><label class="control-label">Name<label></th>
-							<th><label class="control-label">Mobile<label></th>
-							<th><label class="control-label">Landline<label></th>
-							<th><label class="control-label">Email<label></th>
-							<th><label class="control-label">Relation<label></th>
-							
-						</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.0.name', ['label' => false,'class' => 'form-control input-sm firstupercase','placeholder'=>'Name']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.0.mobile', ['type' => 'text','label' => false,'class' => 'form-control input-sm allLetter','placeholder' => 'Mobile','maxlength'=>10]); ?>
-							
-						</td>
-						<td>
-						<?php echo $this->Form->input('employee_contact_persons.0.landline', ['type' => 'text','label' => false,'class' => 'form-control input-sm land_line','placeholder' => 'landline','maxlength'=>30]); ?>
-						
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.0.email', ['label' => false,'class' => 'form-control input-sm nospace','placeholder'=>'Email']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.0.relation', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Relation']); ?>
-						</td>
-					</tr>
-					
-					<tr>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.1.name', ['label' => false,'class' => 'form-control input-sm firstupercase','placeholder'=>'Name']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.1.mobile', ['type' => 'text','label' => false,'class' => 'form-control input-sm allLetter','placeholder' => 'Mobile']); ?>
-							
-						</td>
-						<td>
-						<?php echo $this->Form->input('employee_contact_persons.1.landline', ['type' => 'text','label' => false,'class' => 'form-control input-sm land_line','placeholder' => 'landline','maxlength'=>30]); ?>
-						
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.1.email', ['label' => false,'class' => 'form-control input-sm nospace','placeholder'=>'Email']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('employee_contact_persons.1.relation', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Relation']); ?>
-						</td>
-					</tr>
-						
-						
-					</tbody>
-					
-				</table>
+			      <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">State</label>
+							<?php  
+							echo $this->Form->input('present_state', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm state_change','options'=>@$states,'div_id'=>'2','district'=>'present_district']);
+							?>   
+						</div>
+					</div>
+			       
+				   <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">District</label>
+							<div id="present_district2">
+								<?php echo $this->Form->input('present_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+							</div>
+						</div>
+					</div>
+			       <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Pin code</label>
+							<?php echo $this->Form->input('present_pin_code', ['label' => false,'placeholder'=>'Pin Code','class'=>'form-control input-sm','maxlength'=>6,'minlength'=>6]); ?>
+						</div>
+					</div>
+			</div>
+			<div class="col-md-12 pad">
 				
+			      <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Mobile No</label>
+							<?php echo $this->Form->input('present_mobile_no', ['label' => false,'placeholder'=>'Mobile No','class'=>'form-control input-sm','maxlength'=>10,'minlength'=>10]); ?>
+						</div>
+					</div>
+			       
+				   <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Phone NO</label>
+							<?php echo $this->Form->input('present_phone_no', ['label' => false,'placeholder'=>'Phone No','class'=>'form-control input-sm']); ?>
+						</div>
+					</div>
+			       <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Email</label>
+							<?php echo $this->Form->input('present_email', ['label' => false,'placeholder'=>'Email','class'=>'form-control input-sm','type'=>'email']); ?>
+						</div>
+					</div>
+			</div>
+			<div class="col-md-12 pad">
 				
-				
-				
-				<h4 style="font-size:13px'">Bank's Detail</h4>
-				<table class="table table-condensed tableitm">
-					<thead>
-						<tr>
-							<th><label class="control-label">Bank Name<label></th>
-							<th><label class="control-label">Account Number<label></th>
-							<th><label class="control-label">Branch Name<label></th>
-							<th><label class="control-label">IFSC Code<label></th>
-							
-						</tr>
-					</thead>
-					<tbody>
-						<td>
-							<?php echo $this->Form->input('bank_name', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Bank Name']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('account_no', ['label' => false,'class' => 'form-control input-sm nospace allLetter','maxlength'=>20,'placeholder'=>'Account No']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('branch_name', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Branch Name']); ?>
-						</td>
-						<td>
-							<?php echo $this->Form->input('ifsc_code', ['label' => false,'class' => 'form-control input-sm ','id' => 'ifsc_cod','placeholder'=>'IFSC Code']); ?>
-						</td>
-					</tbody>
-				</table>
-				
-				<div class="row">
-					<div class="col-md-4">
-						<label class="control-label">Work In Companies</label>
-						<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
+			        <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Present Address</label>
+							<?php echo $this->Form->input('present_address', ['label' => false,'placeholder'=>'Present Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
+						</div>
+					</div>
+			</div>
+		</fieldset>	
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
+			<legend><b>Permanent Address details  </b></legend>
+			<div class="col-md-12 pad">
+			  <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">State</label>
+						<?php echo $this->Form->input('permanent_state', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm state_change','options'=>@$states,'div_id'=>'3','district'=>'permanent_district']); ?>
 					</div>
 				</div>
+			   <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">District</label>
+						<div id="permanent_district3">
+						<?php echo $this->Form->input('permanent_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+						</div>
+					</div>
+				</div>
+			   <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Pin code</label>
+						<?php echo $this->Form->input('permanent_pin_code', ['label' => false,'placeholder'=>'Pin Code','class'=>'form-control input-sm','maxlength'=>6,'minlength'=>6]); ?>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 pad">
+			  <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Mobile No</label>
+						<?php echo $this->Form->input('permanent_mobile_no', ['label' => false,'placeholder'=>'Mobile No','class'=>'form-control input-sm','maxlength'=>10,'minlength'=>10]); ?>
+					</div>
+				</div>
+			   <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Phone NO</label>
+						<?php echo $this->Form->input('permanent_phone_no', ['label' => false,'placeholder'=>'Phone No','class'=>'form-control input-sm']); ?>
+					</div>
+				</div>
+			   <div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Email</label>
+						<?php echo $this->Form->input('permanent_email', ['label' => false,'placeholder'=>'Email','class'=>'form-control input-sm','type'=>'email']); ?>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 pad">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Permanent Address</label>
+						<?php echo $this->Form->input('permanent_address', ['label' => false,'placeholder'=>'Permanent Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
+					</div>
+				</div>
+			</div>
+		</fieldset>
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
+			<legend><b>Employee  Nomination Information  </b></legend>
+			<div class="col-md-12 pad">
+				
+			      <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Nominee Name</label>
+							<?php echo $this->Form->input('nominee_name', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Nominee Name']); ?>
+						</div>
+					</div>
+			       
+				   <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Relation with the employee</label>
+							<?php echo $this->Form->input('relation_with_employee', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Relation with the employee']); ?>
+						</div>
+					</div>
+			       <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Type of Nomination</label>
+							<?php echo $this->Form->input('nomination_type', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Type of Nomination']); ?>
+						</div>
+					</div>
+			</div>
+			<div class="col-md-12 pad">
+				
+			      <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">State</label>
+							<?php echo $this->Form->input('nominee_state', ['empty'=> '---Select State---','label' => false,'class'=>'form-control select2me input-sm state_change','options'=>@$states,'div_id'=>'4','district'=>'nominee_district']); ?>
+						</div>
+					</div> 
+			       
+				   <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">District</label>
+							<div id="nominee_district4">
+								<?php echo $this->Form->input('nominee_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+							</div>
+						</div>
+					</div>
+			       <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Pin Code</label>
+							<?php echo $this->Form->input('nominee_pin_code', ['label' => false,'placeholder'=>'Pin Code','class'=>'form-control input-sm','maxlength'=>6,'minlength'=>6]); ?>
+						</div>
+					</div>
+			</div>
+			<div class="col-md-12 pad">
+				
+			        <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Mobile No</label>
+							<?php echo $this->Form->input('nominee_mobile_no', ['label' => false,'placeholder'=>'Mobile No','class'=>'form-control input-sm','maxlength'=>10,'minlength'=>10]); ?>
+						</div>
+					</div>
+					
+			        <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Present Address</label>
+							<?php echo $this->Form->input('nominee_present_address', ['label' => false,'placeholder'=>'Present Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]);  ?>
+						</div>
+					</div>
+			</div>
+		</fieldset>
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
+			<legend><b>Employee Professional Information  ( Joining  Details )</b></legend>
+			<div class="col-md-12 pad">
+				
+			      <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Appointment</label>
+							<?php echo $this->Form->input('appointment_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+						</div>
+					</div>
+			       
+				   <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Employee ID </label>
+							<?php echo $this->Form->input('employee_id', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Employee ID','type'=>'text']); ?>
+						</div>
+					</div>
+			       <div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label  label-css">Date of Joining in the Deptt</label>
+							<?php echo $this->Form->input('dept_joining_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+						</div>
+					</div>
+			</div>
+			<div class="col-md-12 pad">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Initial Designation </label>
+						<?php echo $this->Form->input('initial_designation', ['label' => false,'placeholder'=>'Initial Designation','class'=>'form-control input-sm']); ?>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Office Name at the time of initial joining in Deptt</label>
+						<?php echo $this->Form->input('office_name', ['label' => false,'placeholder'=>'Office Name','class'=>'form-control input-sm']); ?>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Mode of Recruitment</label>
+						<?php echo $this->Form->input('recruitment_mode', ['label' => false,'placeholder'=>'Mode of Recruitment','class'=>'form-control input-sm']); ?>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 pad">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Reporting To </label>
+						<?php echo $this->Form->input('reporting_to', ['label' => false,'placeholder'=>'Reporting To','class'=>'form-control input-sm']); ?>
+					</div>
+				</div>
+			</div>
+		</fieldset>		
+		<fieldset style="margin-left:  0px;margin-right: 0px;">		
+			<legend><b>Bank's Detail</b></legend>			
+			<table class="table table-condensed tableitm">
+				<thead>
+					<tr>
+						<th><label class="control-label">Account Type<label></th>
+						<th><label class="control-label">Bank Name<label></th>
+						<th><label class="control-label">Account Number<label></th>
+						<th><label class="control-label">Branch Name<label></th>
+						<th><label class="control-label">IFSC Code<label></th>
+						
+					</tr>
+				</thead>
+				<tbody>
+					<td>
+						<?php 
+						$account_type[]=['value'=>'Current ','text'=>'Current'];
+						$account_type[]=['value'=>'Saving ','text'=>'Saving'];
+						echo $this->Form->input('account_type', ['empty'=> '--Select--','data-placeholder'=>'Gender','label' => false,'class'=>'form-control select2 input-sm','options'=>@$account_type,'style'=>'width:100%;']);
+						?>
+					</td>
+					<td>
+						<?php echo $this->Form->input('bank_name', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Bank Name']); ?>
+					</td>
+					<td>
+						<?php echo $this->Form->input('account_no', ['label' => false,'class' => 'form-control input-sm nospace allLetter','maxlength'=>20,'placeholder'=>'Account No']); ?>
+					</td>
+					<td>
+						<?php echo $this->Form->input('branch_name', ['label' => false,'class' => 'form-control input-sm firstupercase allAlpha','placeholder'=>'Branch Name']); ?>
+					</td>
+					<td>
+						<?php echo $this->Form->input('ifsc_code', ['label' => false,'class' => 'form-control input-sm ','id' => 'ifsc_cod','placeholder'=>'IFSC Code']); ?>
+					</td>
+				</tbody>
+			</table>	
+		</fieldset>	
+				
+		<div class="row">
+			<div class="col-md-4">
+				<label class="control-label">Work In Companies</label>
+				<?php echo $this->Form->input('companies._ids', ['label' => false,'options' => $Companies,'multiple' => 'checkbox']); ?>
+			</div>
+		</div>
 		</div>
 		
 		
@@ -623,15 +848,21 @@ $('select[name="account_first_subgroup_id"]').die().live("change",function() {
 });
 </script>
  <script type="text/javascript">
-                 $(document).ready(function () {
-                    $('#id_radio2').click(function () {
-                     $('#married_info').show('fast');
-                });
-				 $('#id_radio1').click(function () {
-					 $('.spouse').val('');
-					 $('.doba').val('');
-					 $('.nochild').val('');
-                     $('#married_info').hide('fast');
-                });
-				 });
+$(document).ready(function () {
+	$('#id_radio2').click(function () {
+		$('#married_info').show('fast');
+	});
+	$('#id_radio1').click(function () {
+		$('.spouse').val('');
+		$('.doba').val('');
+		$('.nochild').val('');
+		$('#married_info').hide('fast');
+	});
+	$('#id_radio3').click(function () {
+		$('.spouse').val('');
+		$('.doba').val('');
+		$('.nochild').val('');
+		$('#married_info').hide('fast');
+	});
+});
 </script>

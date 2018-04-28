@@ -123,11 +123,23 @@ class EmployeesController extends AppController
                 $this->Flash->error(__('The employee could not be saved. Please, try again.'));
             }
         }
+		
+		$states=[];
+		$state_details=$this->Employees->States->find();
+		if(sizeof($state_details)>0)
+		{
+			foreach($state_details as $state)
+			{ 
+				$name = $state->name.' ( '.$state->state_code.' )';
+				$states[] = ['value'=>$state->id,'text'=>$name];
+			}
+		}
+		
         $departments = $this->Employees->Departments->find('list')->order(['Departments.name' => 'ASC']);
         $designations = $this->Employees->Designations->find('list')->order(['Designations.name' => 'ASC']);
         $AccountCategories = $this->Employees->AccountCategories->find('list')->order(['AccountCategories.name' => 'ASC']);
         $Companies = $this->Employees->Companies->find('list');
-        $this->set(compact('employee', 'departments', 'designations', 'AccountCategories', 'Companies'));
+        $this->set(compact('employee', 'departments', 'designations', 'AccountCategories', 'Companies', 'states'));
         $this->set('_serialize', ['employee']);
     }
 
