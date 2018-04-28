@@ -36,7 +36,8 @@ class EmployeeRecordsTable extends Table
         $this->displayField('id');
         $this->primaryKey('id');
 
-        $this->belongsTo('Employees', [
+        $this->belongsTo('EmployeeSalaryDivisions');
+		$this->belongsTo('Employees', [
             'foreignKey' => 'employee_id',
             'joinType' => 'INNER'
         ]);

@@ -1235,7 +1235,7 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Receipt Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
-				}else if($ledger->voucher_source=="Invoice"){  //pr($ledger->voucher_source); exit;
+				}else if($ledger->voucher_source=="Invoice"){  
 					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
 					if($inq->sale_tax_id==0){
 						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id, [

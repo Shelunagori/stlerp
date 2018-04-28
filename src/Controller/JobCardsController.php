@@ -350,8 +350,9 @@ class JobCardsController extends AppController
         $jobCard = $this->JobCards->get($id, [
             'contain' => ['SalesOrders'=>['Customers','SalesOrderRows'=>['Items'=>function ($q){
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
-				},'JobCardRows'=>['Items']]],'Creator', 'Companies','Customers']
-        ]); 
+				},'JobCardRows'=>['Items']]],'Creator', 'Companies','Customers'=>['CustomerAddress']]
+        ]);
+//pr($jobCard->customer->customer_address[0]->address); exit;
         $this->set('jobCard', $jobCard);
         $this->set('_serialize', ['jobCard']);
     }

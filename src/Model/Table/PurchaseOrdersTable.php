@@ -127,11 +127,7 @@ class PurchaseOrdersTable extends Table
 		$validator
             ->requirePresence('sale_tax_per', 'create')
             ->notEmpty('sale_tax_per');
-			
-			
-		$validator
-            ->requirePresence('delivery', 'create')
-            ->notEmpty('delivery');
+		
 		
 		$validator
             ->requirePresence('lr_to_be_prepared_in_favour_of', 'create')

@@ -235,7 +235,12 @@
 									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
 									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} 
 									?>
-									<?php if(date("d-m-Y") > date("d-m-Y",strtotime($purchaseOrder->delivery_date))){?>
+									<?php 
+										$td=(date("Y-m-d"));
+										$dd=(date("Y-m-d",strtotime($purchaseOrder->delivery_date)));
+										if($dd < date("Y-m-d",strtotime($td))){
+										
+									?>
 									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
 									
 									<?php

@@ -144,6 +144,7 @@
 										</ul>
 								</div>
 							</td>
+							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">

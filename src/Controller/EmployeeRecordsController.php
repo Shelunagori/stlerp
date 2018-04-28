@@ -68,8 +68,10 @@ class EmployeeRecordsController extends AppController
                 $this->Flash->error(__('The employee record could not be saved. Please, try again.'));
             }
         }
-       // $employees = $this->EmployeeRecords->Employees->find('list', ['limit' => 200]);
-        $this->set(compact('employeeRecord', 'employee_record_type', 'month_year'));
+        $employees = $this->EmployeeRecords->Employees->find('list', ['limit' => 200]);
+        $EmployeeSalaryDivision = $this->EmployeeRecords->EmployeeSalaryDivisions->find('list');
+		//pr($EmployeeSalaryDivision->toArray()); exit;
+        $this->set(compact('employeeRecord', 'employee_record_type', 'month_year','employees','EmployeeSalaryDivision'));
         $this->set('_serialize', ['employeeRecord']);
     }
 

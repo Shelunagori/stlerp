@@ -51,7 +51,7 @@ margin-bottom: 0;
 					<td  width="25%"><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
 					<td  width="20%"><label  style="font-size:105%"><b>Customer Name</b></label></td>
 					<td  width="5%">:</td>
-					<td  width="25%"><?= h($jobCard->sales_order->customer->customer_name) ?></td>
+					<td  width="25%"><?= h($jobCard->sales_order->customer->customer_name).'('. h($jobCard->sales_order->customer->alias).')' ?></td>
 				</tr>
 				<tr>
 					<td><label><b>Sales Order No</b></label></td>
@@ -70,7 +70,7 @@ margin-bottom: 0;
 				<tr>
 					<td valign="top"><label style="font-size:105%"><b>Dispatch Destination</b></label></td>
 					<td valign="top">:</td>
-					<td colspan="4"><?= $this->Text->autoParagraph(h($jobCard->sales_order->dispatch_address))?></td>
+					<td colspan="4"><?= $this->Text->autoParagraph(h($jobCard->customer->customer_address[0]->address))?></td>
 				</tr>
 				<tr>
 					<td valign="top"><label style="font-size:105%"><b>Packing</b></label></td>

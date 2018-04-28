@@ -1563,7 +1563,7 @@ class ItemLedgersController extends AppController
 					}
 			}
 		}
-		
+	//pr($sales_order_qty); exit;
 	$PurchaseOrders = $this->ItemLedgers->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['GrnRows' => function($q) {
 				return $q->select(['grn_id','purchase_order_row_id','item_id','total_qty' => $q->func()->sum('GrnRows.quantity')])->group('GrnRows.purchase_order_row_id');
 	}]])->where($where3);
@@ -1592,7 +1592,7 @@ class ItemLedgersController extends AppController
 	
 	$Quotations = $this->ItemLedgers->Quotations->find()->contain(['QuotationRows'=>['SalesOrderRows' => function($q) {
 				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
-	}]])->where($where5);
+	}]])->where($where5)->where(['Quotations.status !='=>'Closed']);
 	$qo_qty=[];
 	$so_qty=[];
 	$qotation_id=[];
@@ -1706,6 +1706,11 @@ class ItemLedgersController extends AppController
 		
 		$material_report=[];
 		$ledger_item=[];
+		$Items_data =$this->ItemLedgers->Items->find();
+		foreach($Items_data as $d){
+			$material_report[$d->id]=array('item_name'=>$d->name,'item_id'=>$d->id,'Current_Stock'=>'0','minimum_stock'=>'0');
+		}
+		
 		//asort($ItemLedgers);
 		foreach ($ItemLedgers as $itemLedger){ 
 			$ledger_item[]=$itemLedger->item->id;
@@ -1715,6 +1720,7 @@ class ItemLedgersController extends AppController
 			$material_report[$item_id]=array('item_name'=>$item_name,'item_id'=>$item_id,'Current_Stock'=>$Current_Stock,'minimum_stock'=>@$itemLedger->item->item_companies[0]->minimum_stock);
 			
 		}
+		//pr($material_report); exit;
 		asort($material_report);
 		//pr($material_reports); exit;
 		/*
@@ -1737,7 +1743,7 @@ class ItemLedgersController extends AppController
 			}
 		}
 		
-		//pr($ItemDatas); exit;
+		//pr($material_report);  pr($ItemDatas); exit;
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);

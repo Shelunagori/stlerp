@@ -1,14 +1,7 @@
-<--------------Manoj------------>
-Purchase_return_quantity remove in invoice_booking_rows.
-Purchase_return_quantity remove in purchase_order_rows table.
-Add New Field in grn_rows: purchase_order_row_id int(10)
-Add New Field in purchase_return_rows: invoice_booking_row_id int(10)
-Add New Field in invoice_booking_rows: grn_row_id int(10)
+
 <--------------Gopal------------>
-Add New Field in Refrence_details opening_balance varchar(255).
+Add New table employee_salary_divisions
+Add New table employee_salaries
 
 
-
-<---------------Dimpal---->
-change item_serial_number to serial_number in invoice_rows table
 
