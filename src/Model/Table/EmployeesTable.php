@@ -62,7 +62,7 @@ class EmployeesTable extends Table
             'foreignKey' => 'account_group_id',
             'joinType' => 'INNER'
         ]);
-		
+		$this->belongsTo('States');
 		$this->belongsTo('AccountFirstSubgroups', [
 			'foreignKey' => 'account_first_subgroup_id',
             'joinType' => 'INNER'
