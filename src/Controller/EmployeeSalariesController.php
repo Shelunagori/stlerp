@@ -51,6 +51,9 @@ class EmployeeSalariesController extends AppController
      */
     public function add($id = null)
     {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
         $employeeSalary = $this->EmployeeSalaries->newEntity();
         if ($this->request->is('post')) {
             $employeeSalary = $this->EmployeeSalaries->patchEntity($employeeSalary, $this->request->data);
@@ -63,9 +66,8 @@ class EmployeeSalariesController extends AppController
             }
         }
         $employee = $this->EmployeeSalaries->Employees->get($id);
-		pr($employee); exit;
         $employeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryDivisions->find('list', ['limit' => 200]);
-        $this->set(compact('employeeSalary', 'employees', 'employeeSalaryDivisions'));
+        $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions'));
         $this->set('_serialize', ['employeeSalary']);
     }
 
