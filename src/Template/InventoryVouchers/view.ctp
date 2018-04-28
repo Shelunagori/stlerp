@@ -6,6 +6,7 @@
 	.hidden-print{
 		display:none;
 	}
+	
 }
 p{
 margin-bottom: 0;

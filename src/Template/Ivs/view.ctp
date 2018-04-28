@@ -7,6 +7,18 @@
 	.hidden-print{
 		display:none;
 	}
+	table tr td {
+  font-size: 14px !important;
+  font-family:'Times New Roman',Times,serif;
+}
+	table th {
+  font-size: 14px !important;
+  font-family:'Times New Roman',Times,serif;
+}
+table tr td b{
+  font-size: 14px !important;
+  font-family:'Times New Roman',Times,serif;
+}
 }
 p{
 margin-bottom: 0;
