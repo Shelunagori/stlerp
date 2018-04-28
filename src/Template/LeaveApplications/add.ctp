@@ -67,7 +67,22 @@ border:none;
 
 <div class="portlet-body form">
 		<?php echo $this->Form->create($leaveApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+			<?php 	$first="01";
+				$last="31";
+				$start_date=$first.'-'.$financial_month_first->month;
+				$end_date=$last.'-'.$financial_month_last->month;
 			
+			$default_date='';
+			$cur_date=date('Y-m-d');
+			$start_date1=date('Y-m-d',strtotime($start_date));
+			$end_date1=date('Y-m-d',strtotime($end_date));
+			if($start_date1 <= $cur_date && $end_date1 >= $cur_date){
+				$default_date=date('d-m-Y');
+			}else{
+				$default_date=date('d-m-Y',strtotime($end_date));
+			}
+				//pr($default_date); exit;
+		?>
 			<div class="form-body">
 				<div class="col-md-2"></div>
 				<div class="col-md-10" style="padding-bottom:10px;">
@@ -113,14 +128,14 @@ border:none;
 					<div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Date of Leave Required (From)</label>   
-								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date' => date("d-m-Y")]); ?>
+								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
 							</div>
 						</div>
 					   
 					   <div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Date of Leave Required (To)</label>
-								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
+								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
 							</div>
 						</div>
 					   

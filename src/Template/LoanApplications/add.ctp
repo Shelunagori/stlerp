@@ -40,79 +40,64 @@ border:none;
 			<?php echo $this->Form->create($loanApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
 			<div class="form-body ">
 				<div class="row">
-					 <div class="col-md-6">
-						<div class="col-md-6">
+					
+						<div class="col-md-3">
 							<div class="form-group">
-								<label class="control-label  label-css">Employee Name</label>   
+								<label class="control-label">Employee Name</label>   
 								<?php echo $this->Form->input('employee_name', ['readonly','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name]); ?>
 								<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id]); ?>
 							</div>
 						</div>
 						
-					   <div class="col-md-6">
+					   <div class="col-md-3">
 							<div class="form-group">
-								<label class="control-label  label-css">Salary (Pm)</label>
+								<label class="control-label">Salary (Pm)</label>
 								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="row">
-					 <div class="col-md-6">
-						 <div class="col-md-6">
+						 <div class="col-md-3">
 							<div class="form-group">
-								<label class="control-label  label-css">Amount Of Loan</label>
+								<label class="control-label">Amount Of Loan</label>
 								<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
 							</div>
 						</div>
-						 <div class="col-md-6">
+						 <div class="col-md-3">
 								<div class="form-group">
-									<label class="control-label  label-css">Reason For Loan</label>
+									<label class="control-label">Reason For Loan</label>
 									<?php echo $this->Form->input('reason_for_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
 								</div>
 							</div>
-						</div>
 				</div>
+				<br/>
 				<div class="row">
-					<div class="col-md-6">
-						 <div class="col-md-6">
+					
+						 <div class="col-md-3">
 							<div class="form-group">
-								<label class="control-label  label-css">Starting Date Of Loan</label>
+								<label class="control-label">Starting Date Of Loan</label>
 								<?php echo $this->Form->input('starting_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
 							</div>
 						</div>
-						 <div class="col-md-6">
+						 <div class="col-md-3">
 							<div class="form-group">
-								<label class="control-label  label-css">Ending Date Of Loan</label>
+								<label class="control-label">Ending Date Of Loan</label>
 								<?php echo $this->Form->input('ending_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
 								
 							</div>
 						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						 <div class="col-md-12">
+						<div class="col-md-6">
 							<div class="form-group">
-								<label class="control-label  label-css attache_file" >Remark</label>
+								<label class="control-label attache_file" >Remark</label>
 								<?php echo $this->Form->input('remark', ['label' => false,'placeholder'=>'','class'=>'form-control','type'=>'textarea','rows'=>3,'colspan'=>5]); ?>
 							</div>
 						</div>
-					</div>
 				</div>
+				
 			</div>
 		</div>
-			
-		<div class="row">
-			<div class="col-md-6">
-			<div class="box-footer" align="left">
-				<center>
-				
-				 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
-				</center>
-			</div>
-			</div>
-			</div>
+		<div class="form-actions right">
+			 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
+		</div>
+		
 			<?php echo $this->Form->end(); ?>
 			</div>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>

@@ -41,24 +41,24 @@ border:none;
 				
 					
 	
-			<div class="form-body">
+			<div class="form-body ">
 				<div class="row">
 				
 			        <div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label  label-css">Employee Name</label>   
+							<label class="control-label">Employee Name</label>   
 							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
 						</div>
 					</div>
 			        <div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label  label-css">Amount</label>
+							<label class="control-label">Amount</label>
 							<?php echo $this->Form->input('amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','min'=>0]); ?>
 						</div>
 					</div>
 			       <div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label  label-css">Reason</label>
+							<label class="control-label">Reason</label>
 							<?php echo $this->Form->input('reason', ['label' => false,'placeholder'=>'','class'=>'form-control','type'=>'textarea','rows'=>2]); ?>
 						</div>
 					</div>
@@ -66,16 +66,13 @@ border:none;
 			</div>
 			</div>
 			
-		</fieldset>	
+		<div class="form-actions right">
+			 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
+		</div>
 		
 			</div>
 		</div>
-			<div class="box-footer">
-				<center>
-				
-				 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
-				</center>
-			</div>
+			
 			</div>
 			<?php echo $this->Form->end(); ?>
 			</div>

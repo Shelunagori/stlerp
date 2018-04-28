@@ -55,6 +55,35 @@ class LeaveApplicationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		 $st_year_id = $session->read('st_year_id');
+		////start code for finnancial year
+		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+		
+		 $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		   $tody1 = date("Y-m-d");
+
+		   $fromdate = strtotime($fromdate1);
+		   $todate = strtotime($todate1); 
+	       $tody = strtotime($tody1);
+
+		  if($fromdate < $tody || $todate > $tody)
+		   {
+			 if($SessionCheckDate['status'] == 'Open')
+			 { $chkdate = 'Found'; }
+			 else
+			 { $chkdate = 'Not Found'; }
+
+		   }
+		   else
+			{
+				$chkdate = 'Not Found';	
+			}
+		////ends code for financial year
+		 
+		 
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
 		//pr($empData); exit;
@@ -110,7 +139,7 @@ class LeaveApplicationsController extends AppController
 			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
 			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
 		}
-        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake'));
+        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last'));
         $this->set('_serialize', ['leaveApplication']);
     }
 
