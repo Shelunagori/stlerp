@@ -2,6 +2,9 @@
 <--------------Gopal------------>
 Add New table employee_salary_divisions
 Add New table employee_salaries
+Add New table employee_salary_rows
+Add New table employee_attendances
+Add New table employee_monthly_paid_salaries
 
 
 

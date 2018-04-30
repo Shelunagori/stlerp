@@ -53,6 +53,72 @@ class EmployeeSalariesController extends AppController
      *
      * @return \Cake\Network\Response|void Redirects on successful add, renders view otherwise.
      */
+    public function paySallary($From=null){
+		//$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		if(!empty($From)){ 
+			$From="01-".$From;
+			$time=strtotime($From);
+			$month=date("m",$time);
+			$year=date("Y",$time);
+			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+		}
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
+
+		$emp_sallary_division=[];
+		$basic_sallary=[];
+		foreach($employees as $dt){
+			$From=date('Y-m-d',strtotime($From));
+			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
+			@$basic_sallary[@$dt->id]=$EmployeeSalary->amount; 
+			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
+				if($EmployeeSalary){
+					foreach($EmployeeSalary->employee_salary_rows as $dt1){  
+						$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+						
+					}
+				}
+		} 
+//pr($emp_sallary_division); exit;
+		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
+		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
+		
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division'));
+
+	}
+
+    public function paidSallary(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$employeeSalary = $this->EmployeeSalaries->newEntity();
+		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$From=$this->request->query('From');
+		if(!empty($From)){
+			$From="01-".$From;
+			$time=strtotime($From);
+			$month=date("m",$time);
+		}
+		$where1=[];
+		if(!empty($month)){ 
+			$where1['month LIKE']=$month;
+		}else{
+			$time=strtotime(date('d-m-Y'));
+			$month=date("m",$time); 
+			$where1['month LIKE']=$month;
+		}
+		//$this->EmployeeAttendances->find()->where($where1);
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]);  
+		$EmployeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find(); 
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','EmployeeSalaryDivisions'));
+        $this->set('_serialize', ['employeeSalary']);
+	}
     public function add($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -67,6 +133,7 @@ class EmployeeSalariesController extends AppController
 			$employeeSalary->effective_date_from=$effective_date_from;
 			$employeeSalary->effective_date_to=$effective_date_to;
 			$employeeSalary->created_on=$s_employee_id;
+			$employeeSalary->amount=$employeeSalary->amount;
 			if ($this->EmployeeSalaries->save($employeeSalary)) { 
                 $this->Flash->success(__('The employee salary has been saved.'));
 

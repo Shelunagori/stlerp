@@ -46,6 +46,9 @@ class EmployeeSalariesTable extends Table
 			'saveStrategy' => 'replace'
         ]);
 		
+		$this->belongsTo('FinancialYears');
+		$this->belongsTo('EmployeeAttendances');
+		
     }
 
     /**

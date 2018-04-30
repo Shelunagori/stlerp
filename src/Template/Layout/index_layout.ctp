@@ -877,7 +877,7 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/LeaveApplications/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/LeaveApplications' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/LeaveApplications' ).'</li>'; ?>
 							</ul>
 						</li>
 						<li>
@@ -888,7 +888,7 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/TravelRequests/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/TravelRequests' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/TravelRequests' ).'</li>'; ?>
 							</ul>
 						</li>
 						<li>
@@ -899,7 +899,7 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/LoanApplications/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/LoanApplications' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/LoanApplications' ).'</li>'; ?>
 							</ul>
 						</li>
 						<li>
@@ -910,7 +910,7 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/SalaryAdvances/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/SalaryAdvances' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/SalaryAdvances' ).'</li>'; ?>
 							</ul>
 						</li>
 						<li>
@@ -921,7 +921,30 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeRecords/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/EmployeeRecords' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/EmployeeRecords' ).'</li>'; ?>
+							</ul>
+						</li>
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Employee Attendence</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeAttendances/add' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/EmployeeAttendances' ).'</li>'; ?>
+							</ul>
+						</li>
+
+						<li>
+							<a href="javascript:;">
+							<i class="fa fa-file-code-o"></i>
+							<span class="title">Employee Sallary</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/EmployeeAttendances' ).'</li>'; ?>
 							</ul>
 						</li>
 						</ul>
