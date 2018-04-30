@@ -41,10 +41,11 @@ class EmployeeSalariesTable extends Table
             'foreignKey' => 'employee_id',
             'joinType' => 'INNER'
         ]);
-        $this->belongsTo('EmployeeSalaryDivisions', [
-            'foreignKey' => 'employee_salary_division_id',
-            'joinType' => 'INNER'
+         $this->hasMany('EmployeeSalaryRows', [
+            'foreignKey' => 'employee_salary_id',
+			'saveStrategy' => 'replace'
         ]);
+		
     }
 
     /**
@@ -60,15 +61,16 @@ class EmployeeSalariesTable extends Table
             ->allowEmpty('id', 'create');
 
         $validator
-            ->date('effective_date')
-            ->requirePresence('effective_date', 'create')
-            ->notEmpty('effective_date');
+            ->date('effective_date_from')
+            ->requirePresence('effective_date_from', 'create')
+            ->notEmpty('effective_date_from');
 
-        $validator
-            ->decimal('amount')
-            ->requirePresence('amount', 'create')
-            ->notEmpty('amount');
+		$validator
+            ->date('effective_date_to')
+            ->requirePresence('effective_date_to', 'create')
+            ->notEmpty('effective_date_to');
 
+     
         $validator
             ->date('created_on')
             ->requirePresence('created_on', 'create')
@@ -87,7 +89,7 @@ class EmployeeSalariesTable extends Table
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['employee_id'], 'Employees'));
-        $rules->add($rules->existsIn(['employee_salary_division_id'], 'EmployeeSalaryDivisions'));
+        //$rules->add($rules->existsIn(['employee_salary_division_id'], 'EmployeeSalaryDivisions'));
 
         return $rules;
     }

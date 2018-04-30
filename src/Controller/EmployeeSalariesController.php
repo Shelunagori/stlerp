@@ -18,8 +18,12 @@ class EmployeeSalariesController extends AppController
      */
     public function index()
     {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
         $this->paginate = [
-            'contain' => ['Employees', 'EmployeeSalaryDivisions']
+            'contain' => ['Employees'=>['Designations'], 'EmployeeSalaryRows']
         ];
         $employeeSalaries = $this->paginate($this->EmployeeSalaries);
 
@@ -54,10 +58,16 @@ class EmployeeSalariesController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
         $employeeSalary = $this->EmployeeSalaries->newEntity();
         if ($this->request->is('post')) {
+			$effective_date_from=date('Y-m-d',strtotime($this->request->data()['effective_date_from']));
+			$effective_date_to=date('Y-m-d',strtotime($this->request->data()['effective_date_to']));
             $employeeSalary = $this->EmployeeSalaries->patchEntity($employeeSalary, $this->request->data);
-            if ($this->EmployeeSalaries->save($employeeSalary)) {
+			$employeeSalary->effective_date_from=$effective_date_from;
+			$employeeSalary->effective_date_to=$effective_date_to;
+			$employeeSalary->created_on=$s_employee_id;
+			if ($this->EmployeeSalaries->save($employeeSalary)) { 
                 $this->Flash->success(__('The employee salary has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
@@ -66,8 +76,14 @@ class EmployeeSalariesController extends AppController
             }
         }
         $employee = $this->EmployeeSalaries->Employees->get($id);
-        $employeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryDivisions->find('list', ['limit' => 200]);
-        $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions'));
+        $employeeDesignation = $this->EmployeeSalaries->Employees->Designations->find('list');
+        $employeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find();
+		$employeeDetails=[];
+		foreach($employeeSalaryDivisions as $data){
+			$employeeDetails[]=['text'=>$data->name,'value'=>$data->id,'salary_type'=>$data->salary_type];
+		} 
+		//pr($employee); exit;
+        $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions','employeeDetails','employeeDesignation'));
         $this->set('_serialize', ['employeeSalary']);
     }
 
