@@ -75,13 +75,13 @@ border:none;
 			$default_date='';
 			$cur_date=date('Y-m-d');
 			$start_date1=date('Y-m-d',strtotime($start_date));
-			$end_date1=date('Y-m-d',strtotime($end_date));
+			$end_date1=date('Y-m-d',strtotime($end_date)); 
 			if($start_date1 <= $cur_date && $end_date1 >= $cur_date){
 				$default_date=date('d-m-Y');
 			}else{
 				$default_date=date('d-m-Y',strtotime($end_date));
 			}
-				//pr($default_date); exit;
+				
 		?>
 			<div class="form-body">
 				<div class="col-md-2"></div>
@@ -108,8 +108,13 @@ border:none;
 				<div class="col-md-10" style="padding-bottom:10px;">
 					  <div class="col-md-4">
 							<div class="form-group">
-								<label class="control-label  label-css">Name</label>   
-								<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+								<label class="control-label  label-css">Name</label> 
+								<?php if($s_employee_id == 16){ ?>
+									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me']); ?>
+								
+								<?php } else { ?>
+									<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+								<?php } ?>
 							</div>
 						</div>
 						

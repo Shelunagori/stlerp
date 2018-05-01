@@ -95,9 +95,21 @@ class LeaveApplicationsController extends AppController
 			$attache = $this->request->data['supporting_attached'];
 			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
 			
-			//pr($EmployeeHierarchies); exit;
-			$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
-			$leaveApplication->employee_id=$s_employee_id;
+			if($EmployeeHierarchies->employee_id==16){
+				$leaveApplication->parent_employee_id=16;
+			}else{
+				
+				$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			}
+			
+			if($s_employee_id == 16){
+				$leaveApplication->employee_id=$leaveApplication->employee_id;
+				$empData1=$this->LeaveApplications->Employees->get($leaveApplication->employee_id);
+				$leaveApplication->name=$empData1->name;
+			}else{
+				$leaveApplication->employee_id=$s_employee_id;
+			}
+			
 			$leaveApplication->submission_date=date('Y-m-d');
 			$leaveApplication->from_leave_date = strtotime($leaveApplication->from_leave_date); 
 			$leaveApplication->to_leave_date =strtotime($leaveApplication->to_leave_date); 
@@ -139,7 +151,8 @@ class LeaveApplicationsController extends AppController
 			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
 			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
 		}
-        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last'));
+		$employees = $this->LeaveApplications->Employees->find('list'); 
+        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
 

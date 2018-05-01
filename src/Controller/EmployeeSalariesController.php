@@ -137,7 +137,7 @@ class EmployeeSalariesController extends AppController
 			if ($this->EmployeeSalaries->save($employeeSalary)) { 
                 $this->Flash->success(__('The employee salary has been saved.'));
 
-                return $this->redirect(['action' => 'index']);
+                return $this->redirect(['controller' =>'Employees' ,'action' => 'index']);
             } else {
                 $this->Flash->error(__('The employee salary could not be saved. Please, try again.'));
             }
@@ -149,8 +149,10 @@ class EmployeeSalariesController extends AppController
 		foreach($employeeSalaryDivisions as $data){
 			$employeeDetails[]=['text'=>$data->name,'value'=>$data->id,'salary_type'=>$data->salary_type];
 		} 
-		//pr($employee); exit;
-        $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions','employeeDetails','employeeDesignation'));
+		$EmployeeSalaryDetails=[];
+		$EmployeeSalaryDetails = $this->EmployeeSalaries->find()->where(['employee_id'=>$id])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();
+		//pr($EmployeeSalaryDetails); exit;
+        $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions','employeeDetails','employeeDesignation','EmployeeSalaryDetails'));
         $this->set('_serialize', ['employeeSalary']);
     }
 
