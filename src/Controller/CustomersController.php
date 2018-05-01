@@ -1191,7 +1191,8 @@ class CustomersController extends AppController
 		$Invoice_data=$message_web[3];
 		$Voucher_data=$message_web[4];
 		$invoicePO=$message_web[5];
-		
+	
+		//pr($cust_info); exit;
 		$customerAdd=$cust_info->customer_address[0]->address;
 		$email = new Email('default');
 		$email->transport('gmail');
@@ -1199,6 +1200,8 @@ class CustomersController extends AppController
 		$from_name=$company_data->alias;
 		$email_to=$cust_info->customer_contacts[0]->email;
 		$cc_mail=$cust_info->employee->email;
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="gopal@phppoets.in";
 		$sub="Payment reminder ";
 		$member_name="Gopal";
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])

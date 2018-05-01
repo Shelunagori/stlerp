@@ -8,7 +8,9 @@
 			</td>
 		</tr>
 		<tr>
-			<td><?php echo "<br/>"; ?>
+			<td width="50%" valign="top" align="left">
+			<?= $this->Text->autoParagraph(h($customer_data->customer_name.'('.$customer_data->alias.')')) ?>
+			
 			</td>
 		</tr>
 		
@@ -78,16 +80,31 @@
 						$due_date=date('Y-m-d', strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']. ' +'. $payment_terms .'days'));
 						$due_day=date("d-m-Y")-date("d-m-Y",strtotime($due_date));
 						//$rem=date('Y-m-d')-$due_date;
-						$amt=$DueReferenceBalances[$key];
-						if($amt > 0){
+						$amt=round($DueReferenceBalances[$key]);
+						if($amt != 0){
+							$td=date('d-m-Y',strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']));
 						?>
 							
 							<tr>
 								<td width="5%" align="center"><?php echo $i++; ?></td>
-								<td width="20%" align="center"><?php echo $invoicePO[$key]; ?></td>
-								<td width="20%" align="center"><?php echo $Voucher_data[$key]; ?></td>
+								<td width="20%" align="center"><?php if(@$Invoice_data[@$refInvoiceNo[$key]]['customer_po_no']){ 
+									echo @$Invoice_data[@$refInvoiceNo[$key]]['customer_po_no']; 
+								
+								}else{
+									echo @$Invoice_data[@$refInvoiceNo[$key]]['customer_po_no']; 
+								} ?></td>
+								<td> <?php 
+									if($ReferenceBalance['opening_balance']=="Yes"){
+										echo "Opening Balance";
+									}else if($td =="01-01-1970"){ 
+										echo $ReferenceBalance['reference_no'];
+									}else if(@$Voucher_data[$key]){  
+										echo @$Voucher_data[$key];
+									}
+								 ?> 
+								</td>
 								<td width="15%" align="center"><?php echo date("d-m-Y",strtotime($due_date));  ?></td>
-								<td align="right" width="10%"><?php echo $DueReferenceBalances[$key]; 
+								<td align="right" width="10%"><?php echo abs($DueReferenceBalances[$key]); 
 								$total_amt+=$DueReferenceBalances[$key];
 								?></td>
 								

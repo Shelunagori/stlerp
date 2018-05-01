@@ -89,7 +89,7 @@
 						$due_date=date('Y-m-d', strtotime($default_date. ' +'. $ReferenceBalance['transaction_date'] .'days'));
 						
 					}
-			$amt=$DueReferenceBalances[$key];
+			$amt=round($DueReferenceBalances[$key]);
 				if($amt != 0){
 					$td=date('d-m-Y',strtotime(@$Invoice_data[$refInvoiceNo[$key]]['date_created']));
 					
@@ -155,7 +155,7 @@
 								
 							}?>
 						</td>
-						<?php if($DueReferenceBalances[$key] > 0){
+						<?php if(round($DueReferenceBalances[$key]) > 0){
 							$total_debit+=$DueReferenceBalances[$key];
 							$bal_status='';
 							if($ReferenceBalance['credit'] > 0){
@@ -164,7 +164,7 @@
 							?>
 							<td align="right"><?php echo $bal_status; ?> <?= $this->Number->format($DueReferenceBalances[$key],[ 'places' => 2]); ?></td>
 							<td align="right"><?php echo "0"; ?></td>
-						<?php }else{
+						<?php }else if(round($DueReferenceBalances[$key]) < 0){
 							 $total_credit+=abs($DueReferenceBalances[$key]);
 							 $bal_status='';
 							if($ReferenceBalance['debit'] > 0){
