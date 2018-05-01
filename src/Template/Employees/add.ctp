@@ -44,22 +44,28 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label">Mobile <span class="required" aria-required="true">*</span></label>
 							<?php echo $this->Form->input('mobile', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Mobile','maxlength'=>10]); ?>
 						</div>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label">Landline</label>
 							<?php echo $this->Form->input('phone_no', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Landline','maxlength'=>15]); ?>
 						</div>
 					</div>
-					<div class="col-md-4">
+					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Email <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('email', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Email']); ?>
+							<label class="control-label">Personal Email ID <span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('email', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Personal Email ID']); ?>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group">
+							<label class="control-label">Company Email ID <span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('company_email', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Company Email ID']); ?>
 						</div>
 					</div>
 				</div>
@@ -93,7 +99,7 @@
 					<div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Home District</label>
-							<?php echo $this->Form->input('home_district', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Home District']); ?>
+							<?php echo $this->Form->input('home_district', ['type'=> 'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'Home District']); ?>
 						</div>
 					</div>
 					<div class="col-md-4">
@@ -141,26 +147,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label">Department <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('dipartment_id', ['empty' => 'Select Department','options' => $departments,'label' => false,'class' => 'form-control select2me']); ?>
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label">Designation <span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('designation_id', ['empty' => 'Select Designation','options'=>$designations,'label' => false,'class' => 'form-control select2me','placeholder'=>'Designation']); ?>
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label">Date Of Joining<span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->input('join_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Joining']); ?>
-						</div>
-					</div>
-				</div>
+				
 				<div class="row">
 					<div class="col-md-4">
 						<div class="form-group">
@@ -317,7 +304,7 @@
 						<div class="form-group">
 							<label class="control-label  label-css">District</label>
 							<div id="present_district2">
-								<?php echo $this->Form->input('present_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+								<?php echo $this->Form->input('present_district', ['type'=> 'text','label' => false,'class'=>'form-control input-sm']); ?>
 							</div>
 						</div>
 					</div>
@@ -362,6 +349,7 @@
 		</fieldset>	
 		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Permanent Address details  </b></legend>
+			<?php echo $this->Form->input('same_addrs',['type'=>'checkbox','label'=>'Whether permanent address is same or not?']); ?>
 			<div class="col-md-12 pad">
 			  <div class="col-md-4">
 					<div class="form-group">
@@ -373,7 +361,7 @@
 					<div class="form-group">
 						<label class="control-label  label-css">District</label>
 						<div id="permanent_district3">
-						<?php echo $this->Form->input('permanent_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+						<?php echo $this->Form->input('permanent_district', ['type'=> 'text','label' => false,'class'=>'form-control input-sm']); ?>
 						</div>
 					</div>
 				</div>
@@ -450,7 +438,7 @@
 						<div class="form-group">
 							<label class="control-label  label-css">District</label>
 							<div id="nominee_district4">
-								<?php echo $this->Form->input('nominee_district', ['empty'=> '---Select District---','label' => false,'class'=>'form-control select2me input-sm','options'=>'']); ?>
+								<?php echo $this->Form->input('nominee_district', ['type'=> 'text','label' => false,'class'=>'form-control input-sm','options'=>'']); ?>
 							</div>
 						</div>
 					</div>
@@ -480,8 +468,27 @@
 		</fieldset>
 		<fieldset style="margin-left:  0px;margin-right: 0px;">		
 			<legend><b>Employee Professional Information  ( Joining  Details )</b></legend>
+			<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Department <span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('dipartment_id', ['empty' => 'Select Department','options' => $departments,'label' => false,'class' => 'form-control select2me']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Designation <span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('designation_id', ['empty' => 'Select Designation','options'=>$designations,'label' => false,'class' => 'form-control select2me','placeholder'=>'Designation']); ?>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Date Of Joining<span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('join_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Date of Joining']); ?>
+						</div>
+					</div>
+				</div>
 			<div class="col-md-12 pad">
-				
 			      <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Appointment</label>
@@ -492,7 +499,7 @@
 				   <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Employee ID </label>
-							<?php echo $this->Form->input('employee_id', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Employee ID','type'=>'text']); ?>
+							<?php echo $this->Form->input('employee_id_no', ['label' => false,'class'=>'form-control input-sm','placeholder'=>'Employee ID','type'=>'text']); ?>
 						</div>
 					</div>
 			       <div class="col-md-4">
@@ -526,7 +533,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Reporting To </label>
-						<?php echo $this->Form->input('reporting_to', ['label' => false,'placeholder'=>'Reporting To','class'=>'form-control input-sm']); ?>
+						<?php echo $this->Form->input('reporting_to', ['options'=>$Employees,'label' => false,'class'=>'form-control input-sm']); ?>
 					</div>
 				</div>
 			</div>
@@ -547,9 +554,9 @@
 				<tbody>
 					<td>
 						<?php 
-						$account_type[]=['value'=>'Current ','text'=>'Current'];
 						$account_type[]=['value'=>'Saving ','text'=>'Saving'];
-						echo $this->Form->input('account_type', ['empty'=> '--Select--','data-placeholder'=>'Gender','label' => false,'class'=>'form-control select2 input-sm','options'=>@$account_type,'style'=>'width:100%;']);
+						$account_type[]=['value'=>'Current ','text'=>'Current'];
+						echo $this->Form->input('account_type', ['data-placeholder'=>'Account Type','label' => false,'class'=>'form-control input-sm','options'=>@$account_type,'style'=>'width:100%;']);
 						?>
 					</td>
 					<td>
@@ -863,6 +870,32 @@ $(document).ready(function () {
 		$('.doba').val('');
 		$('.nochild').val('');
 		$('#married_info').hide('fast');
+	});
+	$('input[name="same_addrs"]').click(function () {
+		if($(this).attr('checked')){
+			var q=$('select[name=present_state] option:selected').val();
+			$('select[name=permanent_state]').val(q).select2();
+			
+			var q=$('input[name=present_district]').val();
+			$('input[name=permanent_district]').val('hello');
+			
+			var q=$('input[name=present_pin_code]').val();
+			$('input[name=permanent_pin_code]').val(q);
+			
+			var q=$('input[name=present_mobile_no]').val();
+			$('input[name=permanent_mobile_no]').val(q);
+			
+			var q=$('input[name=present_phone_no]').val();
+			$('input[name=permanent_phone_no]').val(q);
+			
+			var q=$('input[name=present_email]').val();
+			$('input[name=permanent_email]').val(q);
+			
+			var q=$('textarea[name=present_address]').val();
+			$('textarea[name=permanent_address]').val(q);
+		}else{
+			alert('not');
+		}
 	});
 });
 </script>

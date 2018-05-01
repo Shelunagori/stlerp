@@ -21,13 +21,13 @@
 				<form method="GET" >
 				<div class="row">
 									
-									<div class="col-md-3">
-										<input type="text" name="employee_name" class="form-control input-sm" placeholder="Employee Name" value="<?php echo @$employee_name; ?>">
-									</div>
-									<div class="col-md-3">
-										<input type="text" name="department_name" class="form-control input-sm" placeholder="Department Name" value="<?php echo @$department_name; ?>">
-									</div>
-									<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
+					<div class="col-md-3">
+						<input type="text" name="employee_name" class="form-control input-sm" placeholder="Employee Name" value="<?php echo @$employee_name; ?>">
+					</div>
+					<div class="col-md-3">
+						<input type="text" name="department_name" class="form-control input-sm" placeholder="Department Name" value="<?php echo @$department_name; ?>">
+					</div>
+					<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 				</div>
 				</form>
 		<div class="table-scrollable">
@@ -57,16 +57,12 @@
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $employee->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View')); ?>
 							<?php } ?>
 							<?php if(in_array(48,$allowed_pages)){?>
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $employee->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
-							<!--<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
-								['action' => 'delete', $employee->id], 
-								[
-									'escape' => false,
-									'class' => 'btn btn-xs btn-danger',
-									'confirm' => __('Are you sure ?', $employee->id)
-								]
-							) ?>
-							<?php } ?>-->
+								<?php echo $this->Html->link('<i class="fa fa-user"></i>',['action' => 'edit', $employee->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Personal Info')); ?>
+								<?php echo $this->Html->link('<i class="fa fa-users"></i>','/employee-family-members/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Family Info')); ?>
+								<?php echo $this->Html->link('<i class="fa fa-warning"></i>','/EmployeeEmergencyDetails/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Emergency Details')); ?>
+								<?php echo $this->Html->link('<i class="fa fa-anchor"></i>','/EmployeeReferenceDetails/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Reference Details')); ?>
+								<?php echo $this->Html->link('<i class="fa fa-graduation-cap"></i>','/EmployeeWorkExperiences/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Work Experience')); ?>
+							<?php } ?>
 							<?php if(in_array(49,$allowed_pages)){?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditCompany', $employee->id],array('escape'=>false,'class'=>'btn btn-xs green tooltips','data-original-title'=>'EditCompany')); ?>
 							<?php } ?>

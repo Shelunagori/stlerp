@@ -5,7 +5,8 @@ use Cake\ORM\Query;
 use Cake\ORM\RulesChecker;
 use Cake\ORM\Table;
 use Cake\Validation\Validator;
-
+use Cake\Event\Event;
+use ArrayObject;
 /**
  * Employees Model
  *
@@ -144,6 +145,12 @@ class EmployeesTable extends Table
      * @param \Cake\ORM\RulesChecker $rules The rules object to be modified.
      * @return \Cake\ORM\RulesChecker
      */
+	 
+	public function beforeMarshal(Event $event, ArrayObject $data)
+    {
+        @$data['appointment_date'] 		= trim(date('Y-m-d',strtotime(@$data['appointment_date'])));
+        @$data['dept_joining_date'] 		= trim(date('Y-m-d',strtotime(@$data['dept_joining_date'])));
+    }
     public function buildRules(RulesChecker $rules)
     {
         $rules->add($rules->existsIn(['department_id'], 'Departments'));

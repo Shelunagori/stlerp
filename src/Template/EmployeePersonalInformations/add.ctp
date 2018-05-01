@@ -838,7 +838,7 @@ $(document).ready(function()
 	
 	rename_rows();
 	var a=0;
-	function rename_rows(){ 
+	function rename_rows(){  
 				var i=0;
 				$("#main_table tbody#main_tbody tr.main_tr").each(function(){ 
 					$(this).find('td:nth-child(1)').html(i+1);
