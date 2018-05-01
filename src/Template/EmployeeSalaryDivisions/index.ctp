@@ -2,7 +2,7 @@
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Units</span>
+			<span class="caption-subject font-blue-steel uppercase">Salary Divisions</span>
 		</div>
 	</div>
 	<div class="portlet-body form">
@@ -30,13 +30,13 @@
 						<div class="input-icon right">
 							<i class="fa"></i>
 							 <?php 
-								echo $this->Form->input('salary_type', ['options'=>['addition'=>'Addition','deduction'=>'Deduction'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','value'=>'Dr','style'=>'vertical-align: top !important;']); ?>
+								echo $this->Form->input('salary_type', ['options'=>['addition'=>'Addition','deduction'=>'Deduction'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','style'=>'vertical-align: top !important;']); ?>
 						</div>
 					</div>
 				</div>
 				<div class="row">
 					<div class="col-md-offset-4 col-md-8">
-						<button type="submit" class="btn btn-primary">Add Unit</button>
+						<button type="submit" class="btn btn-primary">Add</button>
 					</div>
 				</div>
 			</div>
@@ -64,7 +64,20 @@
 							<td><?= h($employeeSalaryDivision->name) ?></td>
 							
 							<td><?= h($employeeSalaryDivision->salary_type) ?></td>
-										
+							<td class="actions">
+							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $employeeSalaryDivision->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
+							<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
+								['action' => 'delete', $employeeSalaryDivision->id], 
+								[
+									'escape' => false,
+									'class'=>'btn btn-xs red tooltips','data-original-title'=>'Delete',
+									
+									'confirm' => __('Are you sure ?', $employeeSalaryDivision->id)
+								]
+							) ?>
+							
+							
+						</td>			
 							
 						</tr>
 						<?php endforeach; ?>

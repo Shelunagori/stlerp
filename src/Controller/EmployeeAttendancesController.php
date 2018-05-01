@@ -85,19 +85,52 @@ class EmployeeAttendancesController extends AppController
 			$to_date=date('Y-m-d',strtotime($to_date));
 			
 			
-			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id]);
-			//pr($employeeLeave->toArray());
+			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved']);
+			
 				foreach($employeeLeave as $data1){ 
 					$data1->to_leave_date=date('Y-m-d',strtotime($data1->to_leave_date));
 					$data1->from_leave_date=date('Y-m-d',strtotime($data1->from_leave_date));
+					$addMonth = date('Y-m-d', strtotime("+1 months", strtotime($to_date)));
+					$minusMonth = date('Y-m-d', strtotime("-1 months", strtotime($from_date)));
 					if($data1->from_leave_date >= $from_date && $data1->to_leave_date <= $to_date){ 
 						@$employee_leave[@$data->id]+=@$data1->day_no;
-						
+					}else if(($data1->from_leave_date > $to_date && $data1->to_leave_date > $to_date)){
+
+					}else if(($data1->from_leave_date < $from_date && $data1->to_leave_date < $from_date)){
+
+					}else if(($data1->from_leave_date >= $minusMonth && $data1->to_leave_date > $to_date) && ($data1->from_leave_date >= $from_date && $data1->to_leave_date < $addMonth)){ 
+						$dt=date('d-m-Y',strtotime($data1->from_leave_date));
+						$dt1=strtotime($dt);
+						$d1=date("d",$dt1); 
+						@$employee_leave[@$data->id]+=@$total_day+1-$d1;
+					}else if(($data1->from_leave_date >= $minusMonth && $data1->to_leave_date < $to_date) && ($data1->to_leave_date >= $from_date && $data1->to_leave_date < $addMonth)){ 
+						$dt=date('d-m-Y',strtotime($data1->to_leave_date));
+						$dt1=strtotime($dt); 
+						$d1=date("d",$dt1);  
+						@$employee_leave[@$data->id]+=$d1;
 					}
 					
 				} 
-			//pr($employeeLeave->toArray()); 
+			
+
 		}
+		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));
+	}
+	
+	   public function getAttendenceListEdit($From=null){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->EmployeeAttendances->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$From1=$From;
+		$From="01-".$From;
+		$time=strtotime($From);
+		$month=date("m",$time); 
+		$year=date("Y",$time);
+		$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+		$employees = $this->EmployeeAttendances->find()->where(['financial_year_id'=>$financial_year->id,'month'=>$month])->contain(['Employees']);
+		//pr($employees->toArray()); exit;
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));
 	}
     public function add()
@@ -147,18 +180,37 @@ class EmployeeAttendancesController extends AppController
      */
     public function edit($id = null)
     {
-        $employeeAttendance = $this->EmployeeAttendances->get($id, [
+        /* $employeeAttendance = $this->EmployeeAttendances->get($id, [
             'contain' => []
-        ]);
+        ]); */
+		$employeeAttendance = $this->EmployeeAttendances->newEntity();
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->EmployeeAttendances->FinancialYears->find()->where(['id'=>$st_year_id])->first();
         if ($this->request->is(['patch', 'post', 'put'])) {
             $employeeAttendance = $this->EmployeeAttendances->patchEntity($employeeAttendance, $this->request->data);
-            if ($this->EmployeeAttendances->save($employeeAttendance)) {
-                $this->Flash->success(__('The employee attendance has been saved.'));
-
-                return $this->redirect(['action' => 'index']);
-            } else {
-                $this->Flash->error(__('The employee attendance could not be saved. Please, try again.'));
-            }
+            $employeeAttendance->effective_date_from='01-'.$employeeAttendance->From;
+			$time=strtotime($employeeAttendance->effective_date_from);
+			$month=date("m",$time);
+			$year=date("Y",$time);
+			//pr($month); exit;
+			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+			$this->EmployeeAttendances->deleteAll(['financial_year_id' => $financial_year->id,'month'=>$month]);
+			foreach($employeeAttendance->employee_attendances as $data){ 
+				$employeeAtten = $this->EmployeeAttendances->newEntity();
+				$employeeAtten->employee_id = $data['employee_id'];
+				$employeeAtten->present_day = $data['present_day'];
+				$employeeAtten->month = $month;
+				$employeeAtten->financial_year_id = $financial_year->id;
+				$employeeAtten->total_month_day = $total_day;
+				$employeeAtten->no_of_leave = $total_day-$data['present_day'];
+				$this->EmployeeAttendances->save($employeeAtten);
+			}
+				$this->Flash->success(__('The employee attendance has been saved.'));
+				return $this->redirect(['action' => 'index']);
         }
         $financialYears = $this->EmployeeAttendances->FinancialYears->find('list', ['limit' => 200]);
         $employees = $this->EmployeeAttendances->Employees->find('list', ['limit' => 200]);

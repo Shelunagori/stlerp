@@ -89,6 +89,11 @@ class EmployeeSalaryDivisionsController extends AppController
      */
     public function edit($id = null)
     {
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
         $employeeSalaryDivision = $this->EmployeeSalaryDivisions->get($id, [
             'contain' => []
         ]);

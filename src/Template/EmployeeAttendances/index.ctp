@@ -1,73 +1,61 @@
- 
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Employee Attendence</span> 
+			<span class="caption-subject font-blue-steel uppercase">Employee Attendence List</span>
 		</div>
-		<form method="GET" >
-				<table class="table table-condensed">
-					<tbody>
-						<tr>
-							<td width="15%">
-								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="mm-yyyy" >
-							</td>
-							<td><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button></td>
-						</tr>
-					</tbody>
-				</table>
-			</form>
-		
-	<div class="portlet-body">
-		<div class="row">
-			<div class="col-md-12">
+		<div class="actions">
 			
-				<?php $page_no=$this->Paginator->current('employeeSalaries'); $page_no=($page_no-1)*20; ?>
-				<table class="table table-bordered table-striped table-hover">
-					<thead>
-						<tr>
-							<th>Sr. No.</th>
-							<th>Employee Name</th>
-							<th>Month</th>
-							<th>Present Day</th>
-							<th>Leave</th>
+		</div>
+		<div class="portlet-body">
+		
+			<div class="row">
+				<div class="col-md-12">
+					<div class="form-group">
 							
-						</tr>
-					</thead>
-					<tbody>
-						<?php  $i=0; foreach ($employeeAttendances as $data): $i++; 
-						$month=date("F",$data->month);
-$month = date('F', mktime(0, 0, 0, $data->month, 10));
-						?>
+								<table class="table table-condensed">
+									<tbody>
+										<tr>
+											<td width="15%">
+												<input type="text" name="From" class="select_date form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="mm-yyyy" >
+											</td>
+											<td><button type="button" class="btn btn-primary btn-sm emp_rec"><i class="fa fa-filter"></i> Go</button></td>
+										</tr>
+									</tbody>
+								</table>
+							
+						</div>
+				</div>
+				<div class="col-md-6">
+				
+				<div id="form_attached">
+					<div class="box box-primary" id="copy_form">
 						
-						<tr>
-							<td><?= h(++$page_no) ?></td>
-							<td><?= h($data->employee->name) ?></td>
-							<td><?= h($month) ?></td>
-							<td><?= h($data->present_day) ?></td>
-							<td><?= h($data->no_of_leave) ?></td>
-							
-						</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-				<div class="paginator">
-					<ul class="pagination">
-						<?= $this->Paginator->prev('< ' . __('previous')) ?>
-						<?= $this->Paginator->numbers() ?>
-						<?= $this->Paginator->next(__('next') . ' >') ?>
-					</ul>
-					<p><?= $this->Paginator->counter() ?></p>
+					</div>
 				</div>
 			</div>
+			
+			</div>
+			
 		</div>
 	</div>
 </div>
-<style>
-#sortable li{
-	cursor: -webkit-grab;
-}
-</style>
-<?php echo $this->Html->css('/drag_drop/jquery-ui.css'); ?>
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 
+<script>
 
+$(document).ready(function() 
+{
+	$('.emp_rec').live('click',function(){
+		var select_date=$(this).closest('tr').find('.select_date').val();
+		
+		var url="<?php echo $this->Url->build(['controller'=>'EmployeeAttendances','action'=>'getAttendenceList']); ?>";
+		url=url+'/'+select_date, 
+		 $.ajax({
+			url: url,
+		}).done(function(response) {
+			$("#copy_form").html(response);
+		});
+	});
+});
+</script>
