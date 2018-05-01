@@ -62,6 +62,17 @@ class EmployeesController extends AppController
         $this->set('employee', $employee);
         $this->set('_serialize', ['employee']);
     }
+	
+	public function view2($id = null)
+    {
+        $this->viewBuilder()->layout('index_layout');
+        $employee = $this->Employees->get($id, [
+            'contain' => ['Departments', 'Designations', 'EmployeeContactPersons']
+        ]);
+
+        $this->set('employee', $employee);
+        $this->set('_serialize', ['employee']);
+    }
 
     /**
      * Add method
