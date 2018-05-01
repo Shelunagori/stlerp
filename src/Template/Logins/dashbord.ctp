@@ -360,20 +360,8 @@
 						</td>
 						<td><?php echo $PendingRequest->emp_data->name; ?>
 						</td>
-						<td><?= $this->Html->link(' Approve ',
-								['controller'=>'LeaveApplications', 'action' => 'approved', $PendingRequest->id],
-								[
-									'escape' => false
-									
-								]
-							) ?>
-								<?= $this->Html->link(' Cancle ',
-								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
-								[
-									'escape' => false
-									
-								]
-							) ?></td>
+						<td><span class="approve">Approve</span>
+						
 					</tr>
 					<?php } ?>
 				</tbody>
@@ -457,6 +445,11 @@ $(document).ready(function() {
 	$('.closebtn').on("click",function() { 
 		$("#myModal12").hide();
     });
+	
+	$('.approve').die().live("click",function() { 
+		var addr=$(this).text();
+		$("#myModal3").show();
+    });
 
 });
 
@@ -469,6 +462,37 @@ $(document).ready(function() {
 			</div>
 			<div class="modal-footer">
 				<button class="btn default closebtn">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+<div id="myModal3" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body" id="result_ajax">
+			<h4>Approve Leave</h4>
+				<div style=" overflow: auto; height: 450px;">
+				<table class="table table-hover tabl_tc">
+				<tr>
+					<td>
+						 <div class="checkbox-list">
+							<label>
+								
+								
+							</label> 
+						 </div>
+						
+						</td>
+				</tr>
+				</table>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn default closebtn2">Close</button>
+				<button class="btn btn-primary insert_tc">Send Email</button>
 			</div>
 		</div>
 	</div>
