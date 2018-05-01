@@ -108,7 +108,7 @@ class EmployeeEmergencyDetailsController extends AppController
     }
 
     /**
-     * Delete method
+     * Delete method  
      *
      * @param string|null $id Employee Emergency Detail id.
      * @return \Cake\Network\Response|null Redirects to index.

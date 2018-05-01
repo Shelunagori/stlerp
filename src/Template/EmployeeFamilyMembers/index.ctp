@@ -13,6 +13,9 @@
 							<tr>
 								<th><?= $this->Paginator->sort('member_name') ?></th>
 								<th><?= $this->Paginator->sort('relationship') ?></th>
+								<th><?= $this->Paginator->sort('dob') ?></th>
+								<th><?= $this->Paginator->sort('dependent') ?></th>
+								<th><?= $this->Paginator->sort('whether_employed') ?></th>
 								<th><?= $this->Paginator->sort('mobile') ?></th>
 								<th><?= $this->Paginator->sort('telephone') ?></th>
 								<th class="actions"><?= __('Actions') ?></th>
@@ -23,6 +26,9 @@
 							<tr>
 								<td><?= h($employeeFamilyMember1->member_name) ?></td>
 								<td><?= h($employeeFamilyMember1->relationship) ?></td>
+								<td><?= h($employeeFamilyMember1->dob->format('d-m-Y')) ?></td>
+								<td><?= h($employeeFamilyMember1->dependent) ?></td>
+								<td><?= h($employeeFamilyMember1->whether_employed) ?></td>
 								<td><?= h($employeeFamilyMember1->mobile) ?></td>
 								<td><?= h($employeeFamilyMember1->telephone) ?></td>
 								<td class="actions">
@@ -67,6 +73,29 @@
 							<div class="form-group">
 								<label class="control-label">Relationship </label>
 								<?php echo $this->Form->input('relationship', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Relationship']); ?>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Date of Birth </label>
+								<?php echo $this->Form->input('dob', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder'=>'Date of Birth','data-date-format' => 'dd-mm-yyyy']); ?>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Dependent </label>
+								<?php echo $this->Form->input('dependent', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Dependent']); ?>
+							</div>
+						</div>
+						<div class="col-md-12">
+							<div class="form-group">
+								<label class="control-label">Whether Employed (State / Centre / unemployed Private) </label>
+								<?php 
+								$whether_employeds[]=['value'=>'State','text'=>'State'];
+								$whether_employeds[]=['value'=>'Center','text'=>'Center'];
+								$whether_employeds[]=['value'=>'Unemployed ','text'=>'Unemployed'];
+								$whether_employeds[]=['value'=>'Private','text'=>'Private'];
+								echo $this->Form->input('whether_employed', ['empty'=> '---Select---','options'=>$whether_employeds,'label' => false,'class' => 'form-control input-sm','placeholder'=>'Whether Employed']); ?>
 							</div>
 						</div>
 						<div class="col-md-12">
