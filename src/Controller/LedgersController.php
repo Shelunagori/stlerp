@@ -1187,6 +1187,10 @@ class LedgersController extends AppController
 			$from = $this->request->query['From'];
 			$To = $this->request->query['To'];
 			$transaction_from_date= date('Y-m-d', strtotime($from));
+			
+			$fromYear=date('Y', strtotime($transaction_from_date));
+			$transaction_from_date_limit=$fromYear.'-4-1';
+			
 			$transaction_to_date= date('Y-m-d', strtotime($To));
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));
 			$company = $this->Companies->get($st_company_id);
@@ -1196,7 +1200,7 @@ class LedgersController extends AppController
 				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  '=>$transaction_from_date]);
 				
 				$opening_balance_ar=[];
-			foreach($OB as $Ledger)
+				foreach($OB as $Ledger)
 				{
 					if($Ledger->voucher_source== "Opening Balance"){
 						@$opening_balance_ar['debit']+=$Ledger->debit;
@@ -1204,8 +1208,14 @@ class LedgersController extends AppController
 					}
 				}	
 			}else{
-				$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <'=>$transaction_from_date]);
-		
+				$cat=$Ledger_Account_data->account_second_subgroup->account_first_subgroup->account_group->account_category->id;
+				if($cat==3 or $cat==4){
+					$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <'=>$transaction_from_date,'transaction_date  >'=>$transaction_from_date_limit]);
+				}else{
+					$OB = $this->Ledgers->find()->where(['ledger_account_id'=>$ledger_account_id,'transaction_date  <'=>$transaction_from_date]);
+				}
+				
+			//pr($OB->toArray()); exit;
 				$opening_balance_ar=[];
 				foreach($OB as $Ledger)
 					{
