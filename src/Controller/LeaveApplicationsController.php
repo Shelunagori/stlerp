@@ -180,7 +180,7 @@ class LeaveApplicationsController extends AppController
             'contain' => []
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
-			$files=$this->request->data['supporting_attached']; 
+			$files=@$this->request->data['supporting_attached']; 
             $leaveApplication = $this->LeaveApplications->patchEntity($leaveApplication, $this->request->data);
 			if(!empty($files['name']))
 			{

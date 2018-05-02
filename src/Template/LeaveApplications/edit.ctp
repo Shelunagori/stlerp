@@ -90,7 +90,7 @@ border:none;
 					<div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Date of Leave Required (From)</label>   
-								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date' => date("d-m-Y"),'value'=>date('d-m-Y',strtotime($leaveApplication->from_leave_date))]); ?>
+								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','value'=>date('d-m-Y',strtotime($leaveApplication->from_leave_date))]); ?>
 							</div>
 						</div>
 					   
