@@ -37,6 +37,7 @@ class RequestLeavesController extends AppController
      * @return \Cake\Network\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+    
     public function view($id = null)
     {
         $requestLeave = $this->RequestLeaves->get($id, [

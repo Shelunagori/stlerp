@@ -34,6 +34,12 @@ class LeaveApplicationsController extends AppController
      * @return \Cake\Network\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+
+		
+	public function approve($id = null){
+		$LeaveApplication = $this->LeaveApplications->get($id);
+		 $this->set(compact('LeaveApplication'));
+	}
     public function view($id = null)
     {
         $leaveApplication = $this->LeaveApplications->get($id, [

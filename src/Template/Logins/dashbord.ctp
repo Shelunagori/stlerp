@@ -199,26 +199,14 @@
 					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
 					<tr>
 						<td><?php echo $i++; ?></td>
-						<td><?php echo $PendingRequest->name; ?></td>
+						<td><?php echo $PendingRequest->name; 
+							 echo $this->Form->input('emp_id', ['type'=>'hidden','class'=>'emp_id','value' => @$PendingRequest->id]); ?></td>
 						<td><?php echo $PendingRequest->day_no; ?></td>
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
 						</td>
 						<td><?php echo $PendingRequest->emp_data->name; ?>
 						</td>
-						<td><?= $this->Html->link(' Approve ',
-								['controller'=>'LeaveApplications', 'action' => 'approved', $PendingRequest->id],
-								[
-									'escape' => false
-									
-								]
-							) ?>
-								<?= $this->Html->link(' Cancle ',
-								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
-								[
-									'escape' => false
-									
-								]
-							) ?></td>
+						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a></td>
 					</tr>
 					<?php } ?>
 				</tbody>
@@ -447,9 +435,24 @@ $(document).ready(function() {
     });
 	
 	$('.approve').die().live("click",function() { 
-		var addr=$(this).text();
-		$("#myModal3").show();
+		
+		var emp_id=$(this).closest('tr').find('.emp_id').val(); 
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'approve']); ?>";
+			url=url+'/'+emp_id, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) { alert(response);
+				$("#show_model").html(response);
+			});
+		//$("#myModal3").show();
     });
+
+	$('.closebtn2').die().live("click",function() { 
+		$("#myModal3").hide();
+    });
+
+	
 
 });
 
@@ -468,32 +471,6 @@ $(document).ready(function() {
 </div>
 
 
+<div id="show_model">
 
-<div id="myModal3" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-body" id="result_ajax">
-			<h4>Approve Leave</h4>
-				<div style=" overflow: auto; height: 450px;">
-				<table class="table table-hover tabl_tc">
-				<tr>
-					<td>
-						 <div class="checkbox-list">
-							<label>
-								
-								
-							</label> 
-						 </div>
-						
-						</td>
-				</tr>
-				</table>
-				</div>
-			</div>
-			<div class="modal-footer">
-				<button class="btn default closebtn2">Close</button>
-				<button class="btn btn-primary insert_tc">Send Email</button>
-			</div>
-		</div>
-	</div>
 </div>
