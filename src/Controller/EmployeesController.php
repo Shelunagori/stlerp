@@ -48,6 +48,22 @@ class EmployeesController extends AppController
         $this->set('_serialize', ['employees']);
         $this->set(compact('url'));
     }
+	
+	function listForSalary(){
+        $this->viewBuilder()->layout('index_layout');
+		
+		$employees=$this->Employees->find()->select(['id','name','salary_company_id'])->order(['name'=>'ASC']);
+		
+		$companies=$this->Employees->Companies->find('list');
+		$this->set(compact('employees', 'companies'));
+	}
+	
+	function saveSalaryInfo($c_id,$employee_id){
+		$Employee=$this->Employees->get($employee_id);
+		$Employee->salary_company_id=$c_id;
+		$this->Employees->save($Employee);
+		exit;
+	}
 
     /**
      * View method
