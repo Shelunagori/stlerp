@@ -53,16 +53,17 @@
 						<td><?= h($employee->mobile) ?></td>
 						<td><?= h($employee->email) ?></td>
 						<td class="actions">
-							<?php if(in_array(47,$allowed_pages) && $employee->employee_companies[0]->freeze==0){ ?>
+							<?php if(in_array(47,$allowed_pages) && @$employee->employee_companies[0]->freeze==0){ ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $employee->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View')); ?>
 							<?php } ?>
-							<?php if(in_array(48,$allowed_pages) && $employee->employee_companies[0]->freeze==0){?>
+							<?php if(in_array(48,$allowed_pages) && @$employee->employee_companies[0]->freeze==0){?>
 								<?php echo $this->Html->link('<i class="fa fa-user"></i>',['action' => 'edit', $employee->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Personal Info')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-users"></i>','/employee-family-members/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Family Info')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-warning"></i>','/EmployeeEmergencyDetails/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Emergency Details')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-anchor"></i>','/EmployeeReferenceDetails/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Reference Details')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-graduation-cap"></i>','/EmployeeWorkExperiences/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Work Experience')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-inr"></i>','/EmployeeSalaries/add/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Salary')); ?>
+								<?php echo $this->Html->link('<i class="fa fa-paper-plane-o"></i>','/CompanyWiseEmployeeSalaries/add/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Company for Salary')); ?>
 							<?php } ?>
 							<?php if(in_array(49,$allowed_pages)){?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditCompany', $employee->id],array('escape'=>false,'class'=>'btn btn-xs green tooltips','data-original-title'=>'EditCompany')); ?>

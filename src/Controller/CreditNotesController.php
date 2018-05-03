@@ -392,16 +392,16 @@ class CreditNotesController extends AppController
 		}
 			//pr($bankCashes); exit;
 			
-		$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();
-		$ReceiptVouchersReceivedFrom=$vr->id;
+		$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();  
+		$ReceiptVouchersReceivedFrom=$vr->id; 
 		$vouchersReferences = $this->CreditNotes->VouchersReferences->get($vr->id, [
             'contain' => ['VoucherLedgerAccounts']
-        ]);
+        ]); 
 		$where=[];
 		foreach($vouchersReferences->voucher_ledger_accounts as $data){
 			$where[]=$data->ledger_account_id;
 		}
-		/* $ReceivedFroms_selected='yes';
+		$ReceivedFroms_selected='yes';
 		if(sizeof($where)>0){
 			$receivedFroms = $this->CreditNotes->ReceivedFroms->find('list',
 				['keyField' => function ($row) {
@@ -417,11 +417,11 @@ class CreditNotesController extends AppController
 				}])->where(['ReceivedFroms.id IN' => $where]);
 		}else{
 			$ReceivedFroms_selected='no';
-		} */
+		} 
 		
-		$receivedFroms=[];
+		/* $receivedFroms=[];
 		$bankCashesDatas = $this->CreditNotes->ReceivedFroms->find();
-		foreach($bankCashesDatas as $bankCashesData){ 
+		foreach($vouchersReferences as $bankCashesData){ 
 			if($bankCashesData->source_model=="Customers"){ 
 				$Customers = $this->CreditNotes->ReceivedFroms->Customers->get($bankCashesData->source_id,[
 						'contain'=>['Districts']]);
@@ -430,8 +430,8 @@ class CreditNotesController extends AppController
 			$receivedFroms[$bankCashesData->id]=['value'=>$bankCashesData->id,'text'=>$bankCashesData->name,'bill_to_bill_account'=>$bankCashesData->bill_to_bill_account,'state_id'=>"8"];
 			
 			}  
-		} ;
-		//pr($receivedFroms); exit;
+		} ; */
+		//pr($vouchersReferences); exit;
 		
 		$gst_type=[6,5];
 		
@@ -744,7 +744,7 @@ class CreditNotesController extends AppController
 			$ReceivedFroms_selected='no';
 		}
 		
-		
+		//pr($receivedFroms);exit;
 		$gst_type=[6,5];
 		
 		$GstTaxes = $this->CreditNotes->SaleTaxes->find()->where(['SaleTaxes.account_second_subgroup_id IN'=>$gst_type])->matching(

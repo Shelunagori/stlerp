@@ -50,7 +50,7 @@
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h($loanApplication->employee_name) ?></td>
+							<td><?= h($loanApplication->employee->name) ?></td>
 							<td><?= h($loanApplication->reason_for_loan) ?></td>
 							<td><?= h($loanApplication->salary_pm) ?></td>
 							<td><?= h($loanApplication->amount_of_loan) ?></td>

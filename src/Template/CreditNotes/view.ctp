@@ -61,6 +61,10 @@ margin-bottom: 0;
 						<?= $this->Text->autoParagraph(h($partyData->customer_address[0]->address)) ?>
 						</td>
 					</tr>
+					<tr>
+						<td><b>PAN No :</b> <?= h($partyData->pan_no)  ?> <b>.   GST No :</b><?= h($partyData->gst_no) ?></td>
+						
+					</tr>
 					
 				</table>
 			</td>
@@ -77,6 +81,15 @@ margin-bottom: 0;
 						<td>Transaction Date</td>
 						<td width="20" align="center">:</td>
 						<td><?= h(date("d-m-Y",strtotime($creditNotes->transaction_date))) ?></td>
+					</tr>
+					<tr>
+						<td>Our PAN</td>
+						<td width="20" align="center">:</td>
+						<td><?= h($creditNotes->company->pan_no) ?></td>
+					</tr><tr>
+						<td>Our GST</td>
+						<td width="20" align="center">:</td>
+						<td><?= h($creditNotes->company->gst_no) ?></td>
 					</tr>
 					
 				</table>
@@ -115,7 +128,7 @@ margin-bottom: 0;
 		<?php $i=1; $total_cr=0; $total_dr=0; foreach ($creditNotes->credit_notes_rows as $credit_notes_row): ?>
 		<tr>
 			<td><?php echo $i++; ?></td>
-			<td  style="text-align: left;"><?= h($credit_notes_row->narration) ?></td>
+			<td  style="text-align: left;"><?= $this->Text->autoParagraph(h($credit_notes_row->narration)) ?></td>
 			<td align="right"><?= h($this->Number->format($credit_notes_row->amount,[ 'places' => 2])) ?> </td>
 			<?php if($creditNotes->igst_total_amount==0){ ?>
 			<td align="center"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>

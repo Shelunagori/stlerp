@@ -9,6 +9,8 @@
 			<td style="background-color:green;"  align="center" colspan=<?php echo $p; ?>><span style='color:white'>Addition</span></td>
 			<?php $q=sizeof($EmployeeSalaryDeduction->toArray()); ?>
 			<td style="background-color:red;" align="center" colspan=<?php echo $q; ?>><span style='color:white'>Deduction</span></td>
+			<td rowspan="2">Loan Amount</td>
+			<td rowspan="2">Other</td>
 			<td rowspan="2">Net Salary</td>
 		</tr>
 		<tr>
@@ -23,7 +25,7 @@
 		
 	</thead>
 	<tbody id="main_tbody1">
-		<?php $total=0; $r=3; $l=1; $i=1; foreach($employees as $data){  $dr_amt=0; $cr_amt=0; ?>
+		<?php $total=0; $r=4; $l=1; $i=1; foreach($employees as $data){  $dr_amt=0; $cr_amt=0; ?>
 				<tr>
 					<td><?php echo $l++; ?></td>
 					<td><?php echo $data->name; ?>
@@ -43,6 +45,8 @@
 						<td align="right"><?= h($this->Number->format(@$emp_sallary_division[@$data->id][@$data4->id],[ 'places' => 2])) ?></td>
 						
 					<?php }  ?>
+						<td align="right"><?= h($this->Number->format(@$loan_amount[@$data->id],[ 'places' => 2])) ?></td>
+						<td align="right"><?= h($this->Number->format(@$loan_amount[@$data->id],[ 'places' => 2])) ?></td>
 						<td align="right"><?= h($this->Number->format(@$dr_amt-$cr_amt,[ 'places' => 2])) ?></td>
 						<?php $total+=@$dr_amt-$cr_amt; ?>
 				</tr>

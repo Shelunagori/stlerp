@@ -225,6 +225,57 @@
 	</div>
 </div>
 <?php }?>
+<?php if($PendingLoanApplications){ ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Pending Loan Request
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Employee Name</th>
+						<th>Status</th>
+						<th>Loan Amount</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingLoanApplications as $PendingRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $PendingRequest->employee->name; 
+						echo $this->Form->input('emp_id', ['type'=>'hidden','class'=>'emp_id','value' => @$PendingRequest->id]); ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingRequest->status; ?></span>
+						</td>
+						<td><?php echo $PendingRequest->amount_of_loan; ?></td>
+						</td>
+						<td><a href="#" class="approveLoan"><i class="fa fa-thumbs-o-up"></i> Approve </a>
+						<?= $this->Html->link(' Cancle ',
+								['controller'=>'LoanApplications', 'action' => 'cancle', $PendingRequest->id],
+								[
+									'escape' => false,'class'=>'fa fa-times'
+									
+								]
+							) ?>
+						</td>
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }?>
 <?php if($PendingTravelRequests){ ?>
 <div class="col-md-12 col-sm-12">
 	<div class="portlet grey-cascade box">
@@ -329,6 +380,21 @@ $(document).ready(function() {
 		$("#myModal3").hide();
     });
 
+//Loan Application
+
+$('.approveLoan').die().live("click",function(e){
+		e.preventDefault(); 
+		var emp_id=$(this).closest('tr').find('.emp_id').val(); 
+		var url="<?php echo $this->Url->build(['controller'=>'LoanApplications','action'=>'approve']); ?>";
+			url=url+'/'+emp_id, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) { 
+				$("#show_model").html(response);
+			});
+		//$("#myModal3").show();
+    });
 	
 
 });

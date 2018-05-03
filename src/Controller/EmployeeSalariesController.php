@@ -55,6 +55,7 @@ class EmployeeSalariesController extends AppController
      */
     public function paySallary($From=null){
 		//$this->viewBuilder()->layout('index_layout');
+		$From1=$From;
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
@@ -66,7 +67,8 @@ class EmployeeSalariesController extends AppController
 			$month=date("m",$time);
 			$year=date("Y",$time);
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
-		}
+		} 
+		
 		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
 		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])
 		->contain(['EmployeeCompanies'])
@@ -78,11 +80,17 @@ class EmployeeSalariesController extends AppController
 
 		$emp_sallary_division=[];
 		$basic_sallary=[];
+		$loan_amount=[];
 		foreach($employees as $dt){
-			$From=date('Y-m-d',strtotime($From));
+			$From=date('Y-m-d',strtotime($From)); 
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
+			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From])->first();  
+				if($LoanApplications){
+					$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
+				}
+				
 				if($EmployeeSalary){
 					foreach($EmployeeSalary->employee_salary_rows as $dt1){ 
 						$esd = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->get($dt1->employee_salary_division_id);
@@ -98,12 +106,21 @@ class EmployeeSalariesController extends AppController
 						
 					}
 				}
-		} 
-//pr($basic_sallary); exit;
+						$ledger_account=$this->EmployeeSalaries->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$dt->id,'company_id'=>$st_company_id])->first();
+						$ToDate=$total_day."-".$From1;
+						$to_date=date('Y-m-d',strtotime($ToDate)); 
+						
+						$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
+						$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+						->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
+						pr($query->toArray());
+		
+		}  exit;
+//pr($loan_amount); exit;
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
 		
-		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division'));
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount'));
 
 	}
 

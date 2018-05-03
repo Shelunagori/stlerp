@@ -24,6 +24,7 @@ class LoginsTable extends Table
 		$this->belongsTo('PurchaseOrders');
 		$this->belongsTo('LeaveApplications');
 		$this->belongsTo('TravelRequests');
+		$this->belongsTo('LoanApplications');
 		$this->belongsTo('Grns');
 		
     }

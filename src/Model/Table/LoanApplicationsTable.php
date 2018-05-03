@@ -35,6 +35,7 @@ class LoanApplicationsTable extends Table
         $this->displayField('id');
         $this->primaryKey('id');
 		 $this->belongsTo('Employees');
+		$this->belongsTo('EmployeeSalaries');
 		$this->belongsTo('empData', [
 			'className' => 'Employees',
             'foreignKey' => 'parent_employee_id',
@@ -98,8 +99,8 @@ class LoanApplicationsTable extends Table
     }
 	public function beforeMarshal(Event $event, ArrayObject $data)
     {
-        @$data['starting_date_of_loan'] = trim(date('Y-m-d',strtotime(@$data['starting_date_of_loan'])));
-        @$data['ending_date_of_loan'] = trim(date('Y-m-d',strtotime(@$data['ending_date_of_loan'])));
+      //  @$data['starting_date_of_loan'] = trim(date('Y-m-d',strtotime(@$data['starting_date_of_loan'])));
+      //  @$data['ending_date_of_loan'] = trim(date('Y-m-d',strtotime(@$data['ending_date_of_loan'])));
         @$data['create_date']      = trim(date('Y-m-d'));
     }
 }

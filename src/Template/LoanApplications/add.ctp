@@ -52,7 +52,7 @@ border:none;
 					   <div class="col-md-3">
 							<div class="form-group">
 								<label class="control-label">Salary (Pm)</label>
-								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empSallary,'readonly']); ?>
 							</div>
 						</div>
 						 <div class="col-md-3">
@@ -71,19 +71,6 @@ border:none;
 				<br/>
 				<div class="row">
 					
-						 <div class="col-md-3">
-							<div class="form-group">
-								<label class="control-label">Starting Date Of Loan</label>
-								<?php echo $this->Form->input('starting_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-							</div>
-						</div>
-						 <div class="col-md-3">
-							<div class="form-group">
-								<label class="control-label">Ending Date Of Loan</label>
-								<?php echo $this->Form->input('ending_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
-								
-							</div>
-						</div>
 						<div class="col-md-6">
 							<div class="form-group">
 								<label class="control-label attache_file" >Remark</label>

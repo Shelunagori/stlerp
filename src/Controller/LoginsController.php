@@ -456,7 +456,9 @@ class LoginsController extends AppController
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['leave_status'=>'Pending'])->contain(['empData'])->toArray();
 			
 			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
-			//pr($PendingleaveRequests); exit;
+		
+			$PendingLoanApplications = $this->Logins->LoanApplications->find()->where(['LoanApplications.status'=>'Pending'])->contain(['Employees'])->toArray();
+			//pr($PendingLoanApplications); exit;
 			
 		}
 		
@@ -466,7 +468,7 @@ class LoginsController extends AppController
 		$PendingTravelRequestStatus = $this->Logins->TravelRequests->find()->where(['TravelRequests.employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
 		/* pr($employee_id);
 		pr($PendingTravelRequestStatus); exit; */
-	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus','monthelySaleForInvoice','monthelySaleForSO','monthelySaleForQO'));
+	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus','monthelySaleForInvoice','monthelySaleForSO','monthelySaleForQO','PendingLoanApplications'));
 		
     }
 }
