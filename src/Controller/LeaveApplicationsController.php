@@ -38,7 +38,7 @@ class LeaveApplicationsController extends AppController
 		
 	public function approve($id = null){
 		$LeaveApplication = $this->LeaveApplications->get($id);
-		 $this->set(compact('LeaveApplication'));
+		 $this->set(compact('LeaveApplication','id'));
 	}
     public function view($id = null)
     {
@@ -230,30 +230,20 @@ class LeaveApplicationsController extends AppController
      * @return \Cake\Network\Response|null Redirects to index.
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
-    public function approved($id = null)
-    {
-		$session = $this->request->session();
-		$st_company_id = $session->read('st_company_id');
-		$s_employee_id=$this->viewVars['s_employee_id'];
-        $leaveApplication = $this->LeaveApplications->get($id);
-		
-		$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
-//pr($EmployeeHierarchies->parent_accounting_group->employee_id); exit;
-		if($EmployeeHierarchies->parent_id != null){
-			$query = $this->LeaveApplications->query();
-					$query->update()
-						->set(['parent_employee_id' => $EmployeeHierarchies->parent_accounting_group->employee_id])
-						->where(['id' => $id])
-						->execute();
-		
-		}else{
-			$approve_date=date('Y-m-d');
-			$query = $this->LeaveApplications->query();
-					$query->update()
-						->set(['leave_status' =>'approved','approve_date'=>$approve_date])
-						->where(['id' => $id])
-						->execute();
-		}
+    public function approved($id = null,$approve_leave_from = null,$approve_leave_to = null,$leave_type = null,$comment = null)
+    {	
+		$approve_date=date('Y-m-d');
+		$approve_leave_from=date('Y-m-d',strtotime($approve_leave_from));
+		$approve_leave_to=date('Y-m-d',strtotime($approve_leave_to));
+		$approve_leave_from = strtotime($approve_leave_from); 
+		$approve_leave_to =strtotime($approve_leave_to); 
+		$datediff =$approve_leave_to - $approve_leave_from;
+		$day_no=round($datediff / (60 * 60 * 24))+1;
+		$query = $this->LeaveApplications->query();
+			$query->update()
+				->set(['leave_status' =>'approved','approve_date'=>$approve_date,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'comment'=>$comment,'leave_type'=>$leave_type,'no_of_day_approve'=>$day_no])
+				->where(['id' => $id])
+				->execute();
 		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
     }
 

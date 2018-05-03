@@ -27,6 +27,7 @@ class EmployeeSalaryDivisionsController extends AppController
 		$employeeSalaryDivision = $this->EmployeeSalaryDivisions->newEntity();
         if ($this->request->is('post')) {
             $employeeSalaryDivision = $this->EmployeeSalaryDivisions->patchEntity($employeeSalaryDivision, $this->request->data);
+			
             if ($this->EmployeeSalaryDivisions->save($employeeSalaryDivision)) {
                 $this->Flash->success(__('The employee salary division has been saved.'));
 
@@ -35,9 +36,10 @@ class EmployeeSalaryDivisionsController extends AppController
                 $this->Flash->error(__('The employee salary division could not be saved. Please, try again.'));
             }
         }
-        $employeeSalaryDivisions = $this->paginate($this->EmployeeSalaryDivisions);
-
-        $this->set(compact('employeeSalaryDivisions','employeeSalaryDivision'));
+        $employeeSalaryDivisions = $this->paginate($this->EmployeeSalaryDivisions->find()->contain(['LedgerAccounts']));
+		$LedgerAccounts = $this->EmployeeSalaryDivisions->LedgerAccounts->find('list')->where(['LedgerAccounts.company_id' => $st_company_id]);
+		//pr($LedgerAccounts->toArray()); exit;
+        $this->set(compact('employeeSalaryDivisions','employeeSalaryDivision','LedgerAccounts'));
         $this->set('_serialize', ['employeeSalaryDivisions']);
     }
 
@@ -99,6 +101,7 @@ class EmployeeSalaryDivisionsController extends AppController
         ]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $employeeSalaryDivision = $this->EmployeeSalaryDivisions->patchEntity($employeeSalaryDivision, $this->request->data);
+			
             if ($this->EmployeeSalaryDivisions->save($employeeSalaryDivision)) {
                 $this->Flash->success(__('The employee salary division has been saved.'));
 
@@ -107,7 +110,8 @@ class EmployeeSalaryDivisionsController extends AppController
                 $this->Flash->error(__('The employee salary division could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('employeeSalaryDivision'));
+		$LedgerAccounts = $this->EmployeeSalaryDivisions->LedgerAccounts->find('list')->where(['LedgerAccounts.company_id' => $st_company_id]);
+        $this->set(compact('employeeSalaryDivision','LedgerAccounts'));
         $this->set('_serialize', ['employeeSalaryDivision']);
     }
 

@@ -33,6 +33,7 @@ class EmployeeSalaryDivisionsTable extends Table
         $this->table('employee_salary_divisions');
         $this->displayField('name');
         $this->primaryKey('id');
+		$this->belongsTo('LedgerAccounts');
     }
 
     /**

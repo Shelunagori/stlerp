@@ -427,6 +427,19 @@ class MaterialIndentsController extends AppController
 
         return $this->redirect(['action' => 'AddToCart']);
     }
+
+	public function deletedata($id = null)
+    {
+        //$this->request->allowMethod(['post', 'delete']);
+        $ItemBucket = $this->MaterialIndents->get($id);
+        if ($this->MaterialIndents->delete($ItemBucket)) {
+            $this->Flash->success(__('The Item has been deleted.'));
+        } else {
+            $this->Flash->error(__('The Item could not be deleted. Please, try again.'));
+        }
+
+        return $this->redirect(['action' => 'index']);
+    }
 	
 	
 	

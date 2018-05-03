@@ -20,10 +20,14 @@ class EmployeesController extends AppController
     {
         $url = $this->request->here();
         $url = parse_url($url, PHP_URL_QUERY);
-
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
         $this->viewBuilder()->layout('index_layout');
         $this->paginate = [
-            'contain' => ['Departments', 'Designations']
+            'contain' => ['Departments', 'Designations','EmployeeCompanies'=>function ($q) use($st_company_id) {
+						   return $q
+								->where(['EmployeeCompanies.company_id'=>$st_company_id]);
+						}]
         ];
 
         $where = [];
@@ -39,7 +43,7 @@ class EmployeesController extends AppController
         }
         $employees = $this->paginate($this->Employees->find()->where($where)->order(['Employees.name' => 'ASC']));
 
-
+		
         $this->set(compact('employees', 'status'));
         $this->set('_serialize', ['employees']);
         $this->set(compact('url'));

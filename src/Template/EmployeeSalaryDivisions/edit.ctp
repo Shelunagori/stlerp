@@ -34,6 +34,42 @@
 							</div>
 						</div>
 					</div>
+					<div class="form-group">
+					<label class="control-label col-md-3">Vary/Fixed <span class="required" aria-required="true">
+					* </span>
+					</label>
+					<div class="col-md-9">
+						<div class="input-icon right">
+							<i class="fa"></i>
+							 <?php 
+								echo $this->Form->input('vary_fixed', ['options'=>['Vary'=>'Vary','Fixed'=>'Fixed'],'label' => false,'class' => 'form-control input-sm  cr_dr_amount','style'=>'vertical-align: top !important;']); ?>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">Ledger <span class="required" aria-required="true">
+					* </span>
+					</label>
+					<div class="col-md-9">
+						<div class="input-icon right">
+							<i class="fa"></i>
+							 <?php 
+								echo $this->Form->input('ledger_account_id', ['empty'=>'--Select Ledger--','options'=>$LedgerAccounts,'label' => false,'class' => 'form-control input-sm  select2me','style'=>'vertical-align: top !important;']); ?>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="control-label col-md-3">Dr/Cr  <span class="required" aria-required="true">
+					* </span>
+					</label>
+					<div class="col-md-9">
+						<div class="input-icon right">
+							<i class="fa"></i>
+							 <?php 
+								echo $this->Form->input('cr_dr', ['options'=>['dr'=>'Dr','cr'=>'Cr'],'label' => false,'class' => 'form-control input-sm  ','style'=>'vertical-align: top !important;']); ?>
+						</div>
+					</div>
+				</div>
 					<div class="row">
 						<div class="col-md-offset-4 col-md-8">
 							<button type="submit" class="btn btn-primary">Update</button>

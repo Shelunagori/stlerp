@@ -36,7 +36,7 @@
 			</div>
 			
 			</div>
-			<?= $this->Form->button(__('Submit'),['class'=>'btn btn-success','type'=>'Submit']) ?>
+			
 			<?php echo $this->Form->end(); ?>
 		</div>
 	</div>

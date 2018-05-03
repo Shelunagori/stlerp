@@ -1,4 +1,4 @@
-<?php if($employee_id==23 or $employee_id==16){ ?>
+<?php if($employee_id==23 or $employee_id==16 or $employee_id==17){ ?>
 <div class="row">
 	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 ">
 		<div class="dashboard-stat blue-madison">
@@ -206,7 +206,16 @@
 						</td>
 						<td><?php echo $PendingRequest->emp_data->name; ?>
 						</td>
-						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a></td>
+						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a>
+						<?= $this->Html->link(' Cancle ',
+								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
+								[
+									'escape' => false,'class'=>'fa fa-times'
+									
+								]
+							) ?>
+						</td>
+						
 					</tr>
 					<?php } ?>
 				</tbody>
@@ -271,139 +280,7 @@
 	</div>
 </div>
 <?php }?>
-<?php } else { ?>	
-
-<?php if($PendingTravelRequestStatus){  ?>
-<div class="col-md-12 col-sm-12">
-	<div class="portlet grey-cascade box">
-		<div class="portlet-title">
-			<div class="caption">
-				<i class="fa fa-cogs"></i>Travel Request Status
-			</div>
-			<div class="actions">
-				
-			</div>
-		</div>
-		<div class="portlet-body">
-			<div class="table-responsive">
-				<table class="table table-hover table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>S.No</th>
-						<th>Status</th>
-						<th>Pending From</th>
-						
-					</tr>
-				</thead>
-				<tbody>
-					<?php $i=1;	foreach($PendingTravelRequestStatus as $PendingTravelRequest){ ?>
-					<tr>
-						<td><?php echo $i++; ?></td>
-						<td><span class="label label-sm label-success"><?php echo $PendingTravelRequest->status; ?></span>
-						</td>
-						<td><?php echo $PendingTravelRequest->emp_data->name; ?>
-						</td>
-						
-					</tr>
-					<?php } ?>
-				</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<?php }?>
-
-<?php if($PendingleaveRequests){ ?>
-<div class="col-md-12 col-sm-12">
-	<div class="portlet grey-cascade box">
-		<div class="portlet-title">
-			<div class="caption">
-				<i class="fa fa-cogs"></i>Pending Leave Request
-			</div>
-			<div class="actions">
-				
-			</div>
-		</div>
-		<div class="portlet-body">
-			<div class="table-responsive">
-				<table class="table table-hover table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>S.No</th>
-						<th>Employee Name</th>
-						<th>No of Days</th>
-						<th>Leave Status</th>
-						<th>Pending From</th>
-						<th>Action</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
-					<tr>
-						<td><?php echo $i++; ?></td>
-						<td><?php echo $PendingRequest->name; ?></td>
-						<td><?php echo $PendingRequest->day_no; ?></td>
-						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
-						</td>
-						<td><?php echo $PendingRequest->emp_data->name; ?>
-						</td>
-						<td><span class="approve">Approve</span>
-						
-					</tr>
-					<?php } ?>
-				</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<?php }?>
-
-<?php if($PendingleaveStatus){
-
-?>
-<div class="col-md-12 col-sm-12">
-	<div class="portlet grey-cascade box">
-		<div class="portlet-title">
-			<div class="caption">
-				<i class="fa fa-cogs"></i>Leave Request Status
-			</div>
-			<div class="actions">
-				
-			</div>
-		</div>
-		<div class="portlet-body">
-			<div class="table-responsive">
-				<table class="table table-hover table-bordered table-striped">
-				<thead>
-					<tr>
-						<th>S.No</th>
-						<th>Status</th>
-						<th>Pending From</th>
-					</tr>
-				</thead>
-				<tbody>
-					<?php $i=1;	foreach($PendingleaveStatus as $Pendingleave){ //pr($Pendingleave); ?>
-					<tr>
-						<td><?php echo $i++; ?></td>
-						<td><span class="label label-sm label-success"><?php echo $Pendingleave->leave_status; ?></span>
-						</td>
-						<?php if($Pendingleave->leave_status=='Pending'){ ?>
-						<td><?php echo $Pendingleave->emp_data->name; ?></td>
-						<?php } else {?>
-						<td><?php echo $Pendingleave->emp_data->name; ?></td>
-						<?php }?>
-					</tr>
-					<?php } ?>
-				</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
-</div>
-<?php }?>
-<?php }  ?>	
+<?php }   ?>	
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
@@ -434,15 +311,15 @@ $(document).ready(function() {
 		$("#myModal12").hide();
     });
 	
-	$('.approve').die().live("click",function() { 
-		
+	$('.approve').die().live("click",function(e){
+		e.preventDefault(); 
 		var emp_id=$(this).closest('tr').find('.emp_id').val(); 
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'approve']); ?>";
 			url=url+'/'+emp_id, 
 			$.ajax({
 				url: url,
 				type: 'GET',
-			}).done(function(response) { alert(response);
+			}).done(function(response) { 
 				$("#show_model").html(response);
 			});
 		//$("#myModal3").show();

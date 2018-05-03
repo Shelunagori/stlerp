@@ -54,7 +54,9 @@ margin-bottom: 0;
 					<tr>
 						<td>Voucher No</td>
 						<td width="20" align="center">:</td>
-						<td><?= h('#'.str_pad($receipt->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
+						<?php $voucher=('#'.str_pad($receipt->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+						<?php $fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); ?>
+						<td><?= h($voucher.'/'.$fy) ?></td>
 					</tr>
 				</table>
 			</td>

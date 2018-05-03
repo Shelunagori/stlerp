@@ -476,7 +476,12 @@
 			      <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Appointment</label>
-							<?php echo $this->Form->input('appointment_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>$employee->appointment_date->format('d-m-Y')]); ?>
+							<?php if(empty($employee->appointment_date)){ ?>
+									<?php echo $this->Form->input('appointment_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+							<?php }else{  ?>
+									<?php echo $this->Form->input('appointment_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>$employee->appointment_date->format('d-m-Y')]); ?>
+							<?php } ?>
+							
 						</div>
 					</div>
 			       
@@ -489,7 +494,12 @@
 			       <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Joining in the Deptt</label>
-							<?php echo $this->Form->input('dept_joining_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>$employee->dept_joining_date->format('d-m-Y')]); ?>
+							<?php if(empty($employee->dept_joining_date)){ ?>
+									<?php echo $this->Form->input('dept_joining_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+							<?php }else{  ?>
+										<?php echo $this->Form->input('dept_joining_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>$employee->dept_joining_date->format('d-m-Y')]); ?>
+							<?php } ?>
+						
 						</div>
 					</div>
 			</div>

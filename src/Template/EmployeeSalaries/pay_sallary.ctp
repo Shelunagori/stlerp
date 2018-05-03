@@ -25,7 +25,7 @@
 	<tbody id="main_tbody1">
 		<?php $total=0; $r=3; $l=1; $i=1; foreach($employees as $data){  $dr_amt=0; $cr_amt=0; ?>
 				<tr>
-					<td><?php echo $l++; ?>
+					<td><?php echo $l++; ?></td>
 					<td><?php echo $data->name; ?>
 					<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
 					</td>

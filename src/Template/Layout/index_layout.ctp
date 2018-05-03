@@ -843,6 +843,7 @@ select
 					</ul>-->
 				</li>
 				<?php } ?>
+				<?php if($s_employee_id==16 || $s_employee_id==23 || $s_employee_id==14){?>
 				
 				<li>
 					<a href="javascript:;">
@@ -938,12 +939,12 @@ select
 							</a>
 							<ul class="sub-menu">
 								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/EmployeeAttendances' ).'</li>'; ?>
-							</ul>
+								
 						</li>
 						</ul>
 					</ul>
 				</li>
+				<?php } ?>
 				
 			</ul>
 			<!-- END SIDEBAR MENU -->

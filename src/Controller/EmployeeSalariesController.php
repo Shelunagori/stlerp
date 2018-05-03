@@ -67,23 +67,39 @@ class EmployeeSalariesController extends AppController
 			$year=date("Y",$time);
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
 		}
-		$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
+		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])
+		->contain(['EmployeeCompanies'])
+			->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id'=>$st_company_id,'EmployeeCompanies.freeze'=>0]);
+					}
+				);
 
 		$emp_sallary_division=[];
 		$basic_sallary=[];
 		foreach($employees as $dt){
 			$From=date('Y-m-d',strtotime($From));
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
-			@$basic_sallary[@$dt->id]=$EmployeeSalary->amount; 
+			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
 				if($EmployeeSalary){
-					foreach($EmployeeSalary->employee_salary_rows as $dt1){  
-						$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+					foreach($EmployeeSalary->employee_salary_rows as $dt1){ 
+						$esd = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->get($dt1->employee_salary_division_id);
+						if($esd->vary_fixed=="Vary"){
+							$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+						}else{
+							$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$dt1->amount;
+						}
+						if($esd->salary_type=="addition"){ 
+							@$basic_sallary[@$dt->id]+=$dt1->amount; 
+						}
+						
 						
 					}
 				}
 		} 
-//pr($emp_sallary_division); exit;
+//pr($basic_sallary); exit;
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
 		
