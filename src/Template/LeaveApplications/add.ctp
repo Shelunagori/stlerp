@@ -41,10 +41,10 @@ border:none;
 					<thead>
 						<tr>
 						<?php foreach($leavedatas as $leavedata){ ?>
-						<td>Total <?php  echo $leavedata->leave_name ?></td>
+							<td>Total <?php  echo $leavedata->leave_name ?></td>
 						<?php  } ?>
 						<?php foreach($leavedatas as $leavedata){ ?>
-						<td>Pending <?php  echo $leavedata->leave_name ?></td>
+							<td>Pending <?php  echo $leavedata->leave_name ?></td>
 						<?php  } ?>
 						<tr>
 					</thead>
@@ -52,10 +52,10 @@ border:none;
 						
 						<tr>	
 							<?php foreach($leavedatas as $leavedata){ ?>
-							<td><?php  echo $Totaalleave[$leavedata->id]; ?></td>
+								<td><?php  echo $Totaalleave[$leavedata->id]; ?></td>
 							<?php  } ?>	
 							<?php foreach($leavedatas as $leavedata){ ?>
-							<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?></td>
+								<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?></td>
 							<?php  } ?>	
 						</tr>
 						
