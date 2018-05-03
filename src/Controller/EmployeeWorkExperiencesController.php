@@ -22,7 +22,7 @@ class EmployeeWorkExperiencesController extends AppController
         $this->paginate = [
             'contain' => ['Employees']
         ];
-        $employeeWorkExperiences = $this->paginate($this->EmployeeWorkExperiences);
+        $employeeWorkExperiences = $this->paginate($this->EmployeeWorkExperiences->find()->where(['employee_id'=>$employeeID]));
 		
 		$employeeWorkExperience = $this->EmployeeWorkExperiences->newEntity();
         if ($this->request->is('post')) {

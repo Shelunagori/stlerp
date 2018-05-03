@@ -23,7 +23,7 @@ class EmployeeReferenceDetailsController extends AppController
         $this->paginate = [
             'contain' => ['Employees']
         ];
-        $employeeReferenceDetails = $this->paginate($this->EmployeeReferenceDetails);
+        $employeeReferenceDetails = $this->paginate($this->EmployeeReferenceDetails->find()->where(['employee_id'=>$employeeID]));
 
 		$employeeReferenceDetail = $this->EmployeeReferenceDetails->newEntity();
 		if ($this->request->is('post')) {

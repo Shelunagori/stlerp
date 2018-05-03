@@ -55,6 +55,22 @@ class EmployeesTable extends Table
 			'saveStrategy' => 'replace'
         ]);
 		
+		$this->hasMany('EmployeeFamilyMembers', [
+            'foreignKey' => 'employee_id',
+        ]);
+		
+		$this->hasMany('EmployeeEmergencyDetails', [
+            'foreignKey' => 'employee_id',
+        ]);
+		
+		$this->hasMany('EmployeeReferenceDetails', [
+            'foreignKey' => 'employee_id',
+        ]);
+		
+		$this->hasMany('EmployeeWorkExperiences', [
+            'foreignKey' => 'employee_id',
+        ]);
+		
 		$this->belongsTo('AccountCategories', [
             'foreignKey' => 'account_category_id',
             'joinType' => 'INNER'

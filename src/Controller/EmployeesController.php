@@ -56,23 +56,49 @@ class EmployeesController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $employee = $this->Employees->get($id, [
-            'contain' => ['Departments', 'Designations', 'EmployeeContactPersons']
+            'contain' => ['Departments', 'Designations', 'EmployeeContactPersons', 'EmployeeFamilyMembers', 'EmployeeEmergencyDetails', 'EmployeeReferenceDetails', 'EmployeeWorkExperiences']
         ]);
 
-        $this->set('employee', $employee);
+		if($employee->home_state){
+			$state=$this->Employees->States->find()->where(['id'=>$employee->home_state])->first();
+			$stateName=$state->name;
+		}else{
+			$stateName="";
+		}
+		
+		if($employee->present_state){
+			$state=$this->Employees->States->find()->where(['id'=>$employee->present_state])->first();
+			$presentStateName=$state->name;
+		}else{
+			$presentStateName="";
+		}
+		
+		if($employee->permanent_state){
+			$state=$this->Employees->States->find()->where(['id'=>$employee->permanent_state])->first();
+			$permanentStateName=$state->name;
+		}else{
+			$permanentStateName="";
+		}
+		
+		if($employee->nominee_state){
+			$state=$this->Employees->States->find()->where(['id'=>$employee->nominee_state])->first();
+			$nomineeStateName=$state->name;
+		}else{
+			$nomineeStateName="";
+		}
+		
+		if($employee->reporting_to){
+			$em=$this->Employees->find()->where(['id'=>$employee->reporting_to])->first();
+			$reportingTo=$em->name;
+		}else{
+			$reportingTo="";
+		}
+		
+		$this->set(compact('employee', 'stateName', 'presentStateName', 'permanentStateName', 'nomineeStateName', 'reportingTo'));
         $this->set('_serialize', ['employee']);
     }
 	
-	public function view2($id = null)
-    {
-        $this->viewBuilder()->layout('index_layout');
-        $employee = $this->Employees->get($id, [
-            'contain' => ['Departments', 'Designations', 'EmployeeContactPersons']
-        ]);
-
-        $this->set('employee', $employee);
-        $this->set('_serialize', ['employee']);
-    }
+	
 
     /**
      * Add method
