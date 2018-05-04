@@ -379,6 +379,9 @@ $(document).ready(function() {
 	$('.closebtn2').die().live("click",function() { 
 		$("#myModal3").hide();
     });
+	$('.closebtn4').die().live("click",function() { 
+		$("#myModal4").hide();
+    });
 
 //Loan Application
 

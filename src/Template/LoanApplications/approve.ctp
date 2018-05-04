@@ -1,6 +1,6 @@
 <?php echo $this->Html->css('/assets/global/plugins/bootstrap-datepicker/css/datepicker3.css'); ?>
 
-<div id="myModal3" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display:block; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+<div id="myModal4" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display:block; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
 	<div class="modal-dialog">
 		<div class="modal-content">
 			<div class="modal-body" id="result_ajax">
@@ -48,7 +48,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button class="btn default closebtn2">Close</button>
+				<button class="btn default closebtn4">Close</button>
 				<button class="btn btn-primary insert_tc">Approve</button>
 			</div>
 		</div>
