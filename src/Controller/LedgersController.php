@@ -2129,7 +2129,7 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 				->where(function($exp) use($transaction_from_date,$transaction_to_date){
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
 				})->order(['transaction_date' => 'DESC']);
-		//		pr($opening_balance_ar); exit;
+			//	pr($data); exit;
 		
 		}
 		
@@ -2140,7 +2140,7 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 			$message_web='<table border="1">
 				<tr>
 					
-					'; $message_web.='<td colspan="2">'.h($company_data->name).  ' </td>';
+					'; $message_web.='<td colspan="2">'.h($data->name).  ' </td>';
 					$message_web.='<td colspan="2">'.h($transaction_from_date).  ' To'.h($transaction_to_date).'</td>';
 						
 						
@@ -2150,11 +2150,11 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 					'; 
 						if($opening_balance_ar['credit'] > $opening_balance_ar['debit']){
 							$t=$opening_balance_ar['credit'] - $opening_balance_ar['debit'];
-							$message_web.='<td colspan="2" align="right">'.h($t).  ' Cr.</td>';
+							$message_web.='<td colspan="2" align="right">'.h(round($t)).  ' Cr.</td>';
 							
 						}else{ 
 							$t=$opening_balance_ar['credit'] - $opening_balance_ar['debit'];
-							$message_web.='<td colspan="2" align="right">'.h(abs($t)).  ' Dr.</td>';
+							$message_web.='<td colspan="2" align="right">'.h(abs(round($t))).  ' Dr.</td>';
 						}
 						
 				$message_web.='</tr>
@@ -2212,7 +2212,7 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 				$message_web.='</tr></table>';
 		
 		
-	//	pr($message_web); exit;
+		//pr($message_web); exit;
 		
 		
 		$email_to=$customerData->customer_contacts[0]->email;
@@ -2229,7 +2229,7 @@ public function ledgerAccountDataTb($group_id,$from_date,$to_date)
 		
 		$cc_mail=$empData->email;
 	//	pr($email_to);
-		//pr($cc_mail); exit;
+		//pr($attachments); exit;
 		$heading="PFA";
 		$member_name="Gopal";
 		$email->from(['dispatch@mogragroup.com' => $from_name])
