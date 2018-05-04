@@ -81,6 +81,7 @@ class EmployeeSalariesController extends AppController
 		$emp_sallary_division=[];
 		$basic_sallary=[];
 		$loan_amount=[];
+		$other_amount=[];
 		foreach($employees as $dt){
 			$From=date('Y-m-d',strtotime($From)); 
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
@@ -112,15 +113,17 @@ class EmployeeSalariesController extends AppController
 						
 						$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
 						$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-						->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first();
-						pr($query->toArray());
+						->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
+						$dr =$query->toArray()[0]['totalDebit'];
+						$cr =$query->toArray()[0]['totalCredit']; 
+						$other_amount[@$dt->id]=round($dr-$cr,2);
 		
-		}  exit;
-//pr($loan_amount); exit;
+		} 
+//pr($other_amount); exit;
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
 		
-		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount'));
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount'));
 
 	}
 

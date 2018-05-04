@@ -123,7 +123,7 @@
  					<td><?= date("d-m-Y",strtotime($jobCard->required_date));?></td>
 					<td><?= date("d-m-Y",strtotime($jobCard->created_on));?></td>
 					<td class="actions">
-					<?php if(in_array($jobCard->created_by,$allowed_emp)){ ?>
+					
 					<?php if(in_array(24,$allowed_pages)){ ?>
 					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); ?>
 					<?php } ?>
@@ -132,7 +132,7 @@
 					if(!in_array(date("m-Y",strtotime($jobCard->created_on)),$closed_month))
 					{ 
 					echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
-				<?php } } } ?>
+				<?php } }  ?>
 
 				
 					<!-- // if(in_array(34,$allowed_pages)) { 
@@ -170,10 +170,10 @@
  					<td><?= date("d-m-Y",strtotime($jobCard->required_date));?></td>
 					<td><?= date("d-m-Y",strtotime($jobCard->created_on));?></td>
 					<td class="actions">
-					<?php if(in_array($jobCard->created_by,$allowed_emp)){ ?>
+				
 					<?php if(in_array(24,$allowed_pages)){ ?>
 					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); ?>
-					<?php } } ?>
+					<?php }  ?>
 					<!--if(in_array(34,$allowed_pages)) {
 
 					 if($status==null or $status=='Pending'){ 
