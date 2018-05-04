@@ -70,7 +70,7 @@ class EmployeeSalariesController extends AppController
 		} 
 		
 		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
-		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])
 		->contain(['EmployeeCompanies'])
 			->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -87,7 +87,7 @@ class EmployeeSalariesController extends AppController
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
-			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From])->first();  
+			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
 				if($LoanApplications){
 					$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
 				}
