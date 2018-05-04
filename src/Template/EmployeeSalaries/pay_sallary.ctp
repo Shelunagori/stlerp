@@ -81,7 +81,7 @@
 			<td align="right">
 				<?= h($this->Number->format((@$dr_amt-$cr_amt)-$total_row-$loan_amt,[ 'places' => 2])) ?>
 			</td>
-			<?php $total+=@$dr_amt-$cr_amt; ?>
+			<?php $total+=(@$dr_amt-$cr_amt)-$total_row-$loan_amt; ?>
 		</tr>
 		<?php $i++; }  $r+=$p+$q;?>
 		<tr>

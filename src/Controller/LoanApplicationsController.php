@@ -19,7 +19,16 @@ class LoanApplicationsController extends AppController
     public function index()
     {
 		$this->viewBuilder()->layout('index_layout');
-        $loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees']));
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
+		
+		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
+		$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees']));
+		}else{
+		$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+		}
 
         $this->set(compact('loanApplications'));
         $this->set('_serialize', ['loanApplications']);
@@ -33,6 +42,20 @@ class LoanApplicationsController extends AppController
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
 
+	public function getSalary($id = null){
+		$cd  = date('d-m-Y');
+		$From = date('t-m-Y', strtotime($cd));
+		$From=date('Y-m-d',strtotime($From));
+		$EmployeeSalary = $this->LoanApplications->EmployeeSalaries->find()->where(['employee_id'=>$id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'=>['EmployeeSalaryDivisions']])->order(['id'=>'DESC'])->first(); 
+		$empSallary=0;
+		foreach(@$EmployeeSalary->employee_salary_rows as $data){
+				if($data->employee_salary_division->salary_type=='addition'){
+					$empSallary+=$data->amount;
+				}
+		}
+		echo $empSallary; exit;
+		 // pr($empSallary); exit;
+	}
 	public function approve($id = null){
 		$LoanApplications = $this->LoanApplications->get($id); //pr($LoanApplications); exit;
 		 $this->set(compact('LoanApplications','id'));
@@ -74,11 +97,12 @@ class LoanApplicationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
-		//pr($empData); exit;
+		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
+		//pr($empData->department); exit;
         $loanApplication = $this->LoanApplications->newEntity();
         if ($this->request->is('post')) {
             $loanApplication = $this->LoanApplications->patchEntity($loanApplication, $this->request->data);
+			//pr($loanApplication); exit;
 			if ($this->LoanApplications->save($loanApplication)) {
                 $this->Flash->success(__('The loan application has been saved.'));
 
@@ -95,7 +119,8 @@ class LoanApplicationsController extends AppController
 					$empSallary+=$data->amount;
 				}
 		}
-        $this->set(compact('loanApplication','empData','empSallary'));
+		$Employees=$this->LoanApplications->Employees->find('list');
+        $this->set(compact('loanApplication','empData','empSallary','Employees'));
         $this->set('_serialize', ['loanApplication']);
     }
 
@@ -112,6 +137,9 @@ class LoanApplicationsController extends AppController
         $loanApplication = $this->LoanApplications->get($id, [
             'contain' => []
         ]);
+
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $loanApplication = $this->LoanApplications->patchEntity($loanApplication, $this->request->data);
             if ($this->LoanApplications->save($loanApplication)) {
@@ -122,7 +150,16 @@ class LoanApplicationsController extends AppController
                 $this->Flash->error(__('The loan application could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('loanApplication'));
+		$From=date('Y-m-d');
+		$EmployeeSalary = $this->LoanApplications->EmployeeSalaries->find()->where(['employee_id'=>$s_employee_id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'=>['EmployeeSalaryDivisions']])->order(['id'=>'DESC'])->first();  
+		$empSallary=0;
+		foreach(@$EmployeeSalary->employee_salary_rows as $data){
+				if($data->employee_salary_division->salary_type=='addition'){
+					$empSallary+=$data->amount;
+				}
+		}
+		$Employees=$this->LoanApplications->Employees->find('list');
+        $this->set(compact('loanApplication','empData','empSallary','Employees'));
         $this->set('_serialize', ['loanApplication']);
     }
 

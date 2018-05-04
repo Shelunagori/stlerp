@@ -44,15 +44,19 @@ border:none;
 						<div class="col-md-3">
 							<div class="form-group">
 								<label class="control-label">Employee Name</label>   
-								<?php echo $this->Form->input('employee_name', ['readonly','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name]); ?>
-								<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id]); ?>
+								<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
+										<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me employee_id']); ?>
+								<?php }else{ ?>
+									<?php echo $this->Form->input('employee_name', ['readonly','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name]); ?>
+									<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id]); ?>
+								<?php } ?>
 							</div>
 						</div>
 						
 					   <div class="col-md-3">
 							<div class="form-group">
 								<label class="control-label">Salary (Pm)</label>
-								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empSallary,'readonly']); ?>
+								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empSallary,'readonly','id'=>'salary_pm']); ?>
 							</div>
 						</div>
 						 <div class="col-md-3">
@@ -93,6 +97,7 @@ border:none;
 
 $(document).ready(function() 
 {
+	
     	//--------- FORM VALIDATION
 	var form3 = $('#form_sample_3');
 	var error3 = $('.alert-danger', form3);
@@ -179,6 +184,19 @@ $(document).ready(function()
 			form[0].submit();
 		}
 
+	});
+	
+	$('.employee_id').live("change",function() {
+		var employee=$(this).find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LoanApplications','action'=>'getsalary']); ?>";
+			url=url+'/'+employee, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {  
+				$("#salary_pm").val(response);
+			});
+		
 	});
 	
 	//--	 END OF VALIDATION

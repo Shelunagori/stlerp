@@ -32,100 +32,63 @@ border:none;
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Loan Application</span>
+			<span class="caption-subject font-blue-steel uppercase">Edit Loan Application</span>
 		</div>
 	</div>
 
-<div class="portlet-body form">
-		<?php echo $this->Form->create($loanApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
-				
-	
-			<div class="form-body">
+		<div class="portlet-body form ">
+			<?php echo $this->Form->create($loanApplication, ['id'=>'form_sample_3','enctype'=>'multipart/form-data']); ?>
+			<div class="form-body ">
 				<div class="row">
-			        <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Employee Name</label>   
-							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+					
+						<div class="col-md-3">
+							<div class="form-group">
+								<label class="control-label">Employee Name</label>   
+								<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
+										<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me employee_id']); ?>
+								<?php }else{ ?>
+									<?php echo $this->Form->input('employee_name', ['readonly','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name]); ?>
+									<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id]); ?>
+								<?php } ?>
+							</div>
 						</div>
-					</div>
-			        <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Reason For Loan</label>
-							<?php echo $this->Form->input('reason_for_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+						
+					   <div class="col-md-3">
+							<div class="form-group">
+								<label class="control-label">Salary (Pm)</label>
+								<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empSallary,'readonly','id'=>'salary_pm']); ?>
+							</div>
 						</div>
-					</div>
-			       <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Salary Pm</label>
-							<?php echo $this->Form->input('salary_pm', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+						 <div class="col-md-3">
+							<div class="form-group">
+								<label class="control-label">Amount Of Loan</label>
+								<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
+							</div>
 						</div>
-					</div>
-			</div>
-			<div class="row">
-				    <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Amount Of Loan</label>
-							<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
+						 <div class="col-md-3">
+								<div class="form-group">
+									<label class="control-label">Reason For Loan</label>
+									<?php echo $this->Form->input('reason_for_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+								</div>
+							</div>
+				</div>
+				<br/>
+				<div class="row">
+					
+						<div class="col-md-6">
+							<div class="form-group">
+								<label class="control-label attache_file" >Remark</label>
+								<?php echo $this->Form->input('remark', ['label' => false,'placeholder'=>'','class'=>'form-control','type'=>'textarea','rows'=>3,'colspan'=>5]); ?>
+							</div>
 						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Amount Of Loan In Word</label>   
-							<?php echo $this->Form->input('amount_of_loan_in_word', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm', 'type'=>'text']); ?>
-						</div>
-					</div>
-			        <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Starting Date Of Loan</label>
-							<?php 
-							if(!empty($loanApplication->starting_date_of_loan))
-							{
-								if($loanApplication->starting_date_of_loan!='1/1/70')
-								{   
-									$startingDateOfLoan = date("d-m-Y",strtotime($loanApplication->starting_date_of_loan));
-								}
-							}
-							echo $this->Form->input('starting_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$startingDateOfLoan]); ?>
-						</div>
-					</div>
-			</div>
-			<div class="row">
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Ending Date Of Loan</label>
-							<?php 
-							if(!empty($loanApplication->ending_date_of_loan))
-							{
-								if($loanApplication->ending_date_of_loan!='1/1/70')
-								{   
-									$endingDateOfLoan = date("d-m-Y",strtotime($loanApplication->ending_date_of_loan));
-								}
-							}
-							echo $this->Form->input('ending_date_of_loan', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>@$endingDateOfLoan]); ?>
-							
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css attache_file" >Remark</label>
-							<?php echo $this->Form->input('remark', ['label' => false,'placeholder'=>'','class'=>'form-control','type'=>'textarea','rows'=>2]); ?>
-						</div>
-					</div>
-			</div>
-			</div>
-			</div>
-			
-		</fieldset>	
-		
+				</div>
+				
 			</div>
 		</div>
-			<div class="box-footer">
-				<center>
-				
-				 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
-				</center>
-			</div>
-			</div>
+		<div class="form-actions right">
+			 <button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
+		</div>
+		
 			<?php echo $this->Form->end(); ?>
 			</div>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
@@ -220,6 +183,19 @@ $(document).ready(function()
 			form[0].submit();
 		}
 
+	});
+
+	$('.employee_id').live("change",function() {
+		var employee=$(this).find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LoanApplications','action'=>'getsalary']); ?>";
+			url=url+'/'+employee, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {  
+				$("#salary_pm").val(response);
+			});
+		
 	});
 	
 	//--	 END OF VALIDATION

@@ -55,11 +55,11 @@ class LoanApplicationsTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
+      /*  $validator
             ->requirePresence('employee_name', 'create')
             ->notEmpty('employee_name');
 
-        /* $validator
+         $validator
             ->requirePresence('reason_for _loan', 'create')
             ->notEmpty('reason_for _loan');
 
