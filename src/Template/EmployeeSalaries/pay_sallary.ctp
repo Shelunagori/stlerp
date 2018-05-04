@@ -67,7 +67,9 @@
 			</td>
 			<?php }  ?>
 			<td align="right">
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id],2)]); ?>
+				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id],2)]); 
+				$loan_amt=round(@$loan_amount[@$data->id],2);
+				?>
 				
 			</td>
 			<td align="right">
@@ -77,7 +79,7 @@
 				<?php }else{ echo "-"; } ?>
 			</td>
 			<td align="right">
-				<?= h($this->Number->format((@$dr_amt-$cr_amt)-$total_row,[ 'places' => 2])) ?>
+				<?= h($this->Number->format((@$dr_amt-$cr_amt)-$total_row-$loan_amt,[ 'places' => 2])) ?>
 			</td>
 			<?php $total+=@$dr_amt-$cr_amt; ?>
 		</tr>
