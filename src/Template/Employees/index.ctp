@@ -63,7 +63,6 @@
 								<?php echo $this->Html->link('<i class="fa fa-anchor"></i>','/EmployeeReferenceDetails/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Reference Details')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-graduation-cap"></i>','/EmployeeWorkExperiences/index/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Work Experience')); ?>
 								<?php echo $this->Html->link('<i class="fa fa-inr"></i>','/EmployeeSalaries/add/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Salary')); ?>
-								<?php echo $this->Html->link('<i class="fa fa-paper-plane-o"></i>','/CompanyWiseEmployeeSalaries/add/'.$employee->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit Company for Salary')); ?>
 							<?php } ?>
 							<?php if(in_array(49,$allowed_pages)){?>
 							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditCompany', $employee->id],array('escape'=>false,'class'=>'btn btn-xs green tooltips','data-original-title'=>'EditCompany')); ?>

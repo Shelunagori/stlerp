@@ -898,4 +898,48 @@ $(document).ready(function () {
 		}
 	});
 });
+</script> <script type="text/javascript">
+$(document).ready(function () {
+	$('#id_radio2').click(function () {
+		$('#married_info').show('fast');
+	});
+	$('#id_radio1').click(function () {
+		$('.spouse').val('');
+		$('.doba').val('');
+		$('.nochild').val('');
+		$('#married_info').hide('fast');
+	});
+	$('#id_radio3').click(function () {
+		$('.spouse').val('');
+		$('.doba').val('');
+		$('.nochild').val('');
+		$('#married_info').hide('fast');
+	});
+	$('input[name="same_addrs"]').click(function () {
+		if($(this).attr('checked')){
+			var q=$('select[name=present_state] option:selected').val();
+			$('select[name=permanent_state]').val(q).select2();
+			
+			var q=$('input[name=present_district]').val();
+			$('input[name=permanent_district]').val('hello');
+			
+			var q=$('input[name=present_pin_code]').val();
+			$('input[name=permanent_pin_code]').val(q);
+			
+			var q=$('input[name=present_mobile_no]').val();
+			$('input[name=permanent_mobile_no]').val(q);
+			
+			var q=$('input[name=present_phone_no]').val();
+			$('input[name=permanent_phone_no]').val(q);
+			
+			var q=$('input[name=present_email]').val();
+			$('input[name=permanent_email]').val(q);
+			
+			var q=$('textarea[name=present_address]').val();
+			$('textarea[name=permanent_address]').val(q);
+		}else{
+			alert('not');
+		}
+	});
+});
 </script>
