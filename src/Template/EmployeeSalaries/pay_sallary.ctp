@@ -4,6 +4,7 @@
 		<tr>
 			<td rowspan="2">S.N</td>
 			<td rowspan="2">Employee Name</td>
+			<td rowspan="2">Atten.</td>
 			<td rowspan="2">Total Salary</td>
 			<?php $p=sizeof($EmployeeSalaryAddition->toArray()); ?>
 			<td style="background-color:green;"  align="center" colspan=
@@ -44,10 +45,16 @@
 			</td>
 			<td>
 				<?php echo $data->name; ?>
+				
 				<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
 			</td>
 			<td>
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$basic_sallary[@$data->id],2)]); ?>
+				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$EmployeeAtten[@$data->id],2)]); ?>
+				
+			</td>
+			<td>
+				<?php echo @$basic_sallary[@$data->id]; ?>
+				
 				
 			</td>
 			<?php  foreach($EmployeeSalaryAddition as $data2){ 
@@ -73,13 +80,14 @@
 				
 			</td>
 			<td align="right">
-				<?php if(@$other_amount[@$data->id] != 0){ ?>
+				
 				<?php  $total_row=@$other_amount[@$data->id]; ?>
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
-				<?php }else{ echo "-"; } ?>
+				<?php echo $this->Form->input('other_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
+				
 			</td>
 			<td align="right">
-				<?= h($this->Number->format((@$dr_amt-$cr_amt)-$total_row-$loan_amt,[ 'places' => 2])) ?>
+				
+				<?php echo $this->Form->input('net_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>(@$dr_amt-$cr_amt)-$total_row-$loan_amt,'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt)]); ?>
 			</td>
 			<?php $total+=(@$dr_amt-$cr_amt)-$total_row-$loan_amt; ?>
 		</tr>
@@ -116,5 +124,13 @@ $(document).ready(function() {
 				});
 		});
     });
+
+	$('.other_amount1').on("blur",function() {
+		var net_amount=$(this).closest('tr').find('.net_amount').attr('net');
+		var other_amt=$(this).closest('tr').find('.other_amount1').val();
+		var amount_after_other=round(net_amount-other_amt);
+		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
+	});
+	
 });
 </script>
