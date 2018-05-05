@@ -22,7 +22,14 @@ class LeaveApplicationsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$this->viewBuilder()->layout('index_layout');
-        $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes'])->where(['employee_id'=>$s_employee_id]));
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
+		
+		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
+		$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees']));
+		}else{
+		$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+		}
+       // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
         $this->set(compact('leaveApplications'));
         $this->set('_serialize', ['leaveApplications']);
     }
