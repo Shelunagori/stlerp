@@ -50,6 +50,7 @@ class EmployeeSalariesTable extends Table
 		$this->belongsTo('EmployeeAttendances');
 		$this->belongsTo('LoanApplications');
 		$this->belongsTo('LedgerAccounts');
+		$this->belongsTo('Salaries');
 		
     }
 

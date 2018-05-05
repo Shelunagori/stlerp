@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\Event\Event;
 /**
  * EmployeeSalaries Controller
  *
@@ -11,6 +11,11 @@ use App\Controller\AppController;
 class EmployeeSalariesController extends AppController
 {
 
+	 public function beforeFilter(Event $event) {
+		 $this->eventManager()->off($this->Csrf);
+	 }
+
+		
     /**
      * Index method
      *
@@ -54,17 +59,20 @@ class EmployeeSalariesController extends AppController
      * @return \Cake\Network\Response|void Redirects on successful add, renders view otherwise.
      */
     public function paySallary($From=null){
+		$this->set(compact('From'));
+
 		//$this->viewBuilder()->layout('index_layout');
 		$From1=$From;
-		$f=explode('-',$From);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		if(!empty($From)){ 
-			$month=$f[0];
-			$year=$f[1];
+			$From="01-".$From;
+			$time=strtotime($From);
+			$month=date("m",$time);
+			$year=date("Y",$time);
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
 		} 
 		
@@ -127,6 +135,138 @@ class EmployeeSalariesController extends AppController
 		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount','EmployeeAtten'));
 
 	}
+	
+	
+	
+	public function generateSalary(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		
+		
+		if ($this->request->is('post')) {
+			$From=$this->request->data()['From'];
+			$other_amount=$this->request->data()['other_amount'];
+			foreach($other_amount as $key=>$value){
+				if($value!=0){
+					$salary = $this->EmployeeSalaries->Salaries->newEntity();
+					$salary->employee_id=$key;
+					$salary->company_id=$st_company_id;
+					$salary->employee_salary_division_id=0;
+					$salary->amount=0;
+					$salary->other_amount=$value;
+					$this->EmployeeSalaries->Salaries->save($salary);
+				}
+			}
+			
+		
+		
+		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		if(!empty($From)){ 
+			$From1=$From;
+			$From="01-".$From;
+			$time=strtotime($From);
+			$month=date("m",$time);
+			$year=date("Y",$time);
+			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+		} 
+		
+		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])
+		->contain(['EmployeeCompanies'])
+			->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id'=>$st_company_id,'EmployeeCompanies.freeze'=>0]);
+					}
+				);
+
+		$emp_sallary_division=[];
+		$basic_sallary=[];
+		$loan_amount=[];
+		$other_amount=[];
+		$EmployeeAtten=[];
+		
+		
+		foreach($employees as $dt){
+			$From=date('Y-m-d',strtotime($From)); 
+			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
+			
+			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
+			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
+			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
+				if($LoanApplications){
+					$loan_amount[$dt->id]=$LoanApplications->instalment_amount;
+					
+					if(@$LoanApplications->instalment_amount>0){
+						$salary = $this->EmployeeSalaries->Salaries->newEntity();
+						$salary->employee_id=$dt->id;
+						$salary->company_id=$st_company_id;
+						$salary->employee_salary_division_id=0;
+						$salary->amount=0;
+						$salary->loan_amount=$LoanApplications->instalment_amount;
+						$this->EmployeeSalaries->Salaries->save($salary);
+					}
+				}
+				
+				if($EmployeeSalary){
+					foreach($EmployeeSalary->employee_salary_rows as $dt1){ 
+						$esd = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->get($dt1->employee_salary_division_id);
+						if($esd->vary_fixed=="Vary"){
+							$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+							
+							if(@$EmployeeAttendance->present_day*@$dt1->amount/$total_day>0){
+								$salary = $this->EmployeeSalaries->Salaries->newEntity();
+								$salary->employee_id=$dt->id;
+								$salary->company_id=$st_company_id;
+								$salary->employee_salary_division_id=$dt1->employee_salary_division_id;
+								$salary->amount=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+								$this->EmployeeSalaries->Salaries->save($salary);
+							}
+							
+						}else{
+							$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$dt1->amount;
+							
+							if(@$dt1->amount>0){
+								$salary = $this->EmployeeSalaries->Salaries->newEntity();
+								$salary->employee_id=$dt->id;
+								$salary->company_id=$st_company_id;
+								$salary->employee_salary_division_id=$dt1->employee_salary_division_id;
+								$salary->amount=$dt1->amount;
+								$this->EmployeeSalaries->Salaries->save($salary);
+							}
+							
+						}
+						if($esd->salary_type=="addition"){ 
+							@$basic_sallary[@$dt->id]+=$dt1->amount; 						
+						}
+						
+						
+					}
+				}
+						$ledger_account=$this->EmployeeSalaries->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$dt->id,'company_id'=>$st_company_id])->first();
+						$ToDate=$total_day."-".$From1;
+						$to_date=date('Y-m-d',strtotime($ToDate)); 
+						
+						$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
+						$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+						->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
+						$dr =$query->toArray()[0]['totalDebit'];
+						$cr =$query->toArray()[0]['totalCredit']; 
+						$other_amount[@$dt->id]=round($dr-$cr,2);
+		
+		} 
+//pr($other_amount); exit;
+		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
+		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
+		
+		
+		}
+		
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount','EmployeeAtten'));
+
+	}
 
     public function paidSallary(){
 		$this->viewBuilder()->layout('index_layout');
@@ -156,11 +296,6 @@ class EmployeeSalariesController extends AppController
 		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','EmployeeSalaryDivisions'));
         $this->set('_serialize', ['employeeSalary']);
 	}
-	
-	 public function generateSalary($From=null){
-		 
-	 }
-	
     public function add($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');

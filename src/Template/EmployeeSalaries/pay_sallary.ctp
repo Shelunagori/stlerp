@@ -1,4 +1,6 @@
+<form method="post" action="<?php echo $this->Url->build(['controller'=>'EmployeeSalaries','action'=>'generateSalary']); ?>">
 
+<input type="hidden" name="From" value="<?php echo $From; ?>" />
 <table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="80%">
 	<thead>
 		<tr>
@@ -43,7 +45,7 @@
 			<td>
 				<?php echo $l++; ?>
 			</td>
-			<td>
+			<td employee_id="<?php echo $data->id; ?>">
 				<?php echo $data->name; ?>
 				
 				<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
@@ -82,7 +84,7 @@
 			<td align="right">
 				
 				<?php  $total_row=@$other_amount[@$data->id]; ?>
-				<?php echo $this->Form->input('other_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
+				<?php echo $this->Form->input('other_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
 				
 			</td>
 			<td align="right">
@@ -105,8 +107,8 @@
 		</tr>
 	</tbody>
 </table>
-<button type="button" class="btn blue genertSlry">GENERATE SALARY</button>
-
+<button type="submit" class="btn blue genertSlry">GENERATE SALARY</button>
+</form>
 
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
