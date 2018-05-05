@@ -41,6 +41,7 @@
 							<td><?= h($leaveApplication->day_no) ?></td>
 							<td><?= h($leaveApplication->leave_status) ?></td>
 							<td class="actions">
+								<?php if($leaveApplication->leave_status=="Pending"){?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $leaveApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $leaveApplication->id], 
@@ -50,6 +51,7 @@
 									'confirm' => __('Are you sure ?', $leaveApplication->id)
 								]
 							) ?>
+								<?php } ?>
 							</td>
 						</tr>
 						

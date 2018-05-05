@@ -105,7 +105,7 @@ border:none;
 							$rmode[]=['value'=>'Bus','text'=>'Bus'];
 							$rmode[]=['value'=>'Rail','text'=>'Rail'];
 							$rmode[]=['value'=>'Self','text'=>'Self'];
-							echo $this->Form->input('return_travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
+							echo $this->Form->input('travel_mode', ['empty'=> '---Select Mode---','label' => false,'class'=>'form-control select2me input-sm','options'=>@$rmode]); ?>
 						</div>
 					</div>
 					

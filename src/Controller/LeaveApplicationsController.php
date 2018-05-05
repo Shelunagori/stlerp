@@ -155,7 +155,7 @@ class LeaveApplicationsController extends AppController
 			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
 			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
 		}
-		$employees = $this->LeaveApplications->Employees->find('list'); 
+		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
         $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
@@ -216,7 +216,7 @@ class LeaveApplicationsController extends AppController
                 $this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
-		$employees = $this->LeaveApplications->Employees->find('list'); 
+		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
 		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
         $this->set(compact('leaveApplication','leavetypes','empData','employees'));
         $this->set('_serialize', ['leaveApplication']);

@@ -32,7 +32,7 @@
 						<?php $i=0; foreach ($salaryAdvances as $salaryAdvance): ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h($salaryAdvance->employee_name) ?></td>
+							<td><?= h($salaryAdvance->employee->name) ?></td>
 							<td><?= h($salaryAdvance->amount) ?></td>
 							<td><?= h($salaryAdvance->reason) ?></td>
 							<td class="actions">

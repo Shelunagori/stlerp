@@ -154,7 +154,7 @@ class LoanApplicationsController extends AppController
             }
         }
 		$From=date('Y-m-d');
-		$EmployeeSalary = $this->LoanApplications->EmployeeSalaries->find()->where(['employee_id'=>$s_employee_id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'=>['EmployeeSalaryDivisions']])->order(['id'=>'DESC'])->first();  
+		$EmployeeSalary = $this->LoanApplications->EmployeeSalaries->find()->where(['employee_id'=>$loanApplication->employee_id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'=>['EmployeeSalaryDivisions']])->order(['id'=>'DESC'])->first();  
 		$empSallary=0;
 		foreach(@$EmployeeSalary->employee_salary_rows as $data){
 				if($data->employee_salary_division->salary_type=='addition'){

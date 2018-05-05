@@ -65,11 +65,10 @@ class TravelRequestsController extends AppController
         if ($this->request->is('post')) {
             $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
 			$travelRequest->employee_id=$s_employee_id;
-			$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
-			$travelRequest->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			
 			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
-			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->return_mode_to_date));
-
+			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->travel_mode_to_date));
+			
             if ($this->TravelRequests->save($travelRequest)) {
 				
                 $this->Flash->success(__('The travel request has been saved.'));
@@ -98,18 +97,18 @@ class TravelRequestsController extends AppController
 		 $st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		//$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations']]);
-		
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
         $travelRequest = $this->TravelRequests->get($id, [
             'contain' => ['TravelRequestRows','Employees'=>['Designations']]
         ]); //pr($travelRequest);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
 			$travelRequest->employee_id=$s_employee_id;
-			$EmployeeHierarchies=$this->TravelRequests->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
-			$travelRequest->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			
 			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
-			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->return_mode_to_date));
-            if ($this->TravelRequests->save($travelRequest)) {
+			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->travel_mode_to_date)); 
+            if ($this->TravelRequests->save($travelRequest)) { 
                 $this->Flash->success(__('The travel request has been saved.'));
 
                 return $this->redirect(['action' => 'index']);

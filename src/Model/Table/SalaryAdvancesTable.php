@@ -34,6 +34,8 @@ class SalaryAdvancesTable extends Table
         $this->table('salary_advances');
         $this->displayField('id');
         $this->primaryKey('id');
+		$this->belongsTo('Employees');
+		$this->belongsTo('EmployeeSalaries');
     }
 
     /**
@@ -48,9 +50,7 @@ class SalaryAdvancesTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
-            ->requirePresence('employee_name', 'create')
-            ->notEmpty('employee_name');
+       
 
 
         $validator

@@ -47,13 +47,22 @@ border:none;
 			        <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Employee Name</label>   
-							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm']); ?>
+							<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
+										<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me employee_id']); ?>
+								<?php }else{ ?>
+									<?php echo $this->Form->input('employee_name', ['readonly','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name]); ?>
+									<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id]); ?>
+								<?php } ?>
 						</div>
 					</div>
 			        <div class="col-md-4">
 						<div class="form-group">
 							<label class="control-label">Amount</label>
-							<?php echo $this->Form->input('amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','min'=>0]); ?>
+							<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
+							<?php echo $this->Form->input('amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm']); ?>
+							<?php }else{ ?>
+							<?php echo $this->Form->input('amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary]); ?>
+							<?php } ?>
 						</div>
 					</div>
 			       <div class="col-md-4">
@@ -157,7 +166,18 @@ $(document).ready(function()
 		}
 
 	});
-	
+	$('.employee_id').live("change",function() {
+		var employee=$(this).find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LoanApplications','action'=>'getsalary']); ?>";
+			url=url+'/'+employee, 
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {  
+				$("#salary_pm").val(response);
+			});
+		
+	});
 	//--	 END OF VALIDATION
 	
 });

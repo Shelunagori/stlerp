@@ -75,7 +75,7 @@ class EmployeeAttendancesController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$From1=$From;
 		$From="01-".$From;
-		$employees = $this->EmployeeAttendances->Employees->find()->where(['id !='=>23])
+		$employees = $this->EmployeeAttendances->Employees->find()->where(['id !='=>23,'salary_company_id'=>$st_company_id])
 		->contain(['EmployeeCompanies'])
 			->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -93,7 +93,7 @@ class EmployeeAttendancesController extends AppController
 			$to_date=date('Y-m-d',strtotime($to_date));
 			
 			
-			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved','leave_type'=>'Paid']);
+			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved','leave_mode'=>'Paid']);
 			
 				foreach($employeeLeave as $data1){ 
 					$data1->to_leave_date=date('Y-m-d',strtotime($data1->to_leave_date));
