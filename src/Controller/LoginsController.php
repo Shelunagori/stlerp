@@ -453,12 +453,12 @@ class LoginsController extends AppController
 		$grns = $grns->select(['ct' => $grns->func()->count('Grns.id')])->first();
 		$pending_grn=$grns->ct;
 		if($employee_id==16 || $employee_id==23){
-			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['leave_status'=>'Pending'])->contain(['empData'])->toArray();
+			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->contain(['Employees'])->where(['leave_status'=>'Pending'])->toArray();
 			
 			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
 		
 			$PendingLoanApplications = $this->Logins->LoanApplications->find()->where(['LoanApplications.status'=>'Pending'])->contain(['Employees'])->toArray();
-			//pr($PendingLoanApplications); exit;
+			//pr($PendingleaveRequests); exit;
 			
 		}
 		
@@ -472,4 +472,5 @@ class LoginsController extends AppController
 		
     }
 }
+
 

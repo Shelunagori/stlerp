@@ -33,7 +33,7 @@
 						<?php $i=0; foreach ($leaveApplications as $leaveApplication):  $i++; ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h($leaveApplication->name) ?></td>
+							<td><?= h($leaveApplication->employee->name) ?></td>
 							<td><?php 
 							if($leaveApplication->submission_date!='1/1/70')
 							{

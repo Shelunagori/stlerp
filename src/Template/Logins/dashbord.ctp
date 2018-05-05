@@ -191,7 +191,6 @@
 						<th>Employee Name</th>
 						<th>No of Days</th>
 						<th>Leave Status</th>
-						<th>Pending From</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -199,13 +198,12 @@
 					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
 					<tr>
 						<td><?php echo $i++; ?></td>
-						<td><?php echo $PendingRequest->name; 
+						<td><?php echo $PendingRequest->employee->name; 
 							 echo $this->Form->input('emp_id', ['type'=>'hidden','class'=>'emp_id','value' => @$PendingRequest->id]); ?></td>
 						<td><?php echo $PendingRequest->day_no; ?></td>
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
 						</td>
-						<td><?php echo $PendingRequest->emp_data->name; ?>
-						</td>
+						
 						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a>
 						<?= $this->Html->link(' Cancle ',
 								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],

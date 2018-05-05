@@ -71,17 +71,15 @@ border:none;
 					  <div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Name</label>   
-								<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me','value'=>$leaveApplication->employee_id]); ?>
+								
+								<?php } else { ?>
+									<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+								<?php } ?>
 							</div>
 						</div>
 						
-					   
-					   <div class="col-md-4">
-							<div class="form-group">
-								<label class="control-label  label-css">Designation</label>
-								<?php echo $this->Form->input('designation', ['label' => false,'class'=>'form-control input-sm','value'=>$empData->designation->name,'readonly']); ?>
-							</div>
-						</div>
 					  
 				</div>
 			
@@ -97,7 +95,7 @@ border:none;
 					   <div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Date of Leave Required (To)</label>
-								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y"),'value'=>date('d-m-Y',strtotime($leaveApplication->to_leave_date))]); ?>
+								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($leaveApplication->to_leave_date))]); ?>
 							</div>
 						</div>
 					   

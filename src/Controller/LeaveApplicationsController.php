@@ -68,7 +68,7 @@ class LeaveApplicationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		 $st_year_id = $session->read('st_year_id');
-		////start code for finnancial year
+		
 		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
@@ -98,7 +98,7 @@ class LeaveApplicationsController extends AppController
 		 
 		 
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		//pr($empData); exit;
         $leaveApplication = $this->LeaveApplications->newEntity();
         if ($this->request->is('post')) {
@@ -108,26 +108,17 @@ class LeaveApplicationsController extends AppController
 			$attache = $this->request->data['supporting_attached'];
 			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
 			
-			if($EmployeeHierarchies->employee_id==16){
-				$leaveApplication->parent_employee_id=16;
-			}else{
-				
-				$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
-			}
 			
-			if($s_employee_id == 16){
-				$leaveApplication->employee_id=$leaveApplication->employee_id;
-				$empData1=$this->LeaveApplications->Employees->get($leaveApplication->employee_id);
-				$leaveApplication->name=$empData1->name;
-			}else{
-				$leaveApplication->employee_id=$s_employee_id;
-			}
 			
+			$leaveApplication->employee_id=$leaveApplication->employee_id;
 			$leaveApplication->submission_date=date('Y-m-d');
-			$leaveApplication->from_leave_date = strtotime($leaveApplication->from_leave_date); 
-			$leaveApplication->to_leave_date =strtotime($leaveApplication->to_leave_date); 
-			$datediff =$leaveApplication->to_leave_date - $leaveApplication->from_leave_date;
-			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;
+			$leaveApplication->from_leave_date =date('Y-m-d', strtotime($leaveApplication->from_leave_date)); 
+			$leaveApplication->to_leave_date =date('Y-m-d', strtotime($leaveApplication->to_leave_date)); 
+			
+			$from_leave_date = strtotime($leaveApplication->from_leave_date); 
+			$to_leave_date =strtotime($leaveApplication->to_leave_date); 
+			$datediff =$to_leave_date - $from_leave_date;
+			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;  //pr($leaveApplication); exit;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -142,7 +133,7 @@ class LeaveApplicationsController extends AppController
 					$this->Flash->success(__('The leave application has been saved.'));
 					return $this->redirect(['action' => 'index']);
 				}
-            } else { pr($leaveApplication); exit;
+            } else {
 					$this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
@@ -182,7 +173,7 @@ class LeaveApplicationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
         $leaveApplication = $this->LeaveApplications->get($id, [
             'contain' => []
         ]);
@@ -198,18 +189,18 @@ class LeaveApplicationsController extends AppController
 				$leaveApplication->supporting_attached = $leaveApplication->doc;
 			}
 			$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$s_employee_id])->first();
-			$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
-			$leaveApplication->employee_id=$s_employee_id;
+			//$leaveApplication->parent_employee_id=$EmployeeHierarchies->parent_accounting_group->employee_id;
+			$leaveApplication->employee_id=$leaveApplication->employee_id;
 			$leaveApplication->submission_date=date('Y-m-d'); 
 			$leaveApplication->from_leave_date = date('Y-m-d',strtotime($leaveApplication->from_leave_date)); 
 			$leaveApplication->to_leave_date = date('Y-m-d',strtotime($leaveApplication->to_leave_date)); 
-			//pr($leaveApplication); exit;
+			
 			$from_leave_date = strtotime($leaveApplication->from_leave_date); 
 			$to_leave_date =strtotime($leaveApplication->to_leave_date); 
 			
 			$datediff =$to_leave_date - $from_leave_date;
-			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;
-			
+			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1; 
+			//pr($leaveApplication); exit;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				if(!empty($files['tmp_name']))
 				{
@@ -225,8 +216,9 @@ class LeaveApplicationsController extends AppController
                 $this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
+		$employees = $this->LeaveApplications->Employees->find('list'); 
 		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
-        $this->set(compact('leaveApplication','leavetypes','empData'));
+        $this->set(compact('leaveApplication','leavetypes','empData','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
 
@@ -248,7 +240,7 @@ class LeaveApplicationsController extends AppController
 		$day_no=round($datediff / (60 * 60 * 24))+1;
 		$query = $this->LeaveApplications->query();
 			$query->update()
-				->set(['leave_status' =>'approved','approve_date'=>$approve_date,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'comment'=>$comment,'leave_type'=>$leave_type,'no_of_day_approve'=>$day_no])
+				->set(['leave_status' =>'approved','approve_date'=>$approve_date,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'comment'=>$comment,'leave_mode'=>$leave_type,'no_of_day_approve'=>$day_no])
 				->where(['id' => $id])
 				->execute();
 		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);

@@ -109,22 +109,18 @@ border:none;
 					  <div class="col-md-4">
 							<div class="form-group">
 								<label class="control-label  label-css">Name</label> 
-								<?php if($s_employee_id == 16){ ?>
-									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me']); ?>
+								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me','value'=>$leaveApplication->employee_id]); ?>
 								
 								<?php } else { ?>
 									<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+									<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id,'readonly']); ?>
 								<?php } ?>
 							</div>
 						</div>
 						
 					   
-					   <div class="col-md-4">
-							<div class="form-group">
-								<label class="control-label  label-css">Designation</label>
-								<?php echo $this->Form->input('designation', ['label' => false,'class'=>'form-control input-sm','value'=>$empData->designation->name,'readonly']); ?>
-							</div>
-						</div>
+					
 					  
 				</div>
 			

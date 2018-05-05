@@ -58,10 +58,10 @@ class LeaveApplicationsTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
+       /*  $validator
             ->requirePresence('name', 'create')
             ->notEmpty('name');
-
+ */
         $validator
             ->date('submission_date')
             ->requirePresence('submission_date', 'create')
