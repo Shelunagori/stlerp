@@ -39,7 +39,7 @@ class LoginsController extends AppController
 				
 				$emp_mobile = $Employee->mobile;
 
-				if($employee_id){
+				if($employee_id == 23){
 					return $this->redirect(['action' => 'Switch-Company']);
 				}
 				/*if(!empty($emp_mobile)){
