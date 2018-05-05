@@ -156,6 +156,11 @@ class EmployeeSalariesController extends AppController
 		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','EmployeeSalaryDivisions'));
         $this->set('_serialize', ['employeeSalary']);
 	}
+	
+	 public function generateSalary($From=null){
+		 
+	 }
+	
     public function add($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');

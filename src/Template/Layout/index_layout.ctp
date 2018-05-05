@@ -843,7 +843,7 @@ select
 					</ul>-->
 				</li>
 				<?php } ?>
-				<?php if($s_employee_id==16 || $s_employee_id==23 || $s_employee_id==14){?>
+				<?php if($s_employee_id==16 || $s_employee_id==23 || $s_employee_id==14 || 1==1){?>
 				
 				<li>
 					<a href="javascript:;">

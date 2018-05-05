@@ -57,6 +57,7 @@
 							<td><?= h(@$startingDateOfLoan) ?></td>
 							<td><?= h(@$endingDateOfLoan) ?></td>
 							<td class="actions">
+							<?php if($loanApplication->status!="approved"){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $loanApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $loanApplication->id], 
@@ -66,6 +67,7 @@
 									'confirm' => __('Are you sure ?', $loanApplication->id)
 								]
 							) ?>
+							<?php } ?>
 							</td>
 						</tr>
 						

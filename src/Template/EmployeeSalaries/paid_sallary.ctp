@@ -71,5 +71,13 @@ $(document).ready(function()
 			$("#copy_form").html(response);
 		});
 	});
+	
+	$('.genertSlry').live('click',function(){
+		var select_date=$('select[name=From]').val();
+		alert(select_date);
+		var url="<?php echo $this->Url->build(['controller'=>'EmployeeSalaries','action'=>'generateSalary']); ?>";
+		url=url+'/'+select_date;
+		window.location.replace(url);
+	});
 });
 </script>

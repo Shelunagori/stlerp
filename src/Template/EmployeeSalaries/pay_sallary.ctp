@@ -105,7 +105,7 @@
 		</tr>
 	</tbody>
 </table>
-
+<button type="button" class="btn blue genertSlry">GENERATE SALARY</button>
 
 
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
