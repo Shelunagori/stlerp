@@ -107,6 +107,12 @@
 		</tr>
 	</tbody>
 </table>
+<input type="text" name="trans_date"   value="<?php echo date('d-m-Y'); ?>" data-date-format="d-m-Y" >
+<select name="bank_id">
+	<?php foreach($bankCashes->toArray() as $bank_id=>$bank_name){
+		echo '<option value="'.$bank_id.'">'.$bank_name.'</option>';
+	} ?>
+</select>
 <button type="submit" class="btn blue genertSlry">GENERATE SALARY</button>
 </form>
 
