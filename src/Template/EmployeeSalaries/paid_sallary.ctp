@@ -28,7 +28,7 @@
 				</div>
 				<div class="col-md-12">
 				
-				<div id="form_attached">
+				<div id="form_attached" style="overflow: auto;">
 					<div class="box box-primary" id="copy_form">
 						
 					</div>

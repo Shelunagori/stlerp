@@ -18,7 +18,7 @@
 			</td>
 			<td rowspan="2">Loan Amount</td>
 			<td rowspan="2">Other</td>
-			<td rowspan="2">Net Salary</td>
+			<td rowspan="2">Net.Salary</td>
 		</tr>
 		<tr>
 			<?php foreach($EmployeeSalaryAddition as $addition){   ?>
