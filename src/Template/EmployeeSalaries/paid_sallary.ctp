@@ -16,8 +16,21 @@
 								<table class="table table-condensed">
 									<tbody>
 										<tr>
-											<td width="15%">
-												<input type="text" name="From" class="select_date form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="mm-yyyy" >
+											<td width="15%"> 
+												<select name="From">
+													<option value="4-<?php echo $s_year_from; ?>">April <?php echo $s_year_from; ?></option>
+													<option value="5-<?php echo $s_year_from; ?>">May <?php echo $s_year_from; ?></option>
+													<option value="6-<?php echo $s_year_from; ?>">June <?php echo $s_year_from; ?></option>
+													<option value="7-<?php echo $s_year_from; ?>">July <?php echo $s_year_from; ?></option>
+													<option value="8-<?php echo $s_year_from; ?>">August <?php echo $s_year_from; ?></option>
+													<option value="9-<?php echo $s_year_from; ?>">September <?php echo $s_year_from; ?></option>
+													<option value="10-<?php echo $s_year_from; ?>">October <?php echo $s_year_from; ?></option>
+													<option value="11-<?php echo $s_year_from; ?>">November <?php echo $s_year_from; ?></option>
+													<option value="12-<?php echo $s_year_from; ?>">December <?php echo $s_year_from; ?></option>
+													<option value="1-<?php echo $s_year_to; ?>">January <?php echo $s_year_to; ?></option>
+													<option value="2-<?php echo $s_year_to; ?>">February <?php echo $s_year_to; ?></option>
+													<option value="3-<?php echo $s_year_to; ?>">March <?php echo $s_year_to; ?></option>
+												</select>
 											</td>
 											<td><button type="button" class="btn btn-primary btn-sm emp_rec"><i class="fa fa-filter"></i> Go</button></td>
 										</tr>
@@ -48,8 +61,8 @@
 $(document).ready(function() 
 {
 	$('.emp_rec').live('click',function(){
-		var select_date=$(this).closest('tr').find('.select_date').val();
-		
+		var select_date=$(this).closest('tr').find('select[name=From]').val();
+		$("#copy_form").html('<h4>Loading...</h4>');
 		var url="<?php echo $this->Url->build(['controller'=>'EmployeeSalaries','action'=>'paySallary']); ?>";
 		url=url+'/'+select_date, 
 		 $.ajax({

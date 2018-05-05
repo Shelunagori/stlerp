@@ -938,9 +938,8 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Generate Salary Sheet', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
 								<?php echo '<li>'.$this->Html->link( 'Employees For Salary', '/Employees/listForSalary' ).'</li>'; ?>
-								
 						</li>
 						</ul>
 					</ul>

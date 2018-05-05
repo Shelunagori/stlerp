@@ -56,16 +56,15 @@ class EmployeeSalariesController extends AppController
     public function paySallary($From=null){
 		//$this->viewBuilder()->layout('index_layout');
 		$From1=$From;
+		$f=explode('-',$From);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		if(!empty($From)){ 
-			$From="01-".$From;
-			$time=strtotime($From);
-			$month=date("m",$time);
-			$year=date("Y",$time);
+			$month=$f[0];
+			$year=$f[1];
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
 		} 
 		
