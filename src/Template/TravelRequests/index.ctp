@@ -22,6 +22,7 @@
 					<thead>
 						<tr>
 							<th width="5%">Sr. No.</th>
+							<th width="15%">Name</th>
 							<th width="15%">Purpose</th>
 							<th width="15%">Advance Amount</th>
 							<th width="15%">Travel From Date</th>
@@ -34,6 +35,7 @@
 						<?php $i=0; foreach ($travelRequests as $travelRequest):  ?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
+							<td><?= h($travelRequest->employee->name) ?></td>
 							<td><?= h($travelRequest->purpose) ?></td>
 							<td><?= h($travelRequest->advance_amt) ?></td>
 							<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_from_date))) ?></td>

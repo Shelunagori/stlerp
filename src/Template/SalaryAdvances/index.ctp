@@ -36,6 +36,7 @@
 							<td><?= h($salaryAdvance->amount) ?></td>
 							<td><?= h($salaryAdvance->reason) ?></td>
 							<td class="actions">
+								<?php if($salaryAdvance->status=="Pending"){?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salaryAdvance->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $salaryAdvance->id], 
@@ -45,6 +46,7 @@
 									'confirm' => __('Are you sure ?', $salaryAdvance->id)
 								]
 							) ?>
+								<?php } ?>
 							</td>
 						</tr>
 						
