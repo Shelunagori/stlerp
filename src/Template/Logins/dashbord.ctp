@@ -189,8 +189,10 @@
 					<tr>
 						<th>S.No</th>
 						<th>Employee Name</th>
+						<th>Leave Type</th>
 						<th>No of Days</th>
 						<th>Leave Status</th>
+						<th>Reason</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -200,11 +202,15 @@
 						<td><?php echo $i++; ?></td>
 						<td><?php echo $PendingRequest->employee->name; 
 							 echo $this->Form->input('emp_id', ['type'=>'hidden','class'=>'emp_id','value' => @$PendingRequest->id]); ?></td>
-						<td><?php echo $PendingRequest->day_no; ?></td>
+						<td><?php echo $PendingRequest->leave_type->leave_name; ?></td>
+						<td><?php echo $PendingRequest->day_no; ?>
+							<span>( From <?php echo $PendingRequest->from_leave_date->format('d-m-Y'); ?> To <?php echo $PendingRequest->to_leave_date->format('d-m-Y'); ?> )</span>
+						</td>
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
 						</td>
+						<td><?php echo $PendingRequest->leave_reason; ?></td>
 						
-						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a>
+						<td>
 						<?= $this->Html->link(' Cancle ',
 								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
@@ -243,6 +249,7 @@
 						<th>Employee Name</th>
 						<th>Status</th>
 						<th>Loan Amount</th>
+						<th>Reason</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -255,9 +262,17 @@
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->status; ?></span>
 						</td>
 						<td><?php echo $PendingRequest->amount_of_loan; ?></td>
+						<td><?php echo $PendingRequest->reason_for_loan; ?></td>
 						</td>
 						<td><a href="#" class="approveLoan"><i class="fa fa-thumbs-o-up"></i> Approve </a>
-						<?= $this->Html->link(' Cancle ',
+							<?= $this->Html->link(' approve ',
+								['controller'=>'LoanApplications', 'action' => 'approveLoan', $PendingRequest->id],
+								[
+									'escape' => false,'class'=>'fa fa-thumbs-o-up'
+									
+								]
+							) ?>
+							<?= $this->Html->link(' Cancle ',
 								['controller'=>'LoanApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
 									'escape' => false,'class'=>'fa fa-times'
@@ -384,7 +399,8 @@ $(document).ready(function() {
 //Loan Application
 
 $('.approveLoan').die().live("click",function(e){
-		e.preventDefault(); 
+		e.preventDefault();
+		$("#show_model").html('<div id="myModal3" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display:block; padding-right: 12px;"><div class="modal-backdrop fade in"></div><div class="modal-dialog"><div class="modal-content"><div style="padding:10px;align:center;">Loading...</div></div></div></div>');
 		var emp_id=$(this).closest('tr').find('.emp_id').val(); 
 		var url="<?php echo $this->Url->build(['controller'=>'LoanApplications','action'=>'approve']); ?>";
 			url=url+'/'+emp_id, 

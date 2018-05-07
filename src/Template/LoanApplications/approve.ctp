@@ -87,7 +87,7 @@ $(document).ready(function() {
 				url: url,
 				type: 'GET',
 			}).done(function(response) { 
-				
+				$("#show_model").html('');
 			});
 		//$("#myModal3").show();
     });

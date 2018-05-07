@@ -159,6 +159,71 @@ class LeaveApplicationsController extends AppController
         $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
+	
+	
+	
+	public function leaveData($EmpId)
+    {
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		 $st_year_id = $session->read('st_year_id');
+		
+		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+		
+		 $SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		   $fromdate1 = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
+		   $todate1 = date("Y-m-d",strtotime($SessionCheckDate->date_to)); 
+		   $tody1 = date("Y-m-d");
+
+		   $fromdate = strtotime($fromdate1);
+		   $todate = strtotime($todate1); 
+	       $tody = strtotime($tody1);
+
+		  if($fromdate < $tody || $todate > $tody)
+		   {
+			 if($SessionCheckDate['status'] == 'Open')
+			 { $chkdate = 'Found'; }
+			 else
+			 { $chkdate = 'Not Found'; }
+
+		   }
+		   else
+			{
+				$chkdate = 'Not Found';	
+			}
+		////ends code for financial year
+		 
+		 
+		$s_employee_id=$EmpId;
+		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
+		//pr($empData); exit;
+        $leaveApplication = $this->LeaveApplications->newEntity();
+        
+			
+		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
+		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$from_date = date("Y-m-d",strtotime($financial_year->date_from));
+		@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
+		$LeaveApplicationDatas=$this->LeaveApplications->find()->where(['employee_id'=>$s_employee_id,'from_leave_date >='=>$from_date,'to_leave_date <='=>$to_date,'leave_status'=>'approved']);
+		$TotaalleaveTake=[];
+		foreach($LeaveApplicationDatas as $LeaveApplicationData){
+			@$TotaalleaveTake[@$LeaveApplicationData->leave_type_id]+=@$LeaveApplicationData->day_no;
+			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
+		} //pr($Totaalleave); exit;
+	
+		$leavedatas = $this->LeaveApplications->LeaveTypes->find();
+		$Totaalleave=[]; $LeaveType=[];
+		foreach($leavedatas as $leavedata){
+			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
+			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
+		}
+		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
+        $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
+        $this->set('_serialize', ['leaveApplication']);
+    }
 
     /**
      * Edit method

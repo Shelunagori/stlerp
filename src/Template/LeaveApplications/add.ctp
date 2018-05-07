@@ -36,7 +36,7 @@ border:none;
 	</div>
 	<div class="portlet-body">
 		<div class="row">
-			<div class="col-md-12">
+			<div class="col-md-12" id="leaveData">
 				<table class="table table-bordered table-striped table-hover">
 					<thead>
 						<tr>
@@ -110,7 +110,7 @@ border:none;
 							<div class="form-group">
 								<label class="control-label  label-css">Name</label> 
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
-									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me','value'=>$leaveApplication->employee_id]); ?>
+									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown','value'=>$leaveApplication->employee_id]); ?>
 								
 								<?php } else { ?>
 									<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
@@ -277,6 +277,19 @@ $(document).ready(function()
 		{
 			$('.attache_file').hide();
 		}
+	});
+	
+	$('.empDropDown').live("change",function(){
+		$('#leaveData').html('Loading...');
+		var empId=$(this).find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveData']); ?>";
+        url=url+'/'+empId;
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) {
+            $('#leaveData').html(response);
+        });
 	});
 });
 </script>
