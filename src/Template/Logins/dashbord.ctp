@@ -210,7 +210,7 @@
 						</td>
 						<td><?php echo $PendingRequest->leave_reason; ?></td>
 						
-						<td>
+						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a>
 						<?= $this->Html->link(' Cancle ',
 								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
@@ -264,7 +264,7 @@
 						<td><?php echo $PendingRequest->amount_of_loan; ?></td>
 						<td><?php echo $PendingRequest->reason_for_loan; ?></td>
 						</td>
-						<td><a href="#" class="approveLoan"><i class="fa fa-thumbs-o-up"></i> Approve </a>
+						<td>
 							<?= $this->Html->link(' approve ',
 								['controller'=>'LoanApplications', 'action' => 'approveLoan', $PendingRequest->id],
 								[
