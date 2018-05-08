@@ -38,6 +38,8 @@ class TravelRequestsTable extends Table
         $this->primaryKey('id');
 		$this->belongsTo('Employees');
 		$this->belongsTo('EmployeeHierarchies');
+		$this->belongsTo('Nppayments');
+		$this->belongsTo('LedgerAccounts');
         $this->hasMany('TravelRequestRows', [
             'foreignKey' => 'travel_request_id',
 			'saveStrategy' => 'replace'

@@ -52,6 +52,7 @@ $(document).ready(function() {
 	$('#from_leave_date').datepicker();
 
 	$('.insert_tc').on("click",function() {
+		$('.insert_tc').text('Submtting...');
 		 var id ="<?php echo $id; ?>";
 		 var comment = $('.comment').val();
 		 var approve_leave_to = $('.approve_leave_to').val();
@@ -66,7 +67,8 @@ $(document).ready(function() {
 				url: url,
 				type: 'GET',
 			}).done(function(response) { 
-				
+				$("#show_model").html('');
+				location.reload();
 			});
 		//$("#myModal3").show();
     });

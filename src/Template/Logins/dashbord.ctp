@@ -345,10 +345,37 @@
 </div>
 <?php }?>
 <?php }   ?>	
+
+<div id="TravelRequestsContainer">hello</div>
+<div id="SalaryAdvancesContainer">hello</div>
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+
+<?php if($employee_id==23 or $employee_id==16 or $employee_id==17){ ?>
 <script>
-$(document).ready(function() { 
+$(document).ready(function() {
+	$("#TravelRequestsContainer").html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+	var url="<?php echo $this->Url->build(['controller'=>'TravelRequests','action'=>'pending']); ?>";
+	$.ajax({
+		url: url,
+	}).done(function(response) {  
+		$("#TravelRequestsContainer").html(response);
+	});
+	
+	$("#SalaryAdvancesContainer").html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
+	var url="<?php echo $this->Url->build(['controller'=>'SalaryAdvances','action'=>'pending']); ?>";
+	$.ajax({
+		url: url,
+	}).done(function(response) {  
+		$("#SalaryAdvancesContainer").html(response);
+	});
+});
+</script>
+<?php } ?>
+<script>
+$(document).ready(function() {
+
+ 
 
     $('.onhover').die().live("click",function() { 
 		
@@ -376,7 +403,8 @@ $(document).ready(function() {
     });
 	
 	$('.approve').die().live("click",function(e){
-		e.preventDefault(); 
+		e.preventDefault();
+		$("#show_model").html('<div id="myModal3" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display:block; padding-right: 12px;"><div class="modal-backdrop fade in"></div><div class="modal-dialog"><div class="modal-content"><div style="padding:10px;">Loading...</div></div></div></div>');
 		var emp_id=$(this).closest('tr').find('.emp_id').val(); 
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'approve']); ?>";
 			url=url+'/'+emp_id, 
