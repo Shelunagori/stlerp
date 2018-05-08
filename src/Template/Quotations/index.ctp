@@ -83,8 +83,26 @@ if(!empty($status)){
 							<td width="15%">
 								<input type="text" name="product" class="form-control input-sm" placeholder="Product" value="<?php echo @$product; ?>">
 							</td>
-							<td width="10%">
+							
+							
+							
+								
+							
+							
+						</tr>
+					</tbody>
+				</table>
+				<table class="table table-condensed">
+					<tbody>
+						<tr>
+							<td  width="24%">
 								<?php echo $this->Form->input('items', ['empty'=>'--Items--','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$items) ]); ?>
+							</td>
+							<td  width="19%">
+								<?php echo $this->Form->input('item_group', ['empty'=>'---Group---','options'=>$ItemGroups,'label' => false,'class' => 'form-control input-sm item_group select2me','placeholder'=>'Item Name','value'=> h(@$item_group) ]); ?>
+							</td>
+							<td  width="19%">
+								<?php echo $this->Form->input('item_subgroup', ['empty'=>'---Sub Group---','options'=>$ItemSubGroups,'label' => false,'class' => 'form-control input-sm item_subgroup select2me','placeholder'=>'Item Name','value'=> h(@$item_subgroup) ]); ?>
 							</td>
 							<?php if($pull_request=="true"){ ?>
 							<td width="15%">
@@ -94,17 +112,15 @@ if(!empty($status)){
 										<input type="text" name="q_dateTo" class="form-control input-sm date-picker" placeholder="To" value="<?php echo @$q_dateTo; ?>"  data-date-format="dd-mm-yyyy" >
 							</td>
 							<?php }else{ ?>
-								<td width="10%">
+								<td width="15%">
 									
 										<input type="text" name="From" class="form-control input-sm date-picker" placeholder="From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
 								</td>
-								<td width="10%">
+								<td width="15%">
 										<input type="text" name="To" class="form-control input-sm date-picker" placeholder="To" value="<?php echo @$To; ?>"  data-date-format="dd-mm-yyyy" >
 									
 								</td>
 							<?php } ?>
-							
-								
 							
 							<td><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button></td>
 						</tr>

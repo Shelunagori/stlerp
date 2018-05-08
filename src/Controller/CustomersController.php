@@ -23,6 +23,8 @@ class CustomersController extends AppController
 	
     public function index()
     {
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
 		$where=[];
 		$customer=$this->request->query('customer');
@@ -42,10 +44,34 @@ class CustomersController extends AppController
             'contain' => ['Districts', 'CustomerSegs']
         ];
         $customers = $this->paginate($this->Customers->find()->where($where)->order(['Customers.customer_name' => 'ASC']));
-        $this->set(compact('customers'));
+        $this->set(compact('customers','url'));
         $this->set('_serialize', ['customers']);
     }
 
+	public function excelExport(){
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$where=[];
+		$customer=$this->request->query('customer');
+		$district=$this->request->query('district');
+		$customer_seg=$this->request->query('customer_seg');
+		$this->set(compact('customer','district','customer_seg'));
+		if(!empty($customer)){
+			$where['customer_name LIKE']='%'.$customer.'%';
+		}
+		if(!empty($district)){
+			$where['Districts.district LIKE']='%'.$district.'%';
+		}
+		if(!empty($customer_seg)){
+			$where['CustomerSegs.name LIKE']='%'.$customer_seg.'%';
+		}
+        
+        $customers = $this->Customers->find()->contain(['Districts', 'CustomerSegs','CustomerContacts','Employees'])->where($where)->order(['Customers.customer_name' => 'ASC']);
+		//pr($customers->toArray());exit;
+        $this->set(compact('customers','url'));
+        $this->set('_serialize', ['customers']);
+	}
     /**
      * View method
      *

@@ -75,13 +75,26 @@
 							<td width="11%">
 								<?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman_name) ]); ?>
 							</td>
-							<td width="11%">
+							
+						</tr>
+					</tbody>
+				</table>
+				<table class="table table-condensed">
+					<tbody>
+						<tr>
+							<td  width="24%">
 								<?php echo $this->Form->input('items', ['empty'=>'--Items--','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$items) ]); ?>
 							</td>
-							<td width="9%">
+							<td  width="19%">
+								<?php echo $this->Form->input('item_group', ['empty'=>'---Group---','options'=>$ItemGroups,'label' => false,'class' => 'form-control input-sm item_group select2me','placeholder'=>'Item Name','value'=> h(@$item_group) ]); ?>
+							</td>
+							<td  width="19%">
+								<?php echo $this->Form->input('item_subgroup', ['empty'=>'---Sub Group---','options'=>$ItemSubGroups,'label' => false,'class' => 'form-control input-sm item_subgroup select2me','placeholder'=>'Item Name','value'=> h(@$item_subgroup) ]); ?>
+							</td>
+							<td >
 								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
 							</td>
-							<td width="9%">
+							<td >
 								<input type="text" name="To" class="form-control input-sm date-picker" placeholder="To" value="<?php echo @$To; ?>" data-date-format="dd-mm-yyyy" >
 							</td>
 							

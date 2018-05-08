@@ -33,12 +33,17 @@ class QuotationsController extends AppController
 		$gst_pull_request=$this->request->query('gst-pull-request');
 		$close_status=$this->request->query('status');
 		$st_year_id = $session->read('st_year_id');
+		//echo $st_year_id;exit;
 		$financial_year = $this->Quotations->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
 		$fromdate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		$todate1 = DATE("Y-m-d",strtotime($SessionCheckDate->date_to)); 
 		$items=$this->request->query('items');
-		$this->set(compact('qt2','customer','salesman','product','From','To','q_dateFrom','q_dateTo','company_id','file','pull_request','gst_pull_request','close_status','items')); 
+		$item_group=$this->request->query('item_group');
+		$item_subgroup=$this->request->query('item_subgroup');
+		$this->set(compact('qt2','customer','salesman','product','From','To','q_dateFrom','q_dateTo','company_id','file','pull_request','gst_pull_request','close_status','items','item_group','item_subgroup')); 
+		$where['company_id']=$st_company_id;
+		$where['financial_year_id']=$st_year_id;
 		if(!empty($company_id)){
 			$where['company_id']=$company_id;
 		}
@@ -102,16 +107,33 @@ class QuotationsController extends AppController
 		/* if(sizeof($max_ids)>0){ echo"hello";
 			$quotations = $this->paginate($this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']));
 		} */
-		if(!empty($items)){  
+		$where1=[];
+		if(!empty($item_category)){
+			$where1['Items.item_category_id']=$item_category;
+		}
+		if(!empty($item_group)){
+			$where1['Items.item_group_id']=$item_group;
+		}
+		
+		if(!empty($item_subgroup)){
+			$where1['Items.item_sub_group_id']=$item_subgroup;
+		}
+		if(!empty($items)){
+			$where1['Items.id']=$items;
+		}
+		if(!empty($items) || !empty($item_group) || !empty($item_subgroup)){  
 			
 			$quotations=$this->paginate($this->Quotations->find()
 			->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])
 			->matching(
-					'QuotationRows.Items', function ($q) use($items,$st_company_id,$where) {
-						return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id])->where($where);
+					'QuotationRows.Items', function ($q) use($items,$st_company_id,$where1) {
+						return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id){
+												return $e->where(['ItemCompanies.company_id'=>$st_company_id]);
+												}]);
 					}
 				)
-				);
+				->where($where));
+				//pr($quotations->toArray());exit;
 		}else if($gst_pull_request=="true"){ 
 			$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
 			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
@@ -133,11 +155,12 @@ class QuotationsController extends AppController
 		$financial_month_first = $this->Quotations->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->Quotations->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
 		
-		 
+		$ItemGroups = $this->Quotations->QuotationRows->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
+		$ItemSubGroups = $this->Quotations->QuotationRows->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);	
 		$companies = $this->Quotations->Companies->find('list');
 		$Items = $this->Quotations->QuotationRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$closeReasons = $this->Quotations->QuotationCloseReasons->find('all');
-        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id'));
+        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id','ItemGroups','ItemSubGroups'));
         $this->set('_serialize', ['quotations']);
 		$this->set(compact('url'));
 	}

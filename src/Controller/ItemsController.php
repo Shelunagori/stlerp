@@ -16,50 +16,60 @@ class ItemsController extends AppController
      *
      * @return \Cake\Network\Response|null
      */
-	public $helpers = [
-         'Paginator' => ['templates' => 'paginator-templates']
-         ];
+	
 		 
     public function index()
     {  
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-       $where=[];
+		$where=[];
+		//$where1=[];
 		$item_name=$this->request->query('item_name');
 		$item_category=$this->request->query('item_category');
 		$item_group=$this->request->query('item_group');
 		$item_subgroup=$this->request->query('item_subgroup');
+		//$serial_no=$this->request->query('serial_no');
 		$page=$this->request->query('page');
 		
-		$this->set(compact('item_name','item_category','item_group','item_subgroup'));
+		$where1['ItemCompanies.company_id']=$st_company_id;
+
+		$this->set(compact('item_name','item_category','item_group','item_subgroup','serial_no'));
 		
 		if(!empty($item_name)){ 
 			$where['Items.name LIKE']='%'.$item_name.'%';
 		}
 		
 		if(!empty($item_category)){
-			$where['ItemCategories.name LIKE']='%'.$item_category.'%';
+			$where['Items.item_category_id']=$item_category;
 		}
 		
 		if(!empty($item_group)){
-			$where['ItemGroups.name LIKE']='%'.$item_group.'%';
+			$where['Items.item_group_id']=$item_group;
 		}
-		
 		
 		if(!empty($item_subgroup)){
-			$where['ItemSubGroups.name LIKE']='%'.$item_subgroup.'%';
+			$where['Items.item_sub_group_id']=$item_subgroup;
 		}
-		
-        $items =$this->Items->find()->contain(['ItemCategories','ItemGroups','ItemSubGroups','Units',
-				'ItemCompanies'=> function ($q)use($st_company_id) {
-				return $q->where(['company_id'=>$st_company_id]);
+		/* $serialnoss = ['0','1'];
+		if(in_array($serial_no, $serialnoss)){ 
+			$where1['ItemCompanies.serial_number_enable']=$serial_no;
+		}
+		 */
+		 //pr($where1);exit;
+        $Items =$this->paginate($this->Items->find()->contain(['ItemCategories','ItemGroups','ItemSubGroups','Units',
+				'ItemCompanies'=> function ($q)use($where1) {
+				return $q->where($where1);
 				}])
-				->where($where)->order(['Items.name' => 'ASC']);
-		
-
-        $this->set(compact('items'));
-        $this->set('_serialize', ['items']);
+				->where($where)->order(['Items.name' => 'ASC']));
+		//pr($Items->toArray());exit;
+		$ItemCategories = $this->Items->ItemCategories->find('list');
+		$ItemGroups = $this->Items->ItemGroups->find('list');
+		$ItemSubGroups = $this->Items->ItemSubGroups->find('list');
+		$serialnos = [];
+		$serialnos= [['text'=>'Enable','value'=>'1'],['text'=>'Disable','value'=>'0']];
+        $this->set(compact('Items','ItemCategories','ItemGroups','ItemSubGroups','serialnos'));
+        $this->set('_serialize', ['Items']);
     }
 
     /**

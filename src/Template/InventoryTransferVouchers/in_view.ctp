@@ -92,6 +92,7 @@ margin-bottom: 0;
 		<?php } ?>
 		<th>Rate</th>
 		<th>Quantity</th>
+		<th>Narration</th>
 	</thead>
 	
 	<tbody>
@@ -126,6 +127,7 @@ margin-bottom: 0;
 					<?php }} ?> 
 				<td valign="top"><?php echo $out_item->amount ?></td>
 				<td valign="top"><?php echo $out_item->quantity ?></td>
+				<td valign="top"><?php echo $out_item->narration ?></td>
 			</tr>
 		<?php $i++; } ?>
 		
