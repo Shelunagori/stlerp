@@ -123,6 +123,7 @@ border:none;
 						]
 					); ?>
 				</div>
+				
 			</div>
 			<div class="row" id="date_from">
 				<div class="col-md-3">
@@ -161,11 +162,21 @@ border:none;
 				</div>
 			</div>
 			<div class="row">
-				<div class="col-md-8">
+				<div class="col-md-6">
 					<div class="form-group">
 						<label class="control-label  label-css">Reason for leave</label>
 						<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>4]); ?>
 					</div>
+				</div>
+				<div class="col-md-6">
+					<label class="control-label  label-css">Intimated/Uninitiated</label><br/>
+					<?php echo $this->Form->radio(
+						'intimated_or_not',
+						[
+							['value' => 'Intimated', 'text' => 'Intimated','checked'],
+							['value' => 'Uninitiated', 'text' => 'Uninitiated']
+						]
+					); ?>
 				</div>
 			</div>
 		</fieldset>	

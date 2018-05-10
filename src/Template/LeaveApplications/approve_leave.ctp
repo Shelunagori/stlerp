@@ -17,7 +17,7 @@
 				<b>Leave Type:</b> <?php echo $LeaveApplication->leave_type->leave_name; ?>
 			</div>
 			<div class="col-md-4">
-				
+				<b>Leave intimation :</b> <?php echo $LeaveApplication->intimated_or_not; ?>
 			</div>
 		</div>
 		<div class="row">
@@ -142,7 +142,9 @@ $(document).ready(function(){
 		var approve_full_half_to=$('select[name="approve_full_half_to"] option:selected').val();
 		if(single_multiple=='Single'){
 			if(approve_full_half_from!='Full Day'){
-				days-=0.5;
+				days=0.5;
+			}else{
+				days=1;
 			}
 		}else{
 			if(approve_full_half_from=='Second Half Day'){
