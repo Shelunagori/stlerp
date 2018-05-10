@@ -93,33 +93,11 @@ class EmployeeAttendancesController extends AppController
 			$to_date=date('Y-m-d',strtotime($to_date));
 			
 			
-			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved','leave_mode'=>'Paid']);
+			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved']);
 			
-				foreach($employeeLeave as $data1){ 
-					$data1->to_leave_date=date('Y-m-d',strtotime($data1->to_leave_date));
-					$data1->from_leave_date=date('Y-m-d',strtotime($data1->from_leave_date));
-					$addMonth = date('Y-m-d', strtotime("+1 months", strtotime($to_date)));
-					$minusMonth = date('Y-m-d', strtotime("-1 months", strtotime($from_date)));
-					if($data1->from_leave_date >= $from_date && $data1->to_leave_date <= $to_date){ 
-						@$employee_leave[@$data->id]+=@$data1->day_no;
-					}else if(($data1->from_leave_date > $to_date && $data1->to_leave_date > $to_date)){
-
-					}else if(($data1->from_leave_date < $from_date && $data1->to_leave_date < $from_date)){
-
-					}else if(($data1->from_leave_date >= $minusMonth && $data1->to_leave_date > $to_date) && ($data1->from_leave_date >= $from_date && $data1->to_leave_date < $addMonth)){ 
-						$dt=date('d-m-Y',strtotime($data1->from_leave_date));
-						$dt1=strtotime($dt);
-						$d1=date("d",$dt1); 
-						@$employee_leave[@$data->id]+=@$total_day+1-$d1;
-					}else if(($data1->from_leave_date >= $minusMonth && $data1->to_leave_date < $to_date) && ($data1->to_leave_date >= $from_date && $data1->to_leave_date < $addMonth)){ 
-						$dt=date('d-m-Y',strtotime($data1->to_leave_date));
-						$dt1=strtotime($dt); 
-						$d1=date("d",$dt1);  
-						@$employee_leave[@$data->id]+=$d1;
-					}
-					
-				} 
-			
+			foreach($employeeLeave as $data1){
+				@$employee_leave[@$data1->employee_id]+=$data1->unpaid_leaves;
+			} 
 
 		}
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));

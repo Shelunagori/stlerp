@@ -210,8 +210,15 @@
 						</td>
 						<td><?php echo $PendingRequest->leave_reason; ?></td>
 						
-						<td><a href="#" class="approve"><i class="fa fa-thumbs-o-up"></i> Approve </a>
-						<?= $this->Html->link(' Cancle ',
+						<td>
+							<?= $this->Html->link(' Approve ',
+								['controller'=>'LeaveApplications', 'action' => 'approveLeave', $PendingRequest->id],
+								[
+									'escape' => false,'class'=>'fa fa-thumbs-o-up'
+									
+								]
+							) ?>
+							<?= $this->Html->link(' Cancle ',
 								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
 									'escape' => false,'class'=>'fa fa-times'
@@ -346,8 +353,8 @@
 <?php }?>
 <?php }   ?>	
 
-<div id="TravelRequestsContainer">hello</div>
-<div id="SalaryAdvancesContainer">hello</div>
+<div id="TravelRequestsContainer"></div>
+<div id="SalaryAdvancesContainer"></div>
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 

@@ -84,73 +84,90 @@ border:none;
 				
 		?>
 			<div class="form-body">
-				<div class="col-md-2"></div>
-				<div class="col-md-10" style="padding-bottom:10px;">
-			     <div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css">Leave Type</label>
-							<?php 
-							$type[]=['value'=>'sick','text'=>'sick'];
-							$type[]=['value'=>'casual','text'=>'casual'];
-							echo $this->Form->input('leave_type_id', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control select2me input-sm leave_type','options'=>@$leavetypes]); ?>
-							
-						</div>
-					</div>
-					<div class="col-md-4">
-						<div class="form-group">
-							<label class="control-label  label-css attache_file" style="display:none;">Attachment File</label>
-							<?php echo $this->Form->input('supporting_attached', ['label' => false,'placeholder'=>'','class'=>'form-control attache_file','type'=>'file','style'=>'display:none']); ?>
-						</div>
-					</div>
-				</div>
-				<div class="col-md-12"></div>
-				<div class="col-md-2"></div>
-				<div class="col-md-10" style="padding-bottom:10px;">
-					  <div class="col-md-4">
-							<div class="form-group">
-								<label class="control-label  label-css">Name</label> 
-								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
-									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown','value'=>$leaveApplication->employee_id]); ?>
-								
-								<?php } else { ?>
-									<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
-									<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id,'readonly']); ?>
-								<?php } ?>
-							</div>
-						</div>
+			<div class="row">
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Name</label> 
+						<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+							<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown','value'=>$leaveApplication->employee_id]); ?>
 						
-					   
-					
-					  
-				</div>
-			
-			<div class="col-md-2"></div>
-				<div class="col-md-10" style="padding-bottom:10px;">
-					<div class="col-md-4">
-							<div class="form-group">
-								<label class="control-label  label-css">Date of Leave Required (From)</label>   
-								<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
-							</div>
-						</div>
-					   
-					   <div class="col-md-4">
-							<div class="form-group">
-								<label class="control-label  label-css">Date of Leave Required (To)</label>
-								<?php echo $this->Form->input('to_leave_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
-							</div>
-						</div>
-					   
-				</div>
-			<div class="col-md-2"></div>
-				<div class="col-md-10" style="padding-bottom:10px;">
-					<div class="col-md-8">
-						<div class="form-group">
-							<label class="control-label  label-css">Reason for leave</label>
-							<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>4]); ?>
-						</div>
+						<?php } else { ?>
+							<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+							<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id,'readonly']); ?>
+						<?php } ?>
 					</div>
 				</div>
-			
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css">Leave Type</label>
+						<?php 
+						$type[]=['value'=>'sick','text'=>'sick'];
+						$type[]=['value'=>'casual','text'=>'casual'];
+						echo $this->Form->input('leave_type_id', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control input-sm leave_type','options'=>@$leavetypes]); ?>
+					</div>
+				</div>
+				<div class="col-md-4">
+					<div class="form-group">
+						<label class="control-label  label-css attache_file" style="display:none;">Attachment File</label>
+						<?php echo $this->Form->input('supporting_attached', ['label' => false,'placeholder'=>'','class'=>'form-control attache_file','type'=>'file','style'=>'display:none']); ?>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6">
+					<?php echo $this->Form->radio(
+						'single_multiple',
+						[
+							['value' => 'Single', 'text' => 'Single Day','checked'],
+							['value' => 'Multiple', 'text' => 'Multiple Days']
+						]
+					); ?>
+				</div>
+			</div>
+			<div class="row" id="date_from">
+				<div class="col-md-3">
+					<div class="form-group" >
+						<label class="control-label  label-css">Date of Leave Required (From)</label>   
+						<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
+					</div>
+				</div>
+			   <div class="col-md-2">
+					<div class="form-group" id="from_half">
+						<label class="control-label  label-css">.</label>  
+						<select name="from_full_half" class="form-control input-sm cr_dr" >
+							<option value="Full Day">Full Day</option>
+							<option value="First Half Day">First Half Day</option>
+							<option value="Second Half Day">Second Half Day</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row" id="date_to">
+				<div class="col-md-3">
+					<div class="form-group" >
+						<label class="control-label  label-css">Date of Leave Required (To)</label>   
+						<?php echo $this->Form->input('to_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
+					</div>
+				</div>
+			   <div class="col-md-2">
+					<div class="form-group" id="to_half">
+						<label class="control-label  label-css">.</label>  
+						<select name="to_full_half" class="form-control input-sm cr_dr" >
+							<option value="Full Day">Full Day</option>
+							<option value="First Half Day">First Half Day</option>
+							<option value="Second Half Day">Second Half Day</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-8">
+					<div class="form-group">
+						<label class="control-label  label-css">Reason for leave</label>
+						<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>4]); ?>
+					</div>
+				</div>
+			</div>
 		</fieldset>	
 		
 			</div>
@@ -178,7 +195,7 @@ $(document).ready(function()
 		errorClass: 'help-block help-block-error', // default input error message class
 		focusInvalid: true, // do not focus the last invalid input
 		rules: {
-			name:{
+			employee_id:{
 				required: true,
 			},
 			submission_date : {
@@ -205,7 +222,7 @@ $(document).ready(function()
 			caste  : {
 				  required: true,
 			},
-			leave_type: {
+			leave_type_id: {
 				  required: true,
 			}
 			
@@ -266,6 +283,31 @@ $(document).ready(function()
 	});
 	
 	//--	 END OF VALIDATION
+	
+	$('input[name=single_multiple]').live("click",function(){
+		var single_multiple=$(this).val();
+		expandHalfDay(single_multiple);
+	});
+	
+	var single_multiple=$('input[name=single_multiple]:checked').val();
+	expandHalfDay(single_multiple);
+	
+	function expandHalfDay(single_multiple){
+		if(single_multiple=="Single"){
+			$('#date_to').hide();
+			
+			$('#from_half').find('select option[value="First Half Day"]').removeAttr('disabled','disabled');
+			$('#from_half').find('select option[value="Full Day"]').attr('selected','selected');
+		}else{
+			$('#date_to').show();
+			
+			$('#to_half').find('select option[value="Second Half Day"]').attr('disabled','disabled');
+			$('#to_half').find('select option[value="Full Day"]').attr('selected','selected');
+			
+			$('#from_half').find('select option[value="First Half Day"]').attr('disabled','disabled');
+			$('#from_half').find('select option[value="Full Day"]').attr('selected','selected');
+		}
+	}
 	
 	$('.leave_type').live("change",function(){
 		var leave_type = $(this).val();

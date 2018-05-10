@@ -62,54 +62,55 @@ class TravelRequestsController extends AppController
 			$travelRequest->status="approve";
 			$this->TravelRequests->save($travelRequest);
 			
-			$nppayment = $this->TravelRequests->Nppayments->newEntity();
-			$nppayment->financial_year_id=$st_year_id;
-			$last_voucher_no=$this->TravelRequests->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-            if($last_voucher_no){
-                $nppayment->voucher_no=$last_voucher_no->voucher_no+1;
-            }else{
-                $nppayment->voucher_no=1;
-            }
-			$nppayment->bank_cash_id=$bank_id;
-			$nppayment->created_on=date("Y-m-d");
-            $nppayment->created_by=$s_employee_id;
-            $nppayment->payment_mode='NEFT/RTGS';
-            $nppayment->company_id=$st_company_id;
-            $nppayment->transaction_date=$trans_date;
-            $nppayment->cheque_no='';
-            $nppayment->advance_salary='yes';
-			$this->TravelRequests->Nppayments->save($nppayment);
+			if($travelRequest->advance_amt>0){
+				$nppayment = $this->TravelRequests->Nppayments->newEntity();
+				$nppayment->financial_year_id=$st_year_id;
+				$last_voucher_no=$this->TravelRequests->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+				if($last_voucher_no){
+					$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				}else{
+					$nppayment->voucher_no=1;
+				}
+				$nppayment->bank_cash_id=$bank_id;
+				$nppayment->created_on=date("Y-m-d");
+				$nppayment->created_by=$s_employee_id;
+				$nppayment->payment_mode='NEFT/RTGS';
+				$nppayment->company_id=$st_company_id;
+				$nppayment->transaction_date=$trans_date;
+				$nppayment->cheque_no='';
+				$nppayment->advance_salary='yes';
+				$this->TravelRequests->Nppayments->save($nppayment);
 			
-			$ledger_account=$this->TravelRequests->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$travelRequest->employee_id,'company_id'=>$st_company_id])->first();
-			
-			$NppaymentRow = $this->TravelRequests->Nppayments->NppaymentRows->newEntity();
-			$NppaymentRow->nppayment_id=$nppayment->id;
-			$NppaymentRow->received_from_id=$ledger_account->id;
-			$NppaymentRow->amount=$travelRequest->advance_amt;
-			$NppaymentRow->cr_dr='Dr';
-			$NppaymentRow->narration='Advance Payment for Travel Request';
-			$this->TravelRequests->Nppayments->NppaymentRows->save($NppaymentRow);
-			
-			$ledger = $this->TravelRequests->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $bank_id;
-			$ledger->credit = $travelRequest->advance_amt;
-			$ledger->debit = 0;
-			$ledger->voucher_id = $nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$this->TravelRequests->Nppayments->Ledgers->save($ledger);
-			
-			$ledger = $this->TravelRequests->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $ledger_account->id;
-			$ledger->credit = 0;
-			$ledger->debit = $travelRequest->advance_amt;
-			$ledger->voucher_id = $nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$this->TravelRequests->Nppayments->Ledgers->save($ledger);
-			
+				$ledger_account=$this->TravelRequests->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$travelRequest->employee_id,'company_id'=>$st_company_id])->first();
+				
+				$NppaymentRow = $this->TravelRequests->Nppayments->NppaymentRows->newEntity();
+				$NppaymentRow->nppayment_id=$nppayment->id;
+				$NppaymentRow->received_from_id=$ledger_account->id;
+				$NppaymentRow->amount=$travelRequest->advance_amt;
+				$NppaymentRow->cr_dr='Dr';
+				$NppaymentRow->narration='Advance Payment for Travel Request';
+				$this->TravelRequests->Nppayments->NppaymentRows->save($NppaymentRow);
+				
+				$ledger = $this->TravelRequests->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $bank_id;
+				$ledger->credit = $travelRequest->advance_amt;
+				$ledger->debit = 0;
+				$ledger->voucher_id = $nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$this->TravelRequests->Nppayments->Ledgers->save($ledger);
+				
+				$ledger = $this->TravelRequests->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $ledger_account->id;
+				$ledger->credit = 0;
+				$ledger->debit = $travelRequest->advance_amt;
+				$ledger->voucher_id = $nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$this->TravelRequests->Nppayments->Ledgers->save($ledger);
+			}
 			return $this->redirect(['controller' =>'Logins' ,'action' => 'dashbord']);
 		}
 		
@@ -170,7 +171,7 @@ class TravelRequestsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		 $st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations']]);
+		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		//pr($empData);
         $travelRequest = $this->TravelRequests->newEntity();
         if ($this->request->is('post')) {
@@ -189,7 +190,9 @@ class TravelRequestsController extends AppController
                 $this->Flash->error(__('The travel request could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('travelRequest','empData'));
+		
+		$employees = $this->TravelRequests->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
+        $this->set(compact('travelRequest','empData','employees','s_employee_id'));
         $this->set('_serialize', ['travelRequest']);
     }
 

@@ -21,8 +21,8 @@
 					</div>
 					<div class="col-md-4">
 							<div class="form-group leave_type">
-								<label class="control-label  label-css">Leave Type</label>
-								<?php echo $this->Form->input('leave_mode', ['options'=>['Paid'=>'Paid','Unpaid'=>'Unpaid'],'label' => false,'class' => 'form-control input-sm  leave_type','style'=>'vertical-align: top !important;']); ?>
+								<label class="control-label label-css">Leave Type</label>
+								<?php echo $this->Form->input('`', ['options'=>['Paid'=>'Paid','Unpaid'=>'Unpaid'],'label' => false,'class' => 'form-control input-sm  leave_type','style'=>'vertical-align: top !important;']); ?>
 							</div>
 					</div>
 

@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\Event\Event;
 /**
  * LeaveApplications Controller
  *
@@ -11,6 +11,9 @@ use App\Controller\AppController;
 class LeaveApplicationsController extends AppController
 {
 
+	public function beforeFilter(Event $event) {
+		 $this->eventManager()->off($this->Csrf);
+	}
     /**
      * Index method
      *
@@ -102,6 +105,7 @@ class LeaveApplicationsController extends AppController
 		//pr($empData); exit;
         $leaveApplication = $this->LeaveApplications->newEntity();
         if ($this->request->is('post')) {
+			//pr($this->request->data); exit;
 			$files=$this->request->data['supporting_attached']; 
             $leaveApplication = $this->LeaveApplications->patchEntity($leaveApplication, $this->request->data);
 			$leaveApplication->supporting_attached = $files['name'];
@@ -115,10 +119,28 @@ class LeaveApplicationsController extends AppController
 			$leaveApplication->from_leave_date =date('Y-m-d', strtotime($leaveApplication->from_leave_date)); 
 			$leaveApplication->to_leave_date =date('Y-m-d', strtotime($leaveApplication->to_leave_date)); 
 			
+			if($leaveApplication->single_multiple=='Single'){
+				$leaveApplication->to_leave_date=$leaveApplication->from_leave_date;
+				$leaveApplication->to_full_half=$leaveApplication->from_full_half;
+			}
+			
 			$from_leave_date = strtotime($leaveApplication->from_leave_date); 
 			$to_leave_date =strtotime($leaveApplication->to_leave_date); 
 			$datediff =$to_leave_date - $from_leave_date;
 			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1;  //pr($leaveApplication); exit;
+			if($leaveApplication->single_multiple=='Single'){
+				if($leaveApplication->from_full_half!='Full Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+			}else{
+				if($leaveApplication->from_full_half=='Second Half Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+				if($leaveApplication->to_full_half=='First Half Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+			}
+			
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -260,12 +282,28 @@ class LeaveApplicationsController extends AppController
 			$leaveApplication->from_leave_date = date('Y-m-d',strtotime($leaveApplication->from_leave_date)); 
 			$leaveApplication->to_leave_date = date('Y-m-d',strtotime($leaveApplication->to_leave_date)); 
 			
+			if($leaveApplication->single_multiple=='Single'){
+				$leaveApplication->to_leave_date=$leaveApplication->from_leave_date;
+				$leaveApplication->to_full_half=$leaveApplication->from_full_half;
+			}
+			
 			$from_leave_date = strtotime($leaveApplication->from_leave_date); 
 			$to_leave_date =strtotime($leaveApplication->to_leave_date); 
 			
 			$datediff =$to_leave_date - $from_leave_date;
 			$leaveApplication->day_no=round($datediff / (60 * 60 * 24))+1; 
-			//pr($leaveApplication); exit;
+			if($leaveApplication->single_multiple=='Single'){
+				if($leaveApplication->from_full_half!='Full Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+			}else{
+				if($leaveApplication->from_full_half=='Second Half Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+				if($leaveApplication->to_full_half=='First Half Day'){
+					$leaveApplication->day_no-=0.5;
+				}
+			}
             if ($this->LeaveApplications->save($leaveApplication)) {
 				if(!empty($files['tmp_name']))
 				{
@@ -311,6 +349,29 @@ class LeaveApplicationsController extends AppController
 		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
     }
 
+	public function approveLeave($id = null){
+		$this->viewBuilder()->layout('index_layout');
+		$LeaveApplication = $this->LeaveApplications->get($id, [
+            'contain' => ['Employees','LeaveTypes']
+        ]);
+		
+		if ($this->request->is('post')) {
+			$approve_single_multiple=$this->request->data['approve_single_multiple'];
+			$approve_leave_from=date('Y-m-d',strtotime($this->request->data['approve_leave_from']));
+			$approve_leave_to=date('Y-m-d',strtotime($this->request->data['approve_leave_to']));
+			$approve_full_half_from=$this->request->data['approve_full_half_from'];
+			$approve_full_half_to=$this->request->data['approve_full_half_to'];
+			$paid_leaves=$this->request->data['paid_leaves'];
+			$unpaid_leaves=$this->request->data['unpaid_leaves'];
+			$query = $this->LeaveApplications->query();
+			$query->update()
+				->set(['leave_status' =>'approved','approve_single_multiple'=>$approve_single_multiple,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'approve_full_half_from'=>$approve_full_half_from,'approve_full_half_to'=>$approve_full_half_to,'paid_leaves'=>$paid_leaves,'unpaid_leaves'=>$unpaid_leaves])
+				->where(['id' => $id])
+				->execute();
+			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
+		};
+		$this->set(compact('LeaveApplication','id'));
+	}
 	public function cancle($id = null)
     {
 		$session = $this->request->session();

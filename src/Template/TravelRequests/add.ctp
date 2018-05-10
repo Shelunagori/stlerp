@@ -41,9 +41,19 @@ border:none;
 				<div class="col-md-2"></div>
 				<div class="col-md-10" style="padding-bottom:10px;">
 			      <div class="col-md-5">
-						<div class="form-group">
+						<!-- <div class="form-group">
 							<label class="control-label  label-css">Employee Name</label>   
 							<?php echo $this->Form->input('employee_name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+						</div> -->
+						<div class="form-group">
+							<label class="control-label  label-css">Name</label> 
+							<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+								<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown','value'=>$s_employee_id]); ?>
+							
+							<?php } else { ?>
+								<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
+								<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id,'readonly']); ?>
+							<?php } ?>
 						</div>
 					</div>
 			       
