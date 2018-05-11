@@ -13,7 +13,7 @@ class LoanApplicationsController extends AppController
 
 	public function beforeFilter(Event $event) {
 		 $this->eventManager()->off($this->Csrf);
-	 }
+	}
     /**
      * Index method
      *
@@ -205,8 +205,9 @@ class LoanApplicationsController extends AppController
             'contain' => ['Employees']
         ]); 
 		
+		$lastLoanApplication=$this->LoanApplications->find()->where(['employee_id'=>$LoanApplications->employee_id])->order(['id'=>'DESC'])->first()->contain(['LoanInstallments']);
+		pr($lastLoanApplication); exit;
 		if ($this->request->is(['patch', 'post', 'put'])) {
-			
             $trans_date=date('Y-m-d',strtotime($this->request->data['trans_date']));
             $starting_date_of_loan=date('Y-m-d',strtotime($this->request->data['starting_date_of_loan']));
             $ending_date_of_loan=date('Y-m-d',strtotime($this->request->data['ending_date_of_loan']));
