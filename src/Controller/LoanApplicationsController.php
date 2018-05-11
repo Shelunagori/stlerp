@@ -56,6 +56,8 @@ class LoanApplicationsController extends AppController
 					$empSallary+=$data->amount;
 				}
 		}
+		$EmployeeLoan = $this->LoanApplications->find()->where(['employee_id'=>$id])->contain(['LoanInstallments']);
+		pr($EmployeeLoan->toArray()); exit;
 		echo $empSallary; exit;
 		 // pr($empSallary); exit;
 	}

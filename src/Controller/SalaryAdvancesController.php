@@ -207,7 +207,7 @@ class SalaryAdvancesController extends AppController
 					$empSallary+=$data->amount;
 				}
 		}
-		
+		//pr($EmployeeSalary)
 		$Employees=$this->SalaryAdvances->Employees->find('list');
         $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
         $this->set('_serialize', ['salaryAdvance']);

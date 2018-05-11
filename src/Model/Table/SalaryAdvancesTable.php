@@ -38,6 +38,7 @@ class SalaryAdvancesTable extends Table
 		$this->belongsTo('EmployeeSalaries');
 		$this->belongsTo('Nppayments');
 		$this->belongsTo('LedgerAccounts');
+		$this->belongsTo('LoanApplications');
     }
 
     /**
