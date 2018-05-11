@@ -39,6 +39,7 @@ class LeaveApplicationsTable extends Table
         $this->belongsTo('FinancialYears');
         $this->belongsTo('FinancialMonths');
         $this->belongsTo('LeaveTypes');
+        $this->belongsTo('TravelRequests');
 		$this->belongsTo('empData', [
 			'className' => 'Employees',
             'foreignKey' => 'parent_employee_id',

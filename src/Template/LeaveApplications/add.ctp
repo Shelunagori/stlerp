@@ -295,11 +295,12 @@ $(document).ready(function()
 	
 	//--	 END OF VALIDATION
 	
-	$('#value_date1').datepicker().on('changeDate', function (ev) {
+/* 	$('#value_date1').datepicker().on('changeDate', function (ev) {
 		var valuefirstone = $(this).val();
-		var employeeData = $('.employeeData').val(); alert(employeeData);
-		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'checkDate']); ?>";
-        url=url+'/'+valuefirstone;
+		var employeeData = $('.employeeData').val();  
+		var single_multiple = $('input[name=single_multiple]:checked').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'checkData']); ?>";
+        url=url+'/'+employeeData+'/'+valuefirstone+'/'+single_multiple; alert(url);
         $.ajax({
             url: url,
             type: 'GET',
@@ -307,7 +308,7 @@ $(document).ready(function()
             $('#leaveData').html(response);
         });
 		alert(valuefirstone);
-	});
+	}); */
 	
 	
 	$('input[name=single_multiple]').live("click",function(){

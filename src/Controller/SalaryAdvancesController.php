@@ -223,7 +223,11 @@ class SalaryAdvancesController extends AppController
 		}
 		$empSallary=$empSallary-$loan_amt;
 		//pr($EmployeeLoan->toArray()); exit;
-		$Employees=$this->SalaryAdvances->Employees->find('list');
+		$Employees=$this->SalaryAdvances->Employees->find('list')->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
         $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
         $this->set('_serialize', ['salaryAdvance']);
     }
@@ -266,7 +270,11 @@ class SalaryAdvancesController extends AppController
 				}
 		}
 		
-		$Employees=$this->SalaryAdvances->Employees->find('list');
+		$Employees=$this->SalaryAdvances->Employees->find('list')->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
         $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
         $this->set('_serialize', ['salaryAdvance']);
     }
