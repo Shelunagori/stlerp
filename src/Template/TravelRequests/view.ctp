@@ -1,113 +1,123 @@
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('Edit Travel Request'), ['action' => 'edit', $travelRequest->id]) ?> </li>
-        <li><?= $this->Form->postLink(__('Delete Travel Request'), ['action' => 'delete', $travelRequest->id], ['confirm' => __('Are you sure you want to delete # {0}?', $travelRequest->id)]) ?> </li>
-        <li><?= $this->Html->link(__('List Travel Requests'), ['action' => 'index']) ?> </li>
-        <li><?= $this->Html->link(__('New Travel Request'), ['action' => 'add']) ?> </li>
-        <li><?= $this->Html->link(__('List Travel Request Rows'), ['controller' => 'TravelRequestRows', 'action' => 'index']) ?> </li>
-        <li><?= $this->Html->link(__('New Travel Request Row'), ['controller' => 'TravelRequestRows', 'action' => 'add']) ?> </li>
-    </ul>
-</nav>
-<div class="travelRequests view large-9 medium-8 columns content">
-    <h3><?= h($travelRequest->id) ?></h3>
-    <table class="vertical-table">
+<style>
+@media print{
+    .maindiv{
+        width:100% !important;
+    }   
+    .hidden-print{
+        display:none;
+    }
+}
+p{
+margin-bottom: 0;
+}
+</style>
+<style type="text/css" media="print">
+@page {
+    size: auto;   /* auto is the initial value */
+    margin: 0 5px 0 20px;  /* this affects the margin in the printer settings */
+}
+</style>
+
+<div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 55%; height:100%;font-size: 12px;" class="maindiv">    
+        <table width="100%" class="divHeader">
         <tr>
-            <th><?= __('Employee Name') ?></th>
-            <td><?= h($travelRequest->employee_name) ?></td>
+            <td width="30%"></td>
+            <td align="center" width="30%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">Travel Request</div></td>
+            <td align="right" width="40%" style="font-size: 12px;">
+            </td>
         </tr>
         <tr>
-            <th><?= __('Employee Designation') ?></th>
-            <td><?= h($travelRequest->employee_designation) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Purpose') ?></th>
-            <td><?= h($travelRequest->purpose) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Travel Mode') ?></th>
-            <td><?= h($travelRequest->travel_mode) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Return Travel Mode') ?></th>
-            <td><?= h($travelRequest->return_travel_mode) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Id') ?></th>
-            <td><?= $this->Number->format($travelRequest->id) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Advance Amt') ?></th>
-            <td><?= $this->Number->format($travelRequest->advance_amt) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Travel From Date') ?></th>
-            <td><?= h($travelRequest->travel_from_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Travel To Date') ?></th>
-            <td><?= h($travelRequest->travel_to_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Travel Mode From Date') ?></th>
-            <td><?= h($travelRequest->travel_mode_from_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Travel Mode To Date') ?></th>
-            <td><?= h($travelRequest->travel_mode_to_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Returnl Mode To Date') ?></th>
-            <td><?= h($travelRequest->returnl_mode_to_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Returnl Mode From Date') ?></th>
-            <td><?= h($travelRequest->returnl_mode_from_date) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Create Date') ?></th>
-            <td><?= h($travelRequest->create_date) ?></td>
+            <td colspan="3">
+                <div style="border:solid 2px #0685a8;margin-bottom:5px;margin-top: 5px;"></div>
+            </td>
         </tr>
     </table>
-    <div class="row">
-        <h4><?= __('Purpose Specification') ?></h4>
-        <?= $this->Text->autoParagraph(h($travelRequest->purpose_specification)); ?>
-    </div>
-    <div class="row">
-        <h4><?= __('Other Mode') ?></h4>
-        <?= $this->Text->autoParagraph(h($travelRequest->other_mode)); ?>
-    </div>
-    <div class="related">
-        <h4><?= __('Related Travel Request Rows') ?></h4>
-        <?php if (!empty($travelRequest->travel_request_rows)): ?>
-        <table cellpadding="0" cellspacing="0">
-            <tr>
-                <th><?= __('Id') ?></th>
-                <th><?= __('Travel Request Id') ?></th>
-                <th><?= __('Party Name') ?></th>
-                <th><?= __('Destination') ?></th>
-                <th><?= __('Meeting Person') ?></th>
-                <th><?= __('Date') ?></th>
-                <th><?= __('Reporting Time') ?></th>
-                <th class="actions"><?= __('Actions') ?></th>
-            </tr>
-            <?php foreach ($travelRequest->travel_request_rows as $travelRequestRows): ?>
-            <tr>
-                <td><?= h($travelRequestRows->id) ?></td>
-                <td><?= h($travelRequestRows->travel_request_id) ?></td>
-                <td><?= h($travelRequestRows->party_name) ?></td>
-                <td><?= h($travelRequestRows->destination) ?></td>
-                <td><?= h($travelRequestRows->meeting_person) ?></td>
-                <td><?= h($travelRequestRows->date) ?></td>
-                <td><?= h($travelRequestRows->reporting_time) ?></td>
-                <td class="actions">
-                    <?= $this->Html->link(__('View'), ['controller' => 'TravelRequestRows', 'action' => 'view', $travelRequestRows->id]) ?>
-                    <?= $this->Html->link(__('Edit'), ['controller' => 'TravelRequestRows', 'action' => 'edit', $travelRequestRows->id]) ?>
-                    <?= $this->Form->postLink(__('Delete'), ['controller' => 'TravelRequestRows', 'action' => 'delete', $travelRequestRows->id], ['confirm' => __('Are you sure you want to delete # {0}?', $travelRequestRows->id)]) ?>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-        <?php endif; ?>
-    </div>
+    <table width="100%">
+					<tr>
+                        <td width="40%">Employee Name</td>
+                        <td align="center">:</td>
+                        <td><?= h($travelRequest->employee->name) ?></td>
+						
+                    </tr>
+                    <tr>
+                       
+					</tr>
+					<tr>
+                        <td  width="40%">Purpose</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->purpose) ?></td>
+					</tr>
+					<tr>
+                        <td  width="40%">Travel Mode</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->travel_mode) ?></td>
+                    </tr>
+					<tr>
+                        <td>Form</td>
+                        <td width="20" align="center">:</td>
+                        <td><?= h(date("d-m-Y",strtotime($travelRequest->travel_mode_from_date))) ?></td>
+                    </tr>
+					<tr>
+						<td>To</td>
+						<td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_mode_to_date))) ?></td>
+					</tr>
+					<tr>
+                        <td  width="40%">Mode Of Travel Return</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->return_travel_mode) ?></td>
+                    </tr>
+					<tr>
+                        <td  width="40%">Advance Amount</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->advance_amt) ?></td>
+                    </tr>
+					<tr>
+                        <td  width="40%">Comment</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->comment) ?></td>
+                    </tr>
+					<tr>
+                        <td  width="40%">Status</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->status) ?></td>
+                    </tr>
+                   
+        </tr>
+    </table>
+	<br/>
+	<br/>
+		<fieldset style="margin-left: 2px;margin-right: 16px;">
+			<legend><b>Travel Schedule Date wise only </b></legend>
+			<table id="main_table" class="table table-condensed table-bordered" style="margin-bottom: 4px;" width="100%">
+				<thead>
+					<tr align="center">
+					   <td><label>S.n.<label></td>
+					   <td><label>Date<label></td>
+					   <td><label>Party Name<label></td>
+					   <td><label>Destination<label></td>
+					   <td><label>Person whom to meet<label></td>
+					   <td><label>Reporting time<label></td>
+					 
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1; foreach($travelRequest->travel_request_rows as $travel_request_row) {?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?= h(date("d-m-Y",strtotime($travel_request_row->date))) ?></td>
+						<td><?php echo $travel_request_row->party_name; ?></td>
+						<td><?php echo $travel_request_row->destination; ?></td>
+						<td><?php echo $travel_request_row->meeting_person; ?></td>
+						<td><?php echo $travel_request_row->reporting_time; ?></td>
+					</tr>
+					<?php } ?>
+				</tbody>
+			</table>
+		</fieldset>
+				
+
+    
+  
 </div>
+

@@ -47,6 +47,8 @@
 								]
 							) ?>
 								<?php } ?>
+								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $salaryAdvance->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+								 ?>
 							</td>
 						</tr>
 						

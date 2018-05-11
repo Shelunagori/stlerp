@@ -1,54 +1,82 @@
-<nav class="large-3 medium-4 columns" id="actions-sidebar">
-    <ul class="side-nav">
-        <li class="heading"><?= __('Actions') ?></li>
-        <li><?= $this->Html->link(__('Edit Loan Application'), ['action' => 'edit', $loanApplication->id]) ?> </li>
-        <li><?= $this->Form->postLink(__('Delete Loan Application'), ['action' => 'delete', $loanApplication->id], ['confirm' => __('Are you sure you want to delete # {0}?', $loanApplication->id)]) ?> </li>
-        <li><?= $this->Html->link(__('List Loan Applications'), ['action' => 'index']) ?> </li>
-        <li><?= $this->Html->link(__('New Loan Application'), ['action' => 'add']) ?> </li>
-    </ul>
-</nav>
-<div class="loanApplications view large-9 medium-8 columns content">
-    <h3><?= h($loanApplication->id) ?></h3>
-    <table class="vertical-table">
+<style>
+@media print{
+    .maindiv{
+        width:100% !important;
+    }   
+    .hidden-print{
+        display:none;
+    }
+}
+p{
+margin-bottom: 0;
+}
+</style>
+<style type="text/css" media="print">
+@page {
+    size: auto;   /* auto is the initial value */
+    margin: 0 5px 0 20px;  /* this affects the margin in the printer settings */
+}
+</style>
+
+<div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 55%; height:100%;font-size: 12px;" class="maindiv">    
+        <table width="100%" class="divHeader">
         <tr>
-            <th><?= __('Employee Name') ?></th>
-            <td><?= h($loanApplication->employee_name) ?></td>
+            <td width="30%"></td>
+            <td align="center" width="30%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">Loan application</div></td>
+            <td align="right" width="40%" style="font-size: 12px;">
+            </td>
         </tr>
         <tr>
-            <th><?= __('Reason For  Loan') ?></th>
-            <td><?= h($loanApplication->reason_for _loan) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Amount  Of Loan') ?></th>
-            <td><?= h($loanApplication->amount _of_loan) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Amount  Of Loan In Word') ?></th>
-            <td><?= h($loanApplication->amount _of_loan_in_word) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Id') ?></th>
-            <td><?= $this->Number->format($loanApplication->id) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Salary Pm') ?></th>
-            <td><?= $this->Number->format($loanApplication->salary_pm) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Starting Date Of Loan') ?></th>
-            <td><?= h($loanApplication->starting_date_of_loan) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Ending Date Of Loan') ?></th>
-            <td><?= h($loanApplication->ending_date_of_loan) ?></td>
-        </tr>
-        <tr>
-            <th><?= __('Create Date') ?></th>
-            <td><?= h($loanApplication->create_date) ?></td>
+            <td colspan="3">
+                <div style="border:solid 2px #0685a8;margin-bottom:5px;margin-top: 5px;"></div>
+            </td>
         </tr>
     </table>
-    <div class="row">
-        <h4><?= __('Remark') ?></h4>
-        <?= $this->Text->autoParagraph(h($loanApplication->remark)); ?>
-    </div>
+    <table width="100%">
+       <tr>
+                        <td>Employee Name</td>
+                        <td width="20" align="center">:</td>
+                        <td><?= h($loanApplication->employee->name) ?></td>
+                    </tr>
+                   <tr>
+                        <td>Amount Of Loan</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->amount_of_loan) ?></td>
+                    </tr>
+					 <tr>
+                        <td>Form</td>
+                        <td width="20" align="center">:</td>
+                        <td><?= h(date("d-m-Y",strtotime($loanApplication->starting_date_of_loan))) ?></td>
+                    </tr>
+					<tr>
+						<td>To</td>
+						<td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($loanApplication->ending_date_of_loan))) ?></td>
+					</tr>
+					<tr>
+                        <td>Reason For Loan</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->reason_for_loan) ?></td>
+                    </tr>
+					<tr>
+                        <td>Remarks</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->remark) ?></td>
+                    </tr>
+					<tr>
+                        <td>Instalment Amount</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->instalment_amount) ?></td>
+                    </tr>
+					<tr>
+                        <td>Status</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->status) ?></td>
+                    </tr>
+        </tr>
+    </table>
+
+    
+  
 </div>
+
