@@ -82,18 +82,18 @@
 				<?php echo $this->Form->input('other_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
 			</td>
 			<td align="right">
-				<?php echo $this->Form->input('net_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>(@$dr_amt-$cr_amt)-$total_row-$loan_amt,'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt)]); ?>
+				<?php echo $this->Form->input('net_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>(@$dr_amt-$cr_amt)-$total_row-$loan_amt,'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
 			</td>
 			<?php $total+=(@$dr_amt-$cr_amt)-$total_row-$loan_amt; ?>
 		</tr>
-		<?php $i++; }  $r+=$p+$q;?>
+		<?php $i++; }  $r+=$p+$q+1;?>
 		<tr>
 			<td align="right" colspan="
 				<?php echo $r; ?>">
 				<b>Total</b>
 			</td>
 			<td align="right" colspan="">
-				<b>
+				<b id="tot">
 					<?= h($this->Number->format(@$total,[ 'places' => 2])) ?>
 				</b>
 			</td>
@@ -132,7 +132,7 @@ $(document).ready(function() {
 			var net_amount=parseFloat($(this).closest('tr').find('input[name="net_amount"]').val());
 			$(this).closest('tr').find('input[name="net_amount"]').val(net_amount+am);
 		}
-		
+		totalColumn();
 	});
 	$('.save').on("click",function() {
 		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){ var counter=0; 
@@ -152,8 +152,17 @@ $(document).ready(function() {
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
 		var amount_after_other=round(net_amount-other_amt);
 		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
+		totalColumn();
 	});
 	
+	function totalColumn(){
+		var t=0;
+		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){
+			var net_amount=parseFloat($(this).find('input.net_amount').val());
+			t=t+net_amount;
+			$('#tot').html('<b>'+t+'</b>');
+		});
+	}
 	
 });
 </script>
