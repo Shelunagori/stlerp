@@ -44,30 +44,94 @@ margin-bottom: 0;
 						<td><?= h($leaveApplication->leave_type->leave_name) ?></td>
 					</tr>
 					<tr>
+                        <td>Leave Intimation</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->intimated_or_not) ?></td>
+					</tr>
+					<tr>
+                        <td>Leave Reason</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->leave_reason) ?></td>
+					</tr>
+					<?php if($leaveApplication->single_multiple=="Single"){ ?>
+					<tr>
                         <td>No of Days</td>
                         <td width="20" align="center">:</td>
 						<td><?= h($leaveApplication->day_no) ?></td>
 					</tr>
-					<tr>
-                        <td>Paid/Unpaid</td>
-                        <td width="20" align="center">:</td>
-						<td><?= h($leaveApplication->leave_mode) ?></td>
-                    </tr>
+					
                     <tr>
                         <td>Form</td>
                         <td width="20" align="center">:</td>
-                        <td><?= h(date("d-m-Y",strtotime($leaveApplication->from_leave_date))) ?></td>
+                        <td><?= h(date("d-m-Y",strtotime($leaveApplication->from_leave_date)).' ('.$leaveApplication->from_full_half).')' ?></td>
                     </tr>
+					<?php }else{ ?>
 					<tr>
-						<td>To</td>
+						<td>Requested date</td>
 						<td width="20" align="center">:</td>
-						<td><?= h(date("d-m-Y",strtotime($leaveApplication->to_leave_date))) ?></td>
+						<td><?= h(date("d-m-Y",strtotime($leaveApplication->from_leave_date))).'   To   	'.h(date("d-m-Y",strtotime($leaveApplication->to_leave_date))).' ( '.$leaveApplication->to_full_half.')' ?></td>
 					</tr>
+					<tr>
+                        <td>No. of Days Request</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->day_no) ?></td>
+					</tr>
+					<?php } ?>
+					<?php if($leaveApplication->leave_status=="approved" && $leaveApplication->single_multiple=="Single"){ ?>
 					<tr>
                         <td>Leave Status</td>
                         <td width="20" align="center">:</td>
 						<td><?= h($leaveApplication->leave_status) ?></td>
                     </tr>
+					<tr>
+                        <td>Approve Form</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($leaveApplication->approve_leave_from)).' ('.$leaveApplication->approve_full_half_from).')' ?></td>
+                    </tr>
+					<tr>
+                        <td>No. of Days Approve</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->paid_leaves+$leaveApplication->unpaid_leaves) ?></td>
+					</tr>
+					<tr>
+                        <td>Paid</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->paid_leaves) ?></td>
+                    </tr>
+					<tr>
+                        <td>Unpaid</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->unpaid_leaves) ?></td>
+                    </tr>
+					<?php }else if($leaveApplication->leave_status=="approved" && $leaveApplication->single_multiple=="Multiple"){ ?>
+						<tr>
+						<td>Approve date</td>
+						<td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($leaveApplication->approve_leave_from))).'   To   	'.h(date("d-m-Y",strtotime($leaveApplication->approve_leave_to))).' ( '.$leaveApplication->approve_full_half_to.')' ?></td>
+					</tr>
+					<tr>
+                        <td>No. of Days Approve</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->paid_leaves+$leaveApplication->unpaid_leaves) ?></td>
+					</tr>
+					<tr>
+                        <td>Paid</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->paid_leaves) ?></td>
+                    </tr>
+					<tr>
+                        <td>Unpaid</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->unpaid_leaves) ?></td>
+                    </tr>
+					
+					<?php }else{ ?>
+					<tr>
+                        <td>Leave Status</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($leaveApplication->leave_status) ?></td>
+                    </tr>
+					<?php } ?>
         </tr>
     </table>
 
