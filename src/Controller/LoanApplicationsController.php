@@ -227,74 +227,74 @@ class LoanApplicationsController extends AppController
 				->execute();
 				
 			
-			$Nppayment=$this->LoanApplications->Nppayments->newEntity();
-			$Nppayment->company_id=$st_company_id;
+			$Payment=$this->LoanApplications->Payments->newEntity();
+			$Payment->company_id=$st_company_id;
 			//Voucher Number Increment
-			$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no=$this->LoanApplications->Payments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
-				$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				$Payment->voucher_no=$last_voucher_no->voucher_no+1;
 			}else{
-				$Nppayment->voucher_no=1;
+				$Payment->voucher_no=1;
 			}
-			$Nppayment->created_on=date("Y-m-d");
-			$Nppayment->financial_year_id=$st_year_id;
-			$Nppayment->created_by=$s_employee_id;
-			$Nppayment->bank_cash_id=$bank_id;
-			$Nppayment->payment_mode='NEFT/RTGS';
-			$Nppayment->cheque_no='';
-			$Nppayment->transaction_date=$trans_date;
-			$Nppayment->loan_application_id = $loanId;
-			$this->LoanApplications->Nppayments->save($Nppayment);
+			$Payment->created_on=date("Y-m-d");
+			$Payment->financial_year_id=$st_year_id;
+			$Payment->created_by=$s_employee_id;
+			$Payment->bank_cash_id=$bank_id;
+			$Payment->payment_mode='NEFT/RTGS';
+			$Payment->cheque_no='';
+			$Payment->transaction_date=$trans_date;
+			$Payment->loan_amount = 'yes';
+			$this->LoanApplications->Payments->save($Payment);
 			
 			$LedgerAccount=$this->LoanApplications->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$LoanApplications->employee_id])->first();
 			
-			$NppaymentRow=$this->LoanApplications->Nppayments->NppaymentRows->newEntity();
-			$NppaymentRow->nppayment_id=$Nppayment->id;
-			$NppaymentRow->received_from_id=$LedgerAccount->id;
-			$NppaymentRow->amount=$approve_amount_of_loan;
-			$NppaymentRow->cr_dr='Dr';
-			$NppaymentRow->narration='Loan approved';
-			$this->LoanApplications->Nppayments->NppaymentRows->save($NppaymentRow);
+			$PaymentRow=$this->LoanApplications->Payments->PaymentRows->newEntity();
+			$PaymentRow->payment_id=$Payment->id;
+			$PaymentRow->received_from_id=$LedgerAccount->id;
+			$PaymentRow->amount=$approve_amount_of_loan;
+			$PaymentRow->cr_dr='Dr';
+			$PaymentRow->narration='Loan approved';
+			$this->LoanApplications->Payments->PaymentRows->save($PaymentRow);
 			
-			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
+			$ledger = $this->LoanApplications->Payments->Ledgers->newEntity();
 			$ledger->company_id=$st_company_id;
 			$ledger->ledger_account_id = $LedgerAccount->id;
 			$ledger->credit = 0;
 			$ledger->debit = $approve_amount_of_loan;
-			$ledger->voucher_id = $Nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
+			$ledger->voucher_id = $Payment->id;
+			$ledger->voucher_source = 'Payment Voucher';
 			$ledger->transaction_date = $trans_date;
 			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
+			$this->LoanApplications->Payments->Ledgers->save($ledger);
 			
 			
 				
 				
-			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
+			$ledger = $this->LoanApplications->Payments->Ledgers->newEntity();
 			$ledger->company_id=$st_company_id;
 			$ledger->ledger_account_id = $bank_id;
 			$ledger->credit = $approve_amount_of_loan;
 			$ledger->debit = 0;
-			$ledger->voucher_id = $Nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
+			$ledger->voucher_id = $Payment->id;
+			$ledger->voucher_source = 'Payment Voucher';
 			$ledger->transaction_date = $trans_date;
 			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
+			$this->LoanApplications->Payments->Ledgers->save($ledger);
 					
 					
 			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
 		
         }
 		
-		$vr=$this->LoanApplications->Nppayments->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Non Print Payment Voucher','sub_entity'=>'Cash/Bank'])->first();
-		$vouchersReferences = $this->LoanApplications->Nppayments->VouchersReferences->get($vr->id, [
+		$vr=$this->LoanApplications->Payments->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Payment Voucher','sub_entity'=>'Cash/Bank'])->first();
+		$vouchersReferences = $this->LoanApplications->Payments->VouchersReferences->get($vr->id, [
 			'contain' => ['VoucherLedgerAccounts']
 		]);
 		$where=[];
 		foreach($vouchersReferences->voucher_ledger_accounts as $data){
 			$where[]=$data->ledger_account_id;
 		}
-		$bankCashes = $this->LoanApplications->Nppayments->BankCashes->find('list',
+		$bankCashes = $this->LoanApplications->Payments->BankCashes->find('list',
 			['keyField' => function ($row) {
 				return $row['id'];
 			},
