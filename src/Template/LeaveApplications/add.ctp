@@ -89,11 +89,11 @@ border:none;
 					<div class="form-group">
 						<label class="control-label  label-css">Name</label> 
 						<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
-							<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown','value'=>$leaveApplication->employee_id]); ?>
+							<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown employeeData','value'=>$leaveApplication->employee_id]); ?>
 						
 						<?php } else { ?>
 							<?php echo $this->Form->input('name', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->name,'readonly']); ?>
-							<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$empData->id,'readonly']); ?>
+							<?php echo $this->Form->input('employee_id', ['type'=>'hidden','label' => false,'placeholder'=>'','class'=>'form-control input-sm employeeData','value'=>$empData->id,'readonly']); ?>
 						<?php } ?>
 					</div>
 				</div>
@@ -129,7 +129,7 @@ border:none;
 				<div class="col-md-3">
 					<div class="form-group" >
 						<label class="control-label  label-css">Date of Leave Required (From)</label>   
-						<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
+						<?php echo $this->Form->input('from_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date,'id'=>'value_date1']); ?>
 					</div>
 				</div>
 			   <div class="col-md-2">
@@ -295,6 +295,21 @@ $(document).ready(function()
 	
 	//--	 END OF VALIDATION
 	
+	$('#value_date1').datepicker().on('changeDate', function (ev) {
+		var valuefirstone = $(this).val();
+		var employeeData = $('.employeeData').val(); alert(employeeData);
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'checkDate']); ?>";
+        url=url+'/'+valuefirstone;
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) {
+            $('#leaveData').html(response);
+        });
+		alert(valuefirstone);
+	});
+	
+	
 	$('input[name=single_multiple]').live("click",function(){
 		var single_multiple=$(this).val();
 		expandHalfDay(single_multiple);
@@ -331,6 +346,8 @@ $(document).ready(function()
 			$('.attache_file').hide();
 		}
 	});
+	
+	
 	
 	$('.empDropDown').live("change",function(){
 		$('#leaveData').html('Loading...');
