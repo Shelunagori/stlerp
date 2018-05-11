@@ -122,7 +122,7 @@ class EmployeeSalariesController extends AppController
 				$ToDate=$total_day."-".$From1;
 				$to_date=date('Y-m-d',strtotime($ToDate)); 
 				
-				$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
+				$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find()->where(['loan_amount IS NULL']);
 				$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
 				->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
 				$dr =$query->toArray()[0]['totalDebit'];
