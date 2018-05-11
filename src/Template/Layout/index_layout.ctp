@@ -941,7 +941,11 @@ select
 								<?php echo '<li>'.$this->Html->link( 'Generate Salary Sheet', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
 								<?php echo '<li>'.$this->Html->link( 'Employees For Salary', '/Employees/listForSalary' ).'</li>'; ?>
 						</li>
+						
 						</ul>
+						<?php 
+						echo '<li>'.$this->Html->link('<i class="icon-home"></i>Pay Slips','/Salaries/paySlip',array('escape'=>false)).'</li>';
+						?>
 					</ul>
 				</li>
 				<?php } ?>

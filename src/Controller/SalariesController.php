@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\Event\Event;
 /**
  * Salaries Controller
  *
@@ -11,6 +11,9 @@ use App\Controller\AppController;
 class SalariesController extends AppController
 {
 
+	public function beforeFilter(Event $event) {
+		 $this->eventManager()->off($this->Csrf);
+	}
     /**
      * Index method
      *
@@ -27,6 +30,21 @@ class SalariesController extends AppController
         $this->set('_serialize', ['salaries']);
     }
 
+	public function paySlip(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->Salaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		
+		if ($this->request->is('post')) {
+			$month_year=$this->request->data['month_year'];
+			$month_year=explode('-',$month_year);
+			$Salaries=$this->Salaries->find()->where(['company_id'=>$st_company_id,'month'=>$month_year[0],'year'=>$month_year[1]])->contain(['EmployeeSalaryDivisions','Employees']);
+		}
+		$this->set(compact('financial_year','Salaries'));
+	}
     /**
      * View method
      *

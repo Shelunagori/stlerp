@@ -50,6 +50,7 @@ class SalariesTable extends Table
             'foreignKey' => 'employee_salary_division_id',
             'joinType' => 'INNER'
         ]);
+		$this->belongsTo('FinancialYears');
     }
 
     /**
