@@ -81,7 +81,7 @@ class LoanApplicationsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $loanApplication = $this->LoanApplications->get($id, [
-            'contain' => []
+            'contain' => ['Employees']
         ]);
 
         $this->set('loanApplication', $loanApplication);

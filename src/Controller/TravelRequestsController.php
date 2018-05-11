@@ -152,7 +152,7 @@ class TravelRequestsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $travelRequest = $this->TravelRequests->get($id, [
-            'contain' => ['TravelRequestRows']
+            'contain' => ['TravelRequestRows','Employees']
         ]);
 
         $this->set('travelRequest', $travelRequest);

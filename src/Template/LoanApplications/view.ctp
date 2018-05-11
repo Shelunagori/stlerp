@@ -43,16 +43,6 @@ margin-bottom: 0;
                         <td width="20" align="center">:</td>
 						<td><?= h($loanApplication->amount_of_loan) ?></td>
                     </tr>
-					 <tr>
-                        <td>Form</td>
-                        <td width="20" align="center">:</td>
-                        <td><?= h(date("d-m-Y",strtotime($loanApplication->starting_date_of_loan))) ?></td>
-                    </tr>
-					<tr>
-						<td>To</td>
-						<td width="20" align="center">:</td>
-						<td><?= h(date("d-m-Y",strtotime($loanApplication->ending_date_of_loan))) ?></td>
-					</tr>
 					<tr>
                         <td>Reason For Loan</td>
                         <td width="20" align="center">:</td>
@@ -63,16 +53,35 @@ margin-bottom: 0;
                         <td width="20" align="center">:</td>
 						<td><?= h($loanApplication->remark) ?></td>
                     </tr>
+					<?php if($loanApplication->status=="approved"){ ?>
+					 <tr>
+                        <td>Form</td>
+                        <td width="20" align="center">:</td>
+                        <td><?= h(date("d-m-Y",strtotime($loanApplication->starting_date_of_loan))) ?></td>
+                    </tr>
+					<tr>
+						<td>To</td>
+						<td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($loanApplication->ending_date_of_loan))) ?></td>
+					</tr>
+					
 					<tr>
                         <td>Instalment Amount</td>
                         <td width="20" align="center">:</td>
 						<td><?= h($loanApplication->instalment_amount) ?></td>
                     </tr>
 					<tr>
+                        <td>No. Of Instalment</td>
+                        <td width="20" align="center">:</td>
+						<td><?= h($loanApplication->no_of_instalment) ?></td>
+                    </tr>
+					<?php }else{ ?>
+					<tr>
                         <td>Status</td>
                         <td width="20" align="center">:</td>
 						<td><?= h($loanApplication->status) ?></td>
                     </tr>
+					<?php } ?>
         </tr>
     </table>
 

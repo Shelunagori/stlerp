@@ -49,16 +49,19 @@ margin-bottom: 0;
 						<td width="20" align="center">:</td>
 						 <td><?= h($salaryAdvance->reason) ?></td>
 					</tr>
+					<?php if($salaryAdvance->status=="approve"){ ?>
 					<tr>
 						<td>For Month</td>
 						<td width="20" align="center">:</td>
 						<td><?= h(date("d-m-Y",strtotime($salaryAdvance->for_month))) ?></td>
 					</tr>
+					<?php }else{ ?>
 					<tr>
                         <td>Leave Status</td>
                         <td width="20" align="center">:</td>
 						<td><?= h($salaryAdvance->status) ?></td>
                     </tr>
+					<?php } ?>
         </tr>
     </table>
 
