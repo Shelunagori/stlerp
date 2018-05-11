@@ -121,12 +121,16 @@ $(document).ready(function() {
 			$(this).closest('td').find('input').val(loan_amount);
 			$(this).text('hold');
 			$(this).attr('undo','');
+			var net_amount=$(this).closest('tr').find('input[name="net_amount"]').val();
+			$(this).closest('tr').find('input[name="net_amount"]').val(net_amount-loan_amount);
 		}else{
-			var am=$(this).closest('td').find('input').val();
+			var am=parseFloat($(this).closest('td').find('input').val());
 			$(this).closest('td').find('input').val(0);
 			$(this).attr('loan_amount',am);
 			$(this).text('undo');
 			$(this).attr('undo','1');
+			var net_amount=parseFloat($(this).closest('tr').find('input[name="net_amount"]').val());
+			$(this).closest('tr').find('input[name="net_amount"]').val(net_amount+am);
 		}
 		
 	});
@@ -143,11 +147,13 @@ $(document).ready(function() {
     });
 
 	$('.other_amount1').on("blur",function() {
+		var ths=$(this);
 		var net_amount=$(this).closest('tr').find('.net_amount').attr('net');
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
 		var amount_after_other=round(net_amount-other_amt);
 		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
 	});
+	
 	
 });
 </script>
