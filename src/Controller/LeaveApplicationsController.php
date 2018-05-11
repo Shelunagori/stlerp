@@ -160,7 +160,9 @@ class LeaveApplicationsController extends AppController
 			//pr($leaveApplication->employee_id);
 			if($leaveApplication->single_multiple=="Single"){ 
 				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->from_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
-			} 
+			}else{
+				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->to_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
+			}
 			
 			foreach($dates as $data){ 
 				$c=$this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$s_employee_id,'LeaveApplications.approve_leave_from <='=>$data])->andWhere(['LeaveApplications.approve_leave_to >='=>$data])->count(); 
@@ -215,7 +217,11 @@ class LeaveApplicationsController extends AppController
 			$Totaalleave[$leavedata->id]=$leavedata->maximum_leave_in_month*12;
 			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
 		}
-		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
+		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id])->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				); 
         $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
@@ -354,6 +360,29 @@ class LeaveApplicationsController extends AppController
 					$leaveApplication->day_no-=0.5;
 				}
 			}
+			
+			if($leaveApplication->single_multiple=="Single"){ 
+				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->from_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
+			}else{
+				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->to_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
+			}
+			
+			foreach($dates as $data){ 
+				$c=$this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$s_employee_id,'LeaveApplications.approve_leave_from <='=>$data])->andWhere(['LeaveApplications.approve_leave_to >='=>$data])->count(); 
+				
+				if($c>0){
+					$this->Flash->error(__('Leave Application cannot be fullfilled with duplicate dates.'));
+					goto a;
+				}
+			}
+			
+			foreach($dates  as $date){
+				$c=$this->LeaveApplications->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count();
+				if($c>0){
+					$this->Flash->error(__('Travel request Applied in these dates.'));
+					goto a;
+				}
+			}
             if ($this->LeaveApplications->save($leaveApplication)) {
 				if(!empty($files['tmp_name']))
 				{
@@ -369,7 +398,12 @@ class LeaveApplicationsController extends AppController
                 $this->Flash->error(__('The leave application could not be saved. Please, try again.'));
             }
         }
-		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
+		a:	
+		$employees = $this->LeaveApplications->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id])->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
 		$leavetypes = $this->LeaveApplications->LeaveTypes->find('list');
         $this->set(compact('leaveApplication','leavetypes','empData','employees'));
         $this->set('_serialize', ['leaveApplication']);

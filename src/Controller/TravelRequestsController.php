@@ -26,7 +26,15 @@ class TravelRequestsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-        $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
+		
+		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
+		$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees']));
+		}else{ 
+		$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+		}
+		
+       // $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 
         $this->set(compact('travelRequests'));
         $this->set('_serialize', ['travelRequests']);
@@ -209,7 +217,11 @@ class TravelRequestsController extends AppController
         }
 		
 		a:
-		$employees = $this->TravelRequests->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
+		$employees = $this->TravelRequests->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id])->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
         $this->set(compact('travelRequest','empData','employees','s_employee_id'));
         $this->set('_serialize', ['travelRequest']);
     }
@@ -262,7 +274,12 @@ class TravelRequestsController extends AppController
                 $this->Flash->error(__('The travel request could not be saved. Please, try again.'));
             }
         }
-        $this->set(compact('travelRequest'));
+		$employees = $this->TravelRequests->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id])->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
+        $this->set(compact('travelRequest','empData','employees'));
         $this->set('_serialize', ['travelRequest']);
     }
 	

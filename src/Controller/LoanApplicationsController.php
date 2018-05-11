@@ -138,7 +138,11 @@ class LoanApplicationsController extends AppController
 			}
 		}
 		
-		$Employees=$this->LoanApplications->Employees->find('list');
+		$Employees=$this->LoanApplications->Employees->find('list')->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  ;
         $this->set(compact('loanApplication','empData','empSallary','Employees'));
         $this->set('_serialize', ['loanApplication']);
     }
@@ -181,7 +185,11 @@ class LoanApplicationsController extends AppController
 			}
 		}
 		
-		$Employees=$this->LoanApplications->Employees->find('list');
+		$Employees=$this->LoanApplications->Employees->find('list')->matching(
+					'EmployeeCompanies', function ($q)  {
+						return $q->where(['EmployeeCompanies.freeze' =>0]);
+					}
+				);  
         $this->set(compact('loanApplication','empData','empSallary','Employees'));
         $this->set('_serialize', ['loanApplication']);
     }
