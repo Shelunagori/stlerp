@@ -47,6 +47,18 @@ class LeaveApplicationsController extends AppController
      */
 
 		
+/* 	public function checkData($id = null,$sellDate=null,$single_multiple=null){
+		$sellDate = date("Y-m-d",strtotime($sellDate));  
+		
+		$LeaveApplication = $this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$id])->toArray();
+		
+		 pr($LeaveApplication); exit;
+		exit;
+	} */
+	
+		
+
+
 	public function approve($id = null){
 		$LeaveApplication = $this->LeaveApplications->get($id);
 		 $this->set(compact('LeaveApplication','id'));
@@ -145,7 +157,17 @@ class LeaveApplicationsController extends AppController
 					$leaveApplication->day_no-=0.5;
 				}
 			}
+			//pr($leaveApplication->employee_id);
+			if($leaveApplication->single_multiple=="Single"){ 
+				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->from_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
+			} 
 			
+			foreach($dates as $data){ pr($data);
+				$leaveCount = $this->LeaveApplications->find()->where(['LeaveApplications.approve_leave_from >='=>$data,'LeaveApplications.approve_leave_to <='=>$data])->count();
+			}
+			//pr($leaveApplication);
+			pr($leaveCount);
+			exit;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -187,7 +209,19 @@ class LeaveApplicationsController extends AppController
         $this->set('_serialize', ['leaveApplication']);
     }
 	
-	
+	function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
+		
+		$dates = array();
+		$current = strtotime($first);
+		$last = strtotime($last);
+
+		while( $current <= $last ) {
+			
+			$dates[] = date($output_format, $current);
+			$current = strtotime($step, $current);
+		} 
+		return $dates;
+	}
 	
 	public function leaveData($EmpId)
     {
