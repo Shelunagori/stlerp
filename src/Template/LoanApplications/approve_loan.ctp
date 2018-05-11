@@ -9,20 +9,47 @@
 		<div class="row">
 			<div class="col-md-4">
 				<div class="form-group leave_type">
-					<label class="control-label  label-css">Employee</label>
+					<label class="control-label  label-css">Last Loan Amount</label><br/>
+					<span> <?php echo $lastLoanApplication->approve_amount_of_loan; ?></span>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="form-group">
+					<label class="control-label  label-css">Last Loan Reason</label><br/>
+					<span> <?php echo $lastLoanApplication->reason_for_loan; ?></span>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="form-group">
+					<label class="control-label  label-css">Installments for Last Loan </label><br/>
+					<?php 
+					$tot=0;
+					foreach($lastLoanApplication->loan_installments as $loan_installment) {
+						echo '<span>'.date('F', mktime(0, 0, 0, $loan_installment->month, 10)).'-'.$loan_installment->year.' (₹ '.$loan_installment->amount.')</span><br/>';
+						$tot+=$loan_installment->amount;
+					} ?>
+					<span><b>Total ₹ <?php echo $tot; ?></b></span>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-4">
+				<div class="form-group leave_type">
+					<label class="control-label  label-css">Employee</label><br/>
 					<span> <?php echo $LoanApplications->employee->name; ?></span>
 				</div>
 			</div>
 			<div class="col-md-4">
 				<div class="form-group">
-					<label class="control-label  label-css">Reason for loan </label>
+					<label class="control-label  label-css">Reason for loan </label><br/>
 					<span> <?php echo $LoanApplications->reason_for_loan; ?></span>
 				</div>
 			</div>
 
 			<div class="col-md-4">
 				<div class="form-group">
-					<label class="control-label  label-css">Remark </label>
+					<label class="control-label  label-css">Remark </label><br/>
 					<span> <?php echo $LoanApplications->remark; ?></span>
 				</div>
 			</div>

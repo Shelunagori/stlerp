@@ -205,8 +205,8 @@ class LoanApplicationsController extends AppController
             'contain' => ['Employees']
         ]); 
 		
-		$lastLoanApplication=$this->LoanApplications->find()->where(['employee_id'=>$LoanApplications->employee_id])->order(['id'=>'DESC'])->first()->contain(['LoanInstallments']);
-		pr($lastLoanApplication); exit;
+		$lastLoanApplication=$this->LoanApplications->find()->where(['employee_id'=>$LoanApplications->employee_id])->order(['id'=>'DESC'])->contain(['LoanInstallments'])->first();
+		
 		if ($this->request->is(['patch', 'post', 'put'])) {
             $trans_date=date('Y-m-d',strtotime($this->request->data['trans_date']));
             $starting_date_of_loan=date('Y-m-d',strtotime($this->request->data['starting_date_of_loan']));
@@ -228,10 +228,10 @@ class LoanApplicationsController extends AppController
 				->execute();
 				
 			
-			$Payment=$this->LoanApplications->Payments->newEntity();
+			$Payment=$this->LoanApplications->Nppayments->newEntity();
 			$Payment->company_id=$st_company_id;
 			//Voucher Number Increment
-			$last_voucher_no=$this->LoanApplications->Payments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			if($last_voucher_no){
 				$Payment->voucher_no=$last_voucher_no->voucher_no+1;
 			}else{
@@ -245,19 +245,19 @@ class LoanApplicationsController extends AppController
 			$Payment->cheque_no='';
 			$Payment->transaction_date=$trans_date;
 			$Payment->loan_amount = 'yes';
-			$this->LoanApplications->Payments->save($Payment);
+			$this->LoanApplications->Nppayments->save($Payment);
 			
 			$LedgerAccount=$this->LoanApplications->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$LoanApplications->employee_id])->first();
 			
-			$PaymentRow=$this->LoanApplications->Payments->PaymentRows->newEntity();
+			$PaymentRow=$this->LoanApplications->Nppayments->NppaymentRows->newEntity();
 			$PaymentRow->payment_id=$Payment->id;
 			$PaymentRow->received_from_id=$LedgerAccount->id;
 			$PaymentRow->amount=$approve_amount_of_loan;
 			$PaymentRow->cr_dr='Dr';
 			$PaymentRow->narration='Loan approved';
-			$this->LoanApplications->Payments->PaymentRows->save($PaymentRow);
+			$this->LoanApplications->Nppayments->NppaymentRows->save($PaymentRow);
 			
-			$ledger = $this->LoanApplications->Payments->Ledgers->newEntity();
+			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
 			$ledger->company_id=$st_company_id;
 			$ledger->ledger_account_id = $LedgerAccount->id;
 			$ledger->credit = 0;
@@ -266,12 +266,12 @@ class LoanApplicationsController extends AppController
 			$ledger->voucher_source = 'Payment Voucher';
 			$ledger->transaction_date = $trans_date;
 			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Payments->Ledgers->save($ledger);
+			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
 			
 			
 				
 				
-			$ledger = $this->LoanApplications->Payments->Ledgers->newEntity();
+			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
 			$ledger->company_id=$st_company_id;
 			$ledger->ledger_account_id = $bank_id;
 			$ledger->credit = $approve_amount_of_loan;
@@ -280,22 +280,22 @@ class LoanApplicationsController extends AppController
 			$ledger->voucher_source = 'Payment Voucher';
 			$ledger->transaction_date = $trans_date;
 			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Payments->Ledgers->save($ledger);
+			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
 					
 					
 			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
 		
         }
 		
-		$vr=$this->LoanApplications->Payments->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Payment Voucher','sub_entity'=>'Cash/Bank'])->first();
-		$vouchersReferences = $this->LoanApplications->Payments->VouchersReferences->get($vr->id, [
+		$vr=$this->LoanApplications->Nppayments->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Payment Voucher','sub_entity'=>'Cash/Bank'])->first();
+		$vouchersReferences = $this->LoanApplications->Nppayments->VouchersReferences->get($vr->id, [
 			'contain' => ['VoucherLedgerAccounts']
 		]);
 		$where=[];
 		foreach($vouchersReferences->voucher_ledger_accounts as $data){
 			$where[]=$data->ledger_account_id;
 		}
-		$bankCashes = $this->LoanApplications->Payments->BankCashes->find('list',
+		$bankCashes = $this->LoanApplications->Nppayments->BankCashes->find('list',
 			['keyField' => function ($row) {
 				return $row['id'];
 			},
@@ -307,6 +307,6 @@ class LoanApplicationsController extends AppController
 				}
 				
 			}])->where(['BankCashes.id IN' => $where]);
-		$this->set(compact('LoanApplications','id', 'bankCashes'));
+		$this->set(compact('LoanApplications','id', 'bankCashes','lastLoanApplication'));
 	}
 }
