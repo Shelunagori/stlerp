@@ -153,7 +153,7 @@ if(!empty($status)){
 						</tr>
 					</thead>
 					<tbody>
-						<?php $i=0; foreach ($quotations as $quotation):  $i++;
+						<?php $total_amount=0; $i=0; foreach ($quotations as $quotation):  $i++;
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
@@ -181,7 +181,7 @@ if(!empty($status)){
 										</ul>
 								</div>
 							</td>
-							<td align="center"><?= h($this->Number->format($quotation->total,['places'=>2])) ?></td>
+							<td align="center"><?= h($this->Number->format($quotation->total,['places'=>2])) ?><?php $total_amount=$total_amount+$quotation->total; ?></td>
 							
 							<?php if($pull_request=="true" ){ ?>
 							<td><?php echo date("d-m-Y",strtotime($quotation->created_on)); ?></td>
@@ -256,6 +256,14 @@ if(!empty($status)){
 						
 						<?php  endforeach; ?>
 					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="6" style="text-align:right"><b>Total</b></td>
+							<td style="text-align:right"><b><?php echo $this->Number->format($total_amount,['places'=>2]);?></b></td>
+							<td style="text-align:right"><b></b></td>
+							<td style="text-align:right"><b></b></td>
+						</tr>
+					</tfoot>
 				</table>
 				
 			</div>

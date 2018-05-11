@@ -123,6 +123,7 @@
 					<tbody>
 						<?php 
 						//pr($allowed_emp); exit;
+						$total_amount=0;
 						foreach ($salesOrders as $salesOrder):
 						
 							$TotalSalesOrderQuantity=0;
@@ -157,7 +158,7 @@
 										</ul>
 								</div>
 							</td>
-							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?></td>
+							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">
@@ -202,7 +203,7 @@
 								</div>
 							</td>
 							
-							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?></td>
+							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 						<td class="actions">
@@ -322,6 +323,14 @@
 						<?php } 
 						endforeach; ?>
 					</tbody>
+					<tfoot>
+						<tr>
+							<td colspan="6" style="text-align:right"><b>Total</b></td>
+							<td style="text-align:right"><b><?php echo $this->Number->format($total_amount,['places'=>2]);?></b></td>
+							<td style="text-align:right"><b></b></td>
+							<td style="text-align:right"><b></b></td>
+						</tr>
+					</tfoot>
 				</table>
 				</div>
 			</div>

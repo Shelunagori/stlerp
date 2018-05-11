@@ -57,6 +57,14 @@ class InventoryTransferVouchersTable extends Table
 			'foreignKey' => 'created_by',
 			'propertyName' => 'creator',
 		]);
+		$this->belongsTo('Customers',[
+			'foreignKey'=>'customer_id',
+			'joinType'=>'INNER'
+		]);
+		$this->belongsTo('Vendors',[
+			'foreignKey'=>'vendor_id',
+			'joinType'=>'INNER'
+		]);
 		$this->belongsTo('FinancialYears');
         $this->belongsTo('FinancialMonths');	
     }

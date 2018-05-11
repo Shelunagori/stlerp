@@ -32,6 +32,60 @@ if($transaction_date <  $start_date ) {
 				//pr($start_date); exit;
 		?>
 	<div class="row">
+		<div class="form-group">
+			<div class="col-md-3">
+				<?php echo $this->Form->radio(
+									'cust_supplier_mode',
+									[
+										['value' => 'customer', 'text' => 'Customers','checked'],
+										['value' => 'supplier', 'text' => 'Supplier']
+									]
+								); ?>
+			</div>
+			<div id="customerData">
+				<div class="col-md-3">
+					<label>Customers</label>
+					<?php
+						$options=array();
+								foreach($customers as $customer){
+									if(empty($customer->alias)){
+										$merge=$customer->customer_name;
+									}else{
+										$merge=$customer->customer_name.'	('.$customer->alias.')';
+									}
+									
+									$options[]=['text' =>$merge, 'value' => $customer->id];
+								}
+
+					?>
+					<?php echo $this->Form->input('customer_id',['empty'=>'---Select Customer ---','options'=>$options,'class'=>'form-control select2me customer_id','label'=>false]); ?>
+				</div>
+				<div class="col-md-3">
+					<label>File No.</label>
+					<div  id="so3_div">
+						<?php echo $this->Form->input('file_no', ['empty'=>'--- Select ---','label' => false,'class' => 'form-control  file_no','id'=>'file_no']); ?>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-3" id="supplierData">
+				<label>Supplier</label>
+				<?php
+					foreach($vendor as $vendors){
+								if(empty($vendors->alias)){
+									$merge1=$vendors->company_name;
+								}else{
+									$merge1=$vendors->company_name.'('.$vendors->alias.')';
+								}
+								
+								$options1[]=['text' =>$merge1, 'value' => $vendors->id];
+
+							}
+							echo $this->Form->input('vendor_id', ['empty' => "--Select--",'label' => false,'options' => $options1,'class' => 'form-control select2me vendor_id','value' => @$vendor->id]); ?>
+
+			</div>
+		</div>	
+	</div><br/>	
+	<div class="row">
 		<div class="col-md-3">
 		<label>Transaction Date</label>
 		<?php echo $this->Form->input('transaction_date', ['label' => false,'class' => 'form-control  date-picker','data-date-format'=>'dd-mm-yyyy','placeholder'=>'dd-mm-yyyy','type' => 'text','value'=>date("d-m-Y",strtotime($inventoryTransferVouchersout->transaction_date)),'data-date-start-date' => $start_date,'data-date-end-date' => $end_date]); ?>
@@ -532,6 +586,58 @@ $(document).ready(function() {
 			}
 		});	
 	}
+	
+	////
+	
+	$('input[type=radio]').die().live("click",function() { 
+		var selectedValue = $('input[type=radio]:checked').val();
+		if(selectedValue == "supplier"){
+			$('#supplierData').show();
+			$('#customerData').hide();
+			$('.vendor_id').attr('required','required');
+			$('.file_no').removeAttr('required');
+			$('.customer_id ').removeAttr('required');
+			$('.file_no').select2('data',null);
+			$('.customer_id').select2('data',null);
+		}else if(selectedValue == "customer"){
+			$('#supplierData').hide();
+			$('#customerData').show();
+			$('.customer_id').attr('required','required');
+			$('.file_no').attr('required','required');
+			$('.vendor_id ').removeAttr('required');
+			$('.vendor_id').select2('data',null);
+		}
+	});
+	var selectedValue = $('input[type=radio]:checked').val();
+		if(selectedValue == "supplier"){
+			$('#supplierData').show();
+			$('#customerData').hide();
+			$('.vendor_id').attr('required','required');
+			$('.file_no').removeAttr('required');
+			$('.customer_id ').removeAttr('required');
+			$('.file_no').select2('data',null);
+			$('.customer_id').select2('data',null);
+		}else if(selectedValue == "customer"){
+			$('#supplierData').hide();
+			$('#customerData').show();
+			$('.customer_id').attr('required','required');
+			$('.file_no').attr('required','required');
+			$('.vendor_id ').removeAttr('required');
+			$('.vendor_id').select2('data',null);
+		}
+	
+	$('select[name="customer_id"]').on("change",function() {
+		var customer_id=$('select[name="customer_id"] option:selected').val();
+		$("#so3_div").html('Loading...');
+		var url="<?php echo $this->Url->build(['controller'=>'Filenames','action'=>'listFilename']); ?>";
+		url=url+'/'+customer_id+'/so',
+		$.ajax({
+			url: url,
+		}).done(function(response) {
+			$("#so3_div").html(response);
+			$('select[name="qt3"]').attr('name','so3').select2();
+		});
+	});	
 });
 
 	

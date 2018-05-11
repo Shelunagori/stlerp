@@ -362,9 +362,9 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->in_out='in_out';
 			$inventoryTransferVoucher->created_by=$s_employee_id;
 			$inventoryTransferVoucher->financial_year_id=$st_year_id;
-			
+			$inventoryTransferVoucher->file_no = $inventoryTransferVoucher->so3;
 
-	        //pr($inventory_transfer_voucher_rows);exit;
+	        //pr($inventoryTransferVoucher);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 				
 				foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $key => $inventory_transfer_voucher_row)
@@ -483,8 +483,22 @@ class InventoryTransferVouchersController extends AppController
                 return $this->redirect(['action' => 'add']);
             } 
        
+	    $customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
+		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);	
+				//pr($vendor->toArray());exit;
         $companies = $this->InventoryTransferVouchers->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('inventoryTransferVoucher', 'companies','display_items','options','financial_month_first','financial_month_last'));
+        $this->set(compact('inventoryTransferVoucher', 'companies','display_items','options','financial_month_first','financial_month_last','customers','vendor'));
         $this->set('_serialize', ['inventoryTransferVoucher']);
     }
 
@@ -612,6 +626,11 @@ class InventoryTransferVouchersController extends AppController
             $inventoryTransferVoucher = $this->InventoryTransferVouchers->patchEntity($inventoryTransferVoucher, $this->request->data);
 			$inventoryTransferVoucher->transaction_date=date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date));
 			
+			if(!empty($inventoryTransferVoucher->customer_id)){
+				$inventoryTransferVoucher->file_no=$inventoryTransferVoucher->so3;
+			}else{
+				$inventoryTransferVoucher->file_no='';
+			}
 			$inventoryTransferVoucher->edited_on = date("Y-m-d"); 
 			$inventoryTransferVoucher->edited_by=$this->viewVars['s_employee_id'];
 			//pr($inventoryTransferVoucher);exit;
@@ -781,10 +800,22 @@ class InventoryTransferVouchersController extends AppController
 				}
 			}
 		}
+		 $customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
 		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);	
 	
         $companies = $this->InventoryTransferVouchers->Companies->find('list', ['limit' => 200]);
-        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo','id','item_option1'));
+        $this->set(compact('inventoryTransferVoucher', 'companies','inventoryTransferVouchersout','inventoryTransferVouchersins','id','display_items','financial_month_first','financial_month_last','parentSerialNo','id','item_option1','customers','vendor'));
         $this->set('_serialize', ['inventoryTransferVoucher']);
     }
 
@@ -979,6 +1010,7 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->financial_year_id=$st_year_id;
 			$inventoryTransferVoucher->in_out='In';
 			$inventoryTransferVoucher->created_by=$s_employee_id;
+			$inventoryTransferVoucher->file_no=$inventoryTransferVoucher->so3;
 			$inventoryTransferVoucher->created_on=date('Y-m-d');
 			$inventoryTransferVoucher->transaction_date=date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date));
 			//pr($inventoryTransferVoucher);exit;
@@ -1027,8 +1059,20 @@ class InventoryTransferVouchersController extends AppController
 			}
 			
 		}
+		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
 		
-		$this->set(compact('display_items','inventoryTransferVoucher','financial_month_first','financial_month_last'));
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);	
+		$this->set(compact('display_items','inventoryTransferVoucher','financial_month_first','financial_month_last','customers','vendor'));
 	}
 	
 	public function InventoryOut()
@@ -1069,6 +1113,7 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->created_by=$s_employee_id;
 			$inventoryTransferVoucher->created_on=date('Y-m-d');
 			$inventoryTransferVoucher->transaction_date=date('Y-m-d',strtotime($inventoryTransferVoucher->transaction_date));
+			$inventoryTransferVoucher->file_no=$inventoryTransferVoucher->so3;
 			//pr($inventoryTransferVoucher);exit;
 				if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 				
@@ -1135,7 +1180,20 @@ class InventoryTransferVouchersController extends AppController
 				}
 		
 		}
-		$this->set(compact('display_items','inventoryTransferVoucher','financial_month_first','financial_month_last'));
+		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
+		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);
+		$this->set(compact('display_items','inventoryTransferVoucher','financial_month_first','financial_month_last','customers','vendor'));
 	}
 	
 
@@ -1264,11 +1322,15 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->edited_by=$this->viewVars['s_employee_id'];
 			
 			
-			
+			if(!empty($inventoryTransferVoucher->customer_id)){
+				$inventoryTransferVoucher->file_no=$inventoryTransferVoucher->so3;
+			}else{
+				$inventoryTransferVoucher->file_no='';
+			}
 			$inventoryTransferVoucher->company_id=$st_company_id;
 			$inventoryTransferVoucher->in_out='Out';
 			$inventoryTransferVoucher->transaction_date=date('Y-m-d',strtotime($inventoryTransferVoucher->transaction_date));
-			
+			///pr($inventoryTransferVoucher);exit;
 		if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) { 
 				$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id,'in_out'=>'Out']);
 				
@@ -1335,10 +1397,22 @@ class InventoryTransferVouchersController extends AppController
 				}
 		
 		}
+		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
+		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);	
 		
 		
-		
-		$this->set(compact('display_items','inventoryTransferVoucher','inventoryTransferVouchersout','display_items','id','financial_month_first','financial_month_last'));
+		$this->set(compact('display_items','inventoryTransferVoucher','inventoryTransferVouchersout','display_items','id','financial_month_first','financial_month_last','customers','vendor'));
 	}
 	
 	public function editInventoryIn($id=null)
@@ -1374,6 +1448,11 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->in_out='In';
 			$inventoryTransferVoucher->created_by=$s_employee_id;
 			$inventoryTransferVoucher->transaction_date=date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date));
+			if(!empty($inventoryTransferVoucher->customer_id)){
+				$inventoryTransferVoucher->file_no=$inventoryTransferVoucher->so3;
+			}else{
+				$inventoryTransferVoucher->file_no='';
+			}
 			//pr($inventoryTransferVoucher);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
 			
@@ -1447,9 +1526,22 @@ class InventoryTransferVouchersController extends AppController
 				}
 			}
 		}
+		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
 		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);	
+	
 		
-		$this->set(compact('display_items','inventoryTransferVoucher','inventoryTransferVouchers','display_items','id','financial_month_first','financial_month_last','parentSerialNo'));
+		$this->set(compact('display_items','inventoryTransferVoucher','inventoryTransferVouchers','display_items','id','financial_month_first','financial_month_last','parentSerialNo','customers','vendor'));
 		
 	}
 	
