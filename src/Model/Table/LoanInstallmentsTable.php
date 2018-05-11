@@ -81,7 +81,7 @@ class LoanInstallmentsTable extends Table
      */
     public function buildRules(RulesChecker $rules)
     {
-        $rules->add($rules->existsIn(['loan_application_id'], 'LoanApplications'));
+       // $rules->add($rules->existsIn(['loan_application_id'], 'LoanApplications'));
 
         return $rules;
     }

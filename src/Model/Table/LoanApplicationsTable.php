@@ -38,6 +38,11 @@ class LoanApplicationsTable extends Table
 		$this->belongsTo('EmployeeSalaries');
 		$this->belongsTo('Nppayments');
 		$this->belongsTo('LedgerAccounts');
+		//$this->belongsTo('LoanInstallments');
+		  $this->hasMany('LoanInstallments', [
+            'foreignKey' => 'loan_application_id',
+            'joinType' => 'INNER'
+        ]); 
 		$this->belongsTo('empData', [
 			'className' => 'Employees',
             'foreignKey' => 'parent_employee_id',
