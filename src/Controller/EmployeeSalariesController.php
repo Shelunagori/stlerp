@@ -88,6 +88,7 @@ class EmployeeSalariesController extends AppController
 		$emp_sallary_division=[];
 		$basic_sallary=[];
 		$loan_amount=[];
+		$loan_app=[];
 		$other_amount=[];
 		$EmployeeAtten=[];
 		foreach($employees as $dt){
@@ -99,6 +100,7 @@ class EmployeeSalariesController extends AppController
 			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
 				if($LoanApplications){
 					$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
+					$loan_app[$dt->id]=$LoanApplications->id; 
 				}
 				
 				if($EmployeeSalary){
@@ -116,16 +118,16 @@ class EmployeeSalariesController extends AppController
 						
 					}
 				}
-						$ledger_account=$this->EmployeeSalaries->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$dt->id,'company_id'=>$st_company_id])->first();
-						$ToDate=$total_day."-".$From1;
-						$to_date=date('Y-m-d',strtotime($ToDate)); 
-						
-						$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
-						$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
-						->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
-						$dr =$query->toArray()[0]['totalDebit'];
-						$cr =$query->toArray()[0]['totalCredit']; 
-						$other_amount[@$dt->id]=round($dr-$cr,2);
+				$ledger_account=$this->EmployeeSalaries->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$dt->id,'company_id'=>$st_company_id])->first();
+				$ToDate=$total_day."-".$From1;
+				$to_date=date('Y-m-d',strtotime($ToDate)); 
+				
+				$query=$this->EmployeeSalaries->LedgerAccounts->Ledgers->find();
+				$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
+				->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
+				$dr =$query->toArray()[0]['totalDebit'];
+				$cr =$query->toArray()[0]['totalCredit']; 
+				$other_amount[@$dt->id]=round($dr-$cr,2);
 		
 		} 
 //pr($other_amount); exit;
@@ -160,7 +162,7 @@ class EmployeeSalariesController extends AppController
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
 		
-		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount','EmployeeAtten','bankCashes'));
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','loan_app','other_amount','EmployeeAtten','bankCashes'));
 
 	}
 	
@@ -183,6 +185,8 @@ class EmployeeSalariesController extends AppController
 			
 			$From=$this->request->data()['From'];
 			$other_amounts=$this->request->data()['other_amount'];
+			$loan_amount2=$this->request->data()['loan_amount'];
+			$loan_app=$this->request->data()['loan_app'];
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$bank_id=$this->request->data()['bank_id'];
 			
@@ -208,6 +212,20 @@ class EmployeeSalariesController extends AppController
 					$salary->employee_salary_division_id=0;
 					$salary->amount=0;
 					$salary->other_amount=$value;
+					$salary->month=$month;
+					$salary->year=$year;
+					$this->EmployeeSalaries->Salaries->save($salary);
+				}
+			}
+			
+			foreach($loan_amount2 as $key=>$value){
+				if($value!=0){
+					$salary = $this->EmployeeSalaries->Salaries->newEntity();
+					$salary->employee_id=$key;
+					$salary->company_id=$st_company_id;
+					$salary->employee_salary_division_id=0;
+					$salary->amount=0;
+					$salary->loan_amount=$value;
 					$salary->month=$month;
 					$salary->year=$year;
 					$this->EmployeeSalaries->Salaries->save($salary);
@@ -254,6 +272,8 @@ class EmployeeSalariesController extends AppController
             $Nppayment->company_id=$st_company_id;
             $Nppayment->transaction_date=$trans_date;
             $Nppayment->cheque_no="";
+            $Nppayment->salary_month=$month;
+            $Nppayment->salary_year=$year;
 			$this->EmployeeSalaries->Nppayments->save($Nppayment);
 			
 			
@@ -300,49 +320,43 @@ class EmployeeSalariesController extends AppController
 				$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
 			}
 			
+			if($loan_amount2[$dt->id]>0){ 
+				$LoanInstallment = $this->EmployeeSalaries->LoanInstallments->newEntity();
+				$LoanInstallment->loan_application_id=$loan_app[$dt->id];
+				$LoanInstallment->month=$month;
+				$LoanInstallment->year=$year;
+				$LoanInstallment->amount=$loan_amount2[$dt->id];
+				$this->EmployeeSalaries->LoanInstallments->save($LoanInstallment);
+				
+						
+				$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
+				$NppaymentRow->nppayment_id=$Nppayment->id;
+				$NppaymentRow->received_from_id=$LedgerAccount->id;
+				$NppaymentRow->amount=$loan_amount2[$dt->id];
+				$NppaymentRow->cr_dr='Cr';
+				$NppaymentRow->narration='Loan installment';
+				$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
+				
+				$ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $LedgerAccount->id;
+				$ledger->credit = $loan_amount2[$dt->id];
+				$ledger->debit = 0;
+				$total_cr=$total_cr+$loan_amount2[$dt->id];
+				$ledger->voucher_id = $Nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $Nppayment->transaction_date;
+				$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
+				
+			}
+			
+			
 			$From=date('Y-m-d',strtotime($From)); 
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
 			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
-				if($LoanApplications){
-					$loan_amount[$dt->id]=$LoanApplications->instalment_amount;
-					
-					if(@$LoanApplications->instalment_amount>0){
-						$salary = $this->EmployeeSalaries->Salaries->newEntity();
-						$salary->employee_id=$dt->id;
-						$salary->company_id=$st_company_id;
-						$salary->employee_salary_division_id=0;
-						$salary->amount=0;
-						$salary->loan_amount=$LoanApplications->instalment_amount;
-						$salary->month=$month;
-						$salary->year=$year;
-						$this->EmployeeSalaries->Salaries->save($salary);
-						
-						$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
-						$NppaymentRow->nppayment_id=$Nppayment->id;
-						$NppaymentRow->received_from_id=$LedgerAccount->id;
-						$NppaymentRow->amount=$LoanApplications->instalment_amount;
-						$NppaymentRow->cr_dr='Cr';
-						$NppaymentRow->narration='Loan installment';
-						$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
-						
-						$ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
-						$ledger->company_id=$st_company_id;
-						$ledger->ledger_account_id = $LedgerAccount->id;
-						$ledger->credit = $LoanApplications->instalment_amount;
-						$ledger->debit = 0;
-						$total_cr=$total_cr+$LoanApplications->instalment_amount;
-						$ledger->voucher_id = $Nppayment->id;
-						$ledger->voucher_source = 'Non Print Payment Voucher';
-						$ledger->transaction_date = $Nppayment->transaction_date;
-						$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
-						
-					}
-				}
-				
-				
 				
 				
 				if($EmployeeSalary){
@@ -475,6 +489,8 @@ class EmployeeSalariesController extends AppController
 		
 		
 		}
+		
+		return $this->redirect(['controller' =>'EmployeeSalaries' ,'action' => 'paidSallary']);
 		
 		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount','EmployeeAtten'));
 

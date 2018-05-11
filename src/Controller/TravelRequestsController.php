@@ -78,7 +78,7 @@ class TravelRequestsController extends AppController
 				$nppayment->company_id=$st_company_id;
 				$nppayment->transaction_date=$trans_date;
 				$nppayment->cheque_no='';
-				$nppayment->advance_salary='yes';
+				$nppayment->travel_request_id=$travelRequest->id;
 				$this->TravelRequests->Nppayments->save($nppayment);
 			
 				$ledger_account=$this->TravelRequests->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$travelRequest->employee_id,'company_id'=>$st_company_id])->first();

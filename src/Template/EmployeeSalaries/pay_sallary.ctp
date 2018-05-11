@@ -56,39 +56,32 @@
 			</td>
 			<td>
 				<?php echo @$basic_sallary[@$data->id]; ?>
-				
-				
 			</td>
-			<?php  foreach($EmployeeSalaryAddition as $data2){ 
-							$dr_amt+=@$emp_sallary_division[@$data->id][@$data2->id];
-						?>
-			<td align="right" salary_div="<?php echo @$data2->id;?>">
-				<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data2->id],2)]); ?>
-			</td>
+			<?php  
+			foreach($EmployeeSalaryAddition as $data2){ 
+				$dr_amt+=@$emp_sallary_division[@$data->id][@$data2->id];?>
+				<td align="right" salary_div="<?php echo @$data2->id;?>">
+					<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data2->id],2)]); ?>
+				</td>
 			<?php }  ?>
-			<?php  foreach($EmployeeSalaryDeduction as $data4){  
-							$cr_amt+=@$emp_sallary_division[@$data->id][@$data4->id];
-							 
-						?>
-			<td align="right" salary_div="<?php echo @$data4->id;?>">
-				
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data4->id],2)]); ?>
-			</td>
+			<?php  
+			foreach($EmployeeSalaryDeduction as $data4){  
+				$cr_amt+=@$emp_sallary_division[@$data->id][@$data4->id];?>
+				<td align="right" salary_div="<?php echo @$data4->id;?>">
+					<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data4->id],2)]); ?>
+				</td>
 			<?php }  ?>
 			<td align="right">
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id],2)]); 
-				$loan_amt=round(@$loan_amount[@$data->id],2);
-				?>
-				
+				<?php echo $this->Form->input('loan_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id],2)]); 
+				echo $this->Form->input('loan_app['.$data->id.']', ['class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$data->id]]); 
+				$loan_amt=round(@$loan_amount[@$data->id],2);?>
+				<a href="#" class="hold">Hold</a>
 			</td>
 			<td align="right">
-				
 				<?php  $total_row=@$other_amount[@$data->id]; ?>
 				<?php echo $this->Form->input('other_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
-				
 			</td>
 			<td align="right">
-				
 				<?php echo $this->Form->input('net_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>(@$dr_amt-$cr_amt)-$total_row-$loan_amt,'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt)]); ?>
 			</td>
 			<?php $total+=(@$dr_amt-$cr_amt)-$total_row-$loan_amt; ?>
@@ -120,8 +113,24 @@
 <script>
 $(document).ready(function() {   
 	
-	$('.save').on("click",function() {
+	$('.hold').on("click",function(event) {
+		event.preventDefault();
+		var undo=$(this).attr('undo');
+		if(undo==1){
+			var loan_amount=$(this).attr('loan_amount');
+			$(this).closest('td').find('input').val(loan_amount);
+			$(this).text('hold');
+			$(this).attr('undo','');
+		}else{
+			var am=$(this).closest('td').find('input').val();
+			$(this).closest('td').find('input').val(0);
+			$(this).attr('loan_amount',am);
+			$(this).text('undo');
+			$(this).attr('undo','1');
+		}
 		
+	});
+	$('.save').on("click",function() {
 		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){ var counter=0; 
 				$(this).find('td').each(function(){ counter++;
 					var p=$(this);

@@ -11,19 +11,18 @@
 			<div class="row">
 				<div class="col-md-12">
 					<div class="form-group">
-							
-								<table class="table table-condensed">
-									<tbody>
-										<tr>
-											<td width="15%">
-												<input type="text" name="From" class="select_date form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="mm-yyyy" >
-											</td>
-											<td><button type="button" class="btn btn-primary btn-sm emp_rec"><i class="fa fa-filter"></i> Go</button></td>
-										</tr>
-									</tbody>
-								</table>
-							
-						</div>
+							<table class="table table-condensed">
+								<tbody>
+									<tr>
+										<td width="15%">
+											<input type="text" name="From" class="select_date form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="mm-yyyy" >
+										</td>
+										<td><button type="button" class="btn btn-primary btn-sm emp_rec"><i class="fa fa-filter"></i> Go</button></td>
+									</tr>
+								</tbody>
+							</table>
+						
+					</div>
 				</div>
 				<div class="col-md-12">
 				
@@ -36,19 +35,14 @@
 					</div>
 				</div>
 			</div>
-			
 			</div>
-			
-			
 		</div>
 	</div>
 </div>
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 
 <script>
-
-$(document).ready(function() 
-{
+$(document).ready(function(){
 	$('.emp_rec').live('click',function(){
 		var select_date=$(this).closest('tr').find('.select_date').val();
 		
@@ -60,8 +54,5 @@ $(document).ready(function()
 			$("#copy_form").html(response);
 		});
 	});
-	
-	
-	
 });
 </script>

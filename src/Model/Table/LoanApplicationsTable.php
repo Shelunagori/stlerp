@@ -36,7 +36,7 @@ class LoanApplicationsTable extends Table
         $this->primaryKey('id');
 		 $this->belongsTo('Employees');
 		$this->belongsTo('EmployeeSalaries');
-		$this->belongsTo('Payments');
+		$this->belongsTo('Nppayments');
 		$this->belongsTo('LedgerAccounts');
 		$this->belongsTo('empData', [
 			'className' => 'Employees',

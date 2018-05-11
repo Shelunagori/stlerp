@@ -90,7 +90,7 @@ class SalaryAdvancesController extends AppController
             $nppayment->company_id=$st_company_id;
             $nppayment->transaction_date=$trans_date;
             $nppayment->cheque_no='';
-            $nppayment->advance_salary='yes';
+            $nppayment->salary_advance_id=$salaryAdvance->id;
 			$this->SalaryAdvances->Nppayments->save($nppayment);
 			
 			$ledger_account=$this->SalaryAdvances->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$salaryAdvance->employee_id,'company_id'=>$st_company_id])->first();
