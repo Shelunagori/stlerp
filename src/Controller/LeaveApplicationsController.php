@@ -166,23 +166,19 @@ class LeaveApplicationsController extends AppController
 				$c=$this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$s_employee_id,'LeaveApplications.approve_leave_from <='=>$data])->andWhere(['LeaveApplications.approve_leave_to >='=>$data])->count(); 
 				
 				if($c>0){
-					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
+					$this->Flash->error(__('Leave Application cannot be fullfilled with duplicate dates.'));
 					goto a;
 				}
 			}
 			
 			foreach($dates  as $date){
-				$c=$this->LeaveApplications->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count(); pr($data);
-				pr($c); exit;
+				$c=$this->LeaveApplications->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count();
 				if($c>0){
-					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
+					$this->Flash->error(__('Travel request Applied in these dates.'));
 					goto a;
 				}
 			}
 			
-			//pr($leaveApplication);
-			pr($c);
-			exit;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
