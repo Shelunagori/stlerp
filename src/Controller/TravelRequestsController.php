@@ -181,20 +181,52 @@ class TravelRequestsController extends AppController
 			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
 			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->travel_mode_to_date));
 			
+			$dates=$this->date_range($travelRequest->travel_from_date, $travelRequest->travel_to_date, $step = '+1 day', $output_format = 'Y-m-d' );
+			foreach($dates  as $date){
+				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->orWhere(['travel_mode_to_date >='=>$date])->count();
+				if($c>0){
+					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
+					goto a;
+				}
+			}
+			foreach($dates  as $date){
+				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->orWhere(['approve_full_half_to >='=>$date])->count();
+				if($c>0){
+					$this->Flash->error(__('Leave application apllied in between same dates.'));
+					goto a;
+				}
+			}
+			
             if ($this->TravelRequests->save($travelRequest)) {
 				
                 $this->Flash->success(__('The travel request has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
             } else {
+				pr($travelRequest); exit;
                 $this->Flash->error(__('The travel request could not be saved. Please, try again.'));
             }
         }
 		
+		a:
 		$employees = $this->TravelRequests->Employees->find('list')->where(['id !='=>23,'salary_company_id'=>$st_company_id]); 
         $this->set(compact('travelRequest','empData','employees','s_employee_id'));
         $this->set('_serialize', ['travelRequest']);
     }
+	
+	function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
+		$dates = array();
+		$current = strtotime($first);
+		$last = strtotime($last);
+
+		while( $current <= $last ) {
+
+			$dates[] = date($output_format, $current);
+			$current = strtotime($step, $current);
+		}
+
+		return $dates;
+	}
 
     /**
      * Edit method

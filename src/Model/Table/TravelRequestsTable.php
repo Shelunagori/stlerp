@@ -40,6 +40,7 @@ class TravelRequestsTable extends Table
 		$this->belongsTo('EmployeeHierarchies');
 		$this->belongsTo('Nppayments');
 		$this->belongsTo('LedgerAccounts');
+		$this->belongsTo('LeaveApplications');
         $this->hasMany('TravelRequestRows', [
             'foreignKey' => 'travel_request_id',
 			'saveStrategy' => 'replace'
@@ -63,9 +64,6 @@ class TravelRequestsTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-        $validator
-            ->requirePresence('employee_name', 'create')
-            ->notEmpty('employee_name');
 
         $validator
             ->requirePresence('employee_designation', 'create')
