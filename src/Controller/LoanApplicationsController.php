@@ -56,9 +56,21 @@ class LoanApplicationsController extends AppController
 					$empSallary+=$data->amount;
 				}
 		}
-		$EmployeeLoan = $this->LoanApplications->find()->where(['employee_id'=>$id])->contain(['LoanInstallments']);
-		pr($EmployeeLoan->toArray()); exit;
-		echo $empSallary; exit;
+		//$EmployeeLoan = $this->LoanApplications->find()->where(['employee_id'=>$id])->contain(['LoanInstallments']);
+		$EmployeeLoan = $this->LoanApplications->find()->where(['employee_id'=>$id])->contain(['LoanInstallments' => function ($q) {
+					$q->select(['LoanInstallments.loan_application_id','LoanInstallments.id','total_loan_amt' => $q->func()->sum('LoanInstallments.amount')]);
+					return $q;
+				}]);
+				//pr($EmployeeLoan->toArray()); exit;
+		$loan_amt=0;
+		foreach($EmployeeLoan as $data){   
+			if(@$data->loan_installments[0]->total_loan_amt){ 
+				if($data->amount_of_loan >= @$data->loan_installments[0]->total_loan_amt){
+					$loan_amt=$data->instalment_amount;
+				}
+			}
+		}
+		echo $empSallary-$loan_amt; exit;
 		 // pr($empSallary); exit;
 	}
 	public function approve($id = null){

@@ -207,7 +207,22 @@ class SalaryAdvancesController extends AppController
 					$empSallary+=$data->amount;
 				}
 		}
-		//pr($EmployeeSalary)
+		
+		$EmployeeLoan = $this->SalaryAdvances->LoanApplications->find()->where(['employee_id'=>$s_employee_id])->contain(['LoanInstallments' => function ($q) {
+					$q->select(['LoanInstallments.loan_application_id','LoanInstallments.id','total_loan_amt' => $q->func()->sum('LoanInstallments.amount')]);
+					return $q;
+				}]);
+				
+		$loan_amt=0;
+		foreach($EmployeeLoan as $data){   
+			if(@$data->loan_installments[0]->total_loan_amt){ 
+				if($data->amount_of_loan >= @$data->loan_installments[0]->total_loan_amt){
+					$loan_amt=$data->instalment_amount;
+				}
+			}
+		}
+		$empSallary=$empSallary-$loan_amt;
+		//pr($EmployeeLoan->toArray()); exit;
 		$Employees=$this->SalaryAdvances->Employees->find('list');
         $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
         $this->set('_serialize', ['salaryAdvance']);

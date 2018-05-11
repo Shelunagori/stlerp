@@ -58,16 +58,13 @@ border:none;
 						<div class="form-group">
 							<label class="control-label">Amount</label>
 							<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
-							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary]); ?>
+							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary,'value'=>$salaryAdvance->amount]); ?>
 							<?php }else{ ?>
-							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary]); ?>
+							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary,'value'=>$salaryAdvance->amount]); ?>
 							<?php } ?>
 						</div>
 					</div>
-					<div class="col-md-3">
-						<label class="control-label">Amount</label>
-						<?php echo $this->Form->input('amount', ['label' => false,'class'=>'form-control input-sm']); ?>
-					</div>
+					
 			       <div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label">Reason</label>
