@@ -1963,7 +1963,6 @@ class InvoicesController extends AppController
 						}
 					}
 					
-			//	pr($total_amt); exit;
 				$minimumSellingPrice=0;
 				if(empty($item->item_companies[0]->minimum_selling_price_factor)){
 					$rate=0;
@@ -1971,10 +1970,6 @@ class InvoicesController extends AppController
 					$qtySum=$qtySum/100;
 					@$rate=$sumValue/$qtySum;
 					$minimumSellingPrice=$rate*$item->item_companies[0]->minimum_selling_price_factor;
-					
-					//pr($qtySum);
-					//pr($rate);
-				//	pr($minimumSellingPrice); exit;
 				}
 					
 				

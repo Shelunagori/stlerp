@@ -49,7 +49,7 @@ $(document).ready(function()
 	$('.emp_rec').live('click',function(){
 		var select_date=$(this).closest('tr').find('.select_date').val();
 		
-		var url="<?php echo $this->Url->build(['controller'=>'EmployeeAttendances','action'=>'getAttendenceList']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'EmployeeAttendances','action'=>'getAttendenceListNew']); ?>";
 		url=url+'/'+select_date, 
 		 $.ajax({
 			url: url,

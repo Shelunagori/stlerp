@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\Event\Event;
 /**
  * EmployeeAttendances Controller
  *
@@ -11,6 +11,9 @@ use App\Controller\AppController;
 class EmployeeAttendancesController extends AppController
 {
 
+	public function beforeFilter(Event $event) {
+		 $this->eventManager()->off($this->Csrf);
+	}
     /**
      * Index method
      *
@@ -23,29 +26,20 @@ class EmployeeAttendancesController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$st_year_id = $session->read('st_year_id');
-		$From=$this->request->query('From');
-		if(!empty($From)){
-			$From="01-".$From;
-			$time=strtotime($From);
-			$month=date("m",$time);
-		}
-		
-		$where1=[];
-		if(!empty($month)){ 
-			$where1['month LIKE']=$month;
-		}else{
-			$time=strtotime(date('d-m-Y'));
-			$month=date("m",$time); 
-			$where1['month LIKE']=$month;
-		}
-		//pr($where1); exit;
-        $this->paginate = [
-            'contain' => ['FinancialYears', 'Employees']
-        ];
-        $employeeAttendances = $this->paginate($this->EmployeeAttendances->find()->where($where1));
 
-        $this->set(compact('employeeAttendances'));
-        $this->set('_serialize', ['employeeAttendances']);
+		if ($this->request->is('post')) {
+			$attns=$this->request->data['attn'];
+			$month=$this->request->data['month'];
+			$year=$this->request->data['year'];
+			
+			foreach($attns as $employeeId=>$days){
+				$row=$this->EmployeeAttendances->find()->where(['month'=>$month,'year'=>$year,'employee_id'=>$employeeId])->first();
+				$EmployeeAttendance=$this->EmployeeAttendances->get($row->id);
+				$EmployeeAttendance->present_day=$days;
+				$this->EmployeeAttendances->save($EmployeeAttendance);
+			}
+		}
+        //$this->set(compact('employeeAttendances'));
     }
 
     /**
@@ -103,6 +97,18 @@ class EmployeeAttendancesController extends AppController
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));
 	}
 	
+	public function getAttendenceListNew($From=null){
+		$this->viewBuilder()->layout('');
+		$f=explode('-',$From);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$EmployeeAttendances = $this->EmployeeAttendances->find()->where(['month'=>$f[0],'year'=>$f[1]])->contain(['Employees']);
+		
+		
+		
+		$this->set(compact('EmployeeAttendances','f'));
+	}
+	
 	   public function getAttendenceListEdit($From=null){
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
@@ -141,6 +147,7 @@ class EmployeeAttendancesController extends AppController
 				$employeeAtten->employee_id = $data['employee_id'];
 				$employeeAtten->present_day = $data['present_day'];
 				$employeeAtten->month = $month;
+				$employeeAtten->year = $year;
 				$employeeAtten->financial_year_id = $financial_year->id;
 				$employeeAtten->total_month_day = $total_day;
 				$employeeAtten->no_of_leave = $total_day-$data['present_day'];

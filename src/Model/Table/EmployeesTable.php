@@ -70,6 +70,9 @@ class EmployeesTable extends Table
 		$this->hasMany('EmployeeWorkExperiences', [
             'foreignKey' => 'employee_id',
         ]);
+		$this->hasMany('Salaries', [
+            'foreignKey' => 'employee_id',
+        ]);
 		
 		$this->belongsTo('AccountCategories', [
             'foreignKey' => 'account_category_id',

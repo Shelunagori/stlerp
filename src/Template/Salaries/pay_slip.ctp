@@ -22,9 +22,40 @@
 			<button type="submit">Print</button>
 		</form>
 		
-		<?php foreach($Salaries as $Salarie){ ?>
+		<?php foreach($Employees as $Employee){ 
+			if(sizeof($Employee->salaries)>0){
+		?>
 			<div style="border:solid 1px;">
-				<div>Pay Slip for <?php echo $Salarie->employee->name; ?></div>
-		<?php } ?>
+				<div>Pay Slip for <?php echo $Employee->name; ?></div>
+				<table width="100%">
+					<tr>
+						<td>Addition</td>
+						<td>Deduction</td>
+					</tr>
+					<tr>
+						<td valign="top" style="width:50%;">
+							<?php foreach($Employee->salaries as $salarie){
+								if($salarie->employee_salary_division->salary_type=="addition"){
+									echo '<div class="dv">₹ '.$salarie->amount.'</div>';
+								}
+							} ?>
+						</td>
+						<td valign="top">
+							<?php foreach($Employee->salaries as $salarie){
+								if($salarie->employee_salary_division->salary_type=="deduction"){
+									echo '<div class="dv">₹ '.$salarie->amount.'</div>';
+								}
+							} ?>
+						</td>
+					</tr>
+				</table>
+			</div>
+		<?php } } ?>
 	</div>
 </div>
+<style>
+.dv{
+border-top: solid 1px #CCC;
+    padding: 5px;
+}
+</style>

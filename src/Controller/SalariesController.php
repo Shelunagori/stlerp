@@ -41,9 +41,12 @@ class SalariesController extends AppController
 		if ($this->request->is('post')) {
 			$month_year=$this->request->data['month_year'];
 			$month_year=explode('-',$month_year);
-			$Salaries=$this->Salaries->find()->where(['company_id'=>$st_company_id,'month'=>$month_year[0],'year'=>$month_year[1]])->contain(['EmployeeSalaryDivisions','Employees']);
+			$Employees=$this->Salaries->Employees->find()
+			->contain(['Salaries'=>function($q) use($month_year){
+				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1]])->contain(['EmployeeSalaryDivisions']);
+			}]);
 		}
-		$this->set(compact('financial_year','Salaries'));
+		$this->set(compact('financial_year','Employees'));
 	}
     /**
      * View method
