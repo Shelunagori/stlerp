@@ -1229,6 +1229,7 @@ $(document).ready(function() {
 			}).done(function(response) {
 			if(response){	
 				var values = parseFloat(response);
+				values=round(values,2);
 					row_no.find('.rate').attr({ min:values}).rules('add', {
 							required:true,
 							min: values,
