@@ -1364,22 +1364,23 @@ $(document).ready(function() {
 		var obj = $(this);
 		var row_no = $(this).closest('tr.tr1');
 		//var values= row_no.find('.rate').val();
-		
+		 
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'getMinSellingFactor']); ?>";
 		if(item_id){
-			url=url+'/'+item_id,
+			url=url+'/'+item_id;
 			$.ajax({
 				url: url
 			}).done(function(response) {
 				if(response){
 				var values = parseFloat(response);
-					row_no.find('.rate').attr({ min:values}).rules('add', {
-							required:true,
-							min: values,
-							messages: {
-								min: "Minimum selling price : "+values
-							}
-						});
+				values=round(values,2);
+				row_no.find('.rate').attr({ min:values}).rules('add', {
+						required:true,
+						min: values,
+						messages: {
+							min: "Minimum selling price : "+values
+						}
+					});
 				}else{
 					row_no.find('.rate').attr({ min:0}).rules('add', {
 								required:true,
@@ -1435,7 +1436,7 @@ $(document).ready(function() {
 				$(".item_box[popup_id="+popup_id+"]").val('').select2();
 			}
 	}
-	function last_three_rates(popup_id,item_id,row_no){ 
+	function last_three_rates(popup_id,item_id,row_no){
 			var customer_id=$('select[name="customer_id"]').val();
 			$('.modal[popup_div_id='+popup_id+']').show();
 			$('div[popup_ajax_id='+popup_id+']').html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
@@ -1446,24 +1447,9 @@ $(document).ready(function() {
 					url: url,
 					dataType: 'json',
 				}).done(function(response) {
-					if(response){
-						$('div[popup_ajax_id='+popup_id+']').html(response.html);
-						var values = parseFloat(response.minimum_selling_price);
-							row_no.find('.rate').attr({ min:values}).rules('add', {
-							min: values,
-							messages: {
-								min: "Minimum selling price : "+values
-							}
-						});
-					}else{
-						$('div[popup_ajax_id='+popup_id+']').html(response.html);
-					row_no.find('.rate').attr({ min:0}).rules('add', {
-								required:true,
-								min: 0
-							});
-					}	
+					$('div[popup_ajax_id='+popup_id+']').html(response.html);	
 				});
-			}else{ 
+			}else{
 				$('div[popup_ajax_id='+popup_id+']').html('Select customer first.');
 				$(".item_box[popup_id="+popup_id+"]").val('').select2();
 			}
