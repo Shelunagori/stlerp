@@ -1265,6 +1265,7 @@ $(document).ready(function() {
 			if(response){
 				$('div[popup_ajax_id='+popup_id+']').html(response.html);
 				var values = parseFloat(response.minimum_selling_price);
+				values=round(values,2);
 						row_no.find('.rate').attr({ min:values}).rules('add', {
 						min: values,
 						messages: {
