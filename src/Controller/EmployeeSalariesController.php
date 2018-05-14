@@ -180,9 +180,6 @@ class EmployeeSalariesController extends AppController
 		
 		
 		if ($this->request->is('post')) {
-			
-			
-			
 			$From=$this->request->data()['From'];
 			$other_amounts=$this->request->data()['other_amount'];
 			$loan_amount2=$this->request->data()['loan_amount'];

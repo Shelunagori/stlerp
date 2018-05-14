@@ -1796,7 +1796,8 @@ class InvoicesController extends AppController
 				
 			
 			if(empty($Items->item_companies[0]->minimum_selling_price_factor)){
-				$minimum_selling_price_factor=1;
+				$rate=0;
+				$minimum_selling_price_factor=0;
 			}else{
 				$minimum_selling_price_factor=$Items->item_companies[0]->minimum_selling_price_factor;
 			}
@@ -1842,7 +1843,8 @@ class InvoicesController extends AppController
 				
 			
 			if(empty($item->item_companies[0]->minimum_selling_price_factor)){
-				$minimum_selling_price_factor=1;
+				$rate=0;
+				$minimum_selling_price_factor=0;
 			}else{
 				$minimum_selling_price_factor=$item->item_companies[0]->minimum_selling_price_factor;
 			}
