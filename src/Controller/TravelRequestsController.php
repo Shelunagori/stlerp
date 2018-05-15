@@ -199,7 +199,7 @@ class TravelRequestsController extends AppController
 				}
 			}
 			foreach($dates  as $date){
-				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->andWhere([])->where(['employee_id'=>$travelRequest->employee_id])->count();
+				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->andWhere(['approve_leave_to >='=>$date])->where(['employee_id'=>$travelRequest->employee_id])->count();
 				if($c>0){
 					$this->Flash->error(__('Leave application apllied in between same dates.'));
 					goto a;
@@ -277,7 +277,7 @@ class TravelRequestsController extends AppController
 				}
 			}
 			foreach($dates  as $date){
-				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->andWhere([])->where(['employee_id'=>$travelRequest->employee_id])->count();
+				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->andWhere([['approve_leave_to >='=>$date]])->where(['employee_id'=>$travelRequest->employee_id])->count();
 				if($c>0){
 					$this->Flash->error(__('Leave application apllied in between same dates.'));
 					goto a;

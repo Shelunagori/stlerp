@@ -1106,7 +1106,9 @@ class SaleReturnsController extends AppController
 			
 			$saleReturn = $this->SaleReturns->newEntity();
 		  if ($this->request->is('post')) {
-			 $data=$this->request->data; 
+			$data=$this->request->data;
+			//pr($data);
+			$saleReturn = $this->SaleReturns->patchEntity($saleReturn, $data);
 			$last_voucher_no_sr=$this->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
 			$last_voucher_no_credit_note=$this->SaleReturns->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			
@@ -1138,14 +1140,16 @@ class SaleReturnsController extends AppController
 			$saleReturn->date_created=date("Y-m-d");
 			$saleReturn->invoice_type='GST';
 			$saleReturn->total_after_pnf=$saleReturn->total_taxable_value;
-			$saleReturn->sales_ledger_account=$saleReturn->sales_ledger_account;
+			$saleReturn->sales_ledger_account=$data['sales_ledger_account'];
+			$saleReturn->grand_total=$data['grand_total'];
 			$saleReturn->sale_return_type="GST";
 			$saleReturn->sale_return_status="Yes";
 			$saleReturn->transaction_date=date("Y-m-d",strtotime($saleReturn->transaction_date)); 
 			
-		//pr($saleReturn); exit;
 
 			$ref_rows=@$saleReturn->ref_rows;
+			
+			//pr($saleReturn); exit;
 			if ($this->SaleReturns->save($saleReturn)) {
 				
 				//GET CUSTOMER LEDGER-ACCOUNT-ID
@@ -1366,7 +1370,7 @@ class SaleReturnsController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'Index']);
-            } else {  pr($saleReturn); exit;
+            } else { echo 'hello';  pr($saleReturn); exit;
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }

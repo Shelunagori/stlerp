@@ -77,6 +77,7 @@ class SaleReturn extends Entity
      */
     protected $_accessible = [
         '*' => true,
-        'id' => false
+        'id' => false,
+		'sale_return_rows'=>true
     ];
 }

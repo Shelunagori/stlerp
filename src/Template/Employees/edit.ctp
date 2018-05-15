@@ -579,7 +579,7 @@
 		
 		
 			<div class="form-actions">
-					<button type="submit" class="btn btn-primary">ADD EMPLOYEE</button>
+					<button type="submit" class="btn btn-primary">UPDATE</button>
 			</div>
 		</div>
 		<?= $this->Form->end() ?>

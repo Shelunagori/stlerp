@@ -222,20 +222,22 @@ class EmployeesController extends AppController
             $employee->permanent_join_date = date("Y-m-d", strtotime($employee->permanent_join_date));
 
             $file = $this->request->data['signature'];
+			
             if (!empty($file['name'])) {
                 $ext = substr(strtolower(strrchr($file['name'], '.')), 1); //get the extension
-                $arr_ext = array('png'); //set allowed extensions
+                $arr_ext = array('png','jpg'); //set allowed extensions
                 $setNewFileName = uniqid();
 
                 $employee->signature = $setNewFileName . '.' . $ext;
                 @unlink(WWW_ROOT . '/signatures/' . $employee->getOriginal('signature'));
-                if (in_array($ext, $arr_ext)) {
+                if (in_array($ext, $arr_ext)) { echo WWW_ROOT . '/signatures/' . $setNewFileName . '.' . $ext;
                     move_uploaded_file($file['tmp_name'], WWW_ROOT . '/signatures/' . $setNewFileName . '.' . $ext);
                 }
+				pr($file); 
             } else {
                 $employee->signature = $employee->getOriginal('signature');
             }
-
+			//pr($employee); exit;
             if ($this->Employees->save($employee)) {
                 $query = $this->Employees->LedgerAccounts->query();
                 $query->update()
@@ -246,6 +248,7 @@ class EmployeesController extends AppController
 
                 return $this->redirect(['action' => 'index']);
             } else {
+				pr($employee); exit;
                 $this->Flash->error(__('The employee could not be saved. Please, try again.'));
             }
         }
