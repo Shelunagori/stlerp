@@ -167,7 +167,7 @@ $html = '
 							<td style="white-space:nowrap;"  width="25%" valign="top">
 								<table width="100%">
 									<tr>
-										<td valign="top" style="vertical-align: top;" >Invoice No.</td>
+										<td valign="top" style="vertical-align: top;" >Sales Return No.</td>
 										<td  valign="top">:</td>
 										<td  valign="top" width="20%">'. h(("CR-".str_pad($SaleReturn->sr2, 3, "0", STR_PAD_LEFT)." / ".$SaleReturn->sr3)) .'</td>
 									</tr>

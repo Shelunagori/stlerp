@@ -315,7 +315,7 @@
 						<th>S.No</th>
 						<th>Employee Name</th>
 						<th>Status</th>
-						<th>Pending From</th>
+						<th>Advance Amount</th>
 						<th>Action</th>
 					</tr>
 				</thead>
@@ -326,7 +326,7 @@
 						<td><?php echo $PendingRequest->employee->name; ?></td>
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->status; ?></span>
 						</td>
-						<td><?php echo $PendingRequest->emp_data->name; ?>
+						<td><?php echo $PendingRequest->advance_amt; ?>
 						</td>
 						<td><?= $this->Html->link(' Approve ',
 								['controller'=>'TravelRequests', 'action' => 'approved', $PendingRequest->id],

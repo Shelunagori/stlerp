@@ -115,13 +115,13 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<label class="control-label">LR No</label>
 							<div class="row">
 								<div class="col-md-12">
-									<?php echo $this->Form->input('lr_no', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'LR No','value' => @$invoice->lr_no]); ?>
+									<?php echo $this->Form->input('lr_no', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'LR No']); ?>
 								</div>
 							</div><br/>
 							<label class="control-label">Carrier</label>
 							<div class="row">
 								<div class="col-md-12">
-									<?php echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me','value' => @$invoice->transporter_id]); ?>
+									<?php echo $this->Form->input('transporter_id', ['empty' => "--Select--",'label' => false,'options' => $transporters,'class' => 'form-control input-sm select2me']); ?>
 								</div>
 							</div>
 						</div>
@@ -134,7 +134,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<label class="control-label">Delivery Description <span class="required" aria-required="true">*</span></label>
 							<div class="row">
 								<div class="col-md-12">
-									<?php echo $this->Form->input('delivery_description', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Delivery Description','value'=>$invoice->delivery_description]); ?>
+									<?php echo $this->Form->input('delivery_description', ['label' => false,'class' => 'form-control input-sm','placeholder'=>'Delivery Description']); ?>
 								</div>
 							</div>
 						</div>
@@ -507,7 +507,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 			   <?php if($chkdate == 'Not Found'){  ?>
 					<label class="btn btn-danger"> You are not in Current Financial Year </label>
 				<?php } else { ?>
-					<?= $this->Form->button(__('ADD SALES RETURN'),['class'=>'btn btn-primary','id'=>'add_submit','type'=>'Submit']) ?>
+					<?= $this->Form->button(__('UPDATE SALES RETURN'),['class'=>'btn btn-primary','id'=>'add_submit','type'=>'Submit']) ?>
 				<?php } ?>	
 
 				</div>

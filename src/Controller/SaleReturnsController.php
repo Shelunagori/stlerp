@@ -1423,7 +1423,6 @@ class SaleReturnsController extends AppController
 	}
 	public function gstSalesEdit($id=null)
 	{
-		
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
@@ -1513,7 +1512,7 @@ class SaleReturnsController extends AppController
 		
 
 			$ref_rows=@$saleReturn->ref_rows;
-			//pr($saleReturn);exit;
+			
 			if ($this->SaleReturns->save($saleReturn)) {
 			
 				
@@ -1827,7 +1826,7 @@ class SaleReturnsController extends AppController
 		
 		$transporters = $this->SaleReturns->Invoices->Transporters->find('list');
 		
-		 $this->set(compact('invoice','ledger_account_details','transporters','GstTaxes','ledger_account_details_for_fright','c_LedgerAccount','chkdate','saleReturn','ReferenceDetails','financial_month_first','financial_month_last','sales_return_qty','current_salesreturn_rows','existing_salesreturn_rows','sale_return_row_id','sale_return_id'));	
+		 $this->set(compact('invoice','ledger_account_details','transporters','GstTaxes','ledger_account_details_for_fright','c_LedgerAccount','chkdate','saleReturn','ReferenceDetails','financial_month_first','financial_month_last','sales_return_qty','current_salesreturn_rows','existing_salesreturn_rows','sale_return_row_id','sale_return_id', 'saleReturn_id'));	
 		
 		
 	}
