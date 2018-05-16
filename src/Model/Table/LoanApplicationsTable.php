@@ -37,6 +37,7 @@ class LoanApplicationsTable extends Table
 		 $this->belongsTo('Employees');
 		$this->belongsTo('EmployeeSalaries');
 		$this->belongsTo('Nppayments');
+		$this->belongsTo('FinancialYears');
 		$this->belongsTo('LedgerAccounts');
 		//$this->belongsTo('LoanInstallments');
 		  $this->hasMany('LoanInstallments', [

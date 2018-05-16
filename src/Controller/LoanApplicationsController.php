@@ -220,6 +220,10 @@ class LoanApplicationsController extends AppController
 		$st_year_id = $session->read('st_year_id');
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		
+		$financial_year = $this->LoanApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$yearFrom = date("Y",strtotime($financial_year->date_from));
 		
 		$LoanApplications = $this->LoanApplications->get($loanId, [
             'contain' => ['Employees']
@@ -229,21 +233,22 @@ class LoanApplicationsController extends AppController
 		
 		if ($this->request->is(['patch', 'post', 'put'])) {
             $trans_date=date('Y-m-d',strtotime($this->request->data['trans_date']));
-            $starting_date_of_loan=date('Y-m-d',strtotime($this->request->data['starting_date_of_loan']));
-            $ending_date_of_loan=date('Y-m-d',strtotime($this->request->data['ending_date_of_loan']));
+            //$starting_date_of_loan=date('Y-m-d',strtotime($this->request->data['starting_date_of_loan']));
+            //$ending_date_of_loan=date('Y-m-d',strtotime($this->request->data['ending_date_of_loan']));
             $comment=$this->request->data['comment'];
             $instalment_amount=$this->request->data['instalment_amount'];
             $no_of_instalment=$this->request->data['no_of_instalment'];
             $approve_amount_of_loan=$this->request->data['approve_amount_of_loan'];
             $bank_id=$this->request->data['bank_id'];
-            
+            $installment_from=$this->request->data['installment_from'];
+            $installment_from=explode('-',$installment_from);
 			$approve_date=date('Y-m-d');
-			$starting_date_of_loan=date('Y-m-d',strtotime($starting_date_of_loan));
-			$ending_date_of_loan=date('Y-m-d',strtotime($ending_date_of_loan));
+			//$starting_date_of_loan=date('Y-m-d',strtotime($starting_date_of_loan));
+			//$ending_date_of_loan=date('Y-m-d',strtotime($ending_date_of_loan));
 
 			$query = $this->LoanApplications->query();
 			$query->update()
-				->set(['status' =>'approved','approve_date'=>$approve_date,'starting_date_of_loan'=>$starting_date_of_loan,'ending_date_of_loan'=>$ending_date_of_loan,'comment'=>$comment,'instalment_amount'=>$instalment_amount,'no_of_instalment'=>$no_of_instalment,'approve_amount_of_loan'=>$approve_amount_of_loan])
+				->set(['status' =>'approved','approve_date'=>$approve_date,'installment_start_month'=>$installment_from[0],'installment_start_year'=>$installment_from[1],'comment'=>$comment,'instalment_amount'=>$instalment_amount,'no_of_instalment'=>$no_of_instalment,'approve_amount_of_loan'=>$approve_amount_of_loan])
 				->where(['id' => $loanId])
 				->execute();
 				
@@ -327,6 +332,6 @@ class LoanApplicationsController extends AppController
 				}
 				
 			}])->where(['BankCashes.id IN' => $where]);
-		$this->set(compact('LoanApplications','id', 'bankCashes','lastLoanApplication'));
+		$this->set(compact('LoanApplications','id', 'bankCashes','lastLoanApplication', 'yearFrom'));
 	}
 }

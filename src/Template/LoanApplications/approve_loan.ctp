@@ -63,15 +63,21 @@
 			</div>
 			<div class="col-md-4">
 				<div class="form-group">
-					<label class="control-label  label-css">Effected From </label>
-					<?php echo $this->Form->input('starting_date_of_loan', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker starting_date_of_loan','data-date-format'=>'dd-mm-yyyy','value'=>'','id'=>'from_leave_date','required']); ?>
-				</div>
-			</div>
-
-			<div class="col-md-4">
-				<div class="form-group">
-					<label class="control-label  label-css">Effected To </label>
-					<?php echo $this->Form->input('ending_date_of_loan', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker ending_date_of_loan','data-date-format'=>'dd-mm-yyyy','value'=>'','required']); ?>
+					<label class="control-label  label-css">Installment start from </label>
+					<select name="installment_from" class="form-control input-sm">
+						<option value="4-<?php echo $yearFrom; ?>">Apr-<?php echo $yearFrom; ?></option>
+						<option value="5-<?php echo $yearFrom; ?>">May-<?php echo $yearFrom; ?></option>
+						<option value="6-<?php echo $yearFrom; ?>">June-<?php echo $yearFrom; ?></option>
+						<option value="7-<?php echo $yearFrom; ?>">July-<?php echo $yearFrom; ?></option>
+						<option value="8-<?php echo $yearFrom; ?>">Aug-<?php echo $yearFrom; ?></option>
+						<option value="9-<?php echo $yearFrom; ?>">Sept-<?php echo $yearFrom; ?></option>
+						<option value="10-<?php echo $yearFrom; ?>">Oct-<?php echo $yearFrom; ?></option>
+						<option value="11-<?php echo $yearFrom; ?>">Nov-<?php echo $yearFrom; ?></option>
+						<option value="12-<?php echo $yearFrom; ?>">Dec-<?php echo $yearFrom; ?></option>
+						<option value="1-<?php echo $yearFrom; ?>">Jan-<?php echo $yearFrom+1; ?></option>
+						<option value="2-<?php echo $yearFrom; ?>">Feb-<?php echo $yearFrom+1; ?></option>
+						<option value="3-<?php echo $yearFrom; ?>">Mar-<?php echo $yearFrom+1; ?></option>
+					</select>
 				</div>
 			</div>
 		</div>

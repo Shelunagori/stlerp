@@ -97,11 +97,23 @@ class EmployeeSalariesController extends AppController
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
-			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
-				if($LoanApplications){
-					$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
-					$loan_app[$dt->id]=$LoanApplications->id; 
-				}
+			
+			$LoanInstallments = $this->EmployeeSalaries->LoanApplications->LoanInstallments->find();
+			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'installment_start_month <= '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
+			->select(['id', 'approve_amount_of_loan', 'instalment_amount', 'total_sales'=>$LoanInstallments->func()->sum('LoanInstallments.amount')])
+			->leftJoinWith('LoanInstallments')->first();
+			
+			$InstallmentPaid=$this->EmployeeSalaries->LoanApplications->LoanInstallments->find()->where(['loan_application_id'=>$LoanApplications->id,'month'=>$month,'year'=>$year]);
+			
+			if($InstallmentPaid->count()){
+				$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
+				$loan_app[$dt->id]=$LoanApplications->id; 
+			}
+			elseif($LoanApplications->total_sales<$LoanApplications->approve_amount_of_loan){
+				$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
+				$loan_app[$dt->id]=$LoanApplications->id; 
+			}
+				
 				
 				if($EmployeeSalary){
 					foreach($EmployeeSalary->employee_salary_rows as $dt1){ 
@@ -178,8 +190,9 @@ class EmployeeSalariesController extends AppController
 		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		
 		
-		
+		//Save the salary
 		if ($this->request->is('post')) {
+			
 			$From=$this->request->data()['From'];
 			$other_amounts=$this->request->data()['other_amount'];
 			$loan_amount2=$this->request->data()['loan_amount'];
@@ -197,9 +210,25 @@ class EmployeeSalariesController extends AppController
 			} 
 		
 			$SalaryExist=$this->EmployeeSalaries->Salaries->find()->where(['company_id'=>$st_company_id,'month'=>$month,'year'=>$year]);
-			if(sizeof($SalaryExist->toArray()>0)){
+			if(sizeof($SalaryExist->toArray())>0){
 				echo 'salary has already generated.';
 			}			
+			
+			$OldVoucherNos=[];
+			$oldVouchers=$this->EmployeeSalaries->Nppayments->find()->where(['salary_month'=>$month,'salary_year'=>$year]);
+			if($oldVouchers){
+				foreach($oldVouchers as $oldVoucher){
+					$OldVoucherNos[$oldVoucher->emp_id]=$oldVoucher->voucher_no;
+					
+					$this->EmployeeSalaries->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$oldVoucher->id]);
+					$this->EmployeeSalaries->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $oldVoucher->id]);
+					$this->EmployeeSalaries->Nppayments->deleteAll(['Nppayments.id' => $oldVoucher->id]);
+				}
+			}
+			
+			
+			$this->EmployeeSalaries->Salaries->deleteAll(['month' => $month, 'year' => $year]);
+			
 			
 			foreach($other_amounts as $key=>$value){
 				if($value!=0){
@@ -231,7 +260,6 @@ class EmployeeSalariesController extends AppController
 			
 		
 		
-		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
 		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])
 		->contain(['EmployeeCompanies'])
 			->matching(
@@ -250,17 +278,22 @@ class EmployeeSalariesController extends AppController
 		foreach($employees as $dt){
 			$total_dr=0; $total_cr=0;
 			
+			//Find ledger account of employee
 			$LedgerAccount=$this->EmployeeSalaries->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$dt->id])->first();
+			
+			//Save Non Print Payment Voucher//
 			$Nppayment=$this->EmployeeSalaries->Nppayments->newEntity();
 			
-			$last_voucher_no=$this->EmployeeSalaries->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-            if($last_voucher_no){
-                $Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
-            }else{
-                $Nppayment->voucher_no=1;
-            }
-			
-			
+			if(@$OldVoucherNos[$dt->id]){
+				$Nppayment->voucher_no=$OldVoucherNos[$dt->id];
+			}else{
+				$last_voucher_no=$this->EmployeeSalaries->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+				if($last_voucher_no){
+					$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				}else{
+					$Nppayment->voucher_no=1;
+				}
+			}
 			$Nppayment->financial_year_id=$st_year_id;
 			$Nppayment->bank_cash_id=$bank_id;
 			$Nppayment->created_on=date("Y-m-d");
@@ -271,6 +304,7 @@ class EmployeeSalariesController extends AppController
             $Nppayment->cheque_no="";
             $Nppayment->salary_month=$month;
             $Nppayment->salary_year=$year;
+            $Nppayment->emp_id=$dt->id;
 			$this->EmployeeSalaries->Nppayments->save($Nppayment);
 			
 			
@@ -317,7 +351,8 @@ class EmployeeSalariesController extends AppController
 				$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
 			}
 			
-			if($loan_amount2[$dt->id]>0){ 
+			$this->EmployeeSalaries->LoanInstallments->deleteAll(['month' => $month, 'year' => $year]);
+			if($loan_amount2[$dt->id]>0){
 				$LoanInstallment = $this->EmployeeSalaries->LoanInstallments->newEntity();
 				$LoanInstallment->loan_application_id=$loan_app[$dt->id];
 				$LoanInstallment->month=$month;
@@ -355,7 +390,6 @@ class EmployeeSalariesController extends AppController
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
 			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'starting_date_of_loan <= '=>$From,'ending_date_of_loan >= '=>$From,'status'=>'approved'])->first();  
 				
-				
 				if($EmployeeSalary){
 					foreach($EmployeeSalary->employee_salary_rows as $dt1){
 						
@@ -364,6 +398,7 @@ class EmployeeSalariesController extends AppController
 							$emp_sallary_division[$dt->id][@$dt1->employee_salary_division_id]=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
 							
 							if(@$EmployeeAttendance->present_day*@$dt1->amount/$total_day>0){
+								
 								$salary = $this->EmployeeSalaries->Salaries->newEntity();
 								$salary->employee_id=$dt->id;
 								$salary->company_id=$st_company_id;
@@ -480,13 +515,11 @@ class EmployeeSalariesController extends AppController
 					}
 			
 		}
-//pr($other_amount); exit;
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition']); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction']); 
 		
 		
 		}
-		
 		return $this->redirect(['controller' =>'EmployeeSalaries' ,'action' => 'paidSallary']);
 		
 		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','other_amount','EmployeeAtten'));
@@ -546,7 +579,7 @@ class EmployeeSalariesController extends AppController
         }
         $employee = $this->EmployeeSalaries->Employees->get($id);
         $employeeDesignation = $this->EmployeeSalaries->Employees->Designations->find('list');
-        $employeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find();
+        $employeeSalaryDivisions = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['company_id'=>$st_company_id]);
 		$employeeDetails=[];
 		foreach($employeeSalaryDivisions as $data){
 			$employeeDetails[]=['text'=>$data->name,'value'=>$data->id,'salary_type'=>$data->salary_type];

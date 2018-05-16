@@ -27,7 +27,7 @@ class EmployeeSalaryDivisionsController extends AppController
 		$employeeSalaryDivision = $this->EmployeeSalaryDivisions->newEntity();
         if ($this->request->is('post')) {
             $employeeSalaryDivision = $this->EmployeeSalaryDivisions->patchEntity($employeeSalaryDivision, $this->request->data);
-			
+			$employeeSalaryDivision->company_id=$st_company_id;
             if ($this->EmployeeSalaryDivisions->save($employeeSalaryDivision)) {
                 $this->Flash->success(__('The employee salary division has been saved.'));
 
@@ -36,7 +36,7 @@ class EmployeeSalaryDivisionsController extends AppController
                 $this->Flash->error(__('The employee salary division could not be saved. Please, try again.'));
             }
         }
-        $employeeSalaryDivisions = $this->paginate($this->EmployeeSalaryDivisions->find()->contain(['LedgerAccounts']));
+        $employeeSalaryDivisions = $this->paginate($this->EmployeeSalaryDivisions->find()->where(['EmployeeSalaryDivisions.company_id'=>$st_company_id])->contain(['LedgerAccounts']));
 		$LedgerAccounts = $this->EmployeeSalaryDivisions->LedgerAccounts->find('list')->where(['LedgerAccounts.company_id' => $st_company_id]);
 		//pr($LedgerAccounts->toArray()); exit;
         $this->set(compact('employeeSalaryDivisions','employeeSalaryDivision','LedgerAccounts'));
@@ -67,9 +67,13 @@ class EmployeeSalaryDivisionsController extends AppController
      */
     public function add()
     {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
         $employeeSalaryDivision = $this->EmployeeSalaryDivisions->newEntity();
         if ($this->request->is('post')) {
             $employeeSalaryDivision = $this->EmployeeSalaryDivisions->patchEntity($employeeSalaryDivision, $this->request->data);
+			$employeeSalaryDivision->company_id=$st_company_id;
             if ($this->EmployeeSalaryDivisions->save($employeeSalaryDivision)) {
                 $this->Flash->success(__('The employee salary division has been saved.'));
 
