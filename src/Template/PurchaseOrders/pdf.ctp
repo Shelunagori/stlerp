@@ -246,7 +246,7 @@ $html .= '	<table width="100%" class="table_rows table3">
    </tr>
     <tr>
      <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';"><b>Transporter Name :</b><br/>'. h(($purchaseOrder->transporter->transporter_name)) .'</td>
-    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';" ><b>Delivery : </b><br/>'. h(($purchaseOrder->delivery)) .'</td>
+    <td valign="top" style="text-align:center; font-size:'. h(($purchaseOrder->pdf_font_size)) .';" ><b>Delivery : </b><br/>'. h(date('d-m-Y',strtotime($purchaseOrder->delivery_date))) .'</td>
    </tr>
  
     

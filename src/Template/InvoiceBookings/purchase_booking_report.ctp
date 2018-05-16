@@ -14,7 +14,7 @@
 					<table class="table table-condensed">
 						<tbody>
 							<tr>
-								<td width="18%">
+								<td width="15%">
 									<div class="input-group" style="" id="pnf_text">
 									<span class="input-group-addon">IB-No</span><input type="text" name="book_no" class="form-control input-sm" placeholder="Invoice Booking No" value="<?php echo @$book_no; ?>">
 									</div>
@@ -22,13 +22,13 @@
 								<td width="9%">
 									<input type="text" name="file" class="form-control input-sm" placeholder="IB File" value="<?php echo @$file; ?>">
 								</td>
-								<td width="13%">
+								<td width="10%">
 									<div class="input-group" style="" id="pnf_text">
 									<span class="input-group-addon">IN</span><input type="text" name="in_no" class="form-control input-sm" placeholder="Invoice No" value="<?php echo @$in_no; ?>">
 									</div>
 								</td>
 								
-								<td width="20%">
+								<td width="15%">
 									<?php 
 										$options=array();
 										//pr($vendor); exit();
@@ -47,18 +47,29 @@
 												
 									?>
 								</td>
-								<td width="20%"><?php
+								<td width="10%"><?php
 								echo $this->Form->input('items', ['empty' => "--Select Item--",'label' => false,'options' => $Items,'class' => 'form-control input-sm select2me','value' => @$Items->id]); 
 								?>
-								<td width="10%">
+								
+						</tr>
+					</tbody>
+				</table>
+				<table class="table table-condensed">
+					<tr>
+						<td >
+									<input type="text" name="Po_From" class="form-control input-sm date-picker" placeholder="PO Date From" value="<?php echo @$Po_From; ?>" data-date-format="dd-mm-yyyy" >
+								</td>
+								<td >
+									<input type="text" name="Po_To" class="form-control input-sm date-picker" placeholder="PO Date To" value="<?php echo @$Po_To; ?>" data-date-format="dd-mm-yyyy" >
+								</td>
+								<td >
 									<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
 								</td>
-								<td width="10%">
+								<td >
 									<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Date To" value="<?php echo @$To; ?>" data-date-format="dd-mm-yyyy" >
 								</td>
 								<td><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button></td>
-						</tr>
-					</tbody>
+					</tr>
 				</table>
 			</form>
 				<table class="table table-bordered table-condensed">
@@ -69,12 +80,14 @@
 							<th width="15%">Invoice Booking No.</th>
 							<th width="10%">Invoice No.</th>
 							<th width="10%">Supplier Name</th>
-							<th width="10%">Amount</th>
+							<th width="10%" style="text-align:right;">Amount</th>
+							<th width="10%" style="text-align:right;">Total Amount</th>
 						</tr>
 					</thead>
 					<tbody>
-					<?php $total=0; $i=0;foreach ($invoiceBookings as $invoiceBooking):
+					<?php $total=0;$totalamt=0; $i=0;foreach ($invoiceBookings as $invoiceBooking):
 					$total+=$invoiceBooking->taxable_value;
+					$totalamt+=$invoiceBooking->total;
 					?>
 						<tr>
 							<td><?= h(++$i) ?></td>
@@ -85,13 +98,14 @@
 							<?php  } ?></td>
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
-							<td align="center"><?= h($this->Number->format($invoiceBooking->taxable_value,['places'=>2])) ?></td>
-							
+							<td	 style="text-align:right;"><?= h($this->Number->format($invoiceBooking->taxable_value,['places'=>2])) ?></td>
+							<td  style="text-align:right;"><?= h($this->Number->format($invoiceBooking->total,['places'=>2])) ?></td>
 						</tr>
 							<?php endforeach; ?>
 						<tr>
-							<td colspan="5" align="right">Total</td>
-							<td align="center"><?= h($this->Number->format($total,['places'=>2])) ?></td>
+							<td colspan="5" align="right"><b>Total</b></td>
+							<td style="text-align:right;"><b><?= h($this->Number->format($total,['places'=>2])) ?></b></td>
+							<td style="text-align:right;"><b><?= h($this->Number->format($totalamt,['places'=>2])) ?></b></td>
 						</tr>
 						</tbody>
 					</table>

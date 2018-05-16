@@ -251,11 +251,13 @@ class InventoryTransferVouchersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 
-        $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
-            'contain' => ['Creator','Companies', 'InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+       $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
+            'contain' => ['Creator','Companies','Vendors','Customers','InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
-								}]]]
-        ]);
+								}]]]			
+        ]); 
+		
+		
 		$in_item=[];
 		$out_item=[];
 		foreach($inventoryTransferVoucher->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row){
@@ -276,11 +278,11 @@ class InventoryTransferVouchersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
-            'contain' => ['Creator','Companies', 'InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Creator','Companies','Customers','Vendors','InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]]
         ]);
-
+		
 		$this->set(compact('out_item','in_item'));
         $this->set('inventoryTransferVoucher', $inventoryTransferVoucher);
         $this->set('_serialize', ['inventoryTransferVoucher']);
@@ -292,7 +294,7 @@ class InventoryTransferVouchersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 
         $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
-            'contain' => ['Creator','Companies', 'InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
+            'contain' => ['Creator','Companies','Customers','Vendors', 'InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
 								}]]]
         ]);

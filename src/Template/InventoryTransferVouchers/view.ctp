@@ -50,7 +50,24 @@ margin-bottom: 0;
 					<td width="20" align="center">:</td>
 					<td><?= h('#'.str_pad($inventoryTransferVoucher->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
 				</tr>
-				
+				<tr>
+				<?php if(!empty($inventoryTransferVoucher->customer)){ ?>
+					<td align="left"><b>Customer Name</b></td>
+					<td width="20" align="center">:</td>
+					<td><?= h($inventoryTransferVoucher->customer->customer_name); ?></td>
+				<?php }else if(!empty($inventoryTransferVoucher->vendor)){ ?>
+					<td align="left"><b>Supplier Name</b></td>
+					<td width="20" align="center">:</td>
+					<td><?= h($inventoryTransferVoucher->vendor->company_name); ?></td>
+				<?php } ?>	
+				</tr>
+				<?php if(!empty($inventoryTransferVoucher->customer)){ ?>
+				<tr>
+					<td align="left"><b>File No.</b></td>
+					<td width="20" align="center">:</td>
+					<td><?= h($inventoryTransferVoucher->file_no) ?></td>
+				</tr>
+				<?php } ?>
 			</table>
 	   </td>
 	    <td width="50%" valign="top" align="right">

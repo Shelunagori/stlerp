@@ -95,16 +95,18 @@ class InvoiceBookingsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
-	    $where = [];
+	    $where = [];$where1 = [];
 		$book_no = $this->request->query('book_no');
 		$in_no = $this->request->query('in_no');
 		$file = $this->request->query('file');
 		$From = $this->request->query('From');
 		$To = $this->request->query('To');
+		$Po_From = $this->request->query('Po_From');
+		$Po_To = $this->request->query('Po_To');
 		$vendor_id = $this->request->query('vendor_id');
 		$items = $this->request->query('items');
 		
-		$this->set(compact('book_no','From','To','in_no','file','vendor_id'));
+		$this->set(compact('book_no','From','To','in_no','file','vendor_id','Po_To','Po_From'));
 		
 		if(!empty($book_no))
 		{
@@ -131,6 +133,14 @@ class InvoiceBookingsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['InvoiceBookings.created_on <=']=$To;
 		}
+		if(!empty($Po_From)){
+			$Po_From=date("Y-m-d",strtotime($this->request->query('Po_From')));
+			$where1['PurchaseOrders.date_created >=']=$Po_From;
+		}
+		if(!empty($Po_To)){
+			$Po_To=date("Y-m-d",strtotime($this->request->query('Po_To')));
+			$where1['PurchaseOrders.date_created <=']=$Po_To;
+		}
 		//pr($where); exit;
 			if(!empty($items))
 			{ 
@@ -149,14 +159,16 @@ class InvoiceBookingsController extends AppController
 				->where($where);
 			}
 			else{
-			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id,'InvoiceBookings.gst' =>'yes'])->contain(['Vendors'])->order(['InvoiceBookings.id' => 'DESC']);
+			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id,'InvoiceBookings.gst' =>'yes'])->contain(['Vendors','Grns'=>['PurchaseOrders'=>function ($q) use($where1){
+				return $q->where($where1);
+			}]])->order(['InvoiceBookings.id' => 'DESC']);
 			}
 			$vendor = $this->InvoiceBookings->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
 						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
 					}
 				);
 			$Items = $this->InvoiceBookings->InvoiceBookingRows->Items->find('list')->order(['Items.name' => 'ASC']);
-		//pr($Items->toArray());exit;
+		//pr($invoiceBookings->toArray());exit;
         $this->set(compact('invoiceBookings','status','purchase_return','url','vendor','Items'));
       
     }
@@ -1014,8 +1026,8 @@ class InvoiceBookingsController extends AppController
 			$invoiceBooking->edited_on = date("Y-m-d"); 
 			$invoiceBooking->edited_by=$this->viewVars['s_employee_id'];
 			//pr($invoiceBooking->total_other_charges);
-			//pr($invoiceBooking);
-			//exit;
+			pr($invoiceBooking);
+			exit;
             if ($this->InvoiceBookings->save($invoiceBooking)) { 
 				$ref_rows=@$this->request->data['ref_rows'];
 				$invoiceBookingId=$invoiceBooking->id;
