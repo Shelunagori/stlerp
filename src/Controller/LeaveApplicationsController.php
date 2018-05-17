@@ -122,7 +122,7 @@ class LeaveApplicationsController extends AppController
 		//pr($empData); exit;
         $leaveApplication = $this->LeaveApplications->newEntity();
         if ($this->request->is('post')) {
-			//pr($this->request->data); exit;
+			
 			$files=$this->request->data['supporting_attached']; 
             $leaveApplication = $this->LeaveApplications->patchEntity($leaveApplication, $this->request->data);
 			$leaveApplication->supporting_attached = $files['name'];
@@ -135,6 +135,8 @@ class LeaveApplicationsController extends AppController
 			$leaveApplication->submission_date=date('Y-m-d');
 			$leaveApplication->from_leave_date =date('Y-m-d', strtotime($leaveApplication->from_leave_date)); 
 			$leaveApplication->to_leave_date =date('Y-m-d', strtotime($leaveApplication->to_leave_date)); 
+			$leaveApplication->approve_leave_from =date('Y-m-d', strtotime($leaveApplication->from_leave_date)); 
+			$leaveApplication->approve_leave_to =date('Y-m-d', strtotime($leaveApplication->to_leave_date)); 
 			
 			if($leaveApplication->single_multiple=='Single'){
 				$leaveApplication->to_leave_date=$leaveApplication->from_leave_date;
@@ -164,8 +166,8 @@ class LeaveApplicationsController extends AppController
 				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->to_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			}
 			
-			foreach($dates as $data){ 
-				$c=$this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$s_employee_id,'LeaveApplications.approve_leave_from <='=>$data])->andWhere(['LeaveApplications.approve_leave_to >='=>$data])->count(); 
+			foreach($dates as $data){
+				$c=$this->LeaveApplications->find()->where(['LeaveApplications.employee_id'=>$leaveApplication->employee_id,'LeaveApplications.approve_leave_from <='=>$data, 'LeaveApplications.approve_leave_to >='=>$data])->count(); 
 				
 				if($c>0){
 					$this->Flash->error(__('Leave Application cannot be fullfilled with duplicate dates.'));
@@ -174,7 +176,7 @@ class LeaveApplicationsController extends AppController
 			}
 			
 			foreach($dates  as $date){
-				$c=$this->LeaveApplications->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count();
+				$c=$this->LeaveApplications->TravelRequests->find()->where(['TravelRequests.employee_id'=>$leaveApplication->employee_id, 'travel_mode_from_date <='=>$date, 'travel_mode_to_date >='=>$date])->count();
 				if($c>0){
 					$this->Flash->error(__('Travel request Applied in these dates.'));
 					goto a;
