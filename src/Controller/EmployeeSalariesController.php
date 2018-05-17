@@ -200,7 +200,7 @@ class EmployeeSalariesController extends AppController
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$bank_id=$this->request->data()['bank_id'];
 			
-			if(!empty($From)){ 
+			if(!empty($From)){
 				$From1=$From;
 				$From="01-".$From;
 				$time=strtotime($From);
