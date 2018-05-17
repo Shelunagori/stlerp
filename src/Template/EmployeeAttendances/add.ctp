@@ -110,6 +110,11 @@ $(document).ready(function()
 		}
 
 	});
+	$('.adjst').live('keyup',function(){
+		var one=parseFloat($(this).closest('tr').find('td:nth-child(3) input').val());
+		var two=parseFloat($(this).closest('tr').find('td:nth-child(4) input').val());
+		var two=$(this).closest('tr').find('td:nth-child(5) input').val(one+two);
+	});
 	$('.emp_rec').live('click',function(){
 		var select_date=$(this).closest('tr').find('.select_date').val();
 		

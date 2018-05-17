@@ -65,10 +65,20 @@ class EmployeeAttendancesController extends AppController
      * @return \Cake\Network\Response|void Redirects on successful add, renders view otherwise.
      */
     public function getAttendenceList($From=null){
+		
+		$f=explode('-',$From);
+		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$From1=$From;
 		$From="01-".$From;
+		
+		$EmpAttendances = $this->EmployeeAttendances->find()->where(['month' => $f[0], 'year' => $f[1]]);
+		$adjstDays=[];
+		foreach($EmpAttendances as $EmpAttendance){
+			$adjstDays[$EmpAttendance->employee_id]=$EmpAttendance->adjustment_days;
+		}
+		
 		$employees = $this->EmployeeAttendances->Employees->find()->where(['id !='=>23,'salary_company_id'=>$st_company_id])
 		->contain(['EmployeeCompanies'])
 			->matching(
@@ -94,7 +104,7 @@ class EmployeeAttendancesController extends AppController
 			} 
 
 		}
-		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));
+		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays'));
 	}
 	
 	public function getAttendenceListNew($From=null){
@@ -135,6 +145,9 @@ class EmployeeAttendancesController extends AppController
 		$financial_year = $this->EmployeeAttendances->FinancialYears->find()->where(['id'=>$st_year_id])->first();
         $employeeAttendance = $this->EmployeeAttendances->newEntity();
         if ($this->request->is('post')) {
+			$f=explode('-',$this->request->data['From']);
+			$this->EmployeeAttendances->deleteAll(['month' => $f[0], 'year' => $f[1]]);
+			
             $employeeAttendance = $this->EmployeeAttendances->patchEntity($employeeAttendance, $this->request->data);
 			$employeeAttendance->effective_date_from='01-'.$employeeAttendance->From;
 			$time=strtotime($employeeAttendance->effective_date_from);
@@ -142,9 +155,11 @@ class EmployeeAttendancesController extends AppController
 			$year=date("Y",$time);
 			//pr($month); exit;
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
-			foreach($employeeAttendance->employee_attendances as $data){ 
+			foreach($employeeAttendance->employee_attendances as $data){
 				$employeeAtten = $this->EmployeeAttendances->newEntity();
 				$employeeAtten->employee_id = $data['employee_id'];
+				$employeeAtten->attendance = $data['attendance'];
+				$employeeAtten->adjustment_days = $data['adjustment_days'];
 				$employeeAtten->present_day = $data['present_day'];
 				$employeeAtten->month = $month;
 				$employeeAtten->year = $year;
@@ -154,13 +169,14 @@ class EmployeeAttendancesController extends AppController
 				$this->EmployeeAttendances->save($employeeAtten);
 			}
 				$this->Flash->success(__('The employee attendance has been saved.'));
-				return $this->redirect(['action' => 'index']);
+				return $this->redirect(['action' => 'add']);
 			
 		  }
-       // $financialYears = $this->EmployeeAttendances->FinancialYears->find('list', ['limit' => 200]);
+        
+		
         $employees = $this->EmployeeAttendances->Employees->find()->where(['status'=>'0','id !='=>23]);  
 		//pr(date('d-m-Y',strtotime($financial_year->date_from))); exit;
-        $this->set(compact('employeeAttendance', 'financialYears', 'employees','financial_year'));
+        $this->set(compact('employeeAttendance', 'financialYears', 'employees','financial_year', 'adjstDays'));
         $this->set('_serialize', ['employeeAttendance']);
     }
 

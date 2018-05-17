@@ -919,17 +919,9 @@ select
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i>Salary Divisions','/EmployeeSalaryDivisions/',array('escape'=>false)).'</li>';
 						
 						?>
-						<li>
-							<a href="javascript:;">
-							<i class="fa fa-file-code-o"></i>
-							<span class="title">Employee Attendence</span>
-							<span class="arrow "></span>
-							</a>
-							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeeAttendances/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/EmployeeAttendances' ).'</li>'; ?>
-							</ul>
-						</li>
+						<?php 
+						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Employee Attendence','/EmployeeAttendances/add',array('escape'=>false)).'</li>';
+						?>
 
 						<li>
 							<a href="javascript:;">
