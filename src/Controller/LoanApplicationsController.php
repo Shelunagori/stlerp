@@ -28,9 +28,9 @@ class LoanApplicationsController extends AppController
 		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-		$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees']));
+			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
 		}else{
-		$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'company_id'=>$st_company_id]));
 		}
 
         $this->set(compact('loanApplications'));
@@ -118,7 +118,7 @@ class LoanApplicationsController extends AppController
         $loanApplication = $this->LoanApplications->newEntity();
         if ($this->request->is('post')) {
             $loanApplication = $this->LoanApplications->patchEntity($loanApplication, $this->request->data);
-			//pr($loanApplication); exit;
+			$loanApplication->company_id=$st_company_id;
 			if ($this->LoanApplications->save($loanApplication)) {
                 $this->Flash->success(__('The loan application has been saved.'));
 
@@ -165,6 +165,7 @@ class LoanApplicationsController extends AppController
 		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $loanApplication = $this->LoanApplications->patchEntity($loanApplication, $this->request->data);
+			$loanApplication->company_id=$st_company_id;
             if ($this->LoanApplications->save($loanApplication)) {
                 $this->Flash->success(__('The loan application has been saved.'));
 

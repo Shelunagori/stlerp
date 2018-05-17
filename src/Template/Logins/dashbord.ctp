@@ -296,7 +296,7 @@
 	</div>
 </div>
 <?php }?>
-<?php if($PendingTravelRequests){ ?>
+<!-- <?php if($PendingTravelRequests){ ?>
 <div class="col-md-12 col-sm-12">
 	<div class="portlet grey-cascade box">
 		<div class="portlet-title">
@@ -350,7 +350,7 @@
 		</div>
 	</div>
 </div>
-<?php }?>
+<?php }?> -->
 <?php }   ?>	
 
 <div id="TravelRequestsContainer"></div>

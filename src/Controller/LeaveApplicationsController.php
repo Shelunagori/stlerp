@@ -28,9 +28,9 @@ class LeaveApplicationsController extends AppController
 		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
-		$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees']));
+			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
 		}else{ 
-		$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'company_id'=>$st_company_id]));
 		}
 		//pr($leaveApplications); exit;
        // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
@@ -182,7 +182,7 @@ class LeaveApplicationsController extends AppController
 					goto a;
 				}
 			}
-			
+			$leaveApplication->company_id=$st_company_id;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -339,6 +339,8 @@ class LeaveApplicationsController extends AppController
 			$leaveApplication->submission_date=date('Y-m-d'); 
 			$leaveApplication->from_leave_date = date('Y-m-d',strtotime($leaveApplication->from_leave_date)); 
 			$leaveApplication->to_leave_date = date('Y-m-d',strtotime($leaveApplication->to_leave_date)); 
+			$leaveApplication->approve_leave_from = date('Y-m-d',strtotime($leaveApplication->from_leave_date)); 
+			$leaveApplication->approve_leave_to = date('Y-m-d',strtotime($leaveApplication->to_leave_date)); 
 			
 			if($leaveApplication->single_multiple=='Single'){
 				$leaveApplication->to_leave_date=$leaveApplication->from_leave_date;
@@ -385,6 +387,7 @@ class LeaveApplicationsController extends AppController
 					goto a;
 				}
 			}
+			$leaveApplication->company_id=$st_company_id;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				if(!empty($files['tmp_name']))
 				{

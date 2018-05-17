@@ -29,9 +29,9 @@ class TravelRequestsController extends AppController
 		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
-		$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees']));
+			$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
 		}else{ 
-		$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+			$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id, 'company_id'=>$st_company_id]));
 		}
 		
        // $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
@@ -205,7 +205,7 @@ class TravelRequestsController extends AppController
 					goto a;
 				}
 			}
-			
+			$travelRequest->company_id=$st_company_id;
             if ($this->TravelRequests->save($travelRequest)) {
 				
                 $this->Flash->success(__('The travel request has been saved.'));
@@ -283,7 +283,7 @@ class TravelRequestsController extends AppController
 					goto a;
 				}
 			}
-			
+			$travelRequest->company_id=$st_company_id;
             if ($this->TravelRequests->save($travelRequest)) { 
                 $this->Flash->success(__('The travel request has been saved.'));
 

@@ -28,9 +28,9 @@ class SalaryAdvancesController extends AppController
 		$empData=$this->SalaryAdvances->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-		$salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees']));
+			$salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
 		}else{
-		$salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+			$salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 		}
        // $salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees']));
 
@@ -189,6 +189,7 @@ class SalaryAdvancesController extends AppController
         if ($this->request->is('post')) {
             $salaryAdvance = $this->SalaryAdvances->patchEntity($salaryAdvance, $this->request->data);
             $salaryAdvance->create_date =date('Y-m-d');
+			$salaryAdvance->company_id=$st_company_id;
             if ($this->SalaryAdvances->save($salaryAdvance)) {
                 $this->Flash->success(__('The salary advance has been saved.'));
 
@@ -251,7 +252,8 @@ class SalaryAdvancesController extends AppController
 		$empData=$this->SalaryAdvances->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $salaryAdvance = $this->SalaryAdvances->patchEntity($salaryAdvance, $this->request->data);
-            if ($this->SalaryAdvances->save($salaryAdvance)) {
+            $salaryAdvance->company_id=$st_company_id;
+			if ($this->SalaryAdvances->save($salaryAdvance)) {
                 $this->Flash->success(__('The salary advance has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
