@@ -271,6 +271,7 @@ class LoanApplicationsController extends AppController
 			$Nppayment->cheque_no='';
 			$Nppayment->transaction_date=$trans_date;
 			$Nppayment->loan_amount = 'yes';
+			$Nppayment->loan_application_id = $LoanApplications->id;
 			$this->LoanApplications->Nppayments->save($Nppayment);
 			
 			$LedgerAccount=$this->LoanApplications->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$LoanApplications->employee_id])->first();

@@ -47,7 +47,7 @@ class TravelRequestsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-        $travelRequests = $this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'TravelRequests.status'=>'pending']);
+        $travelRequests = $this->TravelRequests->find()->contain(['Employees'])->where(['TravelRequests.status'=>'pending']);
 
         $this->set(compact('travelRequests'));
         $this->set('_serialize', ['travelRequests']);
@@ -192,12 +192,14 @@ class TravelRequestsController extends AppController
 			
 			$dates=$this->date_range($travelRequest->travel_from_date, $travelRequest->travel_to_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			foreach($dates  as $date){
-				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->where(['employee_id'=>$travelRequest->employee_id])->count();
+				
+				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date, 'travel_mode_to_date >='=>$date, 'employee_id'=>$travelRequest->employee_id])->count();
 				if($c>0){
 					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
 					goto a;
 				}
 			}
+			
 			foreach($dates  as $date){
 				$c=$this->TravelRequests->LeaveApplications->find()->where(['approve_leave_from <='=>$date])->andWhere(['approve_leave_to >='=>$date])->where(['employee_id'=>$travelRequest->employee_id])->count();
 				if($c>0){
@@ -263,14 +265,15 @@ class TravelRequestsController extends AppController
         ]); //pr($travelRequest);
         if ($this->request->is(['patch', 'post', 'put'])) {
             $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
-			$travelRequest->employee_id=$s_employee_id;
+			//$travelRequest->employee_id=$s_employee_id;
 			
 			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
 			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->travel_mode_to_date)); 
 			
 			$dates=$this->date_range($travelRequest->travel_from_date, $travelRequest->travel_to_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			foreach($dates  as $date){
-				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->where(['employee_id'=>$travelRequest->employee_id])->count();
+				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date, 'travel_mode_to_date >='=>$date, 'employee_id'=>$travelRequest->employee_id, 'TravelRequests.id !='=>$travelRequest->id])->count();
+				
 				if($c>0){
 					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
 					goto a;
