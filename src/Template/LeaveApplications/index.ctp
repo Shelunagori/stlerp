@@ -4,16 +4,14 @@
 			<i class="icon-globe font-blue-steel"></i>
 			<span class="caption-subject font-blue-steel ucfirst">Leave Applications</span> 
 		</div>
-		<div class="actions">
-			
-			
-		</div>	
-	
 	<div class="portlet-body">
 		<div class="row">
 			<div class="col-md-12">
 				<form method="GET" >
-				
+				<input type="text" name="FromDate" class="date-picker" value="<?php echo @$FromDate; ?>" data-date-format="dd-mm-yyyy"/>
+				<input type="text" name="ToDate" class="date-picker" value="<?php echo @$ToDate; ?>" data-date-format="dd-mm-yyyy"/>
+				<input type="text" name="empName" value="<?php echo @$empName; ?>"/>
+				<button type="submit">Search</button>
 				</form>
 				<?php $page_no=$this->Paginator->current('leaveApplications'); $page_no=($page_no-1)*20; 
 					

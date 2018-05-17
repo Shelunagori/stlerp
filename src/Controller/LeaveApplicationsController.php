@@ -25,12 +25,33 @@ class LeaveApplicationsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$this->viewBuilder()->layout('index_layout');
+		
+		$FromDate=$this->request->query('FromDate'); $FromDate1=date('Y-m-d',strtotime($FromDate));
+		$ToDate=$this->request->query('ToDate'); $ToDate1=date('Y-m-d',strtotime($ToDate));
+		$this->set(compact('FromDate', 'ToDate'));
+		$dates=$this->date_range($FromDate, $ToDate, $step = '+1 day', $output_format = 'Y-m-d' );
+		
+		$where['company_id']=$st_company_id;
+		$q=[];
+		foreach($dates as $date){
+			$q['OR'][]=[
+					'from_leave_date >=' => $date,
+					'to_leave_date <=' => $date
+				];
+		}
+		
+		$empName=$this->request->query('empName');
+		if(!empty($empName)){
+			$where['Employees.name LIKE']='%'.$empName.'%';
+		}
+		$this->set(compact('empName'));
+		
 		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
-			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
+			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where($where)->where($q));
 		}else{ 
-			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'company_id'=>$st_company_id]));
+			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 		}
 		//pr($leaveApplications); exit;
        // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
