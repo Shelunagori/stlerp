@@ -402,7 +402,7 @@ class LeaveApplicationsController extends AppController
 			}
 			
 			foreach($dates  as $date){
-				$c=$this->LeaveApplications->TravelRequests->find()->where(['travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count();
+				$c=$this->LeaveApplications->TravelRequests->find()->where(['TravelRequests.employee_id'=>$s_employee_id,'travel_mode_from_date <='=>$date])->andWhere(['travel_mode_to_date >='=>$date])->count();
 				if($c>0){
 					$this->Flash->error(__('Travel request Applied in these dates.'));
 					goto a;
