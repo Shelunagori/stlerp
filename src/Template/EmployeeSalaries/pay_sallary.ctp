@@ -122,7 +122,7 @@ $(document).ready(function() {
 			$(this).text('hold');
 			$(this).attr('undo','');
 			var net_amount=$(this).closest('tr').find('input[name="net_amount"]').val();
-			$(this).closest('tr').find('input[name="net_amount"]').val(net_amount-loan_amount);
+			$(this).closest('tr').find('input[name="net_amount"]').val(round(net_amount-loan_amount,2));
 		}else{
 			var am=parseFloat($(this).closest('td').find('input').val());
 			$(this).closest('td').find('input').val(0);
@@ -130,7 +130,7 @@ $(document).ready(function() {
 			$(this).text('undo');
 			$(this).attr('undo','1');
 			var net_amount=parseFloat($(this).closest('tr').find('input[name="net_amount"]').val());
-			$(this).closest('tr').find('input[name="net_amount"]').val(net_amount+am);
+			$(this).closest('tr').find('input[name="net_amount"]').val(round(net_amount+am,2));
 		}
 		totalColumn();
 	});
@@ -150,7 +150,7 @@ $(document).ready(function() {
 		var ths=$(this);
 		var net_amount=$(this).closest('tr').find('.net_amount').attr('net');
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
-		var amount_after_other=round(net_amount-other_amt);
+		var amount_after_other=round(net_amount-other_amt,2);
 		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
 		totalColumn();
 	});
@@ -159,7 +159,7 @@ $(document).ready(function() {
 		var t=0;
 		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){
 			var net_amount=parseFloat($(this).find('input.net_amount').val());
-			t=t+net_amount;
+			t=round(t+net_amount,2);
 			$('#tot').html('<b>'+t+'</b>');
 		});
 	}

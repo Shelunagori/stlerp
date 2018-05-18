@@ -114,7 +114,7 @@ class LeaveApplicationsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		 $st_year_id = $session->read('st_year_id');
+		$st_year_id = $session->read('st_year_id');
 		
 		$financial_year = $this->LeaveApplications->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->LeaveApplications->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
@@ -186,7 +186,7 @@ class LeaveApplicationsController extends AppController
 				}
 			}
 			//pr($leaveApplication->employee_id);
-			if($leaveApplication->single_multiple=="Single"){ 
+			if($leaveApplication->single_multiple=="Single"){
 				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->from_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			}else{
 				$dates=$this->date_range($leaveApplication->from_leave_date, $leaveApplication->to_leave_date, $step = '+1 day', $output_format = 'Y-m-d' );

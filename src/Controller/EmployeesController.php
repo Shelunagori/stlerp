@@ -52,7 +52,12 @@ class EmployeesController extends AppController
 	function listForSalary(){
         $this->viewBuilder()->layout('index_layout');
 		
-		$employees=$this->Employees->find()->select(['id','name','salary_company_id'])->order(['name'=>'ASC']);
+		$employees=$this->Employees->find()->select(['id','name','salary_company_id'])->order(['name'=>'ASC'])
+					->matching(
+						'EmployeeCompanies', function ($q)  {
+							return $q->where(['EmployeeCompanies.freeze' =>0]);
+						}
+					);
 		
 		$companies=$this->Employees->Companies->find('list');
 		$this->set(compact('employees', 'companies'));
