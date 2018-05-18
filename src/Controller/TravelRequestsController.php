@@ -36,7 +36,7 @@ class TravelRequestsController extends AppController
 		
        // $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 
-        $this->set(compact('travelRequests'));
+        $this->set(compact('travelRequests', 'empData'));
         $this->set('_serialize', ['travelRequests']);
     }
 	
@@ -47,7 +47,7 @@ class TravelRequestsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-        $travelRequests = $this->TravelRequests->find()->contain(['Employees'])->where(['TravelRequests.status'=>'pending']);
+        $travelRequests = $this->TravelRequests->find()->contain(['Employees'])->where(['TravelRequests.status'=>'pending','TravelRequests.company_id'=>$st_company_id]);
 
         $this->set(compact('travelRequests'));
         $this->set('_serialize', ['travelRequests']);
@@ -71,13 +71,28 @@ class TravelRequestsController extends AppController
 			$this->TravelRequests->save($travelRequest);
 			
 			if($travelRequest->advance_amt>0){
+				
+				$np=$this->TravelRequests->Nppayments->find()->where(['travel_request_id'=>$travelRequest->id])->first();
+				if($np){
+					$oldVoucher_no=$np->voucher_no;
+					
+					$this->TravelRequests->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$np->id]);
+					$this->TravelRequests->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $np->id]);
+					$this->TravelRequests->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
+				}
+			
+			
 				$nppayment = $this->TravelRequests->Nppayments->newEntity();
 				$nppayment->financial_year_id=$st_year_id;
-				$last_voucher_no=$this->TravelRequests->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-				if($last_voucher_no){
-					$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				if(@$oldVoucher_no){
+					$nppayment->voucher_no=$oldVoucher_no;
 				}else{
-					$nppayment->voucher_no=1;
+					$last_voucher_no=$this->TravelRequests->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+					if($last_voucher_no){
+						$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+					}else{
+						$nppayment->voucher_no=1;
+					}
 				}
 				$nppayment->bank_cash_id=$bank_id;
 				$nppayment->created_on=date("Y-m-d");

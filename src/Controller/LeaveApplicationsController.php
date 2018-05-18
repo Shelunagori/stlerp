@@ -26,6 +26,8 @@ class LeaveApplicationsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$this->viewBuilder()->layout('index_layout');
 		
+		
+		
 		$FromDate=$this->request->query('FromDate'); $FromDate1=date('Y-m-d',strtotime($FromDate));
 		$ToDate=$this->request->query('ToDate'); $ToDate1=date('Y-m-d',strtotime($ToDate));
 		$this->set(compact('FromDate', 'ToDate'));
@@ -39,6 +41,9 @@ class LeaveApplicationsController extends AppController
 					'to_leave_date <=' => $date
 				];
 		}
+		if(!$FromDate or !$ToDate){
+			$q['OR']=[];
+		}
 		
 		$empName=$this->request->query('empName');
 		if(!empty($empName)){
@@ -50,12 +55,13 @@ class LeaveApplicationsController extends AppController
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
 			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where($where)->where($q));
+			//pr($where); pr($q); exit;
 		}else{ 
 			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 		}
 		//pr($leaveApplications); exit;
        // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
-        $this->set(compact('leaveApplications'));
+        $this->set(compact('leaveApplications', 'empData'));
         $this->set('_serialize', ['leaveApplications']);
     }
 
@@ -143,7 +149,6 @@ class LeaveApplicationsController extends AppController
 		//pr($empData); exit;
         $leaveApplication = $this->LeaveApplications->newEntity();
         if ($this->request->is('post')) {
-			
 			$files=$this->request->data['supporting_attached']; 
             $leaveApplication = $this->LeaveApplications->patchEntity($leaveApplication, $this->request->data);
 			$leaveApplication->supporting_attached = $files['name'];

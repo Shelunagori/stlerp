@@ -97,14 +97,59 @@ class EmployeeAttendancesController extends AppController
 			$to_date=date('Y-m-d',strtotime($to_date));
 			
 			
-			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved']);
+			$dates=$this->date_range($From, $to_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			
+			$q=[];
+			foreach($dates as $date){
+				$q['OR'][]=[
+					'approve_leave_from >=' => $date,
+					'approve_leave_to <=' => $date
+				];
+			}
+			
+			$Emp=$this->EmployeeAttendances->Employees->get($data->id);
+			$JoinMonth=date('m',strtotime($Emp->join_date));
+			$JoinYear=date('Y',strtotime($Emp->join_date));
+			
+			$JoinDate=strtotime($JoinYear.'-'.$JoinMonth.'-1');
+			$cDate=strtotime($f[1].'-'.$f[0].'-1');
+			if($JoinDate<=$cDate){
+				if($f[0]==$JoinMonth && $f[1]==$JoinYear){
+					$ab=(strtotime($f[1].'-'.$f[0].'-1')-strtotime($Emp->join_date))/(60 * 60 * 24);
+					@$employee_leave[@$data->id]+=abs($ab);
+				}
+			}else{
+				$t_day=cal_days_in_month(CAL_GREGORIAN,$f[0],$f[1]);
+					@$employee_leave[@$data->id]+=abs($t_day);
+			}
+			
+			
+			
+			
+			
+			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved','approve_leave_from >='=>date('Y-m-d',strtotime($From)), 'approve_leave_to <='=>date('Y-m-d',strtotime($to_date))]);
+			$UniqueEmpIds=[];
 			foreach($employeeLeave as $data1){
 				@$employee_leave[@$data1->employee_id]+=$data1->unpaid_leaves;
-			} 
+			}
+			
 
 		}
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays'));
+	}
+	
+	function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
+		
+		$dates = array();
+		$current = strtotime($first);
+		$last = strtotime($last);
+
+		while( $current <= $last ) {
+			
+			$dates[] = date($output_format, $current);
+			$current = strtotime($step, $current);
+		} 
+		return $dates;
 	}
 	
 	public function getAttendenceListNew($From=null){

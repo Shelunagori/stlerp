@@ -11,9 +11,9 @@ use Cake\Event\Event;
 class EmployeeSalariesController extends AppController
 {
 
-	 public function beforeFilter(Event $event) {
-		 $this->eventManager()->off($this->Csrf);
-	 }
+	public function beforeFilter(Event $event) {
+		$this->eventManager()->off($this->Csrf);
+	}
 
 		
     /**

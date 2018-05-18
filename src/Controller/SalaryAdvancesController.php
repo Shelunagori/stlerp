@@ -34,7 +34,7 @@ class SalaryAdvancesController extends AppController
 		}
        // $salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees']));
 
-        $this->set(compact('salaryAdvances'));
+        $this->set(compact('salaryAdvances', 'empData'));
         $this->set('_serialize', ['salaryAdvances']);
     }
 	
@@ -47,9 +47,9 @@ class SalaryAdvancesController extends AppController
 		$empData=$this->SalaryAdvances->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-			$salaryAdvances = $this->SalaryAdvances->find()->contain(['Employees'])->where(['SalaryAdvances.status'=>'pending']);
+			$salaryAdvances = $this->SalaryAdvances->find()->contain(['Employees'])->where(['SalaryAdvances.status'=>'pending', 'SalaryAdvances.company_id'=>$st_company_id]);
 		}else{
-			$salaryAdvances = $this->SalaryAdvances->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'SalaryAdvances.status'=>'pending']);
+			$salaryAdvances = $this->SalaryAdvances->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'SalaryAdvances.status'=>'pending', 'SalaryAdvances.company_id'=>$st_company_id]);
 		}
        // $salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees']));
 
@@ -75,14 +75,30 @@ class SalaryAdvancesController extends AppController
 			$salaryAdvance->status="approve";
 			$this->SalaryAdvances->save($salaryAdvance);
 			
+			
+			$np=$this->SalaryAdvances->Nppayments->find()->where(['salary_advance_id'=>$salaryAdvance->id])->first();
+			if($np){
+				$oldVoucher_no=$np->voucher_no;
+				
+				$this->SalaryAdvances->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$np->id]);
+				$this->SalaryAdvances->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $np->id]);
+				$this->SalaryAdvances->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
+			}
+				
+				
 			$nppayment = $this->SalaryAdvances->Nppayments->newEntity();
 			$nppayment->financial_year_id=$st_year_id;
-			$last_voucher_no=$this->SalaryAdvances->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-            if($last_voucher_no){
-                $nppayment->voucher_no=$last_voucher_no->voucher_no+1;
-            }else{
-                $nppayment->voucher_no=1;
-            }
+			if(@$oldVoucher_no){
+				$nppayment->voucher_no=$oldVoucher_no;
+			}else{
+				$last_voucher_no=$this->SalaryAdvances->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+				if($last_voucher_no){
+					$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				}else{
+					$nppayment->voucher_no=1;
+				}
+			}
+			
 			$nppayment->bank_cash_id=$bank_id;
 			$nppayment->created_on=date("Y-m-d");
             $nppayment->created_by=$s_employee_id;

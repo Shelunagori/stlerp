@@ -12,7 +12,7 @@
 		<?php $p=1; $i=1; foreach($employees as $data){ ?>
 				<tr>
 					<td><?php echo $p++; ?>
-					<td><?php echo $this->Form->input('employee_name', ['type'=>'text','label' => false,'placeholder'=>'','class'=>'form-control input-sm','value'=>$data->name,'readonly']); ?>
+					<td><?php echo $data->name; ?>
 					<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
 					</td>
 					<td><?php echo $this->Form->input('employee_attendances.'.$i.'.attendance', ['type'=>'text','label' => false,'placeholder'=>'','class'=>'form-control input-sm amount','max'=>$total_day,'value'=>$total_day-@$employee_leave[@$data->id], 'readonly']); ?></td>

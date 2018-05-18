@@ -33,7 +33,7 @@ class LoanApplicationsController extends AppController
 			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'company_id'=>$st_company_id]));
 		}
 
-        $this->set(compact('loanApplications'));
+        $this->set(compact('loanApplications', 'empData'));
         $this->set('_serialize', ['loanApplications']);
     }
 
@@ -254,15 +254,29 @@ class LoanApplicationsController extends AppController
 				->execute();
 				
 			
+			$np=$this->LoanApplications->Nppayments->find()->where(['loan_application_id'=>$LoanApplications->id])->first();
+			if($np){
+				$oldVoucher_no=$np->voucher_no;
+				
+				$this->LoanApplications->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$np->id]);
+				$this->LoanApplications->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $np->id]);
+				$this->LoanApplications->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
+			}
+			
 			$Nppayment=$this->LoanApplications->Nppayments->newEntity();
 			$Nppayment->company_id=$st_company_id;
-			//Voucher Number Increment
-			$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-			if($last_voucher_no){
-				$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+			if(@$oldVoucher_no){
+				$Nppayment->voucher_no=$oldVoucher_no;
 			}else{
-				$Nppayment->voucher_no=1;
+				//Voucher Number Increment
+				$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+				if($last_voucher_no){
+					$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+				}else{
+					$Nppayment->voucher_no=1;
+				}
 			}
+			
 			$Nppayment->created_on=date("Y-m-d");
 			$Nppayment->financial_year_id=$st_year_id;
 			$Nppayment->created_by=$s_employee_id;

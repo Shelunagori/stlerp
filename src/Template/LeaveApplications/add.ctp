@@ -49,7 +49,6 @@ border:none;
 						<tr>
 					</thead>
 					<tbody>
-						
 						<tr>	
 							<?php foreach($leavedatas as $leavedata){ ?>
 								<td><?php  echo $Totaalleave[$leavedata->id]; ?></td>
@@ -58,7 +57,6 @@ border:none;
 								<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?></td>
 							<?php  } ?>	
 						</tr>
-						
 					</tbody>
 				</table>
 			</div>
