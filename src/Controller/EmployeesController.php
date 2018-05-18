@@ -57,7 +57,7 @@ class EmployeesController extends AppController
 						'EmployeeCompanies', function ($q)  {
 							return $q->where(['EmployeeCompanies.freeze' =>0]);
 						}
-					);
+					)->group(['Employees.id']);
 		
 		$companies=$this->Employees->Companies->find('list');
 		$this->set(compact('employees', 'companies'));
