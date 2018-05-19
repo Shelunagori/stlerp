@@ -93,7 +93,12 @@ class EmployeeSalariesController extends AppController
 		$EmployeeAtten=[];
 		foreach($employees as $dt){
 			$From=date('Y-m-d',strtotime($From)); 
-			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
+			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['EmployeeSalaries.id'=>'DESC'])
+			->matching(
+				'EmployeeSalaryRows.EmployeeSalaryDivisions', function ($q) use($st_company_id) {
+					return $q->where(['EmployeeSalaryDivisions.company_id'=>$st_company_id]);
+				}
+			)->first();   
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
@@ -585,7 +590,13 @@ class EmployeeSalariesController extends AppController
 			$employeeDetails[]=['text'=>$data->name,'value'=>$data->id,'salary_type'=>$data->salary_type];
 		} 
 		$EmployeeSalaryDetails=[];
-		$EmployeeSalaryDetails = $this->EmployeeSalaries->find()->where(['employee_id'=>$id])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();
+		$EmployeeSalaryDetails = $this->EmployeeSalaries->find()->where(['employee_id'=>$id])->contain(['EmployeeSalaryRows'])->order(['EmployeeSalaries.id'=>'DESC'])
+		->matching(
+			'EmployeeSalaryRows.EmployeeSalaryDivisions', function ($q) use($st_company_id) {
+				return $q->where(['EmployeeSalaryDivisions.company_id'=>$st_company_id]);
+			}
+		)
+		->first();
 		//pr($EmployeeSalaryDetails); exit;
         $this->set(compact('employeeSalary', 'employee', 'employeeSalaryDivisions','employeeDetails','employeeDesignation','EmployeeSalaryDetails'));
         $this->set('_serialize', ['employeeSalary']);
@@ -638,4 +649,29 @@ class EmployeeSalariesController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+	
+	public function printSallary(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+        $this->set(compact('financial_year'));
+		if ($this->request->is('post')) {
+			$month_year=$this->request->data['month_year'];
+			$month_year=explode('-',$month_year);
+			$Employees=$this->EmployeeSalaries->Employees->find()
+			->contain(['Salaries'=>function($q) use($month_year, $st_company_id){
+				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1],'Salaries.company_id'=>$st_company_id])->contain(['EmployeeSalaryDivisions']);
+			}])
+			->matching(
+					'Salaries', function ($q) use($month_year, $st_company_id) {
+						return $q->where(['month'=>$month_year[0],'year'=>$month_year[1],'Salaries.company_id'=>$st_company_id]);
+					}
+				)
+			->group(['Employees.id'])->toArray();
+			$this->set(compact('Employees'));
+		}
+	}
 }

@@ -737,23 +737,24 @@ $(document).ready(function() {
     });
 	
 	
+	
 	$('.quantity').die().live("keyup",function() {
 		var tr_obj=$(this).closest('tr');  
 		var item_id=tr_obj.find('td:nth-child(2) input.item_ids').val()
 		
-		if(item_id > 0){ 
+		if(item_id > 0){
 			var serial_number_enable=tr_obj.find('td:nth-child(2) input.serial_nos').val();
 			
 				if(serial_number_enable == '1'){
 					var quantity=tr_obj.find('td:nth-child(3) input').val();
-					 if(quantity.search(/[^0-9]/) != -1)
-						{
-							alert("Item serial number is enabled !!! Please Enter Only Digits")
-							tr_obj.find('td:nth-child(3) input').val("");
-						}
-					rename_rows(); 
-					calculate_total();
+					if(quantity.search(/[^0-9]/) != -1)
+					{
+						alert("Item serial number is enabled !!! Please Enter Only Digits")
+						tr_obj.find('td:nth-child(3) input').val("");
+					}
 				}
+				rename_rows(); 
+				calculate_total();
 		}
 		
     });	
@@ -774,7 +775,7 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(3) input.quantity').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");
-				$(this).find('td:nth-child(6) input').attr("name","invoice_rows["+val+"][discount_percentage]").removeAttr("readonly").attr("id","q"+val).attr("id","invoice_rows-"+val+"-discount_percentage");
+				$(this).find('td:nth-child(6) input').attr("name","invoice_rows["+val+"][discount_percentage]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-discount_percentage");
 				$(this).find('td:nth-child(7) input').attr("name","invoice_rows["+val+"][discount_amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-discount_amount").rules("add", "required");
 				$(this).find('td:nth-child(8) input').attr("name","invoice_rows["+val+"][pnf_percentage]").removeAttr("readonly").attr("id","q"+val).attr("id","invoice_rows-"+val+"-pnf_percentage");
 				$(this).find('td:nth-child(9) input').attr("name","invoice_rows["+val+"][pnf_amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-pnf_amount").rules("add", "required");
