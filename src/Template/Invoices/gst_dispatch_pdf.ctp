@@ -217,8 +217,11 @@ $html = '
 		<tr>
 			<td  colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';"><br/>1. Invoice No. '. h(($invoice->invoice->in1."/"."IN-".str_pad($invoice->invoice->in2, 3, "0", STR_PAD_LEFT)."/".$invoice->invoice->in3."/".$invoice->invoice->in4)) .' dated '. h(date("d-m-Y",strtotime($invoice->invoice->date_created))).' For Rs.'. h(number_format($invoice->invoice->grand_total,2)).'/- in duplicate.</td>
 		</tr>
+		<tr>
+			<td colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';">
 		'  .$invoice->send_data . '
-		
+			</td>
+		</tr>
 				
 				<tr>
 					<td style=" font-family:Palatino Linotype; font-size:'. h(($invoice->invoice->dispatch_font_size)) .';"><br/><b>Regards,</b></td>
