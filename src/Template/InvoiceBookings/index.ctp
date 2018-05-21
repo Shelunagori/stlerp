@@ -84,7 +84,7 @@
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
 							<td class="actions">
-							<?php if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
+							<?php //if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
 								<?php if(in_array(18,$allowed_pages)){ ?>
 								<?php 
 								if($invoiceBooking->gst=='no'){
@@ -103,7 +103,9 @@
 									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstInvoiceBookingView', $invoiceBooking->id,],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View'));
                                 }
 								?>
-                                <?php } } ?>
+                                <?php } 
+								//} 
+								?>
 								<?php 
 								
 								if($purchase_return=="true"  && $invoiceBooking->purchase_return_status=='No'){

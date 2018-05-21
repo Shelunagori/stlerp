@@ -79,12 +79,21 @@ class LoginsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		echo $st_company_id; 
+		$st_year_id = $session->read('st_year_id');
+		echo $st_company_id.'-'.$st_year_id; 
 		exit;
 	//	$this->set(compact('st_company_id'));
 	}
 	
-	
+	public function checkFySession()
+	{
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_year_id = $session->read('st_year_id');
+		echo $st_year_id; 
+		exit;
+	//	$this->set(compact('st_company_id'));
+	}
 	
 	public function add()
     {

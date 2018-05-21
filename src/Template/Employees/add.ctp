@@ -873,28 +873,34 @@ $(document).ready(function () {
 	});
 	$('input[name="same_addrs"]').click(function () {
 		if($(this).attr('checked')){
-			var q=$('select[name=present_state] option:selected').val();
-			$('select[name=permanent_state]').val(q).select2();
+			var present_state=$('select[name=present_state] option:selected').val();
+			$('select[name=permanent_state]').val(present_state).select2();
 			
-			var q=$('input[name=present_district]').val();
-			$('input[name=permanent_district]').val('hello');
+			var present_district=$('input[name=present_district]').val();
+			$('input[name=permanent_district]').val(present_district);
 			
-			var q=$('input[name=present_pin_code]').val();
-			$('input[name=permanent_pin_code]').val(q);
+			var present_pin_code=$('input[name=present_pin_code]').val();
+			$('input[name=permanent_pin_code]').val(present_pin_code);
 			
-			var q=$('input[name=present_mobile_no]').val();
-			$('input[name=permanent_mobile_no]').val(q);
+			var present_mobile_no=$('input[name=present_mobile_no]').val();
+			$('input[name=permanent_mobile_no]').val(present_mobile_no);
 			
-			var q=$('input[name=present_phone_no]').val();
-			$('input[name=permanent_phone_no]').val(q);
+			var present_phone_no=$('input[name=present_phone_no]').val();
+			$('input[name=permanent_phone_no]').val(present_phone_no);
 			
-			var q=$('input[name=present_email]').val();
-			$('input[name=permanent_email]').val(q);
+			var present_email=$('input[name=present_email]').val();
+			$('input[name=permanent_email]').val(present_email);
 			
-			var q=$('textarea[name=present_address]').val();
-			$('textarea[name=permanent_address]').val(q);
+			var present_address=$('textarea[name=present_address]').val();
+			$('textarea[name=permanent_address]').val(present_address);
 		}else{
-			alert('not');
+			$('select[name=permanent_state]').val('').select2();
+			$('input[name=permanent_district]').val('');
+			$('input[name=permanent_pin_code]').val('');
+			$('input[name=permanent_mobile_no]').val('');
+			$('input[name=permanent_phone_no]').val('');
+			$('input[name=permanent_email]').val('');
+			$('textarea[name=permanent_address]').val('');
 		}
 	});
 });
@@ -917,28 +923,34 @@ $(document).ready(function () {
 	});
 	$('input[name="same_addrs"]').click(function () {
 		if($(this).attr('checked')){
-			var q=$('select[name=present_state] option:selected').val();
-			$('select[name=permanent_state]').val(q).select2();
+			var present_state=$('select[name=present_state] option:selected').val();
+			$('select[name=permanent_state]').val(present_state).select2();
 			
-			var q=$('input[name=present_district]').val();
-			$('input[name=permanent_district]').val('hello');
+			var present_district=$('input[name=present_district]').val();
+			$('input[name=permanent_district]').val(present_district);
 			
-			var q=$('input[name=present_pin_code]').val();
-			$('input[name=permanent_pin_code]').val(q);
+			var present_pin_code=$('input[name=present_pin_code]').val();
+			$('input[name=permanent_pin_code]').val(present_pin_code);
 			
-			var q=$('input[name=present_mobile_no]').val();
-			$('input[name=permanent_mobile_no]').val(q);
+			var present_mobile_no=$('input[name=present_mobile_no]').val();
+			$('input[name=permanent_mobile_no]').val(present_mobile_no);
 			
-			var q=$('input[name=present_phone_no]').val();
-			$('input[name=permanent_phone_no]').val(q);
+			var present_phone_no=$('input[name=present_phone_no]').val();
+			$('input[name=permanent_phone_no]').val(present_phone_no);
 			
-			var q=$('input[name=present_email]').val();
-			$('input[name=permanent_email]').val(q);
+			var present_email=$('input[name=present_email]').val();
+			$('input[name=permanent_email]').val(present_email);
 			
-			var q=$('textarea[name=present_address]').val();
-			$('textarea[name=permanent_address]').val(q);
+			var present_address=$('textarea[name=present_address]').val();
+			$('textarea[name=permanent_address]').val(present_address);
 		}else{
-			alert('not');
+			$('select[name=permanent_state]').val('').select2();
+			$('input[name=permanent_district]').val('');
+			$('input[name=permanent_pin_code]').val('');
+			$('input[name=permanent_mobile_no]').val('');
+			$('input[name=permanent_phone_no]').val('');
+			$('input[name=permanent_email]').val('');
+			$('textarea[name=permanent_address]').val('');
 		}
 	});
 });

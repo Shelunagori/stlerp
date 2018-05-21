@@ -59,7 +59,7 @@
 							<td><?= h('#'.str_pad($receipt->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
 							<td align="right"><?= h($this->Number->format($receipt->receipt_rows[0]->total_cr-$receipt->receipt_rows[0]->total_dr,[ 'places' => 2])) ?></td>
 							<td class="actions">
-							<?php if(in_array($receipt->created_by,$allowed_emp)){  ?>
+							<?php //if(in_array($receipt->created_by,$allowed_emp)){  ?>
 								<?php 
 								if(in_array(96,$allowed_pages)){
 								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $receipt->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
@@ -68,7 +68,7 @@
 								if(in_array(95,$allowed_pages)){
 								  echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $receipt->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 								}	 ?>
-							<?php 	}	 ?>
+							<?php 	//}	 ?>
 							</td>
 						</tr>
 						<?php endforeach; ?>

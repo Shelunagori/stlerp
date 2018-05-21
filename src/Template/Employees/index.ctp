@@ -30,7 +30,10 @@
 					<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 				</div>
 				</form>
+
 		<div class="table-scrollable">
+				<?php $page_no=$this->Paginator->current('Employees'); $page_no=($page_no-1)*20; ?>
+
 			 <table class="table table-hover">
 				 <thead>
 					<tr>
@@ -46,7 +49,7 @@
 				<tbody>
 					<?php $i=0; foreach ($employees as $employee): $i++; ?>
 					<tr>
-						<td><?= h($i) ?></td>
+						<td><?= h(++$page_no) ?></td>
 						<td><?= h($employee->name) ?></td>
 						<td><?= h($employee->sex) ?></td>
 						<td><?= h($employee->department->name) ?></td>

@@ -143,7 +143,7 @@ class AppController extends Controller
 				$children = $this->EmployeeHierarchies
 				->find('children', ['for' =>$employees_data->id])
 				->toArray();
-			//	pr($employees_data->id); 
+				//pr($employees_data->id); exit;
 				//pr($children); exit;
 				if($children){ //exit;
 					$allowed_emp=array();
@@ -199,6 +199,7 @@ class AppController extends Controller
 		
 			$coreVariable = [
 				'st_company_id' =>$session->read('st_company_id'),
+				'st_year_id' =>$session->read('st_year_id'),
 			];
 			
 			$this->coreVariable = $coreVariable;

@@ -6359,23 +6359,16 @@ class InvoicesController extends AppController
 		$cc_mail=[];
 		$cc_mail[]=$invoice->creator->email;
 		$cc_mail[]=$invoice->customer->employee->email;
-		//$cc_mail[]="harkawat.priyanka0@gmail.com";
-		//$cc_mail[]="priyankajinger143@gmail.com";
-		////pr($email_to);
 		
-		//pr($message_web); exit;
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="harkawat.priyanka0@gmail.com";
-		$member_name="Gopal";
 		
-		 	$email->from(['dispatch@mogragroup.com' => $from_name])
+		 	/* $email->from(['dispatch@mogragroup.com' => $from_name])
 					->to($email_to)
 					->cc($cc_mail)
 					->replyTo('dispatch@mogragroup.com')
 					->subject($sub)
 					->template('notice_send_email')
 					->emailFormat('html')
-					->viewVars(['content'=>$message_web,'member_name'=>$member_name])
+					->viewVars(['content'=>$message_web])
 					->attachments($attachments);
 					$email->send($message_web);
 					//pr($message_web); exit;
@@ -6383,7 +6376,32 @@ class InvoicesController extends AppController
 				$SendEmail = $this->Invoices->SendEmails->newEntity();	
 				$SendEmail->send_data=$message_web1;
 				$SendEmail->invoice_id=$id;
-				$this->Invoices->SendEmails->save($SendEmail); 
+				$this->Invoices->SendEmails->save($SendEmail); */ 
+				if(!empty($email_to)){		
+					try { 
+							$email->from(['dispatch@mogragroup.com' => $from_name])
+							->to($email_to)
+							->cc($cc_mail)
+							->replyTo('dispatch@mogragroup.com')
+							->subject($sub)
+							->template('notice_send_email')
+							->emailFormat('html')
+							->viewVars(['content'=>$message_web])
+							->attachments($attachments);
+					} catch (Exception $e) {
+							echo 'Exception : ',  $e->getMessage(), "\n";
+						} 
+					if($email->send()){
+						$this->Invoices->SendEmails->deleteAll(['invoice_id' => $id]);
+						$SendEmail = $this->Invoices->SendEmails->newEntity();	
+						$SendEmail->send_data=$message_web1;
+						$SendEmail->invoice_id=$id;
+						$this->Invoices->SendEmails->save($SendEmail);
+					}else{
+						$this->Flash->error(__('The Mail has not been Sent.'));
+						return $this->redirect(['action' => 'GstConfirm/'.$id]);
+					}	
+				}
 		//$this->Flash->success(__('The Mail has been Sent.'));
 		return $this->redirect(['action' => 'GstConfirm/'.$id]);
 		
