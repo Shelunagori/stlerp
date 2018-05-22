@@ -413,15 +413,21 @@ class EmployeeSalariesController extends AppController
 								$salary->year=$year;
 								$this->EmployeeSalaries->Salaries->save($salary);
 								
-								$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
+								/* $NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
 								$NppaymentRow->nppayment_id=$Nppayment->id;
 								$NppaymentRow->received_from_id=$esd->ledger_account_id;
 								$NppaymentRow->amount=@$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
 								$NppaymentRow->cr_dr=ucfirst($esd->cr_dr);
 								$NppaymentRow->narration='';
-								$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
+								$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow); */
 								
-								$ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
+								if(ucfirst($esd->cr_dr)=="Cr"){
+									@$ledgerPosting[$esd->ledger_account_id]['credit']+= @$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+								}else{
+									@$ledgerPosting[$esd->ledger_account_id]['debit']+= @$EmployeeAttendance->present_day*@$dt1->amount/$total_day;
+								}
+								
+								/* $ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
 								$ledger->company_id=$st_company_id;
 								$ledger->ledger_account_id = $esd->ledger_account_id;
 								if($NppaymentRow->cr_dr=="Cr"){
@@ -436,7 +442,7 @@ class EmployeeSalariesController extends AppController
 								$ledger->voucher_id = $Nppayment->id;
 								$ledger->voucher_source = 'Non Print Payment Voucher';
 								$ledger->transaction_date = $Nppayment->transaction_date;
-								$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
+								$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger); */
 						
 						
 							}
@@ -454,15 +460,21 @@ class EmployeeSalariesController extends AppController
 								$salary->year=$year;
 								$this->EmployeeSalaries->Salaries->save($salary);
 								
-								$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
+								/* $NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
 								$NppaymentRow->nppayment_id=$Nppayment->id;
 								$NppaymentRow->received_from_id=$esd->ledger_account_id;//load ledger
 								$NppaymentRow->amount=$dt1->amount;
 								$NppaymentRow->cr_dr=ucfirst($esd->cr_dr);
 								$NppaymentRow->narration='';
-								$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
+								$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow); */
 								
-								$ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
+								if($NppaymentRow->cr_dr=="Cr"){
+									@$ledgerPosting[$esd->ledger_account_id]['credit']+= $dt1->amount;
+								}else{
+									@$ledgerPosting[$esd->ledger_account_id]['debit']+= $dt1->amount;
+								}
+								
+								/* $ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
 								$ledger->company_id=$st_company_id;
 								$ledger->ledger_account_id = $esd->ledger_account_id;
 								if($NppaymentRow->cr_dr=="Cr"){
@@ -477,7 +489,7 @@ class EmployeeSalariesController extends AppController
 								$ledger->voucher_id = $Nppayment->id;
 								$ledger->voucher_source = 'Non Print Payment Voucher';
 								$ledger->transaction_date = $Nppayment->transaction_date;
-								$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
+								$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger); */
 							}
 							
 						}
@@ -486,6 +498,40 @@ class EmployeeSalariesController extends AppController
 						}
 						
 						
+					}
+					foreach($ledgerPosting as $ledgerAccId=>$ledgerPostingRow){
+						$r=@$ledgerPostingRow['debit']-@$ledgerPostingRow['credit'];
+						
+						
+						$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
+						$NppaymentRow->nppayment_id=$Nppayment->id;
+						$NppaymentRow->received_from_id=$ledgerAccId;
+						$NppaymentRow->amount=$r;
+						if($r>0){
+							$NppaymentRow->cr_dr='Dr';
+						}else if($r<0){
+							$NppaymentRow->cr_dr='Cr';
+						}
+						$NppaymentRow->narration='';
+						$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
+								
+								
+						$ledger = $this->EmployeeSalaries->Nppayments->Ledgers->newEntity();
+						$ledger->company_id=$st_company_id;
+						$ledger->ledger_account_id = $ledgerAccId;
+						if($r>0){
+							$ledger->credit = 0;
+							$ledger->debit = $r;
+							$total_dr=$total_dr+$r;
+						}else if($r<0){
+							$ledger->credit = abs($r);
+							$ledger->debit = 0;
+							$total_cr=$total_cr+abs($r);
+						}
+						$ledger->voucher_id = $Nppayment->id;
+						$ledger->voucher_source = 'Non Print Payment Voucher';
+						$ledger->transaction_date = $Nppayment->transaction_date;
+						$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
 					}
 				}
 						$ledger_account=$this->EmployeeSalaries->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$dt->id,'company_id'=>$st_company_id])->first();
