@@ -9,18 +9,12 @@
 		</tr>
 		
 		<tr>
-			<td width="50%" valign="top" align="left">
-				<?php echo $PurchaseOrders->vendor->company_name; ?>
-			</td>
-		</tr>
-		<tr>
-			<td width="50%" valign="top" align="left">
-			<?= $this->Text->autoParagraph(h($PurchaseOrders->vendor->address)) ?>
 			
+			<td >
+				<?php echo $PurchaseOrders->vendor->company_name; ?>
+				<?php echo $this->Text->autoParagraph($PurchaseOrders->vendor->address); ?>
 			</td>
 		</tr>
-		
-		
 		<tr>
 			<td>Dear Sir,<?php echo "<br/>"; ?> </td> 
 		</tr>
@@ -36,7 +30,7 @@
 			<td>
 					<table border="1" width="80%">
 						<tr>
-								<th>S. No.</th>
+								<th>S.No.</th>
 								<th>Our PO No.</th>
 								<th>PO Date</th>
 								<th>Delivery Date</th>
@@ -44,14 +38,13 @@
 								
 						</tr>
 						<?php $i=1; foreach($po_no as $key=>$po_no){  
-						$due_date=date('Y-m-d', strtotime(@$po_date[$key]. ' +'. $payment_terms .'days'));
+						
 						?>
 							<?php if($due_day[$key] >= 0){ ?>
 							<tr>
-								<td width="15%"><?php echo $i++; ?></td>
-								<td>
-								<?php echo $this->Html->link($po_no,[
-							'controller'=>'PurchaseOrders','action' => 'confirm',$key],array('target'=>'_blank')); ?>
+								<td width="5%" style="text-align:center;"><?php echo $i++; ?></td>
+								<td style="text-align:center;">
+								<a href="<?php echo $url.'/'.base64_encode($key); ?>"><?php echo $po_no; ?></a>
 								</td>
 								<td  width="20%"  align="center"><?php echo $po_date[$key]; ?></td>
 								<td  width="20%"  align="center"><?php echo $delevery_date[$key]; ?></td>

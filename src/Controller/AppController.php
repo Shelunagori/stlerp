@@ -44,7 +44,7 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
 		$this->loadComponent('Csrf');
-		
+		//$this->loadComponent('Auth');
 		date_default_timezone_set('Asia/Kolkata');
 		
 		$session = $this->request->session();

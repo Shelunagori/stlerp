@@ -6,7 +6,7 @@ use Cake\Mailer\Email;
 use Cake\View\Helper\TextHelper;
 use Cake\View\Helper\NumberHelper;
 use Cake\View\Helper\HtmlHelper;
-
+use Cake\Routing\Router;
 /**
  * PurchaseOrders Controller
  *
@@ -748,6 +748,48 @@ class PurchaseOrdersController extends AppController
         $this->set('id', $id);
     }
 	
+	public function pdfForMail($ids = null){
+		$id = base64_decode($ids);
+		$this->viewBuilder()->layout('');
+         $purchaseOrder = $this->PurchaseOrders->get($id, [
+            'contain' => ['Companies','Vendors','PurchaseOrderRows'=> ['Items'=>['Units']],'Transporters','Creator']
+			]);
+		//pr($purchaseOrder); exit;
+        $this->set('purchaseOrder', $purchaseOrder);
+        $this->set('_serialize', ['purchaseOrder']);
+	}
+	
+	public function confirmForMail($ids = null)
+    {
+		$id = base64_decode($ids);
+		$this->viewBuilder()->layout('pdf_layout');
+			$purchaseOrder = $this->PurchaseOrders->get($id, [
+            'contain' => ['PurchaseOrderRows']
+			]);
+		
+		
+			if ($this->request->is(['patch', 'post', 'put'])) {
+				if(!empty($this->request->data['pdf_font_size'])){
+				$pdf_font_size=$this->request->data['pdf_font_size'];
+				$query = $this->PurchaseOrders->query();
+					$query->update()
+						->set(['pdf_font_size' => $pdf_font_size])
+						->where(['id' => $id])
+						->execute();
+			}
+			if(!empty($this->request->data['purchase_order_rows'])){
+				foreach($this->request->data['purchase_order_rows'] as $purchase_order_rows_id=>$value){
+					$purchaseOrderRow=$this->PurchaseOrders->PurchaseOrderRows->get($purchase_order_rows_id);
+					$purchaseOrderRow->height=$value["height"];
+					$this->PurchaseOrders->PurchaseOrderRows->save($purchaseOrderRow);
+				}
+			}
+			return $this->redirect(['action' => 'confirmForMail/'.$id]);
+        }
+		$this->set(compact('purchaseOrder','id'));
+        $this->set('id', $id);
+    }
+	
 	public function customerFromFilename($filename=null){
 		$this->viewBuilder()->layout('');
 		$filename=explode('-',$filename);
@@ -781,11 +823,11 @@ class PurchaseOrdersController extends AppController
 		
 		$email = new Email('default');
 		$email->transport('gmail');
-		//$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
-		//$cc_mail=$PurchaseOrders->creator->email;
+		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
+		$cc_mail=$PurchaseOrders->creator->email;
 		
-		$email_to="dimpaljain892@gmail.com";
-		$cc_mail="dimpaljain892@gmail.com";
+		//$email_to="dimpaljain892@gmail.com";
+		//$cc_mail="dimpaljain892@gmail.com";
 		$url = Router::Url(['controller' => 'PurchaseOrders', 'action' => 'confirmForMail'], true);
 		$delevery_date=[]; $po_no=[]; $due_day=[];
 		foreach($totalPo as $data){
@@ -796,7 +838,7 @@ class PurchaseOrdersController extends AppController
 			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->delivery_date));
 			//pr($Po); exit;
 		}
-		pr($url); exit;
+		//pr($url); exit;
 		//$email_to="gopalkrishanp3@gmail.com";
 		//$cc_mail="gopal@phppoets.in";
 		$from_name=$company_data->alias;
