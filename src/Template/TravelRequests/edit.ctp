@@ -118,13 +118,13 @@ border:none;
 					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (From)</label>
-							<?php echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_from_date)),'data-date-start-date' => date("d-m-Y")]); ?>
+							<?php echo $this->Form->input('travel_mode_from_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_from_date))]); ?>
 						</div>
 					</div>
 					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Date of Travel (To)</label>
-							<?php echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_to_date)),'data-date-start-date' => date("d-m-Y")]); ?>
+							<?php echo $this->Form->input('travel_mode_to_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','value'=>date('d-m-Y',strtotime($travelRequest->travel_mode_to_date))]); ?>
 						</div>
 					</div>
 				</div>

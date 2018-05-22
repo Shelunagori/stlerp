@@ -174,6 +174,13 @@ class EmployeesController extends AppController
 					$voucherLedgerAccount->vouchers_reference_id =$VouchersReferences->id;
 					$voucherLedgerAccount->ledger_account_id =$ledgerAccount->id;
 					$this->Employees->VoucherLedgerAccounts->save($voucherLedgerAccount);
+					
+					//
+					$VouchersReferences = $this->Employees->VouchersReferences->find()->where(['company_id'=>$data->id,'voucher_entity'=>'Non Print PaymentVoucher -> Paid To'])->first();
+					$voucherLedgerAccount = $this->Employees->VoucherLedgerAccounts->newEntity();
+					$voucherLedgerAccount->vouchers_reference_id =$VouchersReferences->id;
+					$voucherLedgerAccount->ledger_account_id =$ledgerAccount->id;
+					$this->Employees->VoucherLedgerAccounts->save($voucherLedgerAccount);
 				
                 }
 

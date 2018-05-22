@@ -14,10 +14,12 @@
 				<span style='color:white'>Addition</span>
 			</td>
 			<?php $q=sizeof($EmployeeSalaryDeduction->toArray()); ?>
+			<?php if($q>0){ ?>
 			<td style="background-color:red;" align="center" colspan=
 				<?php echo $q; ?>>
 				<span style='color:white'>Deduction</span>
 			</td>
+			<?php } ?>
 			<td rowspan="2">Loan Amount</td>
 			<td rowspan="2">Other</td>
 			<td rowspan="2">Net.Salary</td>

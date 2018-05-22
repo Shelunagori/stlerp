@@ -58,7 +58,7 @@
         <?php endif; ?>
     </div>
 	<form method="post">
-		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text','data-date-start-date' => date("d-m-Y")]); ?>
+		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
 		<select name="bank_id">
 			<?php foreach($bankCashes as $bank_id=>$bankName){
 				echo '<option value="'.$bank_id.'">'.$bankName.'</option>';
