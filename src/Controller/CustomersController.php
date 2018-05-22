@@ -1196,11 +1196,12 @@ class CustomersController extends AppController
 		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
 		$this->set('_serialize', ['LedgerAccounts']);
 	}
-	public function sendMail($id = null){
+	public function sendMail($id = null,$amount=null){ 
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$id=$this->request->query('id');
 		$amount=$this->request->query('amount');
+		$CompanyBanks=$this->Customers->CompanyBanks->find()->where(['company_id'=>$st_company_id,'default_bank'=>1])->first();
 		$customerData=$this->Customers->LedgerAccounts->get($id);
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->Customers->Employees->get($s_employee_id,[
@@ -1208,7 +1209,7 @@ class CustomersController extends AppController
 		$cust_info=$this->Customers->get($customerData->source_id,[
 			'contain'=>['CustomerContacts','CustomerAddress','Employees']
 		]);
-		//pr($cust_info->employee); exit;
+		//pr($CompanyBanks); exit;
 		$to_date=date('Y-m-d');
 		$message_web=$this->findInvoice($id,$to_date);
 		$DueReferenceBalances=$message_web[0];
@@ -1218,18 +1219,20 @@ class CustomersController extends AppController
 		$Voucher_data=$message_web[4];
 		$invoicePO=$message_web[5];
 	
-		//pr($cust_info); exit;
+		//pr($DueReferenceBalances); exit;
 		$customerAdd=$cust_info->customer_address[0]->address;
+		$customerSalesManNames=$cust_info->employee->name;
+		$customerSalesManMobile=$cust_info->employee->mobile;
 		$email = new Email('default');
 		$email->transport('gmail');
 		$company_data=$this->Customers->Companies->get($st_company_id);
 		$from_name=$company_data->alias;
-		$email_to=$cust_info->customer_contacts[0]->email;
-		$cc_mail=$cust_info->employee->email;
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
-		$sub="Payment reminder ";
-		$member_name="Gopal";
+		//$email_to=$cust_info->customer_contacts[0]->email;
+		//$cc_mail=$cust_info->employee->email;
+		$email_to="dimpaljain892@gmail.com";
+$cc_mail="dimpaljain892@gmail.com";
+		$sub="STL - Payment Reminder ";
+		//$member_name="Gopal";
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])
 					->to($email_to)
 					->cc($cc_mail)
@@ -1237,7 +1240,7 @@ class CustomersController extends AppController
 					->subject($sub)
 					->template('send_payment_reminder')
 					->emailFormat('html')
-					->viewVars(['ReferenceBalances'=>$ReferenceBalances,'DueReferenceBalances'=>$DueReferenceBalances,'member_name'=>$member_name,'company'=>$company_data->name,'address'=>$customerAdd,'customer_data'=>$cust_info,'refInvoiceNo'=>$refInvoiceNo,'Voucher_data'=>$Voucher_data,'invoicePO'=>$invoicePO,'Invoice_data'=>$Invoice_data,'salesmaninfo'=>$cust_info->employee]);
+					->viewVars(['ReferenceBalances'=>$ReferenceBalances,'DueReferenceBalances'=>$DueReferenceBalances,'company'=>$company_data->name,'address'=>$customerAdd,'customer_data'=>$cust_info,'refInvoiceNo'=>$refInvoiceNo,'Voucher_data'=>$Voucher_data,'invoicePO'=>$invoicePO,'Invoice_data'=>$Invoice_data,'customerSalesManNames'=>$customerSalesManNames,'customerSalesManMobile'=>$customerSalesManMobile,'CompanyBanks'=>$CompanyBanks]);
 					$email->send();
 		
 	}

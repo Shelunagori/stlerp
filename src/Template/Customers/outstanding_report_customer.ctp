@@ -188,7 +188,7 @@ $('.send_mail').die().live("click",function() {
 	
 	var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'sendMail']); ?>";
 	url=url+'?id='+ledger_id+'&amount='+amt;
-	alert(url);
+	
 	$.ajax({
 		url: url,
 		type: "GET",

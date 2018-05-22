@@ -1085,6 +1085,7 @@ select
 <script>
 	$(document).ready(function() { 
 	setInterval(function(){  abc(); }, 5000);
+	setInterval(function(){  abc1();}, 2000);
 	
 	 function abc(){
 		var old_company= $('input[name="company_id"]').val();
@@ -1093,12 +1094,33 @@ select
 				url: url,
 				type: 'GET',
 				dataType: 'json'
-			}).done(function(response) { alert(response);
-					
+			}).done(function(response) { 
+				if(old_company == response){
+					}else{
+						var a="<?php echo $this->Url->build(['controller'=>'Logins','action'=>'dashbord']); ?>";
+						alert("You have switch Company, Go to Dashboard !");
+						window.location=a;
+					}
 			});
 		}
 		////
 		//setInterval(function(){  checkFYSession(); }, 5000);
+		function abc1(){
+			var year_id= $('input[name="year_id"]').val();
+			var url="<?php echo $this->Url->build(['controller'=>'Logins','action'=>'checkFySession']); ?>";
+				$.ajax({
+					url: url,
+					type: 'GET',
+					dataType: 'json'
+				}).done(function(response1) { 
+						if(year_id == response1){
+					}else{
+						var a1="<?php echo $this->Url->build(['controller'=>'Logins','action'=>'dashbord']); ?>";
+						alert("You have switch Financial Year, Go to Dashboard !");
+						window.location=a1;
+					}
+				});
+		}
 	});
 	
 	

@@ -781,25 +781,26 @@ class PurchaseOrdersController extends AppController
 		
 		$email = new Email('default');
 		$email->transport('gmail');
-		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
-		$cc_mail=$PurchaseOrders->creator->email;
+		//$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
+		//$cc_mail=$PurchaseOrders->creator->email;
 		
-
-		
+		$email_to="dimpaljain892@gmail.com";
+		$cc_mail="dimpaljain892@gmail.com";
+		$url = Router::Url(['controller' => 'PurchaseOrders', 'action' => 'confirmForMail'], true);
 		$delevery_date=[]; $po_no=[]; $due_day=[];
 		foreach($totalPo as $data){
 			$purchaseOrder = $this->PurchaseOrders->get($data);
 			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->delivery_date));
+			$po_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->date_created));
 			$po_no[$purchaseOrder->id]= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4));
 			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->delivery_date));
 			//pr($Po); exit;
 		}
-		
+		pr($url); exit;
 		//$email_to="gopalkrishanp3@gmail.com";
 		//$cc_mail="gopal@phppoets.in";
-		$member_name="Gopal";
 		$from_name=$company_data->alias;
-		$sub="Purchase order delivery reminder ";
+		$sub="STL-Purchase Order Delivery Reminder";
 		
 		//pr($due_day);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
@@ -809,7 +810,7 @@ class PurchaseOrdersController extends AppController
 		->subject($sub)
 		->template('send_purchase_order')
 		->emailFormat('html')
-		->viewVars(['PurchaseOrders'=>$PurchaseOrders,'company'=>$company_data->name,'due_day'=>$due_day,'delevery_date'=>$delevery_date,'po_no'=>$po_no]);  
+		->viewVars(['PurchaseOrders'=>$PurchaseOrders,'company'=>$company_data->name,'due_day'=>$due_day,'delevery_date'=>$delevery_date,'po_no'=>$po_no,'po_date'=>$po_date,'url'=>$url]);  
 		$email->send();
 		echo "Email Send successfully ";
 		exit;

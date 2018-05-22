@@ -132,6 +132,7 @@ class CustomersTable extends Table
 		$this->belongsTo('Ledgers');
 		$this->belongsTo('VoucherLedgerAccounts');
 		$this->belongsTo('VouchersReferences');
+		$this->belongsTo('CompanyBanks');
 		
 		$this->belongsTo('Receipts');
 		$this->belongsTo('Payments'); 
