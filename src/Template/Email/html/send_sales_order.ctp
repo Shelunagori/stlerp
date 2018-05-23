@@ -1,6 +1,6 @@
 <table width="100%" style="font-family:Palatino Linotype;" >
 		<tr>
-			<td align="left" style="font-size: 28px;font-weight: bold;color: #0685a8;"><?php echo $salesOrder->company->name ?>
+			<td align="left" style="font-size: 30px;font-weight: bold;color: #0685a8;"><?php echo $salesOrder->company->name ?>
 			</td>
 		</tr>
 		<tr>

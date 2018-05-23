@@ -1,7 +1,7 @@
 
 <table width="100%" style="font-family:Palatino Linotype;">
 		<tr>
-			<td  align="left" style="font-size: 28px;font-weight: bold;color:#000000;"><?php echo $company ?>
+			<td  align="left" style="font-size: 30px;font-weight: bold;color:#000000;"><?php echo $company ?>
 			</td>
 		</tr>
 		<tr>

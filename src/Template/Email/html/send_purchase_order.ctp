@@ -81,18 +81,15 @@
 			</td>
 		</tr>
 		<tr>
+		<td>Email - purchase@mogragroup.com</td>
+		</tr>
+		<tr>
+			<td>Tel - 8696029999 </td>
+		</tr>
+		<tr>
 		<td>
 			</td>
 		</tr>
-		<tr>
-			<td>8696029999 </td>
-		</tr>
-		<tr>
-		<td>
-			</td>
-		</tr>
-		<tr>
-		<td>purchase@mogragroup.com</td>
-		</tr>
+		
 		
 </table>
