@@ -1,18 +1,17 @@
 <table width="100%" style="font-family:Palatino Linotype;">
 		<tr>
-			<td  align="left" style="font-size: 28px;font-weight: bold;color:#000000;"><?php echo $company ?>
+			<td  align="left" style="font-size: 30px;font-weight: bold;color:#000000;"><?php echo $company ?>
 			</td>
 		</tr>
 		<tr>
 			<td>
+				<?php echo $PurchaseOrders->vendor->company_name; ?>
 			</td>
 		</tr>
 		
 		<tr>
-			
 			<td >
-				<?php echo $PurchaseOrders->vendor->company_name; ?>
-				<?php echo $this->Text->autoParagraph($PurchaseOrders->vendor->address); ?>
+				<?php echo $PurchaseOrders->vendor->address; ?>
 			</td>
 		</tr>
 		<tr>
@@ -80,6 +79,20 @@
 		<tr>
 			<td>Purchase Executive
 			</td>
+		</tr>
+		<tr>
+		<td>
+			</td>
+		</tr>
+		<tr>
+			<td>8696029999 </td>
+		</tr>
+		<tr>
+		<td>
+			</td>
+		</tr>
+		<tr>
+		<td>purchase@mogragroup.com</td>
 		</tr>
 		
 </table>

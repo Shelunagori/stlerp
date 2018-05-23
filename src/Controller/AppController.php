@@ -56,7 +56,11 @@ class AppController extends Controller
 		
 		$controller = $this->request->params['controller'];
 		$action = $this->request->params['action']; 
-		if (in_array($controller, ['Logins']) and in_array($action, ['index','generateOtp'])) {
+		//if (in_array($controller, ['Logins','PurchaseOrders']) and in_array($action, ['index','generateOtp','confirmForMail','pdfForMail'])) {
+		
+		if(in_array($controller, ['PurchaseOrders']) and in_array($action, ['confirmForMail','pdfForMail']))
+		{}
+		else if (in_array($controller, ['Logins']) and in_array($action, ['index','generateOtp']) ) {
 		}else{
 			$st_login_id = $session->read('st_login_id');
 			$st_company_id = $session->read('st_company_id');
