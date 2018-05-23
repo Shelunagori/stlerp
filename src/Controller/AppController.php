@@ -89,6 +89,7 @@ class AppController extends Controller
 				if($st_year_id){
 					$this->loadModel('FinancialYears');
 					$sessionYears=$this->FinancialYears->get($st_year_id);
+					
 					$this->set('s_year_from',date("Y",strtotime($sessionYears->date_from)));
 					$this->set('s_year_to',date("Y",strtotime($sessionYears->date_to)));
 				}

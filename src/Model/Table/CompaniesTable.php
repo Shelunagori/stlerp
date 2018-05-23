@@ -39,6 +39,7 @@ class CompaniesTable extends Table
 		$this->belongsTo('CompanyGroups', [
             'foreignKey' => 'company_group_id',
         ]);
+		
 
         $this->hasMany('ItemUsedByCompanies', [
             'foreignKey' => 'company_id'

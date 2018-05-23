@@ -230,13 +230,17 @@ class PaymentsController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		
+		$session = $this->request->session();
+		$st_year_id = $session->read('st_year_id');
         $payment = $this->Payments->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes','FinancialYears'=>['Companies'],'Companies', 'PaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		$petty_cash_voucher_row_data=[];
 		$petty_cash_grn_data=[];
 		$petty_cash_invoice_data=[];
 		$aval=0;
+		//pr($payment);exit;
 		foreach($payment->payment_rows as $petty_cash_voucher_row){
 			if(!empty($petty_cash_voucher_row->grn_ids)){
 			$petty_cash_voucher_row_data = explode(',',trim(@$petty_cash_voucher_row->grn_ids,','));
@@ -268,7 +272,7 @@ class PaymentsController extends AppController
 		}
 		
 		
-		$this->set(compact('ref_details','petty_cash_invoice_data','petty_cash_grn_data','aval'));
+		$this->set(compact('ref_details','petty_cash_invoice_data','petty_cash_grn_data','aval','st_year_id'));
         $this->set('payment', $payment);
         $this->set('_serialize', ['payment']);
     }
