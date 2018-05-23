@@ -25,16 +25,25 @@
 		<?php if(sizeof(@$Employees)>0){
 			$division=[];
 			$allDivisions=[];
+			$salary_type=[];
 			$Loan=[];
 			$Others=[];
 			foreach($Employees as $Employee){
 				foreach($Employee->salaries as $salarie){
-					$allDivisions[$salarie->employee_salary_division_id]=$salarie->employee_salary_division->name;
+					$allDivisions[$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->name;
+					$salary_type[$Employee->id][$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->salary_type;
 					$division[$Employee->id][$salarie->employee_salary_division_id]=$salarie->amount;
 					$Loan[$Employee->id]=$salarie->loan_amount;
-					$Others[$Employee->id]=$salarie->other_amount;
+					if($salarie->other_amount!=0){
+						$Others[$Employee->id]=$salarie->other_amount;
+						
+					}
 				}
 			}
+			//pr($allDivisions);
+			//pr($salary_type);
+			//pr($division); 
+			//exit;
 			?>
 			<button type="button" onclick="window.print()" class="hide_at_print">Print</button>
 			<table class="table table-condensed table-hover">
@@ -45,17 +54,36 @@
 					} ?>
 					<th>Loan installment</th>
 					<th>Others amount</th>
+					<th>Total</th>
 				</tr>
-				<?php foreach($Employees as $Employee){ ?>
+				<?php $total_sal=[];  $total_loan=0; $total_other=0; foreach($Employees as $Employee){ ?>
 				<tr>
 					<td><?php echo $Employee->name; ?></td>
-					<?php foreach($allDivisions as $DivisionId=>$DivisionName){
+					<?php $total_add=0; $total_ded=0; foreach($allDivisions as $DivisionId=>$DivisionName){
+						
 						echo '<td>'.@$division[$Employee->id][$DivisionId].'</td>';
+						//pr($salary_type[$Employee->id][$DivisionId]);
+						 if(@$salary_type[$Employee->id][$DivisionId]=="addition"){
+							@$total_add+=@$division[$Employee->id][$DivisionId];
+						}else  if(@$salary_type[$Employee->id][$DivisionId]=="deduction"){
+							@$total_ded+=@$division[$Employee->id][$DivisionId];
+						} 
+						//pr($total_add);
+						//pr($total_ded);
+						//@$total_sal[@$DivisionId]+=@$division[$Employee->id][$DivisionId];
 					} ?>
-					<td><?php echo @$Loan[$Employee->id]; ?></td>
-					<td><?php echo @$Others[$Employee->id]; ?></td>
+					<td><?php echo @$Loan[$Employee->id]; $total_loan+=@$Loan[$Employee->id];?></td>
+					<td><?php echo @$Others[$Employee->id]; $total_other+=@$Others[$Employee->id];?></td>
+					<?php $p=@$total_add-@$total_ded-@$Loan[$Employee->id];
+						$q=$p-@$Others[$Employee->id]; 
+						//if(@$Others[$Employee->id])
+					?>
+					
+					<td><?php echo @$q; ?></td>
+					
 				</tr>
 				<?php } ?>
+				
 			</table>
 		<?php }else{
 			echo 'Salary not submited.';

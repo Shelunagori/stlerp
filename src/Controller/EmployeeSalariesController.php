@@ -144,7 +144,10 @@ class EmployeeSalariesController extends AppController
 				->where(['Ledgers.ledger_account_id'=>@$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>@$st_company_id])->first();
 				$dr =$query->toArray()[0]['totalDebit'];
 				$cr =$query->toArray()[0]['totalCredit']; 
-				$other_amount[@$dt->id]=round($dr-$cr,2);
+				
+				$SalaryExist=$this->EmployeeSalaries->Salaries->find()->where(['company_id'=>$st_company_id,'month'=>$month,'year'=>$year,'employee_id'=>@$dt->id])->first();
+				
+				$other_amount[@$dt->id]=round(@$SalaryExist->other_amount,2);
 		
 		} 
 //pr($other_amount); exit;
@@ -314,7 +317,7 @@ class EmployeeSalariesController extends AppController
 			
 			
 			
-			if(@$other_amounts[$dt->id]>0){
+			if(@$other_amounts[$dt->id]<0){
 				$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
 				$NppaymentRow->nppayment_id=$Nppayment->id;
 				$NppaymentRow->received_from_id=$LedgerAccount->id;//ledger account  of emp
@@ -335,7 +338,7 @@ class EmployeeSalariesController extends AppController
 				$ledger->transaction_date = $Nppayment->transaction_date;
 				$this->EmployeeSalaries->Nppayments->Ledgers->save($ledger);
 					
-			}else if(@$other_amounts[$dt->id]<0){
+			}else if(@$other_amounts[$dt->id]>0){
 				$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
 				$NppaymentRow->nppayment_id=$Nppayment->id;
 				$NppaymentRow->received_from_id=$LedgerAccount->id;//ledger account  of emp
@@ -532,7 +535,7 @@ class EmployeeSalariesController extends AppController
 						}else if($r<0){
 							$NppaymentRow->cr_dr='Cr';
 						}
-						$NppaymentRow->narration='';
+						$NppaymentRow->narration='Salary of '.$month.'-'.$year.' for Employee: '.$dt->name; 
 						if($r!=0){
 							$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
 						}
@@ -733,7 +736,7 @@ class EmployeeSalariesController extends AppController
 			$month_year=explode('-',$month_year);
 			$Employees=$this->EmployeeSalaries->Employees->find()
 			->contain(['Salaries'=>function($q) use($month_year, $st_company_id){
-				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1],'Salaries.company_id'=>$st_company_id])->contain(['EmployeeSalaryDivisions']);
+				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1],'Salaries.company_id'=>$st_company_id])->contain(['EmpSalDivs']);
 			}])
 			->matching(
 					'Salaries', function ($q) use($month_year, $st_company_id) {
