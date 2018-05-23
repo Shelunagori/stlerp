@@ -1,17 +1,32 @@
+<html>
+<head>
+<style>
+td > p { margin-top : 0px;  }
+p { margin-top : 0px;  }
+</style>
+</head>
+<body>
+
 <table width="100%" style="font-family:Palatino Linotype;">
 		<tr>
 			<td  align="left" style="font-size: 30px;font-weight: bold;color:#000000;"><?php echo $company ?>
 			</td>
 		</tr>
+		<tr><td></td></tr>
 		<tr>
 			<td>
-				<?php echo $PurchaseOrders->vendor->company_name; ?>
+				<?php 
+					  $cname = $PurchaseOrders->vendor->company_name;	?>
+				<?php echo $cname; ?>
 			</td>
 		</tr>
-		
 		<tr>
-			<td >
-				<?php echo $PurchaseOrders->vendor->address; ?>
+			<td>
+			
+				<?php $add = $this->Text->autoParagraph($PurchaseOrders->vendor->address);
+						echo $add;
+				?>
+			
 			</td>
 		</tr>
 		<tr>
@@ -60,7 +75,7 @@
 		</tr>
 		
 		<tr>
-			<td> We are in immediate requirement of the material.In case you have any further delay please write back to us.<?php echo "<br/>"; ?>
+			<td> We are in immediate requirement of the material. In case you have any further delay please write back to us.<?php echo "<br/>"; ?>
 			</td>
 		</tr>
 		<tr>
@@ -93,3 +108,9 @@
 		
 		
 </table>
+
+
+</body>
+
+
+</html>

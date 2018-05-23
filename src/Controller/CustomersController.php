@@ -1227,10 +1227,10 @@ class CustomersController extends AppController
 		$email->transport('gmail');
 		$company_data=$this->Customers->Companies->get($st_company_id);
 		$from_name=$company_data->alias;
-		//$email_to=$cust_info->customer_contacts[0]->email;
-		//$cc_mail=$cust_info->employee->email;
-		$email_to="dimpaljain892@gmail.com";
-$cc_mail="dimpaljain892@gmail.com";
+		$email_to=$cust_info->customer_contacts[0]->email;
+		$cc_mail=$cust_info->employee->email;
+		//$email_to="dimpaljain892@gmail.com";
+		//$cc_mail="dimpaljain892@gmail.com";
 		$sub="STL - Payment Reminder ";
 		//$member_name="Gopal";
 		 	$email->from(['dispatch@mogragroup.com' => $from_name])

@@ -1,4 +1,11 @@
-
+<html>
+<head>
+<style>
+td > p { margin-top : 0px;  }
+p { margin-top : 0px;  }
+</style>
+</head>
+<body>
 <table width="100%" style="font-family:Palatino Linotype;">
 		<tr>
 			<td  align="left" style="font-size: 30px;font-weight: bold;color:#000000;"><?php echo $company ?>
@@ -14,13 +21,15 @@
 		</tr>
 		
 		<tr>
-			<td width="50%" valign="top" align="left"  style="word-wrap: break-word;">
-			<?php echo $address; ?>
+			<td>
+			
+				<?php $add = $this->Text->autoParagraph($address);
+						echo $add;
+				?>
+			
 			</td>
 		</tr>
-		<tr>
-			<td></td>
-		</tr>
+		
 		<tr>
 			<td>Dear Sir,<?php echo "<br/>"; ?> </td> 
 		</tr>
@@ -173,7 +182,13 @@
 			</td>
 		</tr>
 		<tr>
-			<td>8696029999</td>
+			<td>Tel - 8696029999</td>
 		</tr>
 		
 </table>
+
+
+</body>
+
+
+</html>

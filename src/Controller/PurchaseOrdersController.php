@@ -823,11 +823,11 @@ class PurchaseOrdersController extends AppController
 		
 		$email = new Email('default');
 		$email->transport('gmail');
-		//$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
-		//$cc_mail=$PurchaseOrders->creator->email;
+		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
+		$cc_mail=$PurchaseOrders->creator->email;
 		
-		$email_to="dimpaljain892@gmail.com";
-		$cc_mail="dimpaljain892@gmail.com";
+		//$email_to="dimpaljain892@gmail.com";
+		//$cc_mail="dimpaljain892@gmail.com";
 		$url = Router::Url(['controller' => 'PurchaseOrders', 'action' => 'confirmForMail'], true);
 		$delevery_date=[]; $po_no=[]; $due_day=[];
 		foreach($totalPo as $data){
