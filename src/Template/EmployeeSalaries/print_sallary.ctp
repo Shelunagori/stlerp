@@ -30,13 +30,14 @@
 			$Others=[];
 			foreach($Employees as $Employee){
 				foreach($Employee->salaries as $salarie){
-					$allDivisions[$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->name;
-					$salary_type[$Employee->id][$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->salary_type;
-					$division[$Employee->id][$salarie->employee_salary_division_id]=$salarie->amount;
-					$Loan[$Employee->id]=$salarie->loan_amount;
-					if($salarie->other_amount!=0){
-						$Others[$Employee->id]=$salarie->other_amount;
-						
+					if(@$salarie->emp_sal_div->company_id==$st_company_id){
+						$allDivisions[$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->name;
+						$salary_type[$Employee->id][$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->salary_type;
+						$division[$Employee->id][$salarie->employee_salary_division_id]=$salarie->amount;
+						$Loan[$Employee->id]=$salarie->loan_amount;
+						if($salarie->other_amount!=0){
+							$Others[$Employee->id]=$salarie->other_amount;
+						}
 					}
 				}
 			}
@@ -56,34 +57,34 @@
 					<th>Others amount</th>
 					<th>Total</th>
 				</tr>
-				<?php $total_sal=[];  $total_loan=0; $total_other=0; foreach($Employees as $Employee){ ?>
+				<?php $grand_total=0; $total_sal=[];  $total_loan=0; $total_other=0; foreach($Employees as $Employee){ ?>
 				<tr>
 					<td><?php echo $Employee->name; ?></td>
-					<?php $total_add=0; $total_ded=0; foreach($allDivisions as $DivisionId=>$DivisionName){
+					<?php $total_add=0; $total_ded=0; 
+					$colspan=0;
+					foreach($allDivisions as $DivisionId=>$DivisionName){
+						$colspan++;
 						
-						echo '<td>'.@$division[$Employee->id][$DivisionId].'</td>';
-						//pr($salary_type[$Employee->id][$DivisionId]);
+						echo '<td align="right">'.round(@$division[$Employee->id][$DivisionId]).'</td>';
 						 if(@$salary_type[$Employee->id][$DivisionId]=="addition"){
-							@$total_add+=@$division[$Employee->id][$DivisionId];
+							@$total_add+=round(@$division[$Employee->id][$DivisionId]);
 						}else  if(@$salary_type[$Employee->id][$DivisionId]=="deduction"){
-							@$total_ded+=@$division[$Employee->id][$DivisionId];
+							@$total_ded+=round(@$division[$Employee->id][$DivisionId]);
 						} 
-						//pr($total_add);
-						//pr($total_ded);
-						//@$total_sal[@$DivisionId]+=@$division[$Employee->id][$DivisionId];
 					} ?>
-					<td><?php echo @$Loan[$Employee->id]; $total_loan+=@$Loan[$Employee->id];?></td>
-					<td><?php echo @$Others[$Employee->id]; $total_other+=@$Others[$Employee->id];?></td>
+					<td align="right"><?php echo @$Loan[$Employee->id]; $total_loan+=@$Loan[$Employee->id];?></td>
+					<td align="right"><?php echo @$Others[$Employee->id]; $total_other+=@$Others[$Employee->id];?></td>
 					<?php $p=@$total_add-@$total_ded-@$Loan[$Employee->id];
 						$q=$p-@$Others[$Employee->id]; 
-						//if(@$Others[$Employee->id])
+						$grand_total+=round($q);
 					?>
-					
-					<td><?php echo @$q; ?></td>
-					
+					<td align="right"><?php echo round(@$q); ?></td>
 				</tr>
 				<?php } ?>
-				
+				<tr>
+					<td colspan="<?php echo $colspan+3; ?>" align="right"><b>Grand Total</b></td>
+					<td align="right"><b><?php echo $grand_total; ?></b></td>
+				</tr>
 			</table>
 		<?php }else{
 			echo 'Salary not submited.';

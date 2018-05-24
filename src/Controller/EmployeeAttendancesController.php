@@ -191,7 +191,7 @@ class EmployeeAttendancesController extends AppController
         $employeeAttendance = $this->EmployeeAttendances->newEntity();
         if ($this->request->is('post')) {
 			$f=explode('-',$this->request->data['From']);
-			$this->EmployeeAttendances->deleteAll(['month' => $f[0], 'year' => $f[1]]);
+			$this->EmployeeAttendances->deleteAll(['month' => $f[0], 'year' => $f[1], 'company_id'=>$st_company_id]);
 			
             $employeeAttendance = $this->EmployeeAttendances->patchEntity($employeeAttendance, $this->request->data);
 			$employeeAttendance->effective_date_from='01-'.$employeeAttendance->From;
@@ -211,6 +211,7 @@ class EmployeeAttendancesController extends AppController
 				$employeeAtten->financial_year_id = $financial_year->id;
 				$employeeAtten->total_month_day = $total_day;
 				$employeeAtten->no_of_leave = $total_day-$data['present_day'];
+				$employeeAtten->company_id = $st_company_id;
 				$this->EmployeeAttendances->save($employeeAtten);
 			}
 				$this->Flash->success(__('The employee attendance has been saved.'));

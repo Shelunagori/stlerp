@@ -235,7 +235,7 @@ class EmployeeSalariesController extends AppController
 			}
 			
 			
-			$this->EmployeeSalaries->Salaries->deleteAll(['month' => $month, 'year' => $year]);
+			$this->EmployeeSalaries->Salaries->deleteAll(['month' => $month, 'year' => $year, 'company_id'=>$st_company_id]);
 			
 			
 			foreach($other_amounts as $key=>$value){
@@ -746,5 +746,6 @@ class EmployeeSalariesController extends AppController
 			->group(['Employees.id'])->toArray();
 			$this->set(compact('Employees'));
 		}
+		$this->set(compact('st_company_id'));
 	}
 }
