@@ -147,9 +147,14 @@ class EmployeeSalariesController extends AppController
 				
 				$SalaryExist=$this->EmployeeSalaries->Salaries->find()->where(['company_id'=>$st_company_id,'month'=>$month,'year'=>$year,'employee_id'=>@$dt->id])->first();
 				
-				$other_amount[@$dt->id]=round(@$SalaryExist->other_amount,2);
+				if($SalaryExist){
+					$other_amount[@$dt->id]=round(@$SalaryExist->other_amount,2);
+				}else{
+					
+					$other_amount[@$dt->id]=round((@$dr-@$cr),2);
+				}
 		
-		} 
+		}   
 //pr($other_amount); exit;
 
 
@@ -331,7 +336,7 @@ class EmployeeSalariesController extends AppController
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $LedgerAccount->id;
 				$ledger->credit = 0;
-				$ledger->debit = abs($other_amounts[$dt->id]);
+				$ledger->debit =abs($other_amounts[$dt->id]);
 				$total_dr=$total_dr+$other_amounts[$dt->id];
 				$ledger->voucher_id = $Nppayment->id;
 				$ledger->voucher_source = 'Non Print Payment Voucher';
