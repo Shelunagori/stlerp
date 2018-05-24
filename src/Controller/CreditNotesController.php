@@ -384,12 +384,15 @@ class CreditNotesController extends AppController
 						'contain'=>['Districts']]);
 				$bankCashes[$bankCashesData->id]=['value'=>$bankCashesData->id,'text'=>$merge,'bill_to_bill_account'=>$bankCashesData->bill_to_bill_account,'state_id'=>$Customers->district->state_id];
 			}else if($bankCashesData->source_model=="Vendors"){	
-			$bankCashes[$bankCashesData->id]=['value'=>$bankCashesData->id,'text'=>$merge,'bill_to_bill_account'=>$bankCashesData->bill_to_bill_account,'state_id'=>"8"];
-			}
+			$Vendors = $this->CreditNotes->Vendors->get($bankCashesData->source_id,[
+						'contain'=>['Districts']]);
+						
+			$bankCashes[$bankCashesData->id]=['value'=>$bankCashesData->id,'text'=>$merge,'bill_to_bill_account'=>$bankCashesData->bill_to_bill_account,'state_id'=>@$Vendors->district->state_id];
+			} 
 			
 			//$bankCashes[$bankCashesData->id]=['value'=>$bankCashesData->id,'text'=>$merge,'bill_to_bill_account'=>$bankCashesData->bill_to_bill_account];
 			
-		}
+		} //pr($bankCashes);exit;
 			//pr($bankCashes); exit;
 			
 		$vr=$this->CreditNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();  

@@ -43,7 +43,8 @@ class InvoicesTable extends Table
 		$this->belongsTo('ItemLedgers');
 		$this->belongsTo('Ledgers');
 		$this->hasMany('ReferenceDetails', [
-            'foreignKey' => 'invoice_id'
+            'foreignKey' => 'invoice_id',
+			'saveStrategy' => 'replace'
         ]);
         $this->belongsTo('Customers', [
             'foreignKey' => 'customer_id',
