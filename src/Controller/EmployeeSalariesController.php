@@ -321,7 +321,7 @@ class EmployeeSalariesController extends AppController
 				$NppaymentRow=$this->EmployeeSalaries->Nppayments->NppaymentRows->newEntity();
 				$NppaymentRow->nppayment_id=$Nppayment->id;
 				$NppaymentRow->received_from_id=$LedgerAccount->id;//ledger account  of emp
-				$NppaymentRow->amount=$other_amounts[$dt->id];
+				$NppaymentRow->amount=abs($other_amounts[$dt->id]);
 				$NppaymentRow->cr_dr='Dr';
 				$NppaymentRow->narration='Other amount';
 				$this->EmployeeSalaries->Nppayments->NppaymentRows->save($NppaymentRow);
@@ -331,7 +331,7 @@ class EmployeeSalariesController extends AppController
 				$ledger->company_id=$st_company_id;
 				$ledger->ledger_account_id = $LedgerAccount->id;
 				$ledger->credit = 0;
-				$ledger->debit = $other_amounts[$dt->id];
+				$ledger->debit = abs($other_amounts[$dt->id]);
 				$total_dr=$total_dr+$other_amounts[$dt->id];
 				$ledger->voucher_id = $Nppayment->id;
 				$ledger->voucher_source = 'Non Print Payment Voucher';

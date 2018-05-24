@@ -53,7 +53,7 @@
 				<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
 			</td>
 			<td>
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$EmployeeAtten[@$data->id],2)]); ?>
+				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$EmployeeAtten[@$data->id])]); ?>
 				
 			</td>
 			<td>
@@ -63,30 +63,30 @@
 			foreach($EmployeeSalaryAddition as $data2){ 
 				$dr_amt+=@$emp_sallary_division[@$data->id][@$data2->id];?>
 				<td align="right" salary_div="<?php echo @$data2->id;?>">
-					<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data2->id],2)]); ?>
+					<?php echo $this->Form->input('sales_order_rows.'.$q.'.quotation_row_id', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data2->id])]); ?>
 				</td>
 			<?php }  ?>
 			<?php  
 			foreach($EmployeeSalaryDeduction as $data4){  
 				$cr_amt+=@$emp_sallary_division[@$data->id][@$data4->id];?>
 				<td align="right" salary_div="<?php echo @$data4->id;?>">
-					<?php echo $this->Form->input('amount_of_loan', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data4->id],2)]); ?>
+					<?php echo $this->Form->input('amount_of_loan', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$emp_sallary_division[@$data->id][@$data4->id])]); ?>
 				</td>
 			<?php }  ?>
 			<td align="right">
-				<?php echo $this->Form->input('loan_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id],2)]); 
-				echo $this->Form->input('loan_app['.$data->id.']', ['class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$data->id]]); 
-				$loan_amt=round(@$loan_amount[@$data->id],2);?>
+				<?php echo $this->Form->input('loan_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$loan_amount[@$data->id])]); 
+				echo $this->Form->input('loan_app['.$data->id.']', ['style'=>'text-align:right;','class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$data->id]]); 
+				$loan_amt=round(@$loan_amount[@$data->id]);?>
 				<a href="#" class="hold">Hold</a>
 			</td>
 			<td align="right">
 				<?php  $total_row=@$other_amount[@$data->id]; ?>
-				<?php echo $this->Form->input('other_amount['.$data->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
+				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); ?>
 			</td>
 			<td align="right">
-				<?php echo $this->Form->input('net_amount', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>(@$dr_amt-$cr_amt)-$total_row-$loan_amt,'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
+				<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((@$dr_amt-$cr_amt)-$total_row-$loan_amt),'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
 			</td>
-			<?php $total+=(@$dr_amt-$cr_amt)-$total_row-$loan_amt; ?>
+			<?php $total+=round((@$dr_amt-$cr_amt)-$total_row-$loan_amt); ?>
 		</tr>
 		<?php $i++; }  $r+=$p+$q+1;?>
 		<tr>
@@ -96,13 +96,13 @@
 			</td>
 			<td align="right" colspan="">
 				<b id="tot">
-					<?= h($this->Number->format(@$total,[ 'places' => 2])) ?>
+					<?= h($this->Number->format(@$total)) ?>
 				</b>
 			</td>
 		</tr>
 	</tbody>
 </table>
-<input type="text" name="trans_date"   value="<?php echo date('d-m-Y'); ?>" data-date-format="d-m-Y" >
+<input type="text" name="trans_date" class="date-picker" data-date-format='dd-mm-yyyy' value="<?php echo date('d-m-Y'); ?>" data-date-format="d-m-Y" >
 <select name="bank_id">
 	<?php foreach($bankCashes->toArray() as $bank_id=>$bank_name){
 		echo '<option value="'.$bank_id.'">'.$bank_name.'</option>';
@@ -132,7 +132,7 @@ $(document).ready(function() {
 			$(this).text('undo');
 			$(this).attr('undo','1');
 			var net_amount=parseFloat($(this).closest('tr').find('input[name="net_amount"]').val());
-			$(this).closest('tr').find('input[name="net_amount"]').val(round(net_amount+am,2));
+			$(this).closest('tr').find('input[name="net_amount"]').val(round(net_amount+am));
 		}
 		totalColumn();
 	});
@@ -152,7 +152,7 @@ $(document).ready(function() {
 		var ths=$(this);
 		var net_amount=$(this).closest('tr').find('.net_amount').attr('net');
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
-		var amount_after_other=round(net_amount-other_amt,2);
+		var amount_after_other=round(net_amount-other_amt);
 		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
 		totalColumn();
 	});
@@ -161,7 +161,7 @@ $(document).ready(function() {
 		var t=0;
 		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){
 			var net_amount=parseFloat($(this).find('input.net_amount').val());
-			t=round(t+net_amount,2);
+			t=round(t+net_amount);
 			$('#tot').html('<b>'+t+'</b>');
 		});
 	}
