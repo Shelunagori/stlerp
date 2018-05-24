@@ -71,8 +71,10 @@ class SalaryAdvancesController extends AppController
 		
 		if ($this->request->is('post')) {
 			$bank_id=$this->request->data()['bank_id'];
+			$amount=$this->request->data()['amount'];
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$salaryAdvance->status="approve";
+			$salaryAdvance->amount=$amount;
 			$this->SalaryAdvances->save($salaryAdvance);
 			
 			
@@ -206,6 +208,7 @@ class SalaryAdvancesController extends AppController
             $salaryAdvance = $this->SalaryAdvances->patchEntity($salaryAdvance, $this->request->data);
             $salaryAdvance->create_date =date('Y-m-d');
 			$salaryAdvance->company_id=$st_company_id;
+			//pr($salaryAdvance); exit;
             if ($this->SalaryAdvances->save($salaryAdvance)) {
                 $this->Flash->success(__('The salary advance has been saved.'));
 
@@ -219,11 +222,14 @@ class SalaryAdvancesController extends AppController
 		$From=date('Y-m-d',strtotime($From));
 		$EmployeeSalary = $this->SalaryAdvances->EmployeeSalaries->find()->where(['employee_id'=>$s_employee_id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'=>['EmployeeSalaryDivisions']])->order(['id'=>'DESC'])->first(); 
 		$empSallary=0;
-		foreach(@$EmployeeSalary->employee_salary_rows as $data){
+		if($EmployeeSalary){
+			foreach(@$EmployeeSalary->employee_salary_rows as $data){
 				if($data->employee_salary_division->salary_type=='addition'){
 					$empSallary+=$data->amount;
 				}
+			}
 		}
+		
 		
 		$EmployeeLoan = $this->SalaryAdvances->LoanApplications->find()->where(['employee_id'=>$s_employee_id])->contain(['LoanInstallments' => function ($q) {
 					$q->select(['LoanInstallments.loan_application_id','LoanInstallments.id','total_loan_amt' => $q->func()->sum('LoanInstallments.amount')]);

@@ -31,20 +31,19 @@
 			foreach($Employees as $Employee){
 				foreach($Employee->salaries as $salarie){
 					if(@$salarie->emp_sal_div->company_id==$st_company_id){
+					
 						$allDivisions[$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->name;
 						$salary_type[$Employee->id][$salarie->employee_salary_division_id]=@$salarie->emp_sal_div->salary_type;
 						$division[$Employee->id][$salarie->employee_salary_division_id]=$salarie->amount;
-						$Loan[$Employee->id]=$salarie->loan_amount;
-						if($salarie->other_amount!=0){
-							$Others[$Employee->id]=$salarie->other_amount;
-						}
+						
 					}
+					$Loan[$Employee->id]=$salarie->loan_amount;
+					@$Others[$Employee->id]=@$Others[$Employee->id]+$salarie->other_amount;
 				}
 			}
 			//pr($allDivisions);
 			//pr($salary_type);
-			//pr($division); 
-			//exit;
+			
 			?>
 			<button type="button" onclick="window.print()" class="hide_at_print">Print</button>
 			<table class="table table-condensed table-hover">

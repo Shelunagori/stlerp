@@ -74,10 +74,11 @@ class EmployeeSalariesController extends AppController
 			$month=date("m",$time);
 			$year=date("Y",$time);
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+			$c=$year.'-'.$month.'-'.$total_day;
 		} 
 		
 		//$employees = $this->EmployeeSalaries->Employees->find()->where(['status'=>'0','id !='=>23]); 
-		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])->where(['join_date <='=>$c])
 		->contain(['EmployeeCompanies'])
 			->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
