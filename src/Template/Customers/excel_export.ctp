@@ -35,10 +35,10 @@
 			<tr>
 				<td><?php echo $i; ?></td>
 				<td><?php if(!empty($customer->alias)){ echo $customer->customer_name.'('; echo $customer->alias.')'; }else{ echo $customer->customer_name; } ?></td>
-				<td><?php echo $customer->district->district; ?></td>
-				<td><?php echo $customer->customer_contacts[0]->mobile; ?></td>
-				<td><?php echo $customer->customer_contacts[0]->email; ?></td>
-				<td><?php echo $customer->employee->name; ?></td>
+				<td><?php echo @$customer->district->district; ?></td>
+				<td><?php echo @$customer->customer_contacts[0]->mobile; ?></td>
+				<td><?php echo @$customer->customer_contacts[0]->email; ?></td>
+				<td><?php echo @$customer->employee->name; ?></td>
 			</tr>
 			<?php $i++; }  ?>
 		</tbody>

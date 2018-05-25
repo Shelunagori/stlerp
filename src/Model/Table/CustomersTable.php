@@ -44,7 +44,7 @@ class CustomersTable extends Table
 		
         $this->belongsTo('Districts', [
             'foreignKey' => 'district_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
         $this->belongsTo('CompanyGroups', [
             'foreignKey' => 'company_group_id',
@@ -56,11 +56,11 @@ class CustomersTable extends Table
         ]);
         $this->belongsTo('CustomerSegs', [
             'foreignKey' => 'customer_seg_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
 		$this->belongsTo('Employees', [
             'foreignKey' => 'employee_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
 		$this->belongsTo('Transporters', [
             'foreignKey' => 'transporter_id',
@@ -68,7 +68,8 @@ class CustomersTable extends Table
         ]);
         $this->hasMany('CustomerContacts', [
             'foreignKey' => 'customer_id',
-			'saveStrategy' => 'replace'
+			'saveStrategy' => 'replace',
+            'joinType' => 'LEFT'
         ]);
         $this->hasMany('Quotations', [
             'foreignKey' => 'customer_id'
