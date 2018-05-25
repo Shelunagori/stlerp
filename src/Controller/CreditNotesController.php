@@ -178,7 +178,7 @@ class CreditNotesController extends AppController
 			}
 			
 			$creditNote->voucher_no=$voucher_no1;
-			
+			//pr($creditNote);exit;
            if ($this->CreditNotes->save($creditNote)) {
 				if($creditNote->cr_dr=="Dr"){
 				$ledger = $this->CreditNotes->Ledgers->newEntity();
@@ -539,19 +539,21 @@ class CreditNotesController extends AppController
 				$ledger->company_id = $st_company_id; 
 				$ledger->transaction_date = $creditNote->transaction_date;
 				$this->CreditNotes->Ledgers->save($ledger); 
-				
-				foreach($creditNote->ref_rows as $ref_row){ 
-					$ReferenceDetail = $this->CreditNotes->ReferenceDetails->newEntity();
-					$ReferenceDetail->ledger_account_id = $creditNote->customer_suppiler_id;
-					$ReferenceDetail->company_id=$st_company_id;
-					$ReferenceDetail->reference_type=$ref_row['ref_type'];
-					$ReferenceDetail->reference_no=$ref_row['ref_no'];
-					$ReferenceDetail->debit = $ref_row['ref_amount'];
-					$ReferenceDetail->credit = 0;
-					$ReferenceDetail->credit_note_id = $creditNote->id;
-					$ReferenceDetail->transaction_date = $creditNote->transaction_date;
-					$this->CreditNotes->ReferenceDetails->save($ReferenceDetail); 
+				if(!empty($creditNote->ref_rows)){
+						foreach($creditNote->ref_rows as $ref_row){ 
+						$ReferenceDetail = $this->CreditNotes->ReferenceDetails->newEntity();
+						$ReferenceDetail->ledger_account_id = $creditNote->customer_suppiler_id;
+						$ReferenceDetail->company_id=$st_company_id;
+						$ReferenceDetail->reference_type=$ref_row['ref_type'];
+						$ReferenceDetail->reference_no=$ref_row['ref_no'];
+						$ReferenceDetail->debit = $ref_row['ref_amount'];
+						$ReferenceDetail->credit = 0;
+						$ReferenceDetail->credit_note_id = $creditNote->id;
+						$ReferenceDetail->transaction_date = $creditNote->transaction_date;
+						$this->CreditNotes->ReferenceDetails->save($ReferenceDetail); 
+					}
 				}
+				
 				
 				foreach($creditNote->credit_notes_rows as $credit_notes_row){
 					$ledger = $this->CreditNotes->Ledgers->newEntity();

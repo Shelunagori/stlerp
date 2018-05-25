@@ -171,11 +171,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 								<td ><?php echo $this->Form->input('amount', ['label' => false,'class' => 'form-control input-sm total_amount','placeholder'=>'Amount','readonly','value'=>$credit_notes_row->total_amount]); ?></td>
 								<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 							</tr>
-							<tr class="main_tr1 preimp">
-									<td  colspan="9" class="main"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration','placeholder'=>'Narration','required','value'=>$credit_notes_row->narration]); ?></td>
-								
-								<td></td>
-							</tr>
+							
+							<tr class="main_tr1 preimp" >
+							<td colspan="9" class="main">
+							<div class="note-editable" id="summer" ><?php echo $credit_notes_row->narration; ?></div>
+							<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+							</td>
+							<td></td>
+						</tr>
 						<?php } ?>	
 						</tbody>
 						<tfoot>
@@ -297,7 +300,8 @@ $(document).ready(function() {
 			}
 		},
 
-		invalidHandler: function (event, validator) { //display error alert on form submit   
+		invalidHandler: function (event, validator) { //display error alert on form submit  
+			put_code_description();		
 			success3.hide();
 			error3.show();
 		},
@@ -320,7 +324,7 @@ $(document).ready(function() {
 		submitHandler: function (form) {
 			$('#submitbtn').prop('disabled', true);
 			$('#submitbtn').text('Submitting.....');
-			
+			put_code_description();
 			success3.show();
 			error3.hide();
 			form[0].submit(); // submit the form
@@ -354,7 +358,14 @@ $(document).ready(function() {
 		});
 		rename_rows();
 	}
-	
+	function put_code_description(){
+		var i=0;
+			$("#main_table tbody#main_tbody tr.main_tr1").each(function(){
+			var code=$(this).find('div#summer').code();
+			$(this).find('td:nth-child(1) textarea').val(code);
+		i++; });
+		
+	}
 	function rename_rows(){  
 		var i=0; 
 		$("#main_table tbody#main_tbody tr.main_tr").each(function(){
@@ -396,7 +407,13 @@ $(document).ready(function() {
 		});
 		var i=0;
 		$("#main_table tbody#main_tbody tr.main_tr1").each(function(){
-			$(this).find(".narration").attr({name:"credit_notes_rows["+i+"][narration]", id:"credit_notes_rows-"+i+"-narration"}).rules("add", "required");
+			var htm=$(this).find('td:nth-child(1)').find('div.note-editable').html();
+			if(!htm){ htm=""; }
+			$(this).find('td:nth-child(1)').html('');
+			$(this).find('td:nth-child(1)').append('<div id=summer>'+htm+'</div>');
+			$(this).find('td:nth-child(1)').find('div#summer').summernote();
+			$(this).find('td.main:nth-child(1)').append('<textarea name="credit_notes_rows['+i+'][narration]" style="display:none;"></textarea>');
+			
 			$(this).find("td:eq(0) .row_id").val(i);
 			i++;
 		});
@@ -664,12 +681,12 @@ $('.ref_list').live("change",function() {
 			<td><a class="btn btn-xs btn-default deleterow" href="#" role="button"><i class="fa fa-times"></i></a></td>
 		</tr>
 		<tr class="main_tr1 preimp">
-				<td  colspan="9" class="main"><?php echo $this->Form->input('narration', ['type'=>'textarea','label' => false,'class' => 'form-control input-sm narration','placeholder'=>'Narration','required']); ?>
-				<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
-				</td>
-			
-				<td colspan="1" class=""></td>
-		</tr>
+						<td colspan="9" class="main">
+							<div class="note-editable" id="summer" ></div>
+							<?php echo $this->Form->input('row_id', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm row_id']); ?>
+						</td>
+							<td colspan="1" class=""></td>
+					</tr>
 		
 	</tbody>
 	
