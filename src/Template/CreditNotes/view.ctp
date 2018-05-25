@@ -58,11 +58,15 @@ margin-bottom: 0;
 					<tr>
 						<?php  ?>
 						<td><?= h($creditNotes->head->name.'('.$creditNotes->head->alias.')') ?>
+						<?php if($creditNotes->head->source_model=="Customers"){ ?>
 						<?= $this->Text->autoParagraph(h($partyData->customer_address[0]->address)) ?>
+						<?php }else{?>
+							<?= $this->Text->autoParagraph(h($partyData->address)) ?>
+						<?php }?>
 						</td>
 					</tr>
 					<tr>
-						<td><b>PAN No :</b> <?= h($partyData->pan_no)  ?> <b>. GST No :</b><?= h($partyData->gst_no) ?></td>
+						<td><b>PAN No :</b> <?= h($partyData->pan_no)  ?> <b>.   GST No :</b><?= h($partyData->gst_no) ?></td>
 						
 					</tr>
 					
@@ -73,13 +77,8 @@ margin-bottom: 0;
 					<tr>
 						<td>Voucher No</td>
 						<td width="20" align="center">:</td>
-						<?php 
-							$s_year_from = date("Y",strtotime($creditNotes->financial_year->date_from));
-							$s_year_to = date("Y",strtotime($creditNotes->financial_year->date_to));
-							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
-						?>
-						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$fy) ?></td>
-						
+						<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
+						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$FY) ?></td>
 					</tr>
 					
 					<tr>
@@ -133,7 +132,7 @@ margin-bottom: 0;
 		<?php $i=1; $total_cr=0; $total_dr=0; foreach ($creditNotes->credit_notes_rows as $credit_notes_row): ?>
 		<tr>
 			<td><?php echo $i++; ?></td>
-			<td  style="text-align: left;"><?= $this->Text->autoParagraph(h($credit_notes_row->narration)) ?></td>
+			<td  style="text-align: left;"><?php echo $credit_notes_row->narration ?></td>
 			<td align="right"><?= h($this->Number->format($credit_notes_row->amount,[ 'places' => 2])) ?> </td>
 			<?php if($creditNotes->igst_total_amount==0){ ?>
 			<td align="center"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>

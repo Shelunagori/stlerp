@@ -69,8 +69,7 @@ class CreditNotesController extends AppController
             'contain' => ['CustomerAddress']]);
 
 		}else if($creditNotes->head->source_model=="Vendors"){
-			$partyData = $this->CreditNotes->Vendors->get($creditNotes->head->source_id, [
-            'contain' => ['']]);
+			$partyData = $this->CreditNotes->Vendors->get($creditNotes->head->source_id);
 			//pr($partyData); exit;
 		}
 //spr($creditNotes->financial_year->date_from); exit;
