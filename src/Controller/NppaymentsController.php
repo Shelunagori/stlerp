@@ -283,7 +283,7 @@ class NppaymentsController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $nppayment = $this->Nppayments->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'NppaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes','FinancialYears'=>['Companies'], 'Companies', 'NppaymentRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		
 		$petty_cash_voucher_row_data=[];

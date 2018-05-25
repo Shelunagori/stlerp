@@ -168,7 +168,7 @@ class InvoiceBookingsController extends AppController
 					}
 				);
 			$Items = $this->InvoiceBookings->InvoiceBookingRows->Items->find('list')->order(['Items.name' => 'ASC']);
-		//pr($invoiceBookings->toArray());exit;
+		pr($invoiceBookings->toArray());exit;
         $this->set(compact('invoiceBookings','status','purchase_return','url','vendor','Items'));
       
     }

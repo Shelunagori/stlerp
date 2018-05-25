@@ -50,7 +50,11 @@ margin-bottom: 0;
                         <td>Voucher No</td>
                         <td width="20" align="center">:</td>
 						<?php $voucher=('#'.str_pad($nppayment->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
-						<?php $fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); ?>
+						<?php 
+							$s_year_from = date("Y",strtotime($nppayment->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($nppayment->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+						?>
 						<td><?= h($voucher.'/'.$fy) ?></td>
                     </tr>
                 </table>

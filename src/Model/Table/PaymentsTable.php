@@ -38,7 +38,6 @@ class PaymentsTable extends Table
         $this->primaryKey('id');
 		$this->belongsTo('FinancialYears');
 		$this->belongsTo('VouchersReferences');
-        $this->belongsTo('FinancialYears');
         $this->belongsTo('FinancialMonths');
         $this->belongsTo('ReferenceBalances');
         $this->belongsTo('ReferenceDetails');

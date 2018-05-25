@@ -396,7 +396,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Permanent Address</label>
-						<?php echo $this->Form->input('permanent_address', ['label' => false,'placeholder'=>'Permanent Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
+						<?php echo $this->Form->input('permanent_address2', ['label' => false,'placeholder'=>'Permanent Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
 					</div>
 				</div>
 			</div>

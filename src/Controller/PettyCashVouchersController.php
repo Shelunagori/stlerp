@@ -205,7 +205,7 @@ class PettyCashVouchersController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $pettycashvoucher = $this->PettyCashVouchers->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'PettyCashVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes','FinancialYears'=>['Companies'], 'Companies', 'PettyCashVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		
 		$petty_cash_voucher_row_data=[];

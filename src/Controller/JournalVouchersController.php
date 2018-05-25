@@ -167,7 +167,7 @@ class JournalVouchersController extends AppController
 		
 		$this->viewBuilder()->layout('index_layout');
         $journalVoucher = $this->JournalVouchers->get($id, [
-            'contain' => ['Companies','JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator']
+            'contain' => ['Companies','FinancialYears'=>['Companies'],'JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator']
         ]);
 		
 		$journalVoucher_row_data=[];

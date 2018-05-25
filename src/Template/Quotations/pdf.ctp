@@ -103,9 +103,13 @@ $html = '
 				<img src="'.ROOT . DS  . 'webroot' . DS  .'img/quotation/antico.png" class="img-height" />
 				<br/>Non Metallic Pumps
 			</td>
-			<td width="25%">
-				<img src="'.ROOT . DS  . 'webroot' . DS  .'img/quotation/darling_pump.png" class="img-height" />
+			<td width="35%">
+				<img src="'.ROOT . DS  . 'webroot' . DS  .'img/quotation/darling_pump.png" class="img-height"  />
 				<br/>Submersible Pumps
+			</td>
+			<td width="25%">
+				<img src="'.ROOT . DS  . 'webroot' . DS  .'img/quotation/SPX_bolting.png" class="img-height"/>
+				<br/>SPX Bolting
 			</td>
 			<td width="33%">
 				<img src="'.ROOT . DS  . 'webroot' . DS  .'img/quotation/allweler.png" class="img-height"  />

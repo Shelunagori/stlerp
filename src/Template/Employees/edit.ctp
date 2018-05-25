@@ -2,7 +2,7 @@
 	<div class="portlet-title">
 		<div class="caption" >
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">ADD EMPLOYEE</span>
+			<span class="caption-subject font-blue-steel uppercase">Update EMPLOYEE</span>
 		</div>
 	</div>
 	<div class="portlet-body form">
@@ -227,7 +227,7 @@
 					</div>
 					<div class="col-md-4">
 						<div class="form-group">
-							<label class="control-label">Signature <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">Signature </label>
 							<div><?php echo $this->Html->image('/signatures/'.$employee->signature, ['height' => '50px']); ?></div>
 							<?php echo $this->Form->input('signature', ['type' => 'file','label' => false]);?>
 							<span class="help-block">Upload transparent Signature of size 420 x 165 </span>
@@ -380,7 +380,7 @@
 				<div class="col-md-4">
 					<div class="form-group">
 						<label class="control-label  label-css">Permanent Address</label>
-						<?php echo $this->Form->input('permanent_address', ['label' => false,'placeholder'=>'Permanent Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
+						<?php echo $this->Form->textarea('permanent_address2', ['label' => false,'placeholder'=>'Permanent Address','class'=>'form-control input-sm','type'=>'textarea','rows'=>2]); ?>
 					</div>
 				</div>
 			</div>
@@ -622,9 +622,7 @@ $(document).ready(function() {
 			email:{
 				required: true,
 			},
-			signature:{
-				required: true,
-			},
+			
 			designation_id:{
 				required: true,
 			},

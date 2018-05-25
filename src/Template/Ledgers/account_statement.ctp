@@ -301,11 +301,12 @@ $url_excel="/?".$url;
 					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
-				}else if($ledger->voucher_source=="Credit Note"){
-					$Receipt=$url_link[$ledger->id];
-					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
-					$url_path="/credit-notes/view/".$ledger->voucher_id;
-					if(in_array($Receipt->created_by,$allowed_emp)){
+				}else if($ledger->voucher_source=="Credit Notes"){
+					//pr($ledger['id']);exit;
+					$Receipt=@$url_link[@$ledger->id];
+					$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+					$url_path="/credit-notes/view/".@$ledger->voucher_id;
+					if(in_array(@$Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
 				}else if($ledger->voucher_source=="Purchase Return"){

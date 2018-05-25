@@ -78,10 +78,11 @@
 							<th width="5%">Sr. No.</th>
 							<th width="10%">Invoice Booked On</th>
 							<th width="15%">Invoice Booking No.</th>
+							<th width="10%">PO No.</th>
 							<th width="10%">Invoice No.</th>
 							<th width="10%">Supplier Name</th>
+							<th width="10%" style="text-align:right;">PO Amount</th>
 							<th width="10%" style="text-align:right;">Amount</th>
-							<th width="10%" style="text-align:right;">Total Amount</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -96,10 +97,11 @@
 							<?php echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4, [
 							'controller'=>'InvoiceBookings','action' => 'view', $invoiceBooking->id],array('target'=>'_blank')); ?>
 							<?php  } ?></td>
+							<td><?= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4)) ?></td>
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td	 style="text-align:right;"><?= h($this->Number->format($invoiceBooking->taxable_value,['places'=>2])) ?></td>
-							<td  style="text-align:right;"><?= h($this->Number->format($invoiceBooking->total,['places'=>2])) ?></td>
+							<td  style="text-align:right;"><?= h($this->Number->format($invoiceBooking->grn->purchase_order->total,['places'=>2])) ?></td>
 						</tr>
 							<?php endforeach; ?>
 						<tr>

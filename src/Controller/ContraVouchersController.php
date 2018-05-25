@@ -227,7 +227,7 @@ class ContraVouchersController extends AppController
     {
         $this->viewBuilder()->layout('index_layout');
         $contravoucher = $this->ContraVouchers->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'ContraVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes','FinancialYears'=>['Companies'], 'Companies', 'ContraVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		//pr($contravoucher);exit;
 		$ref_bal=[];

@@ -270,7 +270,7 @@ class ReceiptsController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $receipt = $this->Receipts->get($id, [
-            'contain' => ['BankCashes', 'Companies', 'ReceiptRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
+            'contain' => ['BankCashes','FinancialYears'=>['Companies'], 'Companies', 'ReceiptRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
 		
 		
