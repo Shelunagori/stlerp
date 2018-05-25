@@ -382,20 +382,16 @@ $html.='
 	<tbody>
 			<tr>
 				<td  width="75%">
-					<b style="font-size:13px;"><u>Our Bank Details</u></b>
+					
 					<table width="100%" class="table2">
 						<tr>
-							<td width="" style="white-space: nowrap;">Bank Name</td>
-							<td  style="white-space: nowrap;">: '.h($SaleReturn->company->company_banks[0]->bank_name).'</td>
-							<td  >Branch</td>
-							<td style="white-space: nowrap;">: '.h($SaleReturn->company->company_banks[0]->branch).'</td>
+							<td valign="top" width="18%">Amount in words</td>
+							<td  valign="top"> '. h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text).'</td>
 						</tr>
 						
 						<tr>
-							<td  style="white-space: nowrap;">Account No</td>
-							<td style="white-space: nowrap;">: '.h($SaleReturn->company->company_banks[0]->account_no).'</td>
-							<td >IFSC Code</td>
-							<td  style="white-space: nowrap;">: '.h($SaleReturn->company->company_banks[0]->ifsc_code).'</td>
+							<td valign="top" width="18%">Additional Note</td>
+							<td  valign="top" class="topdata">'. $this->Text->autoParagraph($SaleReturn->additional_note).'</td>
 						</tr>
 						
 					</table>
@@ -441,15 +437,7 @@ $html.='
 		</tbody>
 	</table>
 	<table width="100%" class="table_rows ">
-		<tr>
-			<td valign="top" width="18%">Amount in words</td>
-			<td  valign="top"> '. h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text).'</td>
-		</tr>
-		<tr>
-			<td valign="top" width="18%">Additional Note</td>
-			<td  valign="top" class="topdata">'. $this->Text->autoParagraph($SaleReturn->additional_note).'</td>
-
-		</tr>
+		
 		
 		<tr>
 				<td colspan="2" >
