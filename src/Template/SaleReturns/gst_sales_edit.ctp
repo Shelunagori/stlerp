@@ -593,9 +593,6 @@ $(document).ready(function() {
 			customer_address:{
 				required: true,
 			},
-			lr_no : {
-				  required: true,
-			},
 			customer_po_no  : {
 				  required: true,
 			},
