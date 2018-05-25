@@ -176,6 +176,7 @@ if($transaction_date <  $start_date ) {
 							<tbody>
 							<?php foreach($payment_row->reference_details as $reference_detail){
 								if($reference_detail->reference_type!='On_account'){
+									
 								?>
 								<tr>
 									<td><?php echo $this->Form->input('ref_types', ['empty'=>'--Select-','options'=>$ref_types,'label' => false,'class' => 'form-control input-sm ref_type','value'=>$reference_detail->reference_type]); ?></td>
