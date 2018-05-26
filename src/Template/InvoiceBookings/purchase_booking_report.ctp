@@ -42,13 +42,13 @@
 											$options[]=['text' =>$merge, 'value' => $vendors->id, 'payment_terms' => $vendors->payment_terms];
 
 										}
-										echo $this->Form->input('vendor_id', ['empty' => "--Select Vendor--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me','value' => @$vendor->id]); 
+										echo $this->Form->input('vendor_id', ['empty' => "--Select Vendor--",'label' => false,'options' => $options,'class' => 'form-control input-sm select2me','value' => @$vendor_id]); 
 
 												
 									?>
 								</td>
 								<td width="10%"><?php
-								echo $this->Form->input('items', ['empty' => "--Select Item--",'label' => false,'options' => $Items,'class' => 'form-control input-sm select2me','value' => @$Items->id]); 
+								echo $this->Form->input('items', ['empty' => "--Select Item--",'label' => false,'options' => $Items,'class' => 'form-control input-sm select2me','value' => @$item_id]); 
 								?>
 								
 						</tr>
@@ -88,16 +88,20 @@
 					<tbody>
 					<?php $total=0;$totalamt=0; $i=0;foreach ($invoiceBookings as $invoiceBooking):
 					$total+=$invoiceBooking->taxable_value;
-					$totalamt+=$invoiceBooking->total;
+					$totalamt+=$invoiceBooking->grn->purchase_order->total;
 					?>
 						<tr>
 							<td><?= h(++$i) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
 							<td><?php if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
-							<?php echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4, [
-							'controller'=>'InvoiceBookings','action' => 'view', $invoiceBooking->id],array('target'=>'_blank')); ?>
-							<?php  } ?></td>
-							<td><?= h(($invoiceBooking->grn->purchase_order->po1.'/PO-'.str_pad($$invoiceBooking->grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$$invoiceBooking->grn->purchase_order->po3.'/'.$$invoiceBooking->grn->purchase_order->po4)) ?></td>
+							<?php 
+							if($invoiceBooking->gst=='no'){
+								echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4, [
+								'controller'=>'InvoiceBookings','action' => 'view', $invoiceBooking->id],array('target'=>'_blank')); ?>
+							<?php  }else{
+								echo $this->Html->link($invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4,['controller'=>'InvoiceBookings','action' => 'GstInvoiceBookingView', $invoiceBooking->id,],array('escape'=>false,'target'=>'_blank'));
+							}} ?></td>
+							<td><?php echo $this->Html->link($invoiceBooking->grn->purchase_order->po1.'/PO-'.str_pad($invoiceBooking->grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->purchase_order->po3.'/'.$invoiceBooking->grn->purchase_order->po4,['controller'=>'PurchaseOrders','action' => 'confirm', $invoiceBooking->grn->purchase_order->id,],array('escape'=>false,'target'=>'_blank')); ?></td>
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td  style="text-align:right;"><?= h($this->Number->format($invoiceBooking->grn->purchase_order->total,['places'=>2])) ?></td>
@@ -105,9 +109,10 @@
 						</tr>
 							<?php endforeach; ?>
 						<tr>
-							<td colspan="5" align="right"><b>Total</b></td>
-							<td style="text-align:right;"><b><?= h($this->Number->format($total,['places'=>2])) ?></b></td>
+							<td colspan="6" align="right"><b>Total</b></td>
 							<td style="text-align:right;"><b><?= h($this->Number->format($totalamt,['places'=>2])) ?></b></td>
+							<td style="text-align:right;"><b><?= h($this->Number->format($total,['places'=>2])) ?></b></td>
+							
 						</tr>
 						</tbody>
 					</table>

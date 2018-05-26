@@ -104,7 +104,7 @@ class InvoiceBookingsController extends AppController
 		$Po_From = $this->request->query('Po_From');
 		$Po_To = $this->request->query('Po_To');
 		$vendor_id = $this->request->query('vendor_id');
-		$items = $this->request->query('items');
+		$item_id = $this->request->query('items');
 		
 		$this->set(compact('book_no','From','To','in_no','file','vendor_id','Po_To','Po_From'));
 		
@@ -142,7 +142,7 @@ class InvoiceBookingsController extends AppController
 			$where1['PurchaseOrders.date_created <=']=$Po_To;
 		}
 		//pr($where); exit;
-			if(!empty($items))
+			if(!empty($item_id))
 			{ 
 		
 				$InvoiceBookingRows = $this->InvoiceBookings->InvoiceBookingRows->find();
@@ -150,10 +150,12 @@ class InvoiceBookingsController extends AppController
 				$invoiceBookings->select(['id','total_sales'=>$InvoiceBookingRows->func()->sum('InvoiceBookingRows.quantity')])
 				->innerJoinWith('InvoiceBookingRows')
 				->group(['InvoiceBookings.id'])
-				->matching('InvoiceBookingRows.Items', function ($q) use($items,$st_company_id) {
-											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+				->matching('InvoiceBookingRows.Items', function ($q) use($item_id,$st_company_id) {
+											return $q->where(['Items.id' =>$item_id,'company_id'=>$st_company_id]);
 							})
-				->contain(['Vendors','InvoiceBookingRows'=>['Items']])
+				->contain(['Vendors','InvoiceBookingRows'=>['Items'],'Grns'=>['PurchaseOrders'=>function ($q) use($where1){
+				return $q->where($where1);
+			}]])
 				->autoFields(true)
 				->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])
 				->where($where);
@@ -168,8 +170,8 @@ class InvoiceBookingsController extends AppController
 					}
 				);
 			$Items = $this->InvoiceBookings->InvoiceBookingRows->Items->find('list')->order(['Items.name' => 'ASC']);
-		pr($invoiceBookings->toArray());exit;
-        $this->set(compact('invoiceBookings','status','purchase_return','url','vendor','Items'));
+		//pr($invoiceBookings->toArray());exit;
+        $this->set(compact('invoiceBookings','status','purchase_return','url','vendor','Items','item_id'));
       
     }
 	/* public function DataMigrate()
