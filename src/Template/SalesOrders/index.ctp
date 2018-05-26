@@ -10,11 +10,11 @@
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Sales Order</span>
+			<span class="caption-subject font-blue-steel uppercase">Sales Orders</span>
 			<?php if($pull_request=="true"){ ?>
 			: Select a Sales-Order to convert into Invoice
 			<?php }elseif($gst=="true"){ ?>
-			: Select a Sales-Order to convert into GST Invoice
+			: Select a Sales-Order to convert into Tax Invoice
 			<?php }  elseif($copy_request=="copy"){?>
 			: Select a Sales-Order to Copy <?php }
 			  elseif($gst_copy_request=="copy"){ ?>

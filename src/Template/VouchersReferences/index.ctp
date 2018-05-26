@@ -14,7 +14,7 @@
 						<tr>
 							<th>S.No</th>
 							<th>Voucher</th>
-							<th>Discription</th>
+							<th>Description</th>
 							<th class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>

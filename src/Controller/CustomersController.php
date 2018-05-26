@@ -346,6 +346,7 @@ class CustomersController extends AppController
 	}
 	
 	public function BreakupRangeOverdueNew(){
+		$this->set('title', 'Outstanding Report');
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');

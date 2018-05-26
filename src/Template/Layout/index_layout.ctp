@@ -858,20 +858,7 @@ select
 						
 						
 						<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
-						<?php if(in_array(118,$allowed_pages) ||in_array(119,$allowed_pages)){ ?>
-						<li>
 						
-							<a href="javascript:;">
-							<i class="fa fa-file-code-o"></i>
-							<span class="title">Employee Personal Informaion</span>
-							<span class="arrow "></span>
-							</a>
-							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/EmployeePersonalInformations/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Index', '/EmployeePersonalInformations' ).'</li>'; ?>
-							</ul>
-						</li>
-						<?php } ?>
 						
 						<li>
 							<a href="javascript:;">

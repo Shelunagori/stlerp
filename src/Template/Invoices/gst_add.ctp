@@ -29,7 +29,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Create Invoice (GST)</span>
+			<span class="caption-subject font-blue-steel uppercase">Create Invoice</span>
 		</div>
 	</div>
 	<div class="form-actions">

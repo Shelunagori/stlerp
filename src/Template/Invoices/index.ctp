@@ -4,9 +4,9 @@
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Invoices</span> 
-			<?php if($inventory_voucher=="true"){ echo " :Select invoice to create it's inventory voucher"; } ?>
-			<?php if($sales_return=="true"){ echo " :Select invoice for sales return"; } ?>
+			<span class="caption-subject font-blue-steel uppercase">Invoice</span> 
+			<?php if($inventory_voucher=="true"){ echo ": Select Invoice to create Inventory Voucher"; } ?>
+			<?php if($sales_return=="true"){ echo ": Select Invoice to create Sales Return"; } ?>
 		</div>
 		<div class="actions">
 		<?php if($inventory_voucher!="true"){ ?>
