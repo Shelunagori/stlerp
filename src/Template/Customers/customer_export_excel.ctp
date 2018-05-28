@@ -39,95 +39,104 @@
 			<th>Closing Balance</th>
 		</tr>
 	</thead>
-	<tbody>
 	<?php 
-		$sr=0; $ClosingBalance=0; 
-		$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
-		foreach($LedgerAccounts as $LedgerAccount){ ?>
-		<tr>
-			<td><?php echo ++$sr; ?></td>
-			<td style=" white-space: normal; width: 200px; "><?php echo $LedgerAccount->name.' <br/> '.$LedgerAccount->alias; ?></td>
-			<td><?php echo $CustmerPaymentTerms[$LedgerAccount->id].' Days'; ?></td>
-			<td>
-				<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab1'],2);
-				}else{
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab1'],2);
-				} ?>
-			</td>
-			<td>
-				<?php if(@$Outstanding[$LedgerAccount->id]['Slab2'] > 0){
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab2'],2);
-				}else{
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab2'],2);
-				} ?>
-			</td>
-			<td>
-				<?php if(@$Outstanding[$LedgerAccount->id]['Slab3'] > 0){
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab3'],2);
-				}else{
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab3'],2);
-				} ?>
-			</td>
-			<td>
-				<?php if(@$Outstanding[$LedgerAccount->id]['Slab4'] > 0){
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab4'],2);
-				}else{
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab4'],2);
-				} ?>
-			</td>
-			<td>
-				<?php if(@$Outstanding[$LedgerAccount->id]['Slab5'] > 0){
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab5'],2);
-				}else{
-					echo round(@$Outstanding[$LedgerAccount->id]['Slab5'],2);
-				} ?>
-			</td>
-			
-			<td>
-			<?php 
-				echo round(@$Outstanding[$LedgerAccount->id]['OnAccount'],2); 
-				@$ColumnOnAccount+=@$Outstanding[$LedgerAccount->id]['OnAccount'];
-			?>
-			</td>
-			<td>
-			<?php $TotalOutStanding=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
-			<?php 
-			if($TotalOutStanding>0){
-				echo round(@$TotalOutStanding,2);
-			}elseif($TotalOutStanding<0){
-				echo round(@$TotalOutStanding,2);
-			} ?>
-			<?php
-				@$ColumnOutStanding+=@$TotalOutStanding;
-			?>
-			</td>
-			<td>
-				<?php 
-				echo round(@$Outstanding[$LedgerAccount->id]['NoDue'],2);
-				@$ColumnNoDue+=@$Outstanding[$LedgerAccount->id]['NoDue'];
-				?>
-			</td>
-			<td>
-			<?php $ClosingBalance=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
-			<?php if($ClosingBalance!=0){
-				echo round($ClosingBalance,2);
-			} ?>
-			<?php
-				@$ColumnClosingBalance+=$ClosingBalance;
-			?>
-			</td>
-		</tr>
-		<?php } ?>
-		</tbody>
-		<tfoot>
+			$sr=0; $ClosingBalance=0; 
+			$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
+			foreach($LedgerAccounts as $LedgerAccount){ ?>
 			<tr>
-				<th colspan="8"><div  align="right">TOTAL</div></th>
-				<th><?php echo round($ColumnOnAccount,2); ?></th>
-				<th><?php echo round($ColumnOutStanding,2); ?></th>
-				<th><?php echo round($ColumnNoDue,2); ?></th>
-				<th><?php echo round($ColumnClosingBalance,2); ?></th>
+				<td><?php echo ++$sr; ?></td>
+				<td style=" white-space: normal; width: 200px; ">
+				<?php if(!empty($LedgerAccount->alias)){ ?>
+				<?php echo  $LedgerAccount->name." (". $LedgerAccount->alias.")"; 
+				}else{ 
+					echo $LedgerAccount->name;
+					
+				}		?></td>
+				<td><?php echo $CustmerPaymentTerms[$LedgerAccount->id].' Days'; ?></td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab2'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab2'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab2'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab3'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab3'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab3'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab4'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab4'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab4'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab5'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab5'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab5'],2).'</span>';
+					} ?>
+				</td>
+				
+				<td>
+				<?php 
+					echo round(@$Outstanding[$LedgerAccount->id]['OnAccount'],2); 
+					@$ColumnOnAccount+=@$Outstanding[$LedgerAccount->id]['OnAccount'];
+				?>
+				</td>
+				<td>
+				<?php $TotalOutStanding=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
+				<?php 
+				if($TotalOutStanding>0){
+					echo '<span id="outstnd" class="clrRed">'.round(@$TotalOutStanding,2).'</span>';
+				}elseif($TotalOutStanding<0){
+					echo '<span id="outstnd">'.round(@$TotalOutStanding,2).'</span>';
+				} ?>
+				<?php
+					@$ColumnOutStanding+=@$TotalOutStanding;
+				?>
+				</td>
+				<td>
+					<?php 
+					echo round(@$Outstanding[$LedgerAccount->id]['NoDue'],2);
+					@$ColumnNoDue+=@$Outstanding[$LedgerAccount->id]['NoDue'];
+					?>
+				</td>
+				<td>
+				<?php $ClosingBalance=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
+				<?php if($ClosingBalance!=0){
+					echo round($ClosingBalance,2);
+				}else{
+					echo "0";
+				} ?>
+				<?php
+					@$ColumnClosingBalance+=$ClosingBalance;
+				?>
+				</td>
+				
 			</tr>
-		</tfoot>
-</table>
+			<?php } ?>
+			</tbody>
+			<tfoot id='tf'>
+				<tr>
+					<th colspan="8"><div  align="right">TOTAL</div></th>
+					<th class="oa"><?php echo round($ColumnOnAccount,2); ?></th>
+					<th class="os"><?php echo round($ColumnOutStanding,2); ?></th>
+					<th class="nd"><?php echo round($ColumnNoDue,2); ?></th>
+					<th class="cb"><?php echo (number_format((float)$ColumnClosingBalance, 2, '.', '')); ?></th>
+					
+				</tr>
+			</tfoot>
+			</table>
 			

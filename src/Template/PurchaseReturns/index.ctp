@@ -16,8 +16,13 @@
 				<table class="table table-condensed">
 					<tbody>
 						<tr>
-							<td width="10%">
-								<input type="text" name="vouch_no" class="form-control input-sm" placeholder="Voucher No" value="<?php echo @$vouch_no; ?>">
+							<td width="20%">
+								<input type="text" name="vendor_name" class="form-control input-sm" placeholder="Supplier Name" value="<?php echo @$vendor_name; ?>">
+							</td>
+							<td width="20%">
+								<div class="input-group" style="" id="pnf_text">
+								<span class="input-group-addon">PR</span><input type="text" name="vouch_no" class="form-control input-sm" placeholder="Voucher No" value="<?php echo @$vouch_no; ?>">
+								</div>
 							</td>
 							<td width="15%">
 								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
@@ -35,7 +40,9 @@
 					<thead>
 						<tr>
 							<th>Sr. No.</th>
-							<th>Voucher No</th>
+							<th>Supplier</th>
+							<th>Purchase Return No</th>
+							<th>Invoice Booking No</th>
 							<th>Date</th>
 							<th>Actions</th>
 						</tr>
@@ -46,8 +53,27 @@
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
-							<td><?= h('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
-							
+							<td>
+								<?= h($purchaseReturn->vendor->company_name);?>
+							</td>
+							<td><?php
+							if($purchaseReturn->gst_type=="Gst"){
+								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
+								'action' => 'gstView', $purchaseReturn->id],array('target'=>'_blank'));
+							}else{
+								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
+								'action' => 'View', $purchaseReturn->id],array('target'=>'_blank'));
+							}		?></td>
+							<td>
+								<?php 
+								if($purchaseReturn->invoice_booking->gst=='no'){
+									echo $this->Html->link($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4,[
+								'controller'=>'InvoiceBookings','action' => 'view', $purchaseReturn->invoice_booking->id],array('target'=>'_blank'));
+								}else{
+										echo $this->Html->link($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4,[
+								'controller'=>'InvoiceBookings','action' => 'GstInvoiceBookingView', $purchaseReturn->invoice_booking->id],array('target'=>'_blank'));
+								}	?>
+							</td>
 							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->created_on)); ?></td>
 						<td class="actions">
 							<?php 

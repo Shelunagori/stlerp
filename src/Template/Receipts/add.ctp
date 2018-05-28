@@ -17,7 +17,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 	<div class="portlet-title">
 		<div class="caption" >
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">Add Receipt</span>
+			<span class="caption-subject font-blue-steel uppercase">Add Receipt Voucher</span>
 		</div>
 	</div>
 	<div class="portlet-body form">

@@ -46,7 +46,7 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="left">
 				<table>
 					<tr>
-						<td  width="38%" valign="top">GRN No</td>
+						<td  width="38%" valign="top" >GRN No</td>
 						<td width="2%" valign="top">:</td>
 						<td valign="top"><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
 					</tr>
@@ -141,13 +141,13 @@ if($grn_row->item->item_companies[0]->serial_number_enable == 1) {
 		<table>
 			<tr>
 				<td align="center">
-				<span>For</span> <span style="font-weight: bold;"><?= h($grn->company->name)?><br/></span>
+				<span style="font-weight: bold;">For</span> <span style="font-weight: bold;"><?= h($grn->company->name)?><br/></span>
 				<?php 
 				 echo $this->Html->Image('/signatures/'.$grn->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 				 ?></br>
 				<span style="font-weight: bold;">Authorised Signatory</span>
 				</br>
-				<span><?= h($grn->creator->name) ?></span><br/>
+				<span style="font-weight: bold;"><?= h($grn->creator->name) ?></span><br/>
 				</td>
 			</tr>
 		</table>

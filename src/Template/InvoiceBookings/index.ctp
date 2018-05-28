@@ -62,6 +62,7 @@
 							<th width="10%">Invoice No.</th>
 							<th width="10%">Supplier Name</th>
 							<th width="10%">Invoice Booked On</th>
+							<th width="10%">Amount</th>
 							<th width="10%">Actions</th>
 						</tr>
 					</thead>
@@ -83,6 +84,9 @@
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
+							<td>
+							<?= h($this->Money->indianNumberFormat($invoiceBooking->total))?>
+							</td>
 							<td class="actions">
 							<?php //if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
 								<?php if(in_array(18,$allowed_pages)){ ?>

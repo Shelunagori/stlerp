@@ -24,6 +24,7 @@
 		</tr>	
 		<tr>
 						<th>Sr. No.</th>
+						<th>Customer</th>
 						<th>Sales Return No.</th>
 						<th>Invoice No.</th>
 						<th>Date Created</th>
@@ -36,6 +37,7 @@
 						?>
 					<tr>
 						<td><?= h($i++) ?></td>
+						<td><?= h($saleReturn->customer->customer_name);?></td>
 						<td><?= h(($saleReturn->sr1.'/SR-'.str_pad($saleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->sr3.'/'.$saleReturn->sr4)) ?></td>
 						
 						<td><?= h(($saleReturn->invoice->in1.'/IN-'.str_pad($saleReturn->invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->invoice->in3.'/'.$saleReturn->invoice->in4)) ?></td>

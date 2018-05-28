@@ -2,7 +2,7 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\View\Helper\NumberHelper;
 /**
  * InvoiceBookings Controller
  *
@@ -473,6 +473,7 @@ class InvoiceBookingsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$purchase_return=$this->request->query('purchase-return');
 	    $where = [];
 		$book_no = $this->request->query('book_no');
@@ -518,7 +519,7 @@ class InvoiceBookingsController extends AppController
 			$where['InvoiceBookings.created_on <=']=$To;
 		}
 		
-			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC'])->contain(['Grns','Vendors']);
+			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC'])->contain(['Grns','Vendors']);
 		
 			
 		//pr($invoiceBookings);exit;

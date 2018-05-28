@@ -28,7 +28,7 @@ if($transaction_date <  $start_date ) {
     <div class="portlet-title">
         <div class="caption" >
             <i class="icon-globe font-blue-steel"></i>
-            <span class="caption-subject font-blue-steel uppercase">Edit Petty Cash</span>
+            <span class="caption-subject font-blue-steel uppercase">Edit PettyCash Voucher</span>
         </div>
     </div>
     <div class="portlet-body form">

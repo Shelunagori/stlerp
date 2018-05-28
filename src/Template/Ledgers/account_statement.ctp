@@ -245,10 +245,11 @@ $url_excel="/?".$url;
 					//pr($salereturn->sale_return_type); exit; 
 					$voucher_no=h(($salereturn->sr1.'/SR-'.str_pad($salereturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$salereturn->sr3.'/'.$salereturn->sr4));
 					if($salereturn->sale_return_type=="GST"){
-					$url_path="/sale-returns/gst-sales-edit/".$ledger->voucher_id;	
+						$url_path="/sale-returns/gst-confirm/".$ledger->voucher_id;	
 					}else{
-					$url_path="/sale-returns/edit/".$ledger->voucher_id;
+						$url_path="/sale-returns/confirm/".$ledger->voucher_id;	
 					}
+					
 					if($salereturn->sale_return_type=="GST"){
 						$cgst_amt=$salereturn->total_cgst_amount;
 						$sgst_amt=$salereturn->total_sgst_amount;
@@ -259,16 +260,18 @@ $url_excel="/?".$url;
 						$sgst_amt="-";
 						$igst_amt="-";
 					}
-					
+					if(in_array($salereturn->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 					
 				}else if($ledger->voucher_source=="Invoice Booking"){
 					$ibs=$url_link[$ledger->id];
 					//pr($ibs); exit;
 					$voucher_no=h(($ibs->ib1.'/IB-'.str_pad($ibs->ib2, 3, '0', STR_PAD_LEFT).'/'.$ibs->ib3.'/'.$ibs->ib4));
 					if($ibs->gst=="yes"){
-					$url_path="/invoice-bookings/gst-invoice-booking-view/".$ledger->voucher_id;	
+						$url_path="/invoice-bookings/gst-invoice-booking-view/".$ledger->voucher_id;	
 					}else{
-					$url_path="/invoice-bookings/view/".$ledger->voucher_id;
+						$url_path="/invoice-bookings/view/".$ledger->voucher_id;
 					}
 					
 					//$url_path="/invoice-bookings/view/".$ledger->voucher_id;

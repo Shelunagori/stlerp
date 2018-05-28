@@ -30,7 +30,7 @@ if($transaction_date <  $start_date ) {
 	<div class="portlet-title">
 		<div class="caption" >
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">EDIT JOURNAL VOUCHER</span>
+			<span class="caption-subject font-blue-steel uppercase">Edit Journal Voucher</span>
 		</div>
 	</div>
 	<div class="portlet-body form">

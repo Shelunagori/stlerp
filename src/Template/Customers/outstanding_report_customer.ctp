@@ -7,7 +7,7 @@ table td, table th{
 	color:red;
 }
 </style>
-
+<?php  $url_excel="/?".$url; ?>
 <div class="portlet box red">
 	
 	<div class="portlet-title">
@@ -16,20 +16,29 @@ table td, table th{
 	
 	<div class="portlet-body">
 	<form method="GET" >
-		<table width="100%">
+		<table class="table table-condensed" width="100%">
 			<tbody>
 				<tr>
-					<td width="15%">
+					
+						<td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman_name) ]); ?></td>
+						<td>
+								<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
+							</td>
+						<td width="15%">
 							<?php 
-								$options = [];
-								$options = [['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
+							$options = [];
+							$options = [['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
 							echo $this->Form->input('total', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me stock','placeholder'=>'Sub-Group','value'=> h(@$stock)]); ?>
 						</td>
-						<td></td>
 					   <td align="right" width="10%"><input type="text" class="form-control input-sm pull-right" placeholder="Search..." id="search3"  style="width: 100%;"></td>
 					   <td align="right" width="8%">
 							<?php $url=json_encode($to_send, true);
-			             echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+						if(!empty($salesman_name)){
+							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'?salesman_name='.$salesman_name,['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
+						}else{
+							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
+						}	
+			             ?>
 					   </td>
 				</tr>
 			</tbody>
@@ -154,11 +163,11 @@ table td, table th{
 					@$ColumnClosingBalance+=$ClosingBalance;
 				?>
 				</td>
-				<td>
+				<td style="text-align:center;">
 					<?php 
 					if($ClosingBalance > 0){ ?>
 						
-						<a href="#" class="list-group-item send_mail" amt=<?php echo $ClosingBalance; ?> ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i>Send Email </a>
+						<a href="#" class="btn-primary btn-sm send_mail" title="Send Email " amt=<?php echo $ClosingBalance; ?> ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i></a>
 				<?php	} ?>
 				</td>
 			</tr>
@@ -171,7 +180,7 @@ table td, table th{
 					<th class="os"><?php echo round($ColumnOutStanding,2); ?></th>
 					<th class="nd"><?php echo round($ColumnNoDue,2); ?></th>
 					<th class="cb"><?php echo (number_format((float)$ColumnClosingBalance, 2, '.', '')); ?></th>
-					
+					<th></th>
 				</tr>
 			</tfoot>
 			</table>

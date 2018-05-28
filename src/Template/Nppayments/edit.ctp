@@ -28,7 +28,7 @@ if($transaction_date <  $start_date ) {
     <div class="portlet-title">
         <div class="caption" >
             <i class="icon-globe font-blue-steel"></i>
-            <span class="caption-subject font-blue-steel uppercase">Edit Non Print Payment</span>
+            <span class="caption-subject font-blue-steel uppercase">Edit NonPrint Payment Voucher</span>
         </div>
     </div>
     <div class="portlet-body form">

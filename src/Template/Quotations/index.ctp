@@ -78,7 +78,8 @@ if(!empty($status)){
 								<input type="text" name="customer" class="form-control input-sm" placeholder="Customer" value="<?php echo @$customer; ?>">
 							</td>
 							<td width="16%">
-								<input type="text" name="salesman" class="form-control input-sm" placeholder="Salesman" value="<?php echo @$salesman; ?>">
+								<?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman) ]); ?>
+								
 							</td>
 							<td width="15%">
 								<input type="text" name="product" class="form-control input-sm" placeholder="Product" value="<?php echo @$product; ?>">

@@ -19,7 +19,7 @@
 				<tr>
 					<td colspan="6" align="center">
 					<b> Invoice Booking Report
-					<?php if(!empty($From) || !empty($To)){ echo date('d-m-Y',strtotime($From)); ?> TO <?php echo date('d-m-Y',strtotime($To));  } ?> 
+					<?php if(!empty($From) || !empty($To)){ if(date('d-m-Y',strtotime($From)) == "01-01-1970"){ echo ""; }else{ echo date('d-m-Y',strtotime($From)); } ?> TO <?php  if(date('d-m-Y',strtotime($To)) == "01-01-1970"){ echo ""; }else{date('d-m-Y',strtotime($To));}} ?>
 					
 					</b>
 					</td>
@@ -31,6 +31,7 @@
 							<th width="10%">Invoice No.</th>
 							<th width="10%">Supplier Name</th>
 							<th width="10%">Invoice Booked On</th>
+							<th width="10%">Amount</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -43,6 +44,9 @@
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($invoiceBooking->created_on)) ?></td>
+							<td>
+							<?= h($this->Number->format($invoiceBooking->total,['places'=>2]))?>
+							</td>
 					</tr>
 							<?php endforeach; ?>
 						</tbody>

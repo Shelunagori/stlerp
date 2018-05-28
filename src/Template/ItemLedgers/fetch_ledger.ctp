@@ -75,7 +75,12 @@
 			$party_name=$itemLedger->party_info->customer_name;
 			$created_by = $itemLedger->voucher_info->created_by;
 			$voucher_no=$itemLedger->voucher_info->sr1.'/SR-'.str_pad($itemLedger->voucher_info->sr2, 3, '0', STR_PAD_LEFT).'/'.$itemLedger->voucher_info->sr3.'/'.$itemLedger->voucher_info->sr4;
-			$url_path="/saleReturns/View/".$itemLedger->voucher_info->id;
+			if($itemLedger->voucher_info->sale_return_type == "Non-GST"){
+				$url_path="/sale-returns/confirm/".$itemLedger->voucher_info->id;
+			}else{
+				$url_path="/sale-returns/gst-confirm/".$itemLedger->voucher_info->id;
+			}
+			
 			
 		}
 		else if($source_model=='Inventory Transfer Voucher')

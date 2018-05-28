@@ -27,11 +27,16 @@ class PurchaseReturnsController extends AppController
 		
 		$where = [];
 		
+		$vendor_name = $this->request->query('vendor_name');
 		$vouch_no = $this->request->query('vouch_no');
 		$From    = $this->request->query('From');
 		$To    = $this->request->query('To');
 		
-		$this->set(compact('vouch_no','From','To'));
+		$this->set(compact('vouch_no','From','To','vendor_name'));
+		
+		if(!empty($vendor_name)){
+			$where['Vendors.company_name LIKE']='%'.$vendor_name.'%';
+		}
 		
 		if(!empty($vouch_no)){
 			$where['PurchaseReturns.voucher_no Like']=$vouch_no;
@@ -48,10 +53,10 @@ class PurchaseReturnsController extends AppController
 		
 		
         $this->paginate = [
-            'contain' => ['InvoiceBookings', 'Companies']
+            'contain' => ['InvoiceBookings', 'Companies','Vendors']
         ];
         $purchaseReturns = $this->paginate($this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->order(['PurchaseReturns.id' => 'DESC']));
-
+//pr($purchaseReturns->toArray());exit;
         $this->set(compact('purchaseReturns','url'));
         $this->set('_serialize', ['purchaseReturns']);
     }
@@ -63,14 +68,18 @@ class PurchaseReturnsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$where = [];
-		
+		$vendor_name = $this->request->query('vendor_name');
 		$vouch_no = $this->request->query('vouch_no');
 		$From    = $this->request->query('From');
 		$To    = $this->request->query('To');
 		
-		$this->set(compact('vouch_no','From','To'));
+		$this->set(compact('vouch_no','From','To','vendor_name'));
+		
+		if(!empty($vendor_name)){
+			$where['Vendors.company_name LIKE']='%'.$vendor_name.'%';
+		}
 		
 		if(!empty($vouch_no)){
 			$where['PurchaseReturns.voucher_no Like']=$vouch_no;
@@ -86,10 +95,8 @@ class PurchaseReturnsController extends AppController
 		}
 		
 		
-        $this->paginate = [
-            'contain' => ['InvoiceBookings', 'Companies']
-        ];
-        $purchaseReturns = $this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id])->order(['PurchaseReturns.id' => 'DESC']);
+       
+        $purchaseReturns = $this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->contain(['InvoiceBookings','Vendors'])->order(['PurchaseReturns.id' => 'DESC']);
 
         $this->set(compact('purchaseReturns'));
         $this->set('_serialize', ['purchaseReturns']);

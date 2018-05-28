@@ -93,6 +93,7 @@ class PurchaseOrdersController extends AppController
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
+				
 		}else{	
 			if($pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
@@ -108,7 +109,7 @@ class PurchaseOrdersController extends AppController
 				->order(['PurchaseOrders.id'=>'DESC']);
 				//pr($purchaseOrders); exit;
 			}
-			else if($status=="Converted-Into-GRN" ){    
+			else if($status=="Converted-Into-GRN" ){   
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -116,7 +117,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
@@ -128,7 +129,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
@@ -231,7 +232,8 @@ class PurchaseOrdersController extends AppController
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
-			if($pull_request=="true"){
+			if($pull_request=="true"){ 
+				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -239,11 +241,24 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.date_created <='=>$tdate])
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+				//pr($purchaseOrders); exit;
+			}
+			else if($status=="Converted-Into-GRN" ){    
+				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
+				$purchaseOrders = $this->PurchaseOrders->find();
+				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
-			if($status==null || $status=="Converted-Into-GRN" ){
+			else { 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
@@ -251,19 +266,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where)
-				->order(['PurchaseOrders.id'=>'DESC']);
-			}
-			if($status==null || $status=="Pending" ){ 
-				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
-				$purchaseOrders = $this->PurchaseOrders->find();
-				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
-				->innerJoinWith('PurchaseOrderRows')
-				->group(['PurchaseOrders.id'])
-				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
-				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
@@ -271,18 +274,20 @@ class PurchaseOrdersController extends AppController
 		} 
 		//pr($purchaseOrders->toArray()); exit;
 		//pr($status); exit;
-		
+		$supplier_total_po=[];
 		$total_sales=[]; $total_qty=[];
-		foreach($purchaseOrders as $salesorder){
+		foreach($purchaseOrders as $salesorder){ //pr($salesorder); exit; 
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->purchase_order_rows as $sales_order_row){
 				foreach($sales_order_row->grn_rows as $invoice_row){ 
-						if(sizeof($invoice_row) > 0){
+						if(sizeof($invoice_row) > 0){ 
 							@$total_qty[$salesorder->id]+=$invoice_row->quantity;
 						}
 				}
 			}
+			//$supplier_total_po[$salesorder->vendor_id][]=$salesorder->id;
 		}
+		
 		//pr($total_sales); 
 		//pr($total_qty); 
 		

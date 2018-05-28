@@ -26,6 +26,7 @@ class CustomersController extends AppController
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
+		$st_company_id = $session->read('st_company_id');
 		$where=[];
 		$customer=$this->request->query('customer');
 		$district=$this->request->query('district');
@@ -44,7 +45,8 @@ class CustomersController extends AppController
             'contain' => ['Districts', 'CustomerSegs']
         ];
         $customers = $this->paginate($this->Customers->find()->where($where)->order(['Customers.customer_name' => 'ASC']));
-        $this->set(compact('customers','url'));
+		
+        $this->set(compact('customers','url','SalesMans'));
         $this->set('_serialize', ['customers']);
     }
 
@@ -1086,13 +1088,22 @@ class CustomersController extends AppController
 	
 	public function OutstandingReportCustomer($to_send = null){
 		$to_send = json_decode($to_send, true);
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
 		$TillDate=date('Y-m-d', strtotime($to_send['tdate']));
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$salesman_name = $this->request->query('salesman_name');
+		$where=[];
+		if(!empty($salesman_name)){
+			$where['Customers.employee_id']=$salesman_name;
+		}
 		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
 			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
+			->contain(['Customers' => function($q) use($where){
+				return $q->where($where);
+			}])
 			->order(['LedgerAccounts.name'=>'ASC']);
 		
 		$CustmerPaymentTerms=[]; $Outstanding=[];
@@ -1143,8 +1154,13 @@ class CustomersController extends AppController
 				}
 			}
 		}
+		 $SalesMans = $this->Customers->Employees->find('list')->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>1]);
+					}
+				);
 		//pr($Outstanding); exit;
-		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','SalesMans','salesman_name','url'));
 	}
 	
 	public function CustomerExportExcel($url = null){
@@ -1153,29 +1169,48 @@ class CustomersController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$salesman_name = $this->request->query('salesman_name');
+		$where=[];
+		if(!empty($salesman_name)){
+			$where['Customers.employee_id']=$salesman_name;
+		}
 		$LedgerAccounts =$this->Customers->LedgerAccounts->find()
 			->where(['LedgerAccounts.company_id'=>$st_company_id,'source_model'=>'Customers'])
+			->contain(['Customers' => function($q) use($where){
+				return $q->where($where);
+			}])
 			->order(['LedgerAccounts.name'=>'ASC']);
 		$CustmerPaymentTerms=[]; $Outstanding=[];
-		foreach($LedgerAccounts as $LedgerAccount){
+		
+		foreach($LedgerAccounts as $LedgerAccount){ 
 			$Customer =$this->Customers->get($LedgerAccount->source_id);
 			$CustmerPaymentTerms[$LedgerAccount->id]=$Customer->payment_terms;
 			
 			$ReferenceDetails=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>$LedgerAccount->id,'ReferenceDetails.transaction_date <='=>date('Y-m-d', strtotime($to_send['tdate']))]);
 			
 			
-			foreach($ReferenceDetails as $ReferenceDetail)
-			{
+			foreach($ReferenceDetails as $ReferenceDetail){
 				if($ReferenceDetail->reference_type=="On_account"){
 					@$Outstanding[$LedgerAccount->id]['OnAccount']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 				}else{
-					$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					//pr($ReferenceDetail); exit;
+					if($ReferenceDetail->reference_type=="Against Reference"){
+						$ReferenceDetailData=$this->Customers->LedgerAccounts->ReferenceDetails->find()->where(['ReferenceDetails.ledger_account_id'=>@$LedgerAccount->id,'reference_no'=>@$ReferenceDetail->reference_no,'reference_type !='=>'Against Reference'])->first(); 
+						$transaction_date=date('Y-m-d', strtotime(@$ReferenceDetailData->transaction_date));
+						
+						//pr($ReferenceDetail->transaction_date); exit;
+					}else{ //pr($ReferenceDetail->reference_no);  
+						$transaction_date=date('Y-m-d', strtotime($ReferenceDetail->transaction_date));
+					}
+					$transaction_date=date('Y-m-d', strtotime($transaction_date));
+					
 					$TransactionDateAfterPaymentTerms = date('Y-m-d', strtotime($transaction_date. ' + '.$Customer->payment_terms.' days'));
 					
 					$datediff = strtotime($TillDate) - strtotime($TransactionDateAfterPaymentTerms);
 					$Diff=floor($datediff / (60 * 60 * 24));
-					
+					//pr($TransactionDateAfterPaymentTerms); 
+					//pr($Diff); 
+					//pr($to_send['range3']); 
 					if($Diff<=0){
 						@$Outstanding[$LedgerAccount->id]['NoDue']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 					}elseif(($Diff>=$to_send['range0']) and ($Diff<=$to_send['range1'])){
@@ -1189,7 +1224,7 @@ class CustomersController extends AppController
 					}elseif(($Diff>=$to_send['range7'])){
 						@$Outstanding[$LedgerAccount->id]['Slab5']+=$ReferenceDetail->debit-$ReferenceDetail->credit;
 					}
-					
+				
 				}
 			}
 		}

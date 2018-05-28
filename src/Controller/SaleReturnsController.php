@@ -28,14 +28,18 @@ class SaleReturnsController extends AppController
 		
 		$where = [];
 		
+		$customer = $this->request->query('customer');
 		$vouch_no = $this->request->query('vouch_no');
 		$in_no    = $this->request->query('in_no');
 		$From    = $this->request->query('From');
 		$To    = $this->request->query('To');
 		$total    = $this->request->query('total');
        
-		$this->set(compact('vouch_no','in_no','salesman','From','To','total'));
+		$this->set(compact('vouch_no','in_no','salesman','From','To','total','customer'));
 		
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
 		if(!empty($vouch_no)){
 			$where['SaleReturns.sr2 Like']=$vouch_no;
 		}
@@ -46,18 +50,18 @@ class SaleReturnsController extends AppController
 		
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
-			$where['SaleReturns.date_created >=']=$From;
+			$where['SaleReturns.transaction_date >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['SaleReturns.date_created <=']=$To;
+			$where['SaleReturns.transaction_date <=']=$To;
 		}
 		
 		if(!empty($total)){
 			$where['SaleReturns.total_after_pnf']=$total;
 		}
-		$saleReturns = $this->paginate($this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']));
-		//pr($saleReturns); exit;
+		$saleReturns = $this->paginate($this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices','Customers'])->order(['SaleReturns.id' => 'DESC']));
+		//pr($saleReturns->toArray()); exit;
 
         $this->set(compact('saleReturns','url'));
         $this->set('_serialize', ['saleReturns']);
@@ -67,17 +71,19 @@ class SaleReturnsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$where = [];
-		
+		$customer = $this->request->query('customer');
 		$vouch_no = $this->request->query('vouch_no');
 		$in_no    = $this->request->query('in_no');
 		$From    = $this->request->query('From');
 		$To    = $this->request->query('To');
 		$total    = $this->request->query('total');
        
-		$this->set(compact('vouch_no','in_no','salesman','From','To','total'));
-		
+		$this->set(compact('vouch_no','in_no','salesman','From','To','total','customer'));
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
 		if(!empty($vouch_no)){
 			$where['SaleReturns.sr2 Like']=$vouch_no;
 		}
@@ -88,17 +94,17 @@ class SaleReturnsController extends AppController
 		
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
-			$where['SaleReturns.date_created >=']=$From;
+			$where['SaleReturns.transaction_date >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['SaleReturns.date_created <=']=$To;
+			$where['SaleReturns.transaction_date <=']=$To;
 		}
 		
 		if(!empty($total)){
 			$where['SaleReturns.total_after_pnf']=$total;
 		}
-		$saleReturns = $this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices'])->order(['SaleReturns.id' => 'DESC']);
+		$saleReturns = $this->SaleReturns->find()->where($where)->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id])->contain(['Invoices','Customers'])->order(['SaleReturns.id' => 'DESC']);
 		//pr($saleReturns); exit;
 
         $this->set(compact('saleReturns','url'));
@@ -121,12 +127,45 @@ class SaleReturnsController extends AppController
         $this->set('_serialize', ['saleReturn']);
     }
 
+	public function Confirm($id=null){
+		$this->viewBuilder()->layout('pdf_layout');
+		$SaleReturns = $this->SaleReturns->get($id, [
+            'contain' => ['SaleTaxes','SaleReturnRows']
+			]);
+		
+		$this->set(compact('SaleReturns','id','termsConditions'));
+	}
+	
+	public function Pdf($id=null){
+		$this->viewBuilder()->layout('');
+		
+		 $SaleReturn= $this->SaleReturns->get($id, [
+				'contain' => ['SaleReturnRows'=>['Items'],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator','SaleTaxes']
+			]); 
+			
+				$cgst_per=[];
+		$sgst_per=[];
+		$igst_per=[];
+		foreach($SaleReturn->sale_return_rows as $invoice_row){
+			if($invoice_row->cgst_percentage > 0){
+				$cgst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->cgst_percentage);
+			}
+			if($invoice_row->sgst_percentage > 0){
+				$sgst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->sgst_percentage);
+			}
+			if($invoice_row->igst_percentage > 0){
+				$igst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->igst_percentage);
+			}
+		}
+			//pr($SaleReturn); exit;
+			$this->set(compact('SaleReturn','fright_ledger_account','cgst_per','sgst_per','igst_per'));
+	}
 		
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
 		$SaleReturns = $this->SaleReturns->get($id, [
-            'contain' => ['SaleReturnRows']
+           'contain' => ['SaleTaxes','SaleReturnRows']
 			]);
 		
 		$this->set(compact('SaleReturns','id','termsConditions'));
@@ -1123,12 +1162,16 @@ class SaleReturnsController extends AppController
 			}else{
 				$voucher_no1=1;
 			}
-			
+			if($st_year_id == 4){
+				$fy_year = "18-19";
+			}else{
+				$fy_year = "17-18";
+			}
 			$saleReturn->financial_year_id=$st_year_id;
 			$saleReturn->sr2=$voucher_no1;
 			$saleReturn->sr1=$invoice->in1;
 			$saleReturn->sr3=$invoice->in3;
-			$saleReturn->sr4=$st_year_id;
+			$saleReturn->sr4=$fy_year;
 			$saleReturn->financial_year_id=$st_year_id;
 			$saleReturn->created_by=$s_employee_id;
 			$saleReturn->company_id=$invoice->company_id;

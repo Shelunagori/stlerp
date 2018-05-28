@@ -57,7 +57,7 @@ class QuotationsController extends AppController
 			$where['Customers.customer_name LIKE']='%'.$customer.'%';
 		}
 		if(!empty($salesman)){
-			$where['Employees.name LIKE']='%'.$salesman.'%';
+			$where['Employees.id']=$salesman;
 		}
 		if(!empty($product)){
 			$where['ItemGroups.name LIKE']='%'.$product.'%';
@@ -160,7 +160,12 @@ class QuotationsController extends AppController
 		$companies = $this->Quotations->Companies->find('list');
 		$Items = $this->Quotations->QuotationRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$closeReasons = $this->Quotations->QuotationCloseReasons->find('all');
-        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id','ItemGroups','ItemSubGroups'));
+		$SalesMans = $this->Quotations->Employees->find('list')->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>1]);
+					}
+				);
+        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id','ItemGroups','ItemSubGroups','SalesMans'));
         $this->set('_serialize', ['quotations']);
 		$this->set(compact('url'));
 	}
@@ -210,7 +215,7 @@ class QuotationsController extends AppController
 			$where['Customers.customer_name LIKE']='%'.$customer.'%';
 		}
 		if(!empty($salesman)){
-			$where['Employees.name LIKE']='%'.$salesman.'%';
+			$where['Employees.id']=$salesman;
 		}
 		if(!empty($product)){
 			$where['ItemGroups.name LIKE']='%'.$product.'%';

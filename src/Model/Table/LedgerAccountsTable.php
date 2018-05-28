@@ -44,10 +44,7 @@ class LedgerAccountsTable extends Table
             'joinType' => 'INNER'
         ]);
 		
-        $this->belongsTo('Customers', [
-            'foreignKey' => 'customer_id',
-            'joinType' => 'INNER'
-        ]);
+        
         $this->hasMany('Ledgers', [
             'foreignKey' => 'ledger_account_id'
         ]);
@@ -55,10 +52,6 @@ class LedgerAccountsTable extends Table
             'foreignKey' => 'ledger_account_id'
         ]);
 		
-		$this->belongsTo('Customers', [
-            'foreignKey' => 'customer_id',
-            'joinType' => 'INNER'
-        ]);
 		$this->hasMany('NppaymentRows', [
             'foreignKey' => 'received_from_id'
         ]);
@@ -70,6 +63,11 @@ class LedgerAccountsTable extends Table
         ]);
 		$this->hasMany('JournalVouchers', [
             'foreignKey' => 'received_from_id'
+        ]);
+		$this->belongsTo('Customers', [
+			'className' => 'Customers',
+            'foreignKey' => 'source_id',
+            'joinType' => 'INNER'
         ]);
 		$this->belongsTo('AccountCategories');
 		$this->belongsTo('Grns');
