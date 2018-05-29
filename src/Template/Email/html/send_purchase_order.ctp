@@ -54,15 +54,21 @@ p { margin-top : 0px;  }
 						<?php $i=1; foreach($po_no as $key=>$po_no){  
 						
 						?>
-							<?php if($due_day[$key] >= 0){ ?>
+							<?php if($due_day[$key] > 0){ ?>
 							<tr>
 								<td width="5%" style="text-align:center;"><?php echo $i++; ?></td>
 								<td style="text-align:center;">
 								<a href="<?php echo $url.'/'.base64_encode($key); ?>"><?php echo $po_no; ?></a>
 								</td>
 								<td  width="20%"  align="center"><?php echo $po_date[$key]; ?></td>
+								<?php if($delevery_date[$key]=="01-01-1970"){ ?>
+								<td  width="20%"  align="center"><?php echo "-"; ?></td>
+								<td   width="20%" align="center"><?php echo "-"; ?></td>
+								<?php }else{?>
 								<td  width="20%"  align="center"><?php echo $delevery_date[$key]; ?></td>
-								<td   width="20%" align="center"><?php echo $due_day[$key]; ?></td>
+								<td   width="20%" align="center"><?php echo abs($due_day[$key]); ?></td>
+								<?php } ?>
+								
 							</tr>
 							<?php } ?>	
 						<?php } ?>

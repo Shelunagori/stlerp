@@ -233,15 +233,19 @@
 								<?php
 									if($status != 'Converted-Into-GRN') {
 									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));} 
-									?>
-									<?php 
-										$td=(date("Y-m-d"));
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+									
+									$td=(date("Y-m-d"));
 										$dd=(date("Y-m-d",strtotime($purchaseOrder->delivery_date)));
-										if($dd < date("Y-m-d",strtotime($td))){
+										if($dd < date("Y-m-d",strtotime($td))){?>
 										
+										<?php //echo $this->Html->link('<i class="fa fa-envelope"></i>',array('escape'=>false,'class'=>'btn btn-primary btn-xs send_mail','data-original-title'=>'Send Mail','ledger_id'=$purchaseOrder->id,'totalPo'=$totalPo)); ?>
+										<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-xs send_mail" data-original-title="Edit" onclick="myFunction()"><i class="fa fa-envelope"></i></button>
+									<?php 
+									
+									} 
 									?>
-									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-sm send_mail"><i class="fa fa-envelope"></i> Send Email </button>
+									
 									
 									<?php
 									}} 
@@ -273,20 +277,26 @@
 <script>
 $(document).ready(function() {
 	
-$('.send_mail').die().live("click",function() {
+ $('.send_mail').die().live("click",function() {
 	var totalPo=$(this).attr('totalPo');
 	
-	 var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'sendMail']); ?>";
-	url=url+'?totalPo='+totalPo;
-//alert(url);
-	$.ajax({
-		url: url,
-		type: "GET",
-	}).done(function(response) { 
-	alert(response);
-		//alert("Email Send successfully")
-	}); 
+		if (confirm("Are You Sure You Want To Send Mail!")) {
+		   var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'sendMail']); ?>";
+			url=url+'?totalPo='+totalPo;
+
+			$.ajax({
+				url: url,
+				type: "GET",
+			}).done(function(response) { 
+			//alert(response);
+				alert("Email Send successfully")
+			}); 
+		} else {
+			txt = "You pressed Cancel!";
+		}
+	});
 	
-});
+	
+
 });
 </script>
