@@ -46,8 +46,8 @@ class LoginsController extends AppController
 					return $this->redirect(['controller'=>'Logins', 'action' => 'SwitchCompany']);
 				}*/
 				 if(!empty($emp_mobile)){
-					return $this->redirect(['action' => 'Switch-Company']);
-					//return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
+					//return $this->redirect(['action' => 'Switch-Company']);
+					return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
 				}else{
 					return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
 				} 
