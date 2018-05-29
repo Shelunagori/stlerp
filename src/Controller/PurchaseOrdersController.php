@@ -132,6 +132,17 @@ class PurchaseOrdersController extends AppController
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
+				
+				$purchaseOrderDatas = $this->PurchaseOrders->find();
+				$purchaseOrderDatas->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
+				->innerJoinWith('PurchaseOrderRows')
+				->group(['PurchaseOrders.id'])
+				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
+				->autoFields(true)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where)
+				->order(['PurchaseOrders.id'=>'DESC']);
+				
 			}
 			
 		} 
@@ -139,7 +150,7 @@ class PurchaseOrdersController extends AppController
 		//pr($status); exit;
 		$supplier_total_po=[];
 		$total_sales=[]; $total_qty=[];
-		foreach($purchaseOrders as $salesorder){ //pr($salesorder); exit; 
+		foreach($purchaseOrderDatas as $salesorder){ //pr($salesorder); exit; 
 			$total_sales[$salesorder->id]=$salesorder->total_sales;
 			foreach($salesorder->purchase_order_rows as $sales_order_row){
 				foreach($sales_order_row->grn_rows as $invoice_row){ 
@@ -150,7 +161,7 @@ class PurchaseOrdersController extends AppController
 			}
 			//$supplier_total_po[$salesorder->vendor_id][]=$salesorder->id;
 		}
-		foreach($purchaseOrders as $purchaseOrder){
+		foreach($purchaseOrderDatas as $purchaseOrder){
 			if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){
 				$supplier_total_po[$purchaseOrder->vendor_id][]=$purchaseOrder->id;
 			}
@@ -820,7 +831,9 @@ class PurchaseOrdersController extends AppController
 		$totalPo=$this->request->query('totalPo');
 		$totalPo = explode(",", $totalPo); 
 		$PurchaseOrders = $this->PurchaseOrders->get($totalPo[0], [
-            'contain' => ['Creator','Vendors'=>['VendorContactPersons']]]);
+            'contain' => ['Creator','Vendors'=>['VendorContactPersons'=>function($q){
+				return $q->where(['VendorContactPersons.default_person'=>1]);
+			}]]]);
 		//pr($PurchaseOrders);exit;
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
@@ -840,15 +853,28 @@ class PurchaseOrdersController extends AppController
 			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->delivery_date));
 			$po_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->date_created));
 			$po_no[$purchaseOrder->id]= h(($purchaseOrder->po1.'/PO-'.str_pad($purchaseOrder->po2, 3, '0', STR_PAD_LEFT).'/'.$purchaseOrder->po3.'/'.$purchaseOrder->po4));
-			$due_day[$purchaseOrder->id]=date("d-m-Y")-date("d-m-Y",strtotime($purchaseOrder->delivery_date));
-			//pr($Po); exit;
+			//$due_day[$purchaseOrder->id]=date("Y-m-d")-date("Y-m-d",strtotime($purchaseOrder->delivery_date));
+			$date1=date("Y-m-d");
+			$date2=date("Y-m-d",strtotime($purchaseOrder->delivery_date));
+			//pr($date1); 
+			//pr($date2);
+			$date1=date_create($date1);
+			$date2=date_create($date2);			
+			$diff=date_diff($date2,$date1);
+			echo $diff->format("%R%a days");
+			$due_day[$purchaseOrder->id]=$diff->format("%R%a days");
+			//pr($diff); 
 		}
-		//pr($url); exit;
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
+		//pr($due_day); exit;
+		//pr($due_day);
+		//exit;
+		
 		$from_name=$company_data->alias;
 		$sub="STL-Purchase Order Delivery Reminder";
-		
+		//pr($email_to);
+		//pr($cc_mail);exit; 
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="gopal@phppoets.in";
 		//pr($due_day);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
