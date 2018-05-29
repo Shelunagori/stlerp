@@ -1,5 +1,3 @@
-
-
 <?php 	
 	$first="01";
 	$last="31";
@@ -127,19 +125,8 @@
 										</ul>
 								</div>
 							</td>
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->date_created)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->date_created));
-							} ?></td>
-							
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->delivery_date)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
-							} ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)); 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -167,7 +154,7 @@
 						
 						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
 						<tr <?php if($status=='Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id){ echo 'style="background-color:#f4f4f4"';   
-							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){ 
+							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){
 						?>>
 							<td><?= h(++$page_no) ?></td>
 							
@@ -185,19 +172,8 @@
 										</ul>
 								</div>
 							</td>
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->date_created)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->date_created));
-							} ?></td>
-							
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->delivery_date)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
-							} ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -243,20 +219,8 @@
 										</ul>
 								</div>
 							</td>
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->date_created)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->date_created));
-							} ?></td>
-							
-							<td style="text-align:center;"><?php 
-					if(date("d-m-Y",strtotime( $purchaseOrder->delivery_date)) == "01-01-1970"){
-								echo "-";
-							}else{
-								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
-							} ?></td>
-						
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date)); 	 ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
@@ -281,8 +245,7 @@
 									
 									} 
 									?>
-
-									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-xs blue tooltips send_mail" title="Send Mail"><i class="fa 
+									
 									
 									<?php
 									}} 
@@ -293,7 +256,7 @@
 							
 								<?php if($pull_request=="true"){ 
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
-							 ?>
+							} ?>
 								
 								
 								
