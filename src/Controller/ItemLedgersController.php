@@ -2240,7 +2240,7 @@ class ItemLedgersController extends AppController
 		$this->set(compact('itemDatas','serial_nos','voucher_no','From','To','link','url','sourceData'));
 	}
 	
-	public function SerialMisMatchList(){ 
+	public function SerialMisMatchList(){
 		$this->viewBuilder()->layout('index_layout');
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
@@ -2249,7 +2249,7 @@ class ItemLedgersController extends AppController
 						return $p->where(['ItemCompanies.company_id' => $st_company_id]);
 		}])->toArray();
 		foreach($Items as $Item){ 
-		if(@$Item->item_companies[0]->serial_number_enable==1){ 
+		if(@$Item->item_companies[0]->serial_number_enable==1){
 				$ItemLedgersQty=$this->ItemLedgers->find()
 				->select(['item_id','quantity'=>$this->ItemLedgers->find()->func()->sum('ItemLedgers.quantity')])
 				->group(['ItemLedgers.item_id'])
@@ -2274,5 +2274,426 @@ class ItemLedgersController extends AppController
 		exit;
 	
 	}
+	
+	public function refresh(){
+		$this->viewBuilder()->layout('index_layout');
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$ItemLedgers =	$this->ItemLedgers->find()
+						->where(['company_id'=>$st_company_id, 'source_model'=>'Inventory Transfer Voucher', 'in_out'=>'Out'])
+						->OrWhere(['company_id'=>$st_company_id, 'source_model'=>'Inventory Vouchers', 'in_out'=>'Out'])
+						->order(['ItemLedgers.processed_on'=>'ASC']);
+		$this->set(compact('ItemLedgers'));
+	}
+	
+	public function updateRate(){
+		$session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		$item_id=$this->request->query('item_id');
+		$date=$this->request->query('date');
+			
+		echo $unit_rate = $this->weightedAvgCost($item_id,$date);
+		exit;
+		
+	}
+	
+	public function weightedAvgCost($item_id=null,$transaction_date)
+	{
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+			
+		$Items = $this->ItemLedgers->Items->get($item_id, [
+			'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
+				return $q->where(['company_id'=>$st_company_id]);
+			}]
+		]);
+		$to_date = date('Y-m-d');
+		$unit_rate=0;
+		if($Items->item_companies[0]->serial_number_enable == '0'){
+
+			$stock=[];  $sumValue=0; $where=[];   $stockNew=[]; 
+				
+			if(!empty($transaction_date)){
+				$where['ItemLedgers.processed_on <']=$transaction_date;
+				$where['ItemLedgers.item_id']=$item_id;
+				$where['ItemLedgers.company_id']=$st_company_id;
+			}
+				
+			$StockLedgers=$this->ItemLedgers->find()->where($where)->order(['ItemLedgers.processed_on'=>'ASC']);
+			
+			foreach($StockLedgers as $StockLedger){ 
+				if($StockLedger->in_out=='In'){ 
+					if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+					$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
+					}
+				}
+			}
+				
+			foreach($StockLedgers as $StockLedger){
+				if($StockLedger->in_out=='Out'){	
+					if(sizeof(@$stockNew)==0){
+					break;
+					}
+					$outQty=$StockLedger->quantity;
+					a:
+					if(sizeof(@$stockNew)==0){
+						break;
+					}
+					$R=@$stockNew[0]['qty']-$outQty;
+					if($R>0){
+						$stockNew[0]['qty']=$R;
+					}
+					else if($R<0){
+						unset($stockNew[0]);
+						@$stockNew=array_values(@$stockNew);
+						$outQty=abs($R);
+						goto a;
+					}
+					else{
+						unset($stockNew[0]);
+						$stockNew=array_values($stockNew);
+					}
+				}
+			}
+			$closingValue=0;
+			$total_stock=0;
+			$total_amt=0;
+			$unit_rate=0;
+			foreach($stockNew as $qw){
+				$total_stock+=$qw['qty'];
+				$total_amt+=$qw['rate']*$qw['qty'];
+				
+			}
+
+			if($total_amt > 0 && $total_stock > 0){
+				$unit_rate = $total_amt/$total_stock; 
+			}
+			return $unit_rate; 	
+		}else{
+			$InSerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+								->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'In','SerialNumbers.transaction_date <'=>$transaction_date]);
+			$sr=[];
+			foreach($InSerialNumbers as $InSerialNumber){
+				$sr[$InSerialNumber->id]=$InSerialNumber->id;
+			}
+			
+			$OutSerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+								->where(['SerialNumbers.item_id'=>$item_id,'SerialNumbers.company_id'=>$st_company_id,'status'=>'Out','SerialNumbers.transaction_date <'=>$transaction_date]);
+			
+			foreach($OutSerialNumbers as $OutSerialNumber){
+				unset($sr[$OutSerialNumber->parent_id]);
+			}		
+			
+			$rates=[];
+			foreach($sr as $srId){ //echo 'hello<br/>';
+				$SerialNumber=$this->ItemLedgers->SerialNumbers->get($srId);
+				if($SerialNumber->grn_id>0){ //echo 'grn';
+					$ItemLedgerRow=	$this->ItemLedgers->find()
+									->where(['source_model'=>'Grns','source_id'=>$SerialNumber->grn_id, 'source_row_id'=>$SerialNumber->grn_row_id])->first();
+					$rates[]=$ItemLedgerRow->rate;
+				}
+				else if($SerialNumber->sale_return_id>0){ //echo 'sale_return';
+					$ItemLedgerRow=	$this->ItemLedgers->find()
+									->where(['source_model'=>'Sale Return','source_id'=>$SerialNumber->sale_return_id, 'source_row_id'=>$SerialNumber->sales_return_row_id])->first();
+					$rates[]=$ItemLedgerRow->rate;
+				}
+				else if($SerialNumber->itv_id>0){ //echo 'itv';
+					$ItemLedgerRow=	$this->ItemLedgers->find()
+									->where(['source_model'=>'Inventory Transfer Voucher','source_id'=>$SerialNumber->itv_id, 'source_row_id'=>$SerialNumber->itv_row_id])->first();
+					$rates[]=$ItemLedgerRow->rate;
+				}
+				else if($SerialNumber->iv_row_id>0){ //echo 'iv';
+					$ItemLedgerRow=	$this->ItemLedgers->find()
+									->where(['source_model'=>'Inventory Vouchers','iv_row_id'=>$SerialNumber->iv_row_id])->first();
+					$rates[]=$ItemLedgerRow->rate;
+				}
+				else if($SerialNumber->is_opening_balance  == "Yes"){ //echo 'ob';
+					$ItemLedgerRow=	$this->ItemLedgers->find()
+									->where(['source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.item_id' => $SerialNumber->item_id])->first();
+					$rates[]=$ItemLedgerRow->rate;
+				}
+			}
+			if(sizeof($sr)>0){
+				$unit_rate=array_sum($rates)/sizeof($sr);
+			}else{
+				$unit_rate=0;
+			}
+			echo $unit_rate; exit;
+			
+		}
+		
+	}
+	
+	
+	
+	public function qwerty(){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$itemLedgers=	$this->ItemLedgers->find()
+						->where([
+							'company_id'=>$st_company_id, 
+							'source_model IN'=>['Inventory Vouchers', 'Inventory Transfer Voucher'], 
+							'in_out'=>'Out',
+							'tamp_feild'=>'no'
+							])
+						->order(['itemLedgers.processed_on'=>'ASC'])
+						->contain(['Items'=>['ItemCompanies'=>function($q) use($st_company_id){
+							return $q->where(['company_id'=>$st_company_id]);
+						}]])
+						->limit(100);
+		foreach($itemLedgers as $itemLedger)
+		{
+			if($itemLedger->item->item_companies[0]->serial_number_enable==1)
+			{
+				if($itemLedger->source_model=='Inventory Vouchers')
+				{
+					$SerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+									->where(['iv_row_items'=>$itemLedger->iv_row_item_id]);
+					if($SerialNumbers)
+					{
+						$Rate=[];
+						foreach($SerialNumbers as $SerialNumber)
+						{
+							$inSr=$this->ItemLedgers->SerialNumbers->get($SerialNumber->parent_id);
+							if($inSr->is_opening_balance=='Yes')
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Items', 'item_id'=>$inSr->item_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->grn_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Grns', 'source_id'=>$inSr->grn_id, 'source_row_id'=>$inSr->grn_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->sales_return_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Sale Return', 'source_id'=>$inSr->sales_return_id, 'source_row_id'=>$inSr->sales_return_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->itv_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Inventory Transfer Voucher', 'source_id'=>$inSr->itv_id, 'source_row_id'=>$inSr->itv_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+						}
+						$sumOfRate=array_sum($Rate);
+						$TotalSr=sizeof($SerialNumbers);
+						if($sumOfRate>0 && $TotalSr>0)
+						{
+							$unitRate=$sumOfRate/$TotalSr;
+						}else
+						{
+							$unitRate=0;
+						}
+					}
+				}
+				else if($itemLedger->source_model=='Invoices')
+				{
+					$SerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+									->where(['invoice_row_id'=>$itemLedger->source_row_id]);
+					if($SerialNumbers)
+					{
+						$Rate=[];
+						foreach($SerialNumbers as $SerialNumber)
+						{
+							$inSr=$this->ItemLedgers->SerialNumbers->get($SerialNumber->parent_id);
+							if($inSr->is_opening_balance=='Yes')
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Items', 'item_id'=>$inSr->item_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->grn_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Grns', 'source_id'=>$inSr->grn_id, 'source_row_id'=>$inSr->grn_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->sales_return_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Sale Return', 'source_id'=>$inSr->sales_return_id, 'source_row_id'=>$inSr->sales_return_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->itv_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Inventory Transfer Voucher', 'source_id'=>$inSr->itv_id, 'source_row_id'=>$inSr->itv_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+						}
+						$sumOfRate=array_sum($Rate);
+						$TotalSr=sizeof($SerialNumbers);
+						if($sumOfRate>0 && $TotalSr>0)
+						{
+							$unitRate=$sumOfRate/$TotalSr;
+						}else
+						{
+							$unitRate=0;
+						}
+					}
+				}
+				else if($itemLedger->source_model=='Purchase Return')
+				{
+					$SerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+									->where(['purchase_return_row_id'=>$itemLedger->source_row_id]);
+					if($SerialNumbers)
+					{
+						$Rate=[];
+						foreach($SerialNumbers as $SerialNumber)
+						{
+							$inSr=$this->ItemLedgers->SerialNumbers->get($SerialNumber->parent_id);
+							if($inSr->is_opening_balance=='Yes')
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Items', 'item_id'=>$inSr->item_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->grn_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Grns', 'source_id'=>$inSr->grn_id, 'source_row_id'=>$inSr->grn_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->sales_return_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Sale Return', 'source_id'=>$inSr->sales_return_id, 'source_row_id'=>$inSr->sales_return_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->itv_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Inventory Transfer Voucher', 'source_id'=>$inSr->itv_id, 'source_row_id'=>$inSr->itv_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+						}
+						$sumOfRate=array_sum($Rate);
+						$TotalSr=sizeof($SerialNumbers);
+						if($sumOfRate>0 && $TotalSr>0)
+						{
+							$unitRate=$sumOfRate/$TotalSr;
+						}else
+						{
+							$unitRate=0;
+						}
+					}
+				}
+				else if($itemLedger->source_model=='Inventory Transfer Voucher')
+				{
+					$SerialNumbers=	$this->ItemLedgers->SerialNumbers->find()
+									->where(['itv_row_id'=>$itemLedger->source_row_id]);
+					if($SerialNumbers)
+					{
+						$Rate=[];
+						foreach($SerialNumbers as $SerialNumber)
+						{
+							$inSr=$this->ItemLedgers->SerialNumbers->get($SerialNumber->parent_id);
+							if($inSr->is_opening_balance=='Yes')
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Items', 'item_id'=>$inSr->item_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->grn_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Grns', 'source_id'=>$inSr->grn_id, 'source_row_id'=>$inSr->grn_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->sales_return_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Sale Return', 'source_id'=>$inSr->sales_return_id, 'source_row_id'=>$inSr->sales_return_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+							else if($inSr->itv_row_id>0)
+							{
+								$Row=$this->ItemLedgers->find()->where(['company_id'=>$st_company_id, 'source_model'=>'Inventory Transfer Voucher', 'source_id'=>$inSr->itv_id, 'source_row_id'=>$inSr->itv_row_id])->first();
+								$Rate[]=@$Row->rate;
+							}
+						}
+						$sumOfRate=array_sum($Rate);
+						$TotalSr=sizeof($SerialNumbers);
+						if($sumOfRate>0 && $TotalSr>0)
+						{
+							$unitRate=$sumOfRate/$TotalSr;
+						}else
+						{
+							$unitRate=0;
+						}
+					}
+				}
+				$il=$this->ItemLedgers->get($itemLedger->id);
+				$il->rate=round($unitRate,2);
+				//$this->ItemLedgers->save($il);
+				echo $itemLedger->id.' - '.round($unitRate,2);
+				echo '<hr/>';
+			}
+			else if($itemLedger->item->item_companies[0]->serial_number_enable==0)
+			{
+				$transaction_date=$itemLedger->processed_on;
+				$item_id=$itemLedger->item_id;
+				$stock=[];  $sumValue=0; $where=[];   $stockNew=[]; 
+				if(!empty($transaction_date)){
+					$where['ItemLedgers.processed_on <']=$transaction_date;
+					$where['ItemLedgers.item_id']=$item_id;
+					$where['ItemLedgers.company_id']=$st_company_id;
+				}
+					
+				$StockLedgers=$this->ItemLedgers->find()->where($where)->order(['ItemLedgers.processed_on'=>'ASC']);
+				
+				foreach($StockLedgers as $StockLedger){ 
+					if($StockLedger->in_out=='In'){ 
+						if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+						$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
+						}
+					}
+				}
+					
+				foreach($StockLedgers as $StockLedger){
+					if($StockLedger->in_out=='Out'){	
+						if(sizeof(@$stockNew)==0){
+						break;
+						}
+						$outQty=$StockLedger->quantity;
+						a:
+						if(sizeof(@$stockNew)==0){
+							break;
+						}
+						$R=@$stockNew[0]['qty']-$outQty;
+						if($R>0){
+							$stockNew[0]['qty']=$R;
+						}
+						else if($R<0){
+							unset($stockNew[0]);
+							@$stockNew=array_values(@$stockNew);
+							$outQty=abs($R);
+							goto a;
+						}
+						else{
+							unset($stockNew[0]);
+							$stockNew=array_values($stockNew);
+						}
+					}
+				}
+				$closingValue=0;
+				$total_stock=0;
+				$total_amt=0;
+				$unit_rate=0;
+				foreach($stockNew as $qw){
+					$total_stock+=$qw['qty'];
+					$total_amt+=$qw['rate']*$qw['qty'];
+					
+				}
+
+				if($total_amt > 0 && $total_stock > 0){
+					$unit_rate = $total_amt/$total_stock; 
+				}
+				echo $itemLedger->id.' - '.round($unit_rate,2);
+				echo '<hr/>';
+			}
+			
+			$query2=$this->ItemLedgers->query();
+			$query2->update()
+			->set(['tamp_feild' => 'yes'])
+			->where(['id' => $itemLedger->id])
+			->execute();
+		}
+		exit;
+	}
+	
 }
 

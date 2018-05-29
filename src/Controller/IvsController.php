@@ -468,7 +468,7 @@ class IvsController extends AppController
         $this->set('_serialize', ['iv']);
     }
 
-	public function weightedAvgCostForSerialWise($sr_no_out_id=null){ 
+	public function weightedAvgCostForSerialWise($sr_no_out_id=null){
 	
 	
 	$this->viewBuilder()->layout('');
@@ -820,4 +820,42 @@ class IvsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+	
+	public function qwerty()
+	{
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
+		$Ivs =	$this->Ivs->find()
+				->where(['company_id'=>$st_company_id, 'tamp_feild'=>'no'])
+				->contain(['IvRows'=>['IvRowItems']])
+				->limit(20);
+		foreach($Ivs as $Iv)
+		{
+			foreach($Iv->iv_rows as $iv_row)
+			{
+				$value=0;
+				foreach($iv_row->iv_row_items as $iv_row_item)
+				{
+					$ItemLedger=$this->Ivs->ItemLedgers->find()->where(['source_model'=>'Inventory Vouchers', 'iv_row_item_id'=>$iv_row_item->id])->first();
+					$value+=$ItemLedger->quantity*$ItemLedger->rate;
+				}
+				$ItemLedger=$this->Ivs->ItemLedgers->find()->where(['source_model'=>'Inventory Vouchers', 'iv_row_id'=>$iv_row->id])->first();
+				echo $Iv->id.' - ';
+				echo $unitRate=round($value/$iv_row->quantity,2);
+				echo '<hr>';
+				$query = $this->Ivs->ItemLedgers->query();
+				/* $query->update()
+				->set(['rate' => $unitRate])
+				->where(['id'=>$ItemLedger->id])
+				->execute(); */
+			}
+			$query2=$this->Ivs->query();
+			$query2->update()
+			->set(['tamp_feild' => 'yes'])
+			->where(['id' => $Iv->id])
+			->execute();
+		}
+		exit;
+	}
 }
