@@ -185,7 +185,7 @@ class AppController extends Controller
 
 
 			//pr($allowed_emp); exit;
-			$this->set(compact('allowed_pages','st_company_id','allowed_emp'));
+			$this->set(compact('allowed_pages','st_company_id','allowed_emp','st_year_id'));
 		}
 
 		$this->loadModel('Pages');

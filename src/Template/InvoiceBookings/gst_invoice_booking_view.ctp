@@ -314,7 +314,7 @@ margin-bottom: 0;
 		<table>
 			<tr>
 				<td align="center">
-				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($invoiceBooking->company->name)?><br/></span>
+				<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($invoiceBooking->company->name)?><br/></span>
 				<?php 
 				 echo $this->Html->Image('/signatures/'.$invoiceBooking->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 				 ?></br>

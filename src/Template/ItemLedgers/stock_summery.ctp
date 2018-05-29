@@ -22,7 +22,7 @@
 								<tr>
 									<td width="15%">
 											<label class="control-label">Items </label>
-											<?php echo $this->Form->input('item_name', ['empty'=>'--Select--','options' => $Items,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Category','value'=> h(@$item_name) ]); ?>
+											<?php echo $this->Form->input('item_name', ['empty'=>'--Select--','options' => $Items,'label' => false,'class' => 'form-control input-sm item_name','placeholder'=>'Category','value'=> h(@$item_name) ]); ?>
 									</td>
 									<td width="15%">
 											<label class="control-label">Category </label>
@@ -162,6 +162,7 @@
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
+
 var $rows = $('#main_tble tbody tr');
 	$('#search3').on('keyup',function() {
 	

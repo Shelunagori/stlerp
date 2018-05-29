@@ -160,7 +160,7 @@ margin-bottom: 0;
 		<table >
 			<tr>
 			    <td align="center">
-				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($inventoryTransferVoucher->company->name)?><br/></span>
+				<span style="font-weight: bold;font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($inventoryTransferVoucher->company->name)?><br/></span>
 				<?php 
 				 echo $this->Html->Image('/signatures/'.$inventoryTransferVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 				 ?></br>

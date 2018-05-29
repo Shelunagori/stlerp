@@ -26,6 +26,8 @@
 		</tr>
 		<tr>
 			<th>Sr. No.</th>
+			<th>Customer</th>
+			<th>Supplier</th>
 			<th>Vocher No</th>
 			<th>Transaction Date</th>
 		</tr>
@@ -35,7 +37,23 @@
 if(in_array($inventory_transfer_vouch_data->created_by,$allowed_emp)){
 		$i++; ?>
 	<tr>
-		<td><?= h($i) ?></td>		
+		<td><?= h($i) ?></td>	
+		<td>
+			<?php if(!empty($inventory_transfer_vouch_data->customer)){
+				echo $inventory_transfer_vouch_data->customer->customer_name;
+			}else{
+				echo "-";
+			}
+				?>
+		</td>
+		<td>
+			<?php if(!empty($inventory_transfer_vouch_data->vendor)){
+				echo $inventory_transfer_vouch_data->vendor->company_name;
+			}else{
+				echo "-";
+			}
+				?>
+		</td>		
 		<?php if($inventory_transfer_vouch_data->in_out=='in_out'){ ?>
 		<td><?= h('ITV-'.str_pad($inventory_transfer_vouch_data->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
 		<?php }else if($inventory_transfer_vouch_data->in_out=='in') { ?>

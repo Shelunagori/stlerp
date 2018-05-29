@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <!--[if !IE]><!-->
 <html lang="en">
@@ -325,12 +327,22 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(3,$allowed_pages)){
-						echo '<li>'.$this->Html->link( 'Create', '/Sales-Orders/add' ).'</li>';
-						} ?>
-						<?php if(in_array(149,$allowed_pages)){
-						echo '<li>'.$this->Html->link( 'Create Gst Sales Order', '/Sales-Orders/gstSalesOrderAdd' ).'</li>';
-						} ?>
+						<?php 
+						if($st_year_id == 1){
+							if(in_array(3,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'Create', '/Sales-Orders/add' ).'</li>';
+							} 
+							if(in_array(149,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'Create Gst Sales Order', '/Sales-Orders/gstSalesOrderAdd' ).'</li>';
+							}
+						}else{
+							if(in_array(149,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'Create', '/Sales-Orders/gstSalesOrderAdd' ).'</li>';
+							}
+						}
+						
+						?>
+						<?php ?>
 						<?php if(in_array(22,$allowed_pages) || in_array(4,$allowed_pages)){
 						
 						echo '<li>'.$this->Html->link( 'View', '/Sales-Orders' ).'</li>';
@@ -363,12 +375,20 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(7,$allowed_pages)){
-						echo '<li>'.$this->Html->link( 'Create', '/SalesOrders/index?pull-request=true' ).'</li>';
-						} ?>
-						<?php if(in_array(7,$allowed_pages)){
-						echo '<li>'.$this->Html->link( 'GST Invoice', '/SalesOrders/index?gst=true' ).'</li>';
-						} ?>
+						<?php 
+						if($st_year_id == 1){
+							if(in_array(7,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'Create', '/SalesOrders/index?pull-request=true' ).'</li>';
+							}
+							if(in_array(7,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'GST Invoice', '/SalesOrders/index?gst=true' ).'</li>';
+							}
+						}else{
+							if(in_array(7,$allowed_pages)){
+								echo '<li>'.$this->Html->link( 'Create', '/SalesOrders/index?gst=true' ).'</li>';
+							}
+						}	?>
+						
 						<?php if(in_array(23,$allowed_pages) || in_array(8,$allowed_pages)){
 						echo '<li>'.$this->Html->link( 'View', '/Invoices' ).'</li>';
 						} ?>
@@ -521,12 +541,20 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(17,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Grns/index?pull-request=true',array('escape'=>false)).'</li>';
-						} ?>
-						<?php if(in_array(17,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create Gst Invoice Booking','/Grns/index?grn-pull-request=true',array('escape'=>false)).'</li>';
-						} ?>
+						<?php 
+						if($st_year_id == 1){
+							if(in_array(17,$allowed_pages)){
+								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Grns/index?pull-request=true',array('escape'=>false)).'</li>';
+							}
+							if(in_array(17,$allowed_pages)){
+								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create Gst Invoice Booking','/Grns/index?grn-pull-request=true',array('escape'=>false)).'</li>';
+							}
+						}else{
+							if(in_array(17,$allowed_pages)){
+								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Grns/index?grn-pull-request=true',array('escape'=>false)).'</li>';
+							}
+						}	?>
+						<?php  ?>
 						<?php if(in_array(18,$allowed_pages) || in_array(123,$allowed_pages)){
                         echo '<li>'.$this->Html->link('<i class="icon-home"></i> View','/InvoiceBookings/',array('escape'=>false)).'</li>';
                         } ?>
@@ -786,10 +814,14 @@ select
 					</a>
 					<ul class="sub-menu">
 						<?php 
-						 if(in_array(133,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Non-Gst','/Invoices/SalesReturnIndex?sales_return=true',array('escape'=>false)).'</li>';
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Gst','/Invoices/gstSalesReturn?sales_return=true',array('escape'=>false)).'</li>';
-						 }
+						if($st_year_id == 1){
+							 if(in_array(133,$allowed_pages)){
+								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Non-Gst','/Invoices/SalesReturnIndex?sales_return=true',array('escape'=>false)).'</li>';
+								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Gst','/Invoices/gstSalesReturn?sales_return=true',array('escape'=>false)).'</li>';
+							}
+						}else{
+							echo '<li>'.$this->Html->link('<i class="icon-home"></i>Create','/Invoices/gstSalesReturn?sales_return=true',array('escape'=>false)).'</li>';
+						}	
 						 ?>
 						<?php 
 						if(in_array(136,$allowed_pages)){
@@ -822,10 +854,14 @@ select
 					</a>
 					<ul class="sub-menu">
 						<?php 
-						if(in_array(129,$allowed_pages)){
-						echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
-						echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Gst','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';
-						 }
+						if($st_year_id == 1){
+							if(in_array(129,$allowed_pages)){
+								echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
+								echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Gst','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';
+							 }
+						}else{
+							echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Create','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';
+						}	 
 						 ?>
 						<?php 
 						if(in_array(132,$allowed_pages)){

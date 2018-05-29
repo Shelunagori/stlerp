@@ -46,12 +46,12 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="left">
 				<table>
 					<tr>
-						<td  width="38%" valign="top" >GRN No</td>
-						<td width="2%" valign="top">:</td>
-						<td valign="top"><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
+						<td  width="38%" valign="top" ><b>GRN No</b></td>
+						<td width="2%">:</td>
+						<td ><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
 					</tr>
 					<tr>
-						<td  width="38%" valign="top">Purchase Order No</td>
+						<td  width="38%" valign="top"><b>Purchase Order No</b></td>
 						<td width="2%" valign="top">:</td>
 						<td valign="top"><?= h(($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4)) ?></td>
 					</tr>
@@ -60,17 +60,17 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
-						<td  width="48%" valign="top">Created Date.</td>
+						<td  width="48%" valign="top"><b>Created Date</b></td>
 						<td  width="2%" valign="top">:</td>
 						<td valign="top"><?= h(date("d-m-Y",strtotime($grn->date_created))) ?></td>
 					</tr>
 					<tr>
-						<td  width="48%" valign="top">Transaction Date.</td>
+						<td  width="48%" valign="top"><b>Transaction Date</b></td>
 						<td  width="2%" valign="top">:</td>
 						<td valign="top"><?= h(date("d-m-Y",strtotime($grn->transaction_date))) ?></td>
 					</tr>
 					<tr>
-						<td  width="50%" valign="top">Road Permit No</td>
+						<td  width="50%" valign="top"><b>Road Permit No</b></td>
 						<td  width="2%" valign="top">:</td>
 						<td valign="top" align="center"><?= h(($grn->road_permit_no)) ?></td>
 					</tr>

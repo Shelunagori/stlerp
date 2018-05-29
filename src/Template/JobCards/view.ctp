@@ -19,6 +19,10 @@ margin-bottom: 0;
         border-bottom-style: none;
 
 }
+.tabitem thead tr th {
+    color: #FFF;
+    background-color: #254b73;
+}
 </style>
 <style type="text/css" media="print">
 @page {
@@ -49,7 +53,7 @@ margin-bottom: 0;
 					<td  width="20%"><label><b>Job Card No</b></label></td>
 					<td  width="5%">:</td>
 					<td  width="25%"><?= h(($jobCard->jc1.'/JC-'.str_pad($jobCard->jc2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->jc3.'/'.$jobCard->jc4))?></td>
-					<td  width="20%"><label  style="font-size:105%"><b>Customer Name</b></label></td>
+					<td  width="20%"><label  ><b>Customer Name</b></label></td>
 					<td  width="5%">:</td>
 					<td  width="25%"><?= h($jobCard->sales_order->customer->customer_name).'('. h($jobCard->sales_order->customer->alias).')' ?></td>
 				</tr>
@@ -57,23 +61,23 @@ margin-bottom: 0;
 					<td><label><b>Sales Order No</b></label></td>
 					<td>:</td>
 					<td><?= h(($jobCard->sales_order->so1.'/SO-'.str_pad($jobCard->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$jobCard->sales_order->so3.'/'.$jobCard	->sales_order->so4))?></td>
-					<td><label style="font-size:105%"><b>Customer PO No</b></label></td>
+					<td><label ><b>Customer PO No</b></label></td>
 					<td>:</td>
 					<td><?= h($jobCard->sales_order->customer_po_no)?></td>
 				</tr>
 				<tr>
-					<td><label style="font-size:105%"><b>Required Date</b></label></td>
+					<td><label ><b>Required Date</b></label></td>
 					<td>:</td>
 					<td><?= h($jobCard->required_date=date("d-m-Y",strtotime($jobCard->required_date))) ?></td>
 					
 				</tr>
 				<tr>
-					<td valign="top"><label style="font-size:105%"><b>Dispatch Destination</b></label></td>
+					<td valign="top"><label ><b>Dispatch Destination</b></label></td>
 					<td valign="top">:</td>
 					<td colspan="4"><?= $this->Text->autoParagraph(h($jobCard->customer->customer_address[0]->address))?></td>
 				</tr>
 				<tr>
-					<td valign="top"><label style="font-size:105%"><b>Packing</b></label></td>
+					<td valign="top"><label ><b>Packing</b></label></td>
 					<td valign="top">:</td>
 					<td colspan="4"><?= $this->Text->autoParagraph(h($jobCard->packing)) ?></td>
 					
@@ -84,7 +88,7 @@ margin-bottom: 0;
 	
 <?php if(!empty($jobCard)){ ?>
 <div class="portlet-body form">
-<table class="table table-bordered table-condensed">
+<table width="100%" class="table table-condensed tabitem"  border="0">
 	<thead> 
 		<th width="30%">Production</th>
 		<th width="30%">Consumption</th>
@@ -117,7 +121,7 @@ margin-bottom: 0;
 		<table >
 			<tr>
 			    <td align="center">
-				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($jobCard->company->name)?><br/></span>
+				<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($jobCard->company->name)?><br/></span>
 				<?php 
 				 echo $this->Html->Image('/signatures/'.$jobCard->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 				 ?></br>

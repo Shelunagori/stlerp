@@ -14,9 +14,43 @@
 				<table class="table table-condensed">
 					<tbody>
 						<tr>
+							<td width="20%">
+								<?php 
+								
+								$options=array();
+								foreach($customers as $customer){
+									if(empty($customer->alias)){
+										$merge=$customer->customer_name;
+									}else{
+										$merge=$customer->customer_name.'	('.$customer->alias.')';
+									}
+									
+									$options[]=['text' =>$merge, 'value' => $customer->id];
+								}
+								
+								echo $this->Form->input('customers_id', ['empty'=>'--Customers--','options' => $options,'label' => false,'class' => 'form-control input-sm customers_id','placeholder'=>'Category','value'=> h(@$customers_id) ]); ?>
+							</td>
+							<td width="20%">
+								<?php 
+								foreach($vendor as $vendors){
+								if(empty($vendors->alias)){
+									$merge1=$vendors->company_name;
+								}else{
+									$merge1=$vendors->company_name.'('.$vendors->alias.')';
+								}
+								
+								$options1[]=['text' =>$merge1, 'value' => $vendors->id];
+
+							}
+								
+								echo $this->Form->input('vendor_id', ['empty'=>'--Vendor--','options' => $options1,'label' => false,'class' => 'form-control input-sm vendor_id','placeholder'=>'Category','value'=> h(@$vendor_id) ]); ?>
+							</td>
 							
 							<td width="20%"> 
+								<div class="input-group" style="" id="pnf_text">
+									<span class="input-group-addon">ITV-</span>
 								<input type="text" name="vouch_no" class="form-control input-sm" placeholder="Voucher No" value="<?php echo @$vouch_no; ?>">
+							</div>	
 							</td>
 							<td width="20%">
 								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction Date From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
@@ -36,6 +70,8 @@
 					<thead>
 						<tr>
 							<th>Sr. No.</th>
+							<th>Customer</th>
+							<th>Supplier</th>
 							<th>Vocher No</th>
 							<th>Transaction Date</th>
 							<th>Action</th>
@@ -49,6 +85,22 @@
 					?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
+							<td>
+								<?php if(!empty($inventory_transfer_vouch_data->customer)){
+									echo $inventory_transfer_vouch_data->customer->customer_name;
+								}else{
+									echo "-";
+								}
+									?>
+							</td>
+							<td>
+								<?php if(!empty($inventory_transfer_vouch_data->vendor)){
+									echo $inventory_transfer_vouch_data->vendor->company_name;
+								}else{
+									echo "-";
+								}
+									?>
+							</td>
 							<?php if($inventory_transfer_vouch_data->in_out=='in_out'){ ?>
 							<td><?= h('ITV-'.str_pad($inventory_transfer_vouch_data->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
 							<?php }else if($inventory_transfer_vouch_data->in_out=='In') { ?>
@@ -99,5 +151,13 @@
 				
 			</div>
 		</div>
+	<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+
+<script>
+$(document).ready(function() {
+	$('.customers_id').select2({allowClear :true});
+	$('.vendor_id').select2({allowClear :true});
 	
+});
+</script>
 

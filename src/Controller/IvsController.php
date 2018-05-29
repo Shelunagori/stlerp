@@ -72,7 +72,7 @@ class IvsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$st_company_id = $session->read('st_company_id');
 		
 		$iv_no=$this->request->query('iv_no');
@@ -100,7 +100,7 @@ class IvsController extends AppController
 			$where['Ivs.transaction_date <=']=$To;
 		}
         
-		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows','Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->order(['Ivs.id' => 'DESC']);
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows','Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id,'Ivs.financial_year_id'=>$st_year_id])->order(['Ivs.id' => 'DESC']);
       
         $this->set(compact('ivs','url','From','To'));
 	} 

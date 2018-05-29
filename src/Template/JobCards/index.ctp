@@ -172,7 +172,7 @@
 					<td class="actions">
 				
 					<?php if(in_array(24,$allowed_pages)){ ?>
-					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); ?>
+					<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'_blank','data-original-title'=>'View')); ?>
 					<?php }  ?>
 					<!--if(in_array(34,$allowed_pages)) {
 

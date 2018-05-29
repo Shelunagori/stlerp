@@ -27,15 +27,23 @@ class InventoryTransferVouchersController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$where = [];
+        $vendor_id = $this->request->query('vendor_id');
+        $customers_id = $this->request->query('customers_id');
         $vouch_no = $this->request->query('vouch_no');
 		$From = $this->request->query('From');
 		$To = $this->request->query('To');
 		//pr($vouch_no);exit;
 		
-		$this->set(compact('vouch_no','From','To'));
+		$this->set(compact('vouch_no','From','To','customers_id','vendor_id'));
 		
 		if(!empty($vouch_no)){
 			$where['InventoryTransferVouchers.voucher_no LIKE']=$vouch_no;
+		}
+		if(!empty($customers_id)){
+			$where['InventoryTransferVouchers.customer_id']=$customers_id;
+		}
+		if(!empty($vendor_id)){
+			$where['InventoryTransferVouchers.vendor_id']=$vendor_id;
 		}
 		
 		if(!empty($From)){
@@ -49,14 +57,28 @@ class InventoryTransferVouchersController extends AppController
 		/* $this->paginate = [
             'contain' => ['Companies']
         ]; */
-		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
+		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies','Customers','Vendors'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
+		
+		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
+			return $q
+			->where(['CustomerAddress.default_address'=>1]);
+		}])->matching(
+					'CustomerCompanies', function ($q) use($st_company_id) {
+						return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
+					}
+				);
+		
+		$vendor = $this->InventoryTransferVouchers->Vendors->find('all')->order(['Vendors.company_name' => 'ASC'])->matching('VendorCompanies', function ($q) use($st_company_id) {
+						return $q->where(['VendorCompanies.company_id' => $st_company_id]);
+					}
+				);
 		//pr($inventory_transfer_vouchs->toArray());exit;
 		
 		
 		
         /* $inventoryTransferVouchers = $this->paginate($this->InventoryTransferVouchers->find()->where(['company_id'=>$st_company_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])); */
 
-        $this->set(compact('inventoryTransferVouchers','inventory_transfer_vouchs','url'));
+        $this->set(compact('inventoryTransferVouchers','inventory_transfer_vouchs','url','customers','vendor'));
         $this->set('_serialize', ['inventoryTransferVouchers']);
     }
 	
@@ -211,18 +233,26 @@ class InventoryTransferVouchersController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$where = [];
+		 $vendor_id = $this->request->query('vendor_id');
+        $customers_id = $this->request->query('customers_id');
         $vouch_no = $this->request->query('vouch_no');
 		$From = $this->request->query('From');
 		$To = $this->request->query('To');
 		//pr($vouch_no);exit;
 		
-		$this->set(compact('vouch_no','From','To'));
+		$this->set(compact('vouch_no','From','To','vendor_id','customers_id'));
 		
 		if(!empty($vouch_no)){
 			$where['InventoryTransferVouchers.voucher_no LIKE']=$vouch_no;
 		}
-		
+		if(!empty($customers_id)){
+			$where['InventoryTransferVouchers.customer_id']=$customers_id;
+		}
+		if(!empty($vendor_id)){
+			$where['InventoryTransferVouchers.vendor_id']=$vendor_id;
+		}
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['InventoryTransferVouchers.transaction_date >=']=$From;
@@ -232,7 +262,7 @@ class InventoryTransferVouchersController extends AppController
 			$where['InventoryTransferVouchers.transaction_date <=']=$To;
 		}
 		
-		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies']);
+		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies','Customers','Vendors']);
 		//pr($inventory_transfer_vouchs->toArray());exit;
 		
 

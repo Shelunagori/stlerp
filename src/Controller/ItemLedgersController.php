@@ -737,7 +737,7 @@ class ItemLedgersController extends AppController
 		if(!empty($item_sub_group)){
 			$where['Items.item_sub_group_id ']=$item_sub_group;
 		}
-		
+		pr($where);exit;
 		$this->set(compact('item_category','item_group','item_sub_group','stock','item_name'));
 
 		
