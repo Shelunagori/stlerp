@@ -829,7 +829,9 @@ class IvsController extends AppController
 		$Ivs =	$this->Ivs->find()
 				->where(['company_id'=>$st_company_id, 'tamp_feild'=>'no'])
 				->contain(['IvRows'=>['IvRowItems']])
-				->limit(20);
+				->limit(50);
+		
+				
 		foreach($Ivs as $Iv)
 		{
 			foreach($Iv->iv_rows as $iv_row)
@@ -838,17 +840,19 @@ class IvsController extends AppController
 				foreach($iv_row->iv_row_items as $iv_row_item)
 				{
 					$ItemLedger=$this->Ivs->ItemLedgers->find()->where(['source_model'=>'Inventory Vouchers', 'iv_row_item_id'=>$iv_row_item->id])->first();
+					echo $ItemLedger->id.' ';
+					echo $ItemLedger->quantity.' ';
+					echo $ItemLedger->rate.'<br/>';
 					$value+=$ItemLedger->quantity*$ItemLedger->rate;
 				}
 				$ItemLedger=$this->Ivs->ItemLedgers->find()->where(['source_model'=>'Inventory Vouchers', 'iv_row_id'=>$iv_row->id])->first();
-				echo $Iv->id.' - ';
 				echo $unitRate=round($value/$iv_row->quantity,2);
 				echo '<hr>';
 				$query = $this->Ivs->ItemLedgers->query();
-				/* $query->update()
+				$query->update()
 				->set(['rate' => $unitRate])
 				->where(['id'=>$ItemLedger->id])
-				->execute(); */
+				->execute();
 			}
 			$query2=$this->Ivs->query();
 			$query2->update()

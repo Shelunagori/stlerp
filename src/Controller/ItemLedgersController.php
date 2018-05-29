@@ -2444,6 +2444,7 @@ class ItemLedgersController extends AppController
 							return $q->where(['company_id'=>$st_company_id]);
 						}]])
 						->limit(100);
+						
 		foreach($itemLedgers as $itemLedger)
 		{
 			if($itemLedger->item->item_companies[0]->serial_number_enable==1)
@@ -2480,7 +2481,7 @@ class ItemLedgersController extends AppController
 							}
 						}
 						$sumOfRate=array_sum($Rate);
-						$TotalSr=sizeof($SerialNumbers);
+						$TotalSr=sizeof($SerialNumbers->toArray());
 						if($sumOfRate>0 && $TotalSr>0)
 						{
 							$unitRate=$sumOfRate/$TotalSr;
@@ -2522,7 +2523,7 @@ class ItemLedgersController extends AppController
 							}
 						}
 						$sumOfRate=array_sum($Rate);
-						$TotalSr=sizeof($SerialNumbers);
+						$TotalSr=sizeof($SerialNumbers->toArray());
 						if($sumOfRate>0 && $TotalSr>0)
 						{
 							$unitRate=$sumOfRate/$TotalSr;
@@ -2564,7 +2565,7 @@ class ItemLedgersController extends AppController
 							}
 						}
 						$sumOfRate=array_sum($Rate);
-						$TotalSr=sizeof($SerialNumbers);
+						$TotalSr=sizeof($SerialNumbers->toArray());
 						if($sumOfRate>0 && $TotalSr>0)
 						{
 							$unitRate=$sumOfRate/$TotalSr;
@@ -2606,7 +2607,7 @@ class ItemLedgersController extends AppController
 							}
 						}
 						$sumOfRate=array_sum($Rate);
-						$TotalSr=sizeof($SerialNumbers);
+						$TotalSr=sizeof($SerialNumbers->toArray());
 						if($sumOfRate>0 && $TotalSr>0)
 						{
 							$unitRate=$sumOfRate/$TotalSr;
@@ -2618,7 +2619,7 @@ class ItemLedgersController extends AppController
 				}
 				$il=$this->ItemLedgers->get($itemLedger->id);
 				$il->rate=round($unitRate,2);
-				//$this->ItemLedgers->save($il);
+				$this->ItemLedgers->save($il);
 				echo $itemLedger->id.' - '.round($unitRate,2);
 				echo '<hr/>';
 			}
@@ -2628,9 +2629,10 @@ class ItemLedgersController extends AppController
 				$item_id=$itemLedger->item_id;
 				$stock=[];  $sumValue=0; $where=[];   $stockNew=[]; 
 				if(!empty($transaction_date)){
-					$where['ItemLedgers.processed_on <']=$transaction_date;
+					$where['ItemLedgers.processed_on <=']=$transaction_date;
 					$where['ItemLedgers.item_id']=$item_id;
 					$where['ItemLedgers.company_id']=$st_company_id;
+					$where['ItemLedgers.id !=']=$itemLedger->id;
 				}
 					
 				$StockLedgers=$this->ItemLedgers->find()->where($where)->order(['ItemLedgers.processed_on'=>'ASC']);
@@ -2682,6 +2684,9 @@ class ItemLedgersController extends AppController
 				if($total_amt > 0 && $total_stock > 0){
 					$unit_rate = $total_amt/$total_stock; 
 				}
+				$il=$this->ItemLedgers->get($itemLedger->id);
+				$il->rate=round($unit_rate,2);
+				$this->ItemLedgers->save($il);
 				echo $itemLedger->id.' - '.round($unit_rate,2);
 				echo '<hr/>';
 			}
