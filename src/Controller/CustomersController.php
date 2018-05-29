@@ -26,6 +26,7 @@ class CustomersController extends AppController
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$where=[];
 		$customer=$this->request->query('customer');

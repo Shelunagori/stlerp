@@ -120,29 +120,45 @@
 				$cgst_amt=0;
 				$sgst_amt=0;
 				$igst_amt=0;
+				$emp_id="No";
 				if($ledger->voucher_source=="Journal Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($Receipt->voucher_no); 
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/JournalVouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($Receipt->voucher_no);exit;
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/Payments/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					//pr($url_link[$ledger->id]);exit;
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/petty-cash-vouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Contra Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/contra-vouchers/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Receipt Voucher"){ 
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/receipts/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Invoice"){ 
 					$invoice=$url_link[$ledger->id];
 					$voucher_no=h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4));
@@ -161,16 +177,43 @@
 						$sgst_amt="-";
 						$igst_amt="-";
 					}
+					if(in_array($invoice->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 					
+					
+				}else if($ledger->voucher_source=="Sale Return"){ 
+					$salereturn=$url_link[$ledger->id];
+					//pr($salereturn->sale_return_type); exit; 
+					$voucher_no=h(($salereturn->sr1.'/SR-'.str_pad($salereturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$salereturn->sr3.'/'.$salereturn->sr4));
+					if($salereturn->sale_return_type=="GST"){
+						$url_path="/sale-returns/gst-confirm/".$ledger->voucher_id;	
+					}else{
+						$url_path="/sale-returns/confirm/".$ledger->voucher_id;	
+					}
+					
+					if($salereturn->sale_return_type=="GST"){
+						$cgst_amt=$salereturn->total_cgst_amount;
+						$sgst_amt=$salereturn->total_sgst_amount;
+						$igst_amt=$salereturn->total_igst_amount;
+						
+					}else{
+						$cgst_amt="-";
+						$sgst_amt="-";
+						$igst_amt="-";
+					}
+					if(in_array($salereturn->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 					
 				}else if($ledger->voucher_source=="Invoice Booking"){
 					$ibs=$url_link[$ledger->id];
 					//pr($ibs); exit;
 					$voucher_no=h(($ibs->ib1.'/IB-'.str_pad($ibs->ib2, 3, '0', STR_PAD_LEFT).'/'.$ibs->ib3.'/'.$ibs->ib4));
 					if($ibs->gst=="yes"){
-					$url_path="/invoice-bookings/gst-invoice-booking-view/".$ledger->voucher_id;	
+						$url_path="/invoice-bookings/gst-invoice-booking-view/".$ledger->voucher_id;	
 					}else{
-					$url_path="/invoice-bookings/view/".$ledger->voucher_id;
+						$url_path="/invoice-bookings/view/".$ledger->voucher_id;
 					}
 					
 					//$url_path="/invoice-bookings/view/".$ledger->voucher_id;
@@ -186,22 +229,38 @@
 							$sgst_amt="-";
 							$igst_amt="-";
 					}
+					if(in_array($ibs->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/nppayments/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Debit Note"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/debit-notes/view/".$ledger->voucher_id;
-				}else if($ledger->voucher_source=="Credit Note"){
-					$Receipt=$url_link[$ledger->id];
-					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
-					$url_path="/credit-notes/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
+				}else if($ledger->voucher_source=="Credit Notes"){
+					//pr($ledger['id']);exit;
+					$Receipt=@$url_link[@$ledger->id];
+					$voucher_no=str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT);
+					$url_path="/credit-notes/view/".@$ledger->voucher_id;
+					if(in_array(@$Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$Receipt=$url_link[$ledger->id];
-					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+					$voucher_no=str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT);
 					$url_path="/purchase-returns/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					}
 				}
 				
 				if($ledger->voucher_source != 'Opening Balance')	
@@ -212,10 +271,15 @@
 						<td><?= h($ledger->voucher_source); ?></td>
 						<td>
 						
-						<?php if(!empty($url_path)){
-								echo $voucher_no ;
+						<?php
+							if($emp_id=="Yes"){
+								if(!empty($url_path)){
+									echo $voucher_no ;
+								}else{
+									echo str_pad($ledger->voucher_id,4,'0',STR_PAD_LEFT);
+								}
 							}else{
-								echo str_pad($ledger->voucher_id,4,'0',STR_PAD_LEFT);
+								echo $voucher_no;
 							}
 						?>
 						</td>

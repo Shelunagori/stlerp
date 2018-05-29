@@ -290,7 +290,7 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
 				->where($where)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}

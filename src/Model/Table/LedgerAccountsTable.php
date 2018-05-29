@@ -67,8 +67,9 @@ class LedgerAccountsTable extends Table
 		$this->belongsTo('Customers', [
 			'className' => 'Customers',
             'foreignKey' => 'source_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
+		
 		$this->belongsTo('AccountCategories');
 		$this->belongsTo('Grns');
 		$this->belongsTo('Invoices');
