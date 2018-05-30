@@ -327,8 +327,8 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php 
-						if($st_year_id == 1){
+						<?php $array=[1,2,3];
+						if(in_array($st_year_id,$array)){
 							if(in_array(3,$allowed_pages)){
 								echo '<li>'.$this->Html->link( 'Create', '/Sales-Orders/add' ).'</li>';
 							} 
@@ -375,8 +375,8 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php 
-						if($st_year_id == 1){
+						<?php $array=[1,2,3];
+						if(in_array($st_year_id,$array)){
 							if(in_array(7,$allowed_pages)){
 								echo '<li>'.$this->Html->link( 'Create', '/SalesOrders/index?pull-request=true' ).'</li>';
 							}
@@ -541,8 +541,8 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php 
-						if($st_year_id == 1){
+						<?php $array=[1,2,3];
+						if(in_array($st_year_id,$array)){
 							if(in_array(17,$allowed_pages)){
 								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Create','/Grns/index?pull-request=true',array('escape'=>false)).'</li>';
 							}
@@ -813,8 +813,8 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php 
-						if($st_year_id == 1){
+						<?php $array=[1,2,3];
+						if(in_array($st_year_id,$array)){
 							 if(in_array(133,$allowed_pages)){
 								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Non-Gst','/Invoices/SalesReturnIndex?sales_return=true',array('escape'=>false)).'</li>';
 								echo '<li>'.$this->Html->link('<i class="icon-home"></i> Gst','/Invoices/gstSalesReturn?sales_return=true',array('escape'=>false)).'</li>';
@@ -853,8 +853,8 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php 
-						if($st_year_id == 1){
+						<?php $array=[1,2,3];
+						if(in_array($st_year_id,$array)){
 							if(in_array(129,$allowed_pages)){
 								echo '<li>'.$this->Html->link('<i class="fa fa-recycle"></i> Non-Gst','/InvoiceBookings/PurchaseReturnIndex?purchase-return=true',array('escape'=>false)).'</li>';
 								echo '<li>'.$this->Html->link('<i class="fa fa-qrcode"></i> Gst','/InvoiceBookings/gstPurchaseReturn?purchase-return=true',array('escape'=>false)).'</li>';

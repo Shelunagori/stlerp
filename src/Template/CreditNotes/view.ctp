@@ -6,12 +6,25 @@
 	.hidden-print{
 		display:none;
 	}
+.table{
+		width: 12% !important;
+		margin-left: 19px !important;
+		
+	}
 }
 
 p{
 margin-bottom: 0;
 }
-
+.table{
+		width: 25% !important;
+		margin-left: 19px !important;
+		
+	}
+	.tabitem thead tr th {
+    color: #FFF;
+    background-color: #254b73;
+}
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
     padding: 5px !important;
 }
@@ -19,7 +32,7 @@ margin-bottom: 0;
 <style type="text/css" media="print">
 @page {
     size: auto;   /* auto is the initial value */
-    margin: 0 5px 0 20px;  /* this affects the margin in the printer settings */
+    margin: 5px 5px 5px 5px;  /* this affects the margin in the printer settings */
 }
 
 .table_rows th{
@@ -30,14 +43,31 @@ margin-bottom: 0;
 		border: 1px solid  #000;
 		
 	}
+.table{
+		width: 25% !important;
+		margin-left: 19px !important;
+		
+	}
+@page {
+      size: landscape;
+	  margin-left: 5px !important;
+    }
+.maindiv {  width:100% !important;
+		border: none !important;
+	}
+  table.report { page-break-after:auto }
+  table.report tr    { page-break-inside:avoid; page-break-after:auto }
+  table.report td    { page-break-inside:avoid; page-break-after:auto }
+  table.report thead { display:table-header-group; border:none !important; padding:10px; }
+
 </style>
 <a class="btn  blue hidden-print margin-bottom-5 pull-right" onclick="javascript:window.print();">Print <i class="fa fa-print"></i></a>
 
-<div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 90%;font-size: 12px;" class="maindiv">	
+<div style="border:solid 1px #c7c7c7;background-color: #FFF;padding: 10px;margin: auto;width: 85%;font-size: 12px;" class="maindiv">	
 	<table width="100%" class="divHeader">
 		<tr>
 			<td width="30%"><?php echo $this->Html->image('/logos/'.$creditNotes->company->logo, ['width' => '40%']); ?></td>
-			<td align="center" width="40%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">CREDIT NOTE</div></td>
+			<td align="center" width="40%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">CREDIT-NOTE VOUCHER</div></td>
 			<td align="right" width="40%" style="font-size: 12px;">
 			<span style="font-size: 14px;"><?= h($creditNotes->company->name) ?></span>
 			<span><?= $this->Text->autoParagraph(h($creditNotes->company->address)) ?></span>
@@ -57,13 +87,17 @@ margin-bottom: 0;
 				<table>
 					<tr>
 						<?php  ?>
-						<td><?= h($creditNotes->head->name.'('.$creditNotes->head->alias.')') ?>
+						<td><b><?php if(!empty($creditNotes->head->alias)){
+							echo $creditNotes->head->name.'('.$creditNotes->head->alias.')';
+						}else{
+							echo $creditNotes->head->name;
+						} ?>
 						<?php if($creditNotes->head->source_model=="Customers"){ ?>
 						<?= $this->Text->autoParagraph(h($partyData->customer_address[0]->address)) ?>
 						<?php }else{?>
 							<?= $this->Text->autoParagraph(h($partyData->address)) ?>
 						<?php }?>
-						</td>
+						</b></td>
 					</tr>
 					<tr>
 						<td><b>PAN No :</b> <?= h($partyData->pan_no)  ?> <b>.   GST No :</b><?= h($partyData->gst_no) ?></td>
@@ -75,23 +109,23 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
-						<td>Voucher No</td>
+						<td><b>Voucher No</b></td>
 						<td width="20" align="center">:</td>
 						<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
 						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$FY) ?></td>
 					</tr>
 					
 					<tr>
-						<td>Transaction Date</td>
+						<td><b>Transaction Date</b></td>
 						<td width="20" align="center">:</td>
 						<td><?= h(date("d-m-Y",strtotime($creditNotes->transaction_date))) ?></td>
 					</tr>
 					<tr>
-						<td>Our PAN</td>
+						<td><b>Our PAN</b></td>
 						<td width="20" align="center">:</td>
 						<td><?= h($creditNotes->company->pan_no) ?></td>
 					</tr><tr>
-						<td>Our GST</td>
+						<td><b>Our GST</b></td>
 						<td width="20" align="center">:</td>
 						<td><?= h($creditNotes->company->gst_no) ?></td>
 					</tr>
@@ -102,8 +136,8 @@ margin-bottom: 0;
 	</table>
 	
 	<br/>
-	<table width="100%" border="1" style="font-size:15px">
-		
+	<table class="tabitem" width="100%" border="1" style="font-size:15px">
+		<thead>
 			<tr >
 				<th rowspan="2" style="text-align: center; width:2%;">S.N.</th>
 				<th rowspan="2" style="text-align: center; width:25%;">Narration</th>
@@ -128,11 +162,11 @@ margin-bottom: 0;
 				<th style="text-align: center;" width="6%">Amt</th>
 				<?php } ?>
 			</tr>
-		
+		</thead>
 		<?php $i=1; $total_cr=0; $total_dr=0; foreach ($creditNotes->credit_notes_rows as $credit_notes_row): ?>
 		<tr>
-			<td><?php echo $i++; ?></td>
-			<td  style="text-align: left;"><?php echo $credit_notes_row->narration ?></td>
+			<td style="text-align: center;"><?php echo $i++; ?></td>
+			<td  style="text-align: left;" ><?php echo $credit_notes_row->narration ?></td>
 			<td align="right"><?= h($this->Number->format($credit_notes_row->amount,[ 'places' => 2])) ?> </td>
 			<?php if($creditNotes->igst_total_amount==0){ ?>
 			<td align="center"><?= h(@$cgst_per[$credit_notes_row->id]['tax_figure']) ?></td>
@@ -152,26 +186,26 @@ margin-bottom: 0;
 		
 		<?php if($creditNotes->igst_total_amount==0){ ?>
 		<tr>
-			<td colspan="7" align="right" style="border-bottom-style:none;">CGST Total</td>
-			<td align="right"><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></td>
+			<td colspan="7" align="right" style="border-bottom-style:none;"><b>CGST Total</b></td>
+			<td align="right"><b><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></b></td>
 			
 		</tr>
 		<tr>
-			<td colspan="7" align="right">SGST Total</td>
-			<td align="right"><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></td>
+			<td colspan="7" align="right"><b>SGST Total</b></td>
+			<td align="right"><b><?= h($this->Number->format($creditNotes->cgst_total_amount,[ 'places' => 2])) ?></b></td>
 			
 		</tr>
 		<tr>
-			<td colspan="7" align="right">Grand Total</td>
-			<td align="right"><?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></td>
+			<td colspan="7" align="right"><b>Grand Total</b></td>
+			<td align="right"><b><?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></b></td>
 		</tr>
 		<?php }else{ ?>
 		<tr>
-			<td colspan="5" align="right">IGST Total</td>
-			<td align="right"><?= h($this->Number->format($creditNotes->igst_total_amount,[ 'places' => 2])) ?></td>
+			<td colspan="5" align="right"><b>IGST Total</b></td>
+			<td align="right"><b><?= h($this->Number->format($creditNotes->igst_total_amount,[ 'places' => 2])) ?></b></td>
 		</tr>
 		<tr>
-			<td colspan="5" align="right">Grand Total</td>
+			<td colspan="5" align="right"><b>Grand Total</b></td>
 			<td align="right"><?= h($this->Number->format($creditNotes->grand_total,[ 'places' => 2])) ?></td>
 		</tr>
 		<?php } ?>
@@ -195,9 +229,9 @@ margin-bottom: 0;
 	<div >
 		<table  >
 			<tr>
-				<td><b>Additional Note</b></td>
+				<td style="font-size: 14px;"><b>Additional Note</b></td>
 				<td width="20" align="center">:</td>
-				<td align="right"><?php echo $creditNotes->additional_note; ?></td>
+				<td style="font-size: 14px;" align="right"><?php echo $creditNotes->additional_note; ?></td>
 			</tr>
 						
 		</table>
@@ -209,7 +243,7 @@ margin-bottom: 0;
 			<td align="left" valign="top">
 				<table>
 					<tr>
-						<td style="font-size: 12px;">
+						<td style="font-size: 14px;">
 						<b>Amount in words:</b> <?= h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text) ?></td>
 					</tr>
 					
@@ -229,7 +263,8 @@ margin-bottom: 0;
 						 ?></br>
 						 </hr>
 						 <span><b>Prepared By</b></span><br/>
-						 <span><?= h($creditNotes->company->name) ?></span><br/>
+						 <span><b><?= h($creditNotes->creator->name)?></span><br/>
+						 <span><?= h($creditNotes->company->name) ?></span></b><br/>
 						</td>
 					</tr>
 				</table>

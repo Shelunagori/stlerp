@@ -68,10 +68,10 @@ class GrnsController extends AppController
 		}
 		//$tdate=date('d-m-Y',strtotime($financial_year->date_to)); 
 		if($grn_pull_request=="true"){
-			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->order(['Grns.id' => 'DESC']);
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
 		}else{ 
 			
-			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->order(['Grns.id' => 'DESC']);
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
 		}
 		
 		
@@ -881,5 +881,22 @@ class GrnsController extends AppController
 			<?php } ?>
 		</table>
 		<?php
+	}
+	
+	public function getdata(){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$grns=$this->Grns->find()->where(['company_id'=>25,'financial_year_id'=>1]);
+		$i=1;
+		$datas=[];
+		foreach($grns as $data){
+			$Grnsexists = $this->Grns->exists(['id' => $i,'company_id'=>25]);
+			if(!$Grnsexists){
+				$datas[$data->id]=$data->grn2;
+			}
+			$i++;
+		}
+		pr($datas);
+		exit;
 	}
 }
