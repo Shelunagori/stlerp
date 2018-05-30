@@ -41,7 +41,7 @@
 							<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_from_date))) ?></td>
 							<td><?= h(date("d-m-Y",strtotime($travelRequest->travel_to_date))) ?></td>
 							<td><?= h($travelRequest->status) ?></td>
-							<td class="actions">
+							<td class="actions" >
 								<?php if($travelRequest->status=="Pending"){?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $travelRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
@@ -55,7 +55,9 @@
 								<?php } ?>
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $travelRequest->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
 							<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-								echo $this->Html->link('Edit after approve',['action' => 'approve', $travelRequest->id],['escape'=>false,'target'=>'_blank','class'=>'']);
+								if($travelRequest->status=='approve'){
+									echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approve', $travelRequest->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+								}
 							} ?>
 							</td>
 						</tr>

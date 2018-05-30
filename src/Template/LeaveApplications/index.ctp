@@ -7,12 +7,33 @@
 	<div class="portlet-body">
 		<div class="row">
 			<div class="col-md-12">
-				<form method="GET" >
-				<input type="text" name="FromDate" class="date-picker" value="<?php echo @$FromDate; ?>" data-date-format="dd-mm-yyyy" placeholder="From"/>
-				<input type="text" name="ToDate" class="date-picker" value="<?php echo @$ToDate; ?>" data-date-format="dd-mm-yyyy" placeholder="To"/>
-				<input type="text" name="empName" value="<?php echo @$empName; ?>" placeholder="Employee"/>
-				<button type="submit">Search</button>
-				</form>
+				<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+					<form method="GET" >
+						<table width="70%">
+							<tr>
+								<td>
+									<input type="text" name="FromDate" class="form-control input-sm date-picker" value="<?php echo @$FromDate; ?>" data-date-format="dd-mm-yyyy" placeholder="From"/>
+								</td>
+								<td>
+									<input type="text" name="ToDate" class="form-control input-sm date-picker" value="<?php echo @$ToDate; ?>" data-date-format="dd-mm-yyyy" placeholder="To"/>
+								</td>
+								<td width="50%">
+									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown employeeData', 'value'=>@$employee_id]); ?>
+								</td>
+								<td>
+									<select name="status" class="form-control input-sm " >
+										<option value="">select</option>
+										<option value="approved" <?php if($status=="approved"){ echo "selected='selected'"; } ?>>approved</option>
+										<option value="Pending" <?php if($status=="Pending"){ echo "selected='selected'"; } ?>>Pending</option>
+									</select>
+								</td>
+								<td>
+									<button type="submit" class="btn btn-sm blue">Search</button>
+								</td>
+							</tr>
+						</table>
+					</form>
+				<?php } ?>
 				<?php $page_no=$this->Paginator->current('leaveApplications'); $page_no=($page_no-1)*20; 
 					
 				?>
@@ -52,7 +73,9 @@
 								<?php } ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $leaveApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-									echo $this->Html->link('Edit after approve',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'']);
+									if($leaveApplication->leave_status=="approved"){
+										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									}
 								} ?>
 							</td>
 						</tr>

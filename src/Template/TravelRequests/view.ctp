@@ -24,7 +24,10 @@ margin-bottom: 0;
             <td width="30%"></td>
             <td align="center" width="30%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">Travel Request</div></td>
             <td align="right" width="40%" style="font-size: 12px;">
-            </td>
+				<?php if($travelRequest->status=='Pending'){ ?>
+				<span class="label label-sm label-danger"><?php echo $travelRequest->status; ?></span>
+				<?php } ?>
+			</td>
         </tr>
         <tr>
             <td colspan="3">
@@ -68,7 +71,12 @@ margin-bottom: 0;
 						<td><?= h($travelRequest->return_travel_mode) ?></td>
                     </tr>
 					<tr>
-                        <td  width="40%">Advance Amount</td>
+                        <td  width="40%">Applied Advance Amount</td>
+                        <td  align="center">:</td>
+						<td><?= h($travelRequest->applied_advance_amt) ?></td>
+                    </tr>
+					<tr>
+                        <td  width="40%">Approved Advance Amount</td>
                         <td  align="center">:</td>
 						<td><?= h($travelRequest->advance_amt) ?></td>
                     </tr>

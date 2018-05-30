@@ -21,8 +21,8 @@
             <td><?= h($travelRequest->return_travel_mode) ?></td>
         </tr>
         <tr>
-            <th><?= __('Advance Amt') ?></th>
-            <td><?= $this->Number->format($travelRequest->advance_amt) ?></td>
+            <th><?= __('Applied Advance Amount') ?></th>
+            <td><?= $this->Number->format($travelRequest->applied_advance_amt) ?></td>
         </tr>
         <tr>
             <th><?= __('Travel From Date') ?></th>
@@ -58,7 +58,13 @@
         <?php endif; ?>
     </div>
 	<form method="post">
-		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text']); ?>
+		<label class="control-label  label-css">Advance Amount</label>
+		<?php echo $this->Form->input('advance_amt', ['label' => false, 'type'=>'text','placeholder'=>'0.00','style'=> 'text-align:  right;', 'required']); ?><br/>
+		
+		<label class="control-label  label-css">Transaction Date</label>
+		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text', 'required']); ?><br/>
+		
+		<label class="control-label  label-css">Bank</label><br/>
 		<select name="bank_id">
 			<?php foreach($bankCashes as $bank_id=>$bankName){
 				echo '<option value="'.$bank_id.'">'.$bankName.'</option>';

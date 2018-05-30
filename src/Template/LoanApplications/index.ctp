@@ -71,7 +71,9 @@
 							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $loanApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
 							
 							<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-								echo $this->Html->link('Edit after approve',['action' => 'approveLoan', $loanApplication->id],['escape'=>false,'target'=>'_blank','class'=>'']);
+								if($loanApplication->status=="approved"){
+									echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLoan', $loanApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+								}
 							} ?>
 							</td>
 						</tr>

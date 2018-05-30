@@ -37,28 +37,26 @@ border:none;
 	<div class="portlet-body">
 		<div class="row">
 			<div class="col-md-12" id="leaveData">
-				<table class="table table-bordered table-striped table-hover">
-					<thead>
-						<tr>
-						<?php foreach($leavedatas as $leavedata){ ?>
-							<td>Total <?php  echo $leavedata->leave_name ?></td>
-						<?php  } ?>
-						<?php foreach($leavedatas as $leavedata){ ?>
-							<td>Pending <?php  echo $leavedata->leave_name ?></td>
-						<?php  } ?>
-						<tr>
-					</thead>
-					<tbody>
-						<tr>	
+				<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
+				
+				<?php }else{ ?>
+					<table class="table table-bordered table-striped table-hover" style="width:50%">
+						<thead>
+							<tr>
 							<?php foreach($leavedatas as $leavedata){ ?>
-								<td><?php  echo $Totaalleave[$leavedata->id]; ?></td>
-							<?php  } ?>	
-							<?php foreach($leavedatas as $leavedata){ ?>
-								<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?></td>
-							<?php  } ?>	
-						</tr>
-					</tbody>
-				</table>
+								<td><?php  echo $leavedata->leave_name ?></td>
+							<?php  } ?>
+							<tr>
+						</thead>
+						<tbody>
+							<tr>	
+								<?php foreach($leavedatas as $leavedata){ ?>
+									<td><?php  echo $Totaalleave[$leavedata->id]-@$TotaalleaveTake[@$leavedata->id]; ?>/<?php  echo $Totaalleave[$leavedata->id]; ?></td>
+								<?php  } ?>
+							</tr>
+						</tbody>
+					</table>
+				<?php } ?>
 			</div>
 		</div>
 	</div>

@@ -66,8 +66,10 @@ class TravelRequestsController extends AppController
 
 		if ($this->request->is('post')) {
 			$bank_id=$this->request->data()['bank_id'];
+			$advance_amt=$this->request->data()['advance_amt'];
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$travelRequest->status="approve";
+			$travelRequest->advance_amt=$advance_amt;
 			$this->TravelRequests->save($travelRequest);
 			
 			if($travelRequest->advance_amt>0){
@@ -199,8 +201,6 @@ class TravelRequestsController extends AppController
         $travelRequest = $this->TravelRequests->newEntity();
         if ($this->request->is('post')) {
             $travelRequest = $this->TravelRequests->patchEntity($travelRequest, $this->request->data);
-			
-			//$travelRequest->employee_id=$s_employee_id;
 			
 			$travelRequest->travel_from_date=date('Y-m-d',strtotime($travelRequest->travel_mode_from_date));
 			$travelRequest->travel_to_date=date('Y-m-d',strtotime($travelRequest->travel_mode_to_date));

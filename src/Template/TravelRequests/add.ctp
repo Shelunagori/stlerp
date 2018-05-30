@@ -138,7 +138,7 @@ border:none;
 					<div class="col-md-3">
 						<div class="form-group">
 							<label class="control-label  label-css">Advance Amount</label>
-							<?php echo $this->Form->input('advance_amt', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'text']); ?>
+							<?php echo $this->Form->input('applied_advance_amt', ['label' => false,'placeholder'=>'0.00','class'=>'form-control input-sm','type'=>'text','style'=> 'text-align:  right;']); ?>
 						</div>
 					</div>
 					<div class="col-md-3">

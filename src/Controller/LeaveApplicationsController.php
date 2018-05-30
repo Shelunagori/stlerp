@@ -45,23 +45,30 @@ class LeaveApplicationsController extends AppController
 			$q['OR']=[];
 		}
 		
-		$empName=$this->request->query('empName');
-		if(!empty($empName)){
-			$where['Employees.name LIKE']='%'.$empName.'%';
+		$employee_id=$this->request->query('employee_id');
+		if(!empty($employee_id)){
+			$where['Employees.id']=$employee_id;
 		}
-		$this->set(compact('empName'));
+		$this->set(compact('employee_id'));
+		
+		$status=$this->request->query('status');
+		if(!empty($status)){
+			$where['LeaveApplications.leave_status']=$status;
+		}
+		$this->set(compact('status'));
 		
 		$empData=$this->LeaveApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
 			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where($where)->where($q));
-			//pr($where); pr($q); exit;
-		}else{ 
+		}else{
 			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 		}
+		
+		$Employees=$this->LeaveApplications->Employees->find('list');
 		//pr($leaveApplications); exit;
        // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
-        $this->set(compact('leaveApplications', 'empData'));
+        $this->set(compact('leaveApplications', 'empData', 'Employees'));
         $this->set('_serialize', ['leaveApplications']);
     }
 
