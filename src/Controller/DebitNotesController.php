@@ -22,17 +22,92 @@ class DebitNotesController extends AppController
         
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
+		
+		$st_year_id = $session->read('st_year_id');
+		$where = [];
+        $vendor_id = $this->request->query('vendor_id');
+        $customers_id = $this->request->query('customers_id');
+        $vouch_no = $this->request->query('vouch_no');
+		$From = $this->request->query('From');
+		$To = $this->request->query('To');
+		
+		$this->set(compact('vouch_no','From','To','customers_id','vendor_id'));
+		
+		if(!empty($vouch_no)){
+			$where['DebitNotes.voucher_no LIKE']=$vouch_no;
+		}
+		if(!empty($customers_id)){
+			$where['DebitNotes.customer_id']=$customers_id;
+		}
+		if(!empty($vendor_id)){
+			$where['DebitNotes.vendor_id']=$vendor_id;
+		}
+		
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['DebitNotes.transaction_date >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['DebitNotes.transaction_date <=']=$To;
+		}
         $this->paginate = [
-            'contain' => []
+            'contain' => ['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads']
         ];
         
-		$debitNotes = $this->paginate($this->DebitNotes->find()->where(['company_id'=>$st_company_id])->order(['voucher_no'=>'DESC']));
-        
+		$debitNotes = $this->paginate($this->DebitNotes->find()->where(['DebitNotes.company_id'=>$st_company_id])->where($where)->order(['voucher_no'=>'DESC']));
+         
 		//pr($debitNotes->toArray());exit;
 		
-		$this->set(compact('debitNotes'));
+		$this->set(compact('debitNotes','url'));
         $this->set('_serialize', ['debitNotes']);
 
+	}
+	
+	public function excelExport(){
+		$this->viewBuilder()->layout('');
+        
+        $session = $this->request->session();
+        $st_company_id = $session->read('st_company_id');
+		
+		
+		$st_year_id = $session->read('st_year_id');
+		$where = [];
+        $vendor_id = $this->request->query('vendor_id');
+        $customers_id = $this->request->query('customers_id');
+        $vouch_no = $this->request->query('vouch_no');
+		$From = $this->request->query('From');
+		$To = $this->request->query('To');
+		
+		$this->set(compact('vouch_no','From','To','customers_id','vendor_id'));
+		
+		if(!empty($vouch_no)){
+			$where['DebitNotes.voucher_no LIKE']=$vouch_no;
+		}
+		if(!empty($customers_id)){
+			$where['DebitNotes.customer_id']=$customers_id;
+		}
+		if(!empty($vendor_id)){
+			$where['DebitNotes.vendor_id']=$vendor_id;
+		}
+		
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['DebitNotes.transaction_date >=']=$From;
+		}
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['DebitNotes.transaction_date <=']=$To;
+		}
+        
+		$debitNotes =$this->DebitNotes->find()->where(['DebitNotes.company_id'=>$st_company_id])->where($where)->contain(['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads'])->order(['voucher_no'=>'DESC']);
+         
+		//pr($debitNotes->toArray());exit;
+		
+		$this->set(compact('debitNotes','url'));
+        $this->set('_serialize', ['debitNotes']);
 	}
 
     /**
@@ -46,7 +121,7 @@ class DebitNotesController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
         $debitNote = $this->DebitNotes->get($id, [
-            'contain' => ['CustomerSuppilers', 'Companies','Creator','DebitNotesRows'=>['Heads']]
+            'contain' => ['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
 		
 		//pr($debitNote);exit;
@@ -116,7 +191,7 @@ class DebitNotesController extends AppController
 		if ($this->request->is('post')) {
 			$debitNote = $this->DebitNotes->patchEntity($debitNote, $this->request->data);
 			$debitNote->created_on=date("Y-m-d");
-			$debitNote->transaction_date=date("Y-m-d");
+			$debitNote->transaction_date=date("Y-m-d",strtotime($this->request->data['transaction_date']));
 			$debitNote->company_id=$st_company_id;
 			$debitNote->created_by=$s_employee_id;
 			$debitNote->financial_year_id=$st_year_id;
@@ -454,6 +529,7 @@ class DebitNotesController extends AppController
     public function edit($id = null)
     { 
 	
+	
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
         $session = $this->request->session();
@@ -496,17 +572,18 @@ class DebitNotesController extends AppController
 
 	//pr($creditNote->credit_notes_rows); exit;
 	
-        if ($this->request->is(['patch', 'post', 'put'])) {
+        if ($this->request->is(['patch', 'post', 'put'])) { 
 					$debitNote = $this->DebitNotes->patchEntity($debitNote, $this->request->data);
 					$debitNote->created_on=date("Y-m-d");
-					$debitNote->transaction_date=date("Y-m-d");
+					$debitNote->transaction_date=date("Y-m-d",strtotime($this->request->data['transaction_date']));
 					$debitNote->company_id=$st_company_id;
 					$debitNote->created_by=$s_employee_id;
 					
-			//pr($creditNote); exit;
-           if ($this->DebitNotes->save($debitNote)) {
-			   $this->DebitNotes->Ledgers->deleteAll(['voucher_id' => $debitNote->id, 'voucher_source' => 'Credit Notes']);
-			   $this->DebitNotes->ReferenceDetails->deleteAll(['credit_note_id' => $debitNote->id]);
+			
+           if ($this->DebitNotes->save($debitNote)) { 
+			   $this->DebitNotes->Ledgers->deleteAll(['voucher_id' => $debitNote->id, 'voucher_source' => 'Debit Notes']);
+			   $this->DebitNotes->ReferenceDetails->deleteAll(['debit_note_id' => $debitNote->id]);
+			  
 			   if($debitNote->cr_dr=="Dr"){
 				$ledger = $this->DebitNotes->Ledgers->newEntity();
 				$ledger->ledger_account_id = $debitNote->customer_suppiler_id;
@@ -526,7 +603,7 @@ class DebitNotesController extends AppController
 						$ReferenceDetail->reference_no=$ref_row['ref_no'];
 						$ReferenceDetail->debit = $ref_row['ref_amount'];
 						$ReferenceDetail->credit = 0;
-						$ReferenceDetail->credit_note_id = $debitNote->id;
+						$ReferenceDetail->debit_note_id = $debitNote->id;
 						$ReferenceDetail->transaction_date = $debitNote->transaction_date;
 						$this->DebitNotes->ReferenceDetails->save($ReferenceDetail); 
 					}
@@ -603,7 +680,7 @@ class DebitNotesController extends AppController
 					$ReferenceDetail->reference_no=$ref_row['ref_no'];
 					$ReferenceDetail->credit = $ref_row['ref_amount'];
 					$ReferenceDetail->debit = 0;
-					$ReferenceDetail->credit_note_id = $debitNote->id;
+					$ReferenceDetail->debit_note_id = $debitNote->id;
 					$ReferenceDetail->transaction_date = $debitNote->transaction_date;
 					$this->DebitNotes->ReferenceDetails->save($ReferenceDetail); 
 				}
@@ -666,7 +743,7 @@ class DebitNotesController extends AppController
 				}
 			}
 
-			 $vr=$this->DebitNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Purchase Account'])->first();
+			 $vr=$this->DebitNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Debit Notes','sub_entity'=>'Customer-Suppiler'])->first();
 		
 		$ReceiptVouchersCashBank=$vr->id;
 		$vouchersReferences = $this->DebitNotes->VouchersReferences->get($vr->id, [
@@ -700,7 +777,7 @@ class DebitNotesController extends AppController
 		
 			
 			
-		$vr=$this->DebitNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Credit Notes','sub_entity'=>'Party'])->first();
+		$vr=$this->DebitNotes->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Debit Notes','sub_entity'=>'Heads'])->first();
 		$ReceiptVouchersReceivedFrom=$vr->id;
 		$vouchersReferences = $this->DebitNotes->VouchersReferences->get($vr->id, [
             'contain' => ['VoucherLedgerAccounts']

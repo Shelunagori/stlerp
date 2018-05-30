@@ -695,7 +695,23 @@ select
 						</li>
 						<?php } ?>
 						
-						
+						<?php if(in_array(113,$allowed_pages)||in_array(112,$allowed_pages)|| in_array(111,$allowed_pages) ||in_array(110,$allowed_pages)){ ?>
+						<li>
+							<a href="javascript:;">
+							<i class="icon-basket"></i>
+							<span class="title">Debit Notes</span>
+							<span class="arrow "></span>
+							</a>
+							<ul class="sub-menu">
+							<?php if(in_array(110,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'Add', '/DebitNotes/add' ); ?></li>
+							<?php } ?>
+							<?php if(in_array(113,$allowed_pages)|| in_array(112,$allowed_pages) ||in_array(111,$allowed_pages)){ ?>
+								<li><?php echo $this->Html->link( 'View', '/DebitNotes' ); ?></li>
+							<?php } ?>
+							</ul>
+						</li>
+						<?php } ?>
 					</ul>
 					</ul>
 				</li>

@@ -36,13 +36,13 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				<div class="form-group">
 					<label class="control-label">Voucher no<span class="required" aria-required="true">*</span></label><br/>
 					<?php echo $this->Form->input('voucher_no', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm']); ?>
-					<?php echo  "CR/".$debitNote->voucher_no; ?>
+					<?php echo  "DR/".str_pad($debitNote->voucher_no,4,'0',STR_PAD_LEFT); ?>
 				</div>
 			</div>
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y"),'data-date-start-date' 
+					<?php echo $this->Form->input('transaction_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker','data-date-format' => 'dd-mm-yyyy','value' => date("d-m-Y",strtotime($debitNote->transaction_date)),'data-date-start-date' 
 					=>$start_date ,'data-date-end-date' => $end_date,'required']); ?>
 				</div>
 
@@ -269,9 +269,6 @@ $(document).ready(function() {
 				},
 				customer_supplier_id:{
 					required: true,
-				},
-				grand_total:{
-					
 				}
 			},
 		
@@ -412,7 +409,7 @@ $(document).ready(function() {
 			$(this).find('td:nth-child(1)').html('');
 			$(this).find('td:nth-child(1)').append('<div id=summer>'+htm+'</div>');
 			$(this).find('td:nth-child(1)').find('div#summer').summernote();
-			$(this).find('td.main:nth-child(1)').append('<textarea name="credit_notes_rows['+i+'][narration]" style="display:none;"></textarea>');
+			$(this).find('td.main:nth-child(1)').append('<textarea name="debit_notes_rows['+i+'][narration]" style="display:none;"></textarea>');
 			
 			$(this).find("td:eq(0) .row_id").val(i);
 			i++;
