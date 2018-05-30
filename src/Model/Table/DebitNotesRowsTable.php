@@ -46,6 +46,12 @@ class DebitNotesRowsTable extends Table
 			'foreignKey' => 'head_id',
 			'propertyName' => 'heads',
 		]);
+		
+		$this->belongsTo('ReceivedFroms', [
+			'className' => 'LedgerAccounts',
+            'foreignKey' => 'received_from_id',
+            'propertyName' => 'ReceivedFrom',
+        ]);
     }
 
     /**

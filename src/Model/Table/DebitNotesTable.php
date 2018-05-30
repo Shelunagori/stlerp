@@ -38,6 +38,21 @@ class DebitNotesTable extends Table
         $this->displayField('id');
         $this->primaryKey('id');
 		$this->belongsTo('Ledgers');
+		$this->belongsTo('FinancialMonths');
+		$this->belongsTo('PurchaseReturns');
+		 $this->belongsTo('Vendors');
+		 $this->belongsTo('SaleTaxes');
+		 
+		 $this->belongsTo('BankCashes', [
+			'className' => 'LedgerAccounts',
+            'foreignKey' => 'bank_cash_id',
+            'propertyName' => 'BankCash',
+        ]);
+		$this->belongsTo('ReceivedFroms', [
+			'className' => 'LedgerAccounts',
+            'foreignKey' => 'received_from_id',
+            'propertyName' => 'ReceivedFrom',
+        ]);
 		$this->belongsTo('VouchersReferences');
 		$this->belongsTo('FinancialYears');		
 		$this->belongsTo('ReferenceBalances');

@@ -366,7 +366,15 @@ $(document).ready(function() {
 		rename_rows();  
 		calculate_total();
 	});
-	
+		$('.deleterefrow').live("click",function() {
+		var l=$(this).closest("table tbody").find("tr").length;
+		if (confirm("Are you sure to remove row ?") == true) {
+			if(l>1){
+				$(this).closest("tr").remove();
+				rename_rows();
+			}
+		} 
+	});
 	function put_code_description(){
 		var i=0;
 			$("#main_table tbody#main_tbody tr.main_tr1").each(function(){
