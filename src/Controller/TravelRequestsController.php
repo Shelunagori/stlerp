@@ -28,15 +28,46 @@ class TravelRequestsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->TravelRequests->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
+		$where['company_id']=$st_company_id;
+		$employee_id=$this->request->query('employee_id');
+		if(!empty($employee_id)){
+			$where['Employees.id']=$employee_id;
+		}
+		$this->set(compact('employee_id'));
+		
+		$purpose=$this->request->query('purpose');
+		if(!empty($purpose)){
+			$where['purpose LIKE']='%'.$purpose.'%';
+		}
+		$this->set(compact('purpose'));
+		
+		$tFrom=$this->request->query('tFrom');
+		if(!empty($tFrom)){
+			$where['travel_from_date >=']=date('Y-m-d',strtotime($tFrom));
+		}
+		$this->set(compact('tFrom'));
+		
+		$tTo=$this->request->query('tTo');
+		if(!empty($tTo)){
+			$where['travel_to_date <=']=date('Y-m-d',strtotime($tTo));
+		}
+		$this->set(compact('tTo'));
+		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ 
-			$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
+			$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where($where));
 		}else{ 
 			$travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id, 'company_id'=>$st_company_id]));
 		}
 		
-       // $travelRequests = $this->paginate($this->TravelRequests->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
+		$Employees=	$this->TravelRequests->Employees->find('list')
+					->matching(
+						'EmployeeCompanies', function ($q)  {
+							return $q->where(['EmployeeCompanies.freeze' =>0]);
+						}
+					);
+		
 
-        $this->set(compact('travelRequests', 'empData'));
+        $this->set(compact('travelRequests', 'empData', 'Employees'));
         $this->set('_serialize', ['travelRequests']);
     }
 	
@@ -70,20 +101,20 @@ class TravelRequestsController extends AppController
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$travelRequest->status="approve";
 			$travelRequest->advance_amt=$advance_amt;
+			$travelRequest->trans_date=$trans_date;
 			$this->TravelRequests->save($travelRequest);
 			
-			if($travelRequest->advance_amt>0){
+			
+			$np=$this->TravelRequests->Nppayments->find()->where(['travel_request_id'=>$travelRequest->id])->first();
+			if($np){
+				$oldVoucher_no=$np->voucher_no;
 				
-				$np=$this->TravelRequests->Nppayments->find()->where(['travel_request_id'=>$travelRequest->id])->first();
-				if($np){
-					$oldVoucher_no=$np->voucher_no;
-					
-					$this->TravelRequests->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$np->id]);
-					$this->TravelRequests->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $np->id]);
-					$this->TravelRequests->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
-				}
-			
-			
+				$this->TravelRequests->Nppayments->Ledgers->deleteAll(['voucher_source' => 'Non Print Payment Voucher', 'voucher_id'=>$np->id]);
+				$this->TravelRequests->Nppayments->NppaymentRows->deleteAll(['nppayment_id' => $np->id]);
+				$this->TravelRequests->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
+			}
+				
+			if($travelRequest->advance_amt>0){
 				$nppayment = $this->TravelRequests->Nppayments->newEntity();
 				$nppayment->financial_year_id=$st_year_id;
 				if(@$oldVoucher_no){

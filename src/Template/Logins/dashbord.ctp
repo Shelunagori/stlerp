@@ -255,7 +255,7 @@
 						<th>S.No</th>
 						<th>Employee Name</th>
 						<th>Status</th>
-						<th>Loan Amount</th>
+						<th>Applied Amount</th>
 						<th>Reason</th>
 						<th>Action</th>
 					</tr>
@@ -268,17 +268,12 @@
 						echo $this->Form->input('emp_id', ['type'=>'hidden','class'=>'emp_id','value' => @$PendingRequest->id]); ?></td>
 						<td><span class="label label-sm label-success"><?php echo $PendingRequest->status; ?></span>
 						</td>
-						<td><?php echo $PendingRequest->amount_of_loan; ?></td>
+						<td align="right"><?php echo $PendingRequest->amount_of_loan; ?></td>
 						<td><?php echo $PendingRequest->reason_for_loan; ?></td>
 						</td>
 						<td>
-							<?= $this->Html->link(' approve ',
-								['controller'=>'LoanApplications', 'action' => 'approveLoan', $PendingRequest->id],
-								[
-									'escape' => false,'class'=>'fa fa-thumbs-o-up'
-									
-								]
-							) ?>
+							<?php echo $this->Html->link('Approve',['controller' => 'LoanApplications','action' => 'approveLoan', $PendingRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
+							
 							<?= $this->Html->link(' Cancle ',
 								['controller'=>'LoanApplications', 'action' => 'cancle', $PendingRequest->id],
 								[

@@ -59,10 +59,10 @@
     </div>
 	<form method="post">
 		<label class="control-label  label-css">Advance Amount</label>
-		<?php echo $this->Form->input('advance_amt', ['label' => false, 'type'=>'text','placeholder'=>'0.00','style'=> 'text-align:  right;', 'required']); ?><br/>
+		<?php echo $this->Form->input('advance_amt', ['label' => false, 'type'=>'text','placeholder'=>'0.00','style'=> 'text-align:  right;', 'required', 'value'=>$travelRequest->advance_amt]); ?><br/>
 		
 		<label class="control-label  label-css">Transaction Date</label>
-		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text', 'required']); ?><br/>
+		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text', 'required', 'value'=>$travelRequest->trans_date==null?'':$travelRequest->trans_date->format('d-m-Y')]); ?><br/>
 		
 		<label class="control-label  label-css">Bank</label><br/>
 		<select name="bank_id">

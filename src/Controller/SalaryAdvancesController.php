@@ -52,7 +52,10 @@ class SalaryAdvancesController extends AppController
 			$salaryAdvances = $this->SalaryAdvances->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'SalaryAdvances.status'=>'pending', 'SalaryAdvances.company_id'=>$st_company_id]);
 		}
        // $salaryAdvances = $this->paginate($this->SalaryAdvances->find()->contain(['Employees']));
-
+		
+		
+		
+		
         $this->set(compact('salaryAdvances'));
         $this->set('_serialize', ['salaryAdvances']);
     }
@@ -75,6 +78,7 @@ class SalaryAdvancesController extends AppController
 			$trans_date=date('Y-m-d',strtotime($this->request->data()['trans_date']));
 			$salaryAdvance->status="approve";
 			$salaryAdvance->amount=$amount;
+			$salaryAdvance->trans_date=$trans_date;
 			$this->SalaryAdvances->save($salaryAdvance);
 			
 			
@@ -87,59 +91,61 @@ class SalaryAdvancesController extends AppController
 				$this->SalaryAdvances->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
 			}
 				
-				
-			$nppayment = $this->SalaryAdvances->Nppayments->newEntity();
-			$nppayment->financial_year_id=$st_year_id;
-			if(@$oldVoucher_no){
-				$nppayment->voucher_no=$oldVoucher_no;
-			}else{
-				$last_voucher_no=$this->SalaryAdvances->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-				if($last_voucher_no){
-					$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+			if($salaryAdvance->amount>0){
+				$nppayment = $this->SalaryAdvances->Nppayments->newEntity();
+				$nppayment->financial_year_id=$st_year_id;
+				if(@$oldVoucher_no){
+					$nppayment->voucher_no=$oldVoucher_no;
 				}else{
-					$nppayment->voucher_no=1;
+					$last_voucher_no=$this->SalaryAdvances->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+					if($last_voucher_no){
+						$nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+					}else{
+						$nppayment->voucher_no=1;
+					}
 				}
+				
+				$nppayment->bank_cash_id=$bank_id;
+				$nppayment->created_on=date("Y-m-d");
+				$nppayment->created_by=$s_employee_id;
+				$nppayment->payment_mode='NEFT/RTGS';
+				$nppayment->company_id=$st_company_id;
+				$nppayment->transaction_date=$trans_date;
+				$nppayment->cheque_no='';
+				$nppayment->salary_advance_id=$salaryAdvance->id;
+				$this->SalaryAdvances->Nppayments->save($nppayment);
+				
+				$ledger_account=$this->SalaryAdvances->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$salaryAdvance->employee_id,'company_id'=>$st_company_id])->first();
+				
+				$NppaymentRow = $this->SalaryAdvances->Nppayments->NppaymentRows->newEntity();
+				$NppaymentRow->nppayment_id=$nppayment->id;
+				$NppaymentRow->received_from_id=$ledger_account->id;
+				$NppaymentRow->amount=$salaryAdvance->amount;
+				$NppaymentRow->cr_dr='Dr';
+				$NppaymentRow->narration='Advance Salary';
+				$this->SalaryAdvances->Nppayments->NppaymentRows->save($NppaymentRow);
+				
+				$ledger = $this->SalaryAdvances->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $bank_id;
+				$ledger->credit = $salaryAdvance->amount;
+				$ledger->debit = 0;
+				$ledger->voucher_id = $nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$this->SalaryAdvances->Nppayments->Ledgers->save($ledger);
+				
+				$ledger = $this->SalaryAdvances->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $ledger_account->id;
+				$ledger->credit = 0;
+				$ledger->debit = $salaryAdvance->amount;
+				$ledger->voucher_id = $nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$this->SalaryAdvances->Nppayments->Ledgers->save($ledger);
 			}
 			
-			$nppayment->bank_cash_id=$bank_id;
-			$nppayment->created_on=date("Y-m-d");
-            $nppayment->created_by=$s_employee_id;
-            $nppayment->payment_mode='NEFT/RTGS';
-            $nppayment->company_id=$st_company_id;
-            $nppayment->transaction_date=$trans_date;
-            $nppayment->cheque_no='';
-            $nppayment->salary_advance_id=$salaryAdvance->id;
-			$this->SalaryAdvances->Nppayments->save($nppayment);
-			
-			$ledger_account=$this->SalaryAdvances->LedgerAccounts->find()->where(['source_model'=>'Employees','source_id'=>$salaryAdvance->employee_id,'company_id'=>$st_company_id])->first();
-			
-			$NppaymentRow = $this->SalaryAdvances->Nppayments->NppaymentRows->newEntity();
-			$NppaymentRow->nppayment_id=$nppayment->id;
-			$NppaymentRow->received_from_id=$ledger_account->id;
-			$NppaymentRow->amount=$salaryAdvance->amount;
-			$NppaymentRow->cr_dr='Dr';
-			$NppaymentRow->narration='Advance Salary';
-			$this->SalaryAdvances->Nppayments->NppaymentRows->save($NppaymentRow);
-			
-			$ledger = $this->SalaryAdvances->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $bank_id;
-			$ledger->credit = $salaryAdvance->amount;
-			$ledger->debit = 0;
-			$ledger->voucher_id = $nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$this->SalaryAdvances->Nppayments->Ledgers->save($ledger);
-			
-			$ledger = $this->SalaryAdvances->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $ledger_account->id;
-			$ledger->credit = 0;
-			$ledger->debit = $salaryAdvance->amount;
-			$ledger->voucher_id = $nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$this->SalaryAdvances->Nppayments->Ledgers->save($ledger);
 			
 			return $this->redirect(['controller' =>'Logins' ,'action' => 'dashbord']);
 		}
@@ -251,7 +257,30 @@ class SalaryAdvancesController extends AppController
 						return $q->where(['EmployeeCompanies.freeze' =>0]);
 					}
 				);  
-        $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
+				
+		
+		$LoanApplications=	$this->SalaryAdvances->LoanApplications->find()
+							->where(['employee_id'=>$s_employee_id, 'company_id'=>$st_company_id, 'status'=>'approved'])
+							->order(['LoanApplications.id'=>'DESC'])
+							->contain(['LoanInstallments']);
+		
+		$rt=0;
+		foreach($LoanApplications as $LoanApplication){
+			$repayment=0;
+			if($LoanApplication->loan_installments){
+				foreach($LoanApplication->loan_installments as $loan_installment){
+					$repayment+=$loan_installment->amount;
+				}
+			}
+			
+			if($LoanApplication->approve_amount_of_loan>$repayment){
+				$rt=$LoanApplication->instalment_amount;
+				break;
+			}
+		}
+		
+		
+        $this->set(compact('salaryAdvance','empData','Employees','empSallary', 'rt'));
         $this->set('_serialize', ['salaryAdvance']);
     }
 
@@ -298,8 +327,30 @@ class SalaryAdvancesController extends AppController
 					'EmployeeCompanies', function ($q)  {
 						return $q->where(['EmployeeCompanies.freeze' =>0]);
 					}
-				);  
-        $this->set(compact('salaryAdvance','empData','Employees','empSallary'));
+				); 
+				
+		$LoanApplications=	$this->SalaryAdvances->LoanApplications->find()
+							->where(['employee_id'=>$s_employee_id, 'company_id'=>$st_company_id, 'status'=>'approved'])
+							->order(['LoanApplications.id'=>'DESC'])
+							->contain(['LoanInstallments']);
+		
+		$rt=0;
+		foreach($LoanApplications as $LoanApplication){
+			$repayment=0;
+			if($LoanApplication->loan_installments){
+				foreach($LoanApplication->loan_installments as $loan_installment){
+					$repayment+=$loan_installment->amount;
+				}
+			}
+			
+			if($LoanApplication->approve_amount_of_loan>$repayment){
+				$rt=$LoanApplication->instalment_amount;
+				break;
+			}
+		}
+		
+		
+        $this->set(compact('salaryAdvance','empData','Employees','empSallary', 'rt'));
         $this->set('_serialize', ['salaryAdvance']);
     }
 

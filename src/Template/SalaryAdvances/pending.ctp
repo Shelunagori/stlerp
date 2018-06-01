@@ -10,7 +10,7 @@
 					<tr>
 						<th>#</th>
 						<th>Employee Name</th>
-						<th>Amount</th>
+						<th>Applied Amount</th>
 						<th>Reason</th>
 						<th>Actions</th>
 					</tr>
@@ -20,7 +20,7 @@
 					<tr>
 						<td><?= h(++$i) ?></td>
 						<td><?= h($salaryAdvance->employee->name) ?></td>
-						<td><?= h($salaryAdvance->amount) ?></td>
+						<td align="right"><?= h($salaryAdvance->applied_amount) ?></td>
 						<td><?= h($salaryAdvance->reason) ?></td>
 						<td><?php echo $this->Html->link('Approve',['controller' => 'SalaryAdvances','action' => 'approve', $salaryAdvance->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?></td>
 					</tr>

@@ -54,13 +54,6 @@ class SalaryAdvancesTable extends Table
             ->allowEmpty('id', 'create');
 
        
-
-
-        $validator
-            ->decimal('amount')
-            ->requirePresence('amount', 'create')
-            ->notEmpty('amount');
-
         
 
         return $validator;

@@ -27,13 +27,44 @@ class LoanApplicationsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->LoanApplications->Employees->get($s_employee_id,['contain'=>['Designations','Departments']]);
 		
+		$where['company_id']=$st_company_id;
+		$employee_id=$this->request->query('employee_id');
+		if(!empty($employee_id)){
+			$where['Employees.id']=$employee_id;
+		}
+		$this->set(compact('employee_id'));
+		
+		$reason=$this->request->query('reason');
+		if(!empty($reason)){
+			$where['reason_for_loan LIKE']='%'.$reason.'%';
+		}
+		$this->set(compact('reason'));
+		
+		$amountFrom=$this->request->query('amountFrom');
+		if(!empty($amountFrom)){
+			$where['approve_amount_of_loan >=']=$amountFrom;
+		}
+		$this->set(compact('amountFrom'));
+		
+		$amountTo=$this->request->query('amountTo');
+		if(!empty($amountTo)){
+			$where['approve_amount_of_loan <=']=$amountTo;
+		}
+		$this->set(compact('amountTo'));
+		
 		if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['company_id'=>$st_company_id]));
+			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where($where));
 		}else{
 			$loanApplications = $this->paginate($this->LoanApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id,'company_id'=>$st_company_id]));
 		}
 
-        $this->set(compact('loanApplications', 'empData'));
+		$Employees=	$this->LoanApplications->Employees->find('list')
+					->matching(
+						'EmployeeCompanies', function ($q)  {
+							return $q->where(['EmployeeCompanies.freeze' =>0]);
+						}
+					); 
+        $this->set(compact('loanApplications', 'empData', 'Employees', 's_employee_id'));
         $this->set('_serialize', ['loanApplications']);
     }
 
@@ -157,6 +188,9 @@ class LoanApplicationsController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		
         $loanApplication = $this->LoanApplications->get($id, [
             'contain' => []
         ]);
@@ -215,6 +249,32 @@ class LoanApplicationsController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 	
+	public function getLoanInstallment($employeeId){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$LoanApplications=	$this->LoanApplications->find()
+							->where(['employee_id'=>$employeeId, 'company_id'=>$st_company_id, 'status'=>'approved'])
+							->order(['LoanApplications.id'=>'DESC'])
+							->contain(['LoanInstallments']);
+		
+		$rt=0;
+		foreach($LoanApplications as $LoanApplication){
+			$repayment=0;
+			if($LoanApplication->loan_installments){
+				foreach($LoanApplication->loan_installments as $loan_installment){
+					$repayment+=$loan_installment->amount;
+				}
+			}
+			
+			if($LoanApplication->approve_amount_of_loan>$repayment){
+				$rt=$LoanApplication->instalment_amount;
+				break;
+			}
+		}
+		
+		echo $rt;
+		exit;
+	}
 	public function approveLoan($loanId){
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
@@ -249,7 +309,7 @@ class LoanApplicationsController extends AppController
 
 			$query = $this->LoanApplications->query();
 			$query->update()
-				->set(['status' =>'approved','approve_date'=>$approve_date,'installment_start_month'=>$installment_from[0],'installment_start_year'=>$installment_from[1],'comment'=>$comment,'instalment_amount'=>$instalment_amount,'no_of_instalment'=>$no_of_instalment,'approve_amount_of_loan'=>$approve_amount_of_loan])
+				->set(['status' =>'approved','approve_date'=>$approve_date,'installment_start_month'=>$installment_from[0],'installment_start_year'=>$installment_from[1],'comment'=>$comment,'instalment_amount'=>$instalment_amount,'no_of_instalment'=>$no_of_instalment,'approve_amount_of_loan'=>$approve_amount_of_loan,'trans_date'=>$trans_date])
 				->where(['id' => $loanId])
 				->execute();
 				
@@ -263,66 +323,69 @@ class LoanApplicationsController extends AppController
 				$this->LoanApplications->Nppayments->deleteAll(['Nppayments.id' => $np->id]);
 			}
 			
-			$Nppayment=$this->LoanApplications->Nppayments->newEntity();
-			$Nppayment->company_id=$st_company_id;
-			if(@$oldVoucher_no){
-				$Nppayment->voucher_no=$oldVoucher_no;
-			}else{
-				//Voucher Number Increment
-				$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
-				if($last_voucher_no){
-					$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+			if($approve_amount_of_loan>0){
+				$Nppayment=$this->LoanApplications->Nppayments->newEntity();
+				$Nppayment->company_id=$st_company_id;
+				if(@$oldVoucher_no){
+					$Nppayment->voucher_no=$oldVoucher_no;
 				}else{
-					$Nppayment->voucher_no=1;
+					//Voucher Number Increment
+					$last_voucher_no=$this->LoanApplications->Nppayments->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+					if($last_voucher_no){
+						$Nppayment->voucher_no=$last_voucher_no->voucher_no+1;
+					}else{
+						$Nppayment->voucher_no=1;
+					}
 				}
+				
+				$Nppayment->created_on=date("Y-m-d");
+				$Nppayment->financial_year_id=$st_year_id;
+				$Nppayment->created_by=$s_employee_id;
+				$Nppayment->bank_cash_id=$bank_id;
+				$Nppayment->payment_mode='NEFT/RTGS';
+				$Nppayment->cheque_no='';
+				$Nppayment->transaction_date=$trans_date;
+				$Nppayment->loan_amount = 'yes';
+				$Nppayment->loan_application_id = $LoanApplications->id;
+				$this->LoanApplications->Nppayments->save($Nppayment);
+				
+				$LedgerAccount=$this->LoanApplications->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$LoanApplications->employee_id])->first();
+				
+				$NppaymentRow=$this->LoanApplications->Nppayments->NppaymentRows->newEntity();
+				$NppaymentRow->nppayment_id=$Nppayment->id;
+				$NppaymentRow->received_from_id=$LedgerAccount->id;
+				$NppaymentRow->amount=$approve_amount_of_loan;
+				$NppaymentRow->cr_dr='Dr';
+				$NppaymentRow->narration='Loan approved';
+				$this->LoanApplications->Nppayments->NppaymentRows->save($NppaymentRow);
+				
+				$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $LedgerAccount->id;
+				$ledger->credit = 0;
+				$ledger->debit = $approve_amount_of_loan;
+				$ledger->voucher_id = $Nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$ledger->loan_amount = 'yes';
+				$this->LoanApplications->Nppayments->Ledgers->save($ledger);
+				
+				
+					
+					
+				$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
+				$ledger->company_id=$st_company_id;
+				$ledger->ledger_account_id = $bank_id;
+				$ledger->credit = $approve_amount_of_loan;
+				$ledger->debit = 0;
+				$ledger->voucher_id = $Nppayment->id;
+				$ledger->voucher_source = 'Non Print Payment Voucher';
+				$ledger->transaction_date = $trans_date;
+				$ledger->loan_amount = 'yes';
+				$this->LoanApplications->Nppayments->Ledgers->save($ledger);
+					
 			}
 			
-			$Nppayment->created_on=date("Y-m-d");
-			$Nppayment->financial_year_id=$st_year_id;
-			$Nppayment->created_by=$s_employee_id;
-			$Nppayment->bank_cash_id=$bank_id;
-			$Nppayment->payment_mode='NEFT/RTGS';
-			$Nppayment->cheque_no='';
-			$Nppayment->transaction_date=$trans_date;
-			$Nppayment->loan_amount = 'yes';
-			$Nppayment->loan_application_id = $LoanApplications->id;
-			$this->LoanApplications->Nppayments->save($Nppayment);
-			
-			$LedgerAccount=$this->LoanApplications->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Employees','source_id'=>$LoanApplications->employee_id])->first();
-			
-			$NppaymentRow=$this->LoanApplications->Nppayments->NppaymentRows->newEntity();
-			$NppaymentRow->nppayment_id=$Nppayment->id;
-			$NppaymentRow->received_from_id=$LedgerAccount->id;
-			$NppaymentRow->amount=$approve_amount_of_loan;
-			$NppaymentRow->cr_dr='Dr';
-			$NppaymentRow->narration='Loan approved';
-			$this->LoanApplications->Nppayments->NppaymentRows->save($NppaymentRow);
-			
-			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $LedgerAccount->id;
-			$ledger->credit = 0;
-			$ledger->debit = $approve_amount_of_loan;
-			$ledger->voucher_id = $Nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
-			
-			
-				
-				
-			$ledger = $this->LoanApplications->Nppayments->Ledgers->newEntity();
-			$ledger->company_id=$st_company_id;
-			$ledger->ledger_account_id = $bank_id;
-			$ledger->credit = $approve_amount_of_loan;
-			$ledger->debit = 0;
-			$ledger->voucher_id = $Nppayment->id;
-			$ledger->voucher_source = 'Non Print Payment Voucher';
-			$ledger->transaction_date = $trans_date;
-			$ledger->loan_amount = 'yes';
-			$this->LoanApplications->Nppayments->Ledgers->save($ledger);
-					
 					
 			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
 		

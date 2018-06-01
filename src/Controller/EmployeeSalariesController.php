@@ -105,20 +105,27 @@ class EmployeeSalariesController extends AppController
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
 			
 			$LoanInstallments = $this->EmployeeSalaries->LoanApplications->LoanInstallments->find();
-			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()->where(['employee_id'=>$dt->id,'installment_start_month <= '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
-			->select(['id', 'approve_amount_of_loan', 'instalment_amount', 'total_sales'=>$LoanInstallments->func()->sum('LoanInstallments.amount')])
-			->leftJoinWith('LoanInstallments')->first();
+			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()
+								->where(['employee_id'=>$dt->id,'installment_start_month <= '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
+								->contain(['LoanInstallments']);
 			
-			$InstallmentPaid=$this->EmployeeSalaries->LoanApplications->LoanInstallments->find()->where(['loan_application_id'=>$LoanApplications->id,'month'=>$month,'year'=>$year]);
 			
-			if($InstallmentPaid->count()){
-				$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
-				$loan_app[$dt->id]=$LoanApplications->id; 
+			
+			foreach($LoanApplications as $LoanApplication){
+				$repayment=0;
+				if($LoanApplication->loan_installments){
+					foreach($LoanApplication->loan_installments as $loan_installment){
+						$repayment+=$loan_installment->amount;
+					}
+				}
+				
+				if($LoanApplication->approve_amount_of_loan>$repayment){
+					$loan_amount[$dt->id]=$LoanApplication->instalment_amount; 
+					$loan_app[$dt->id]=$LoanApplication->id;
+					break;
+				}
 			}
-			elseif($LoanApplications->total_sales<$LoanApplications->approve_amount_of_loan){
-				$loan_amount[$dt->id]=$LoanApplications->instalment_amount; 
-				$loan_app[$dt->id]=$LoanApplications->id; 
-			}
+			
 				
 				
 				if($EmployeeSalary){

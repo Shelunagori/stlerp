@@ -23,7 +23,8 @@
 						<tr>
 							<th width="5%">Sr. No.</th>
 							<th width="15%">Employee Name</th>
-							<th width="15%">Amount</th>
+							<th width="15%">Applied Amount</th>
+							<th width="15%">Approved Amount</th>
 							<th width="15%">Reason</th>
 							<th width="10%" class="actions"><?= __('Actions') ?></th>
 						</tr>
@@ -33,7 +34,8 @@
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h($salaryAdvance->employee->name) ?></td>
-							<td><?= h($salaryAdvance->amount) ?></td>
+							<td align="right"><?= $salaryAdvance->applied_amount==0?'':$salaryAdvance->applied_amount ?></td>
+							<td align="right"><?= $salaryAdvance->amount==0?'-':$salaryAdvance->amount ?></td>
 							<td><?= h($salaryAdvance->reason) ?></td>
 							<td class="actions">
 								<?php if($salaryAdvance->status=="Pending"){?>
@@ -49,7 +51,7 @@
 								<?php } ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $salaryAdvance->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-									if($salaryAdvance->status=="approved"){
+									if($salaryAdvance->status=="approve"){
 										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approve', $salaryAdvance->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
 									}
 								} ?>

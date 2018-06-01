@@ -46,7 +46,8 @@
 			
 			?>
 			<button type="button" onclick="window.print()" class="hide_at_print">Print</button>
-			<table class="table table-condensed table-hover">
+			<button type="button" onclick="ExportToExcel('qwerty');" class="hide_at_print">Excel</button>
+			<table class="table table-condensed table-bordered table-hover" id="qwerty">
 				<tr>
 					<th>Employee Name</th>
 					<?php foreach($allDivisions as $DivisionId=>$DivisionName){
@@ -56,10 +57,11 @@
 					<th>Others amount</th>
 					<th>Total</th>
 				</tr>
-				<?php $grand_total=0; $total_sal=[];  $total_loan=0; $total_other=0; foreach($Employees as $Employee){ ?>
+				<?php $grand_total=0; $total_sal=[];  $total_loan=0; $total_other=0;  $Totalcolumn=[];  $loanTot=0;
+				foreach($Employees as $Employee){ ?>
 				<tr>
 					<td><?php echo $Employee->name; ?></td>
-					<?php $total_add=0; $total_ded=0; 
+					<?php $total_add=0; $total_ded=0;  
 					$colspan=0;
 					foreach($allDivisions as $DivisionId=>$DivisionName){
 						$colspan++;
@@ -69,7 +71,8 @@
 							@$total_add+=round(@$division[$Employee->id][$DivisionId]);
 						}else  if(@$salary_type[$Employee->id][$DivisionId]=="deduction"){
 							@$total_ded+=round(@$division[$Employee->id][$DivisionId]);
-						} 
+						}
+						@$Totalcolumn[$DivisionId]=@$Totalcolumn[$DivisionId]+round(@$division[$Employee->id][$DivisionId]);
 					} ?>
 					<td align="right"><?php echo @$Loan[$Employee->id]; $total_loan+=@$Loan[$Employee->id];?></td>
 					<td align="right"><?php echo @$Others[$Employee->id]; $total_other+=@$Others[$Employee->id];?></td>
@@ -81,8 +84,13 @@
 				</tr>
 				<?php } ?>
 				<tr>
-					<td colspan="<?php echo $colspan+3; ?>" align="right"><b>Grand Total</b></td>
-					<td align="right"><b><?php echo $grand_total; ?></b></td>
+					<td></td>
+					<?php foreach($allDivisions as $DivisionId=>$DivisionName){
+						echo '<th style="text-align:right;">'.($Totalcolumn[$DivisionId]).'</th>';
+					} ?>
+					<th style="text-align:right;"><?php echo $total_loan; ?></th>
+					<th style="text-align:right;"><?php echo $total_other; ?></th>
+					<th align="right"><b><?php echo $grand_total; ?></b></th>
 				</tr>
 			</table>
 		<?php }else{
@@ -97,3 +105,10 @@
     margin: 0;  /* this affects the margin in the printer settings */
 }
 </style>
+<script type="text/javascript">
+	function ExportToExcel(mytblId){
+       var htmltable= document.getElementById(mytblId);
+       var html = htmltable.outerHTML;
+       window.open('data:application/vnd.ms-excel,' + encodeURIComponent(html));
+    }
+</script>

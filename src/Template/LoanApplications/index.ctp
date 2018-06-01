@@ -12,23 +12,44 @@
 	<div class="portlet-body">
 		<div class="row">
 			<div class="col-md-12">
+				<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
 				<form method="GET" >
-				
+					<table class="table">
+						<tr>
+							<td>
+								<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me', 'value'=>@$employee_id]); ?>
+							</td>
+							<td>
+								<input type="text" name="reason" class="form-control input-sm" value="<?php echo @$reason; ?>" placeholder="Reason"/>
+							</td>
+							<td>
+								<input type="text" name="amountFrom" class="form-control input-sm" value="<?php echo @$amountFrom; ?>" placeholder="Amount From"/>
+							</td>
+							<td>
+								<input type="text" name="amountTo" class="form-control input-sm" value="<?php echo @$amountTo; ?>" placeholder="Amount To"/>
+							</td>
+							<td>
+								<button type="submit" class="btn btn-sm blue">Filter</button>
+							</td>
+						</tr>
+					</table>
 				</form>
+				<?php } ?>
+				
 				<?php $page_no=$this->Paginator->current('loanApplications'); $page_no=($page_no-1)*20; 
 					
 				?>
 				<table class="table table-bordered table-striped">
 					<thead>
 						<tr>
-							<th width="5%">Sr. No.</th>
-							<th width="15%">Employee Name</th>
-							<th width="15%">Reason For Loan</th>
-							<th width="15%">Salary PM</th>
-							<th width="15%">Amount Of Loan</th>
-							<th width="15%">Starting Date Of Loan</th>
-							<th width="15%">Ending Date Of Loan</th>
-							<th width="10%" class="actions"><?= __('Actions') ?></th>
+							<th>Sr. No.</th>
+							<th>Employee Name</th>
+							<th>Reason For Loan</th>
+							<th>Salary PM</th>
+							<th>Applied Amount</th>
+							<th>Approved Amount</th>
+							<th>Installments start from</th>
+							<th class="actions"><?= __('Actions') ?></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -52,10 +73,10 @@
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h($loanApplication->employee->name) ?></td>
 							<td><?= h($loanApplication->reason_for_loan) ?></td>
-							<td><?= h($loanApplication->salary_pm) ?></td>
-							<td><?= h($loanApplication->amount_of_loan) ?></td>
-							<td><?= h(@$startingDateOfLoan) ?></td>
-							<td><?= h(@$endingDateOfLoan) ?></td>
+							<td align="right"><?= h($loanApplication->salary_pm) ?></td>
+							<td align="right"><?= $loanApplication->amount_of_loan==0?'-':$loanApplication->amount_of_loan ?></td>
+							<td align="right"><?= $loanApplication->approve_amount_of_loan==0?'-':$loanApplication->approve_amount_of_loan ?></td>
+							<td><?= h(@$loanApplication->installment_start_month.'-'.$loanApplication->installment_start_year) ?></td>
 							<td class="actions">
 							<?php if($loanApplication->status!="approved"){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $loanApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>

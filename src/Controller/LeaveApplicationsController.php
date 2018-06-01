@@ -65,7 +65,12 @@ class LeaveApplicationsController extends AppController
 			$leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['Employees'])->where(['employee_id'=>$s_employee_id]));
 		}
 		
-		$Employees=$this->LeaveApplications->Employees->find('list');
+		$Employees=	$this->LeaveApplications->Employees->find('list')
+					->matching(
+						'EmployeeCompanies', function ($q)  {
+							return $q->where(['EmployeeCompanies.freeze' =>0]);
+						}
+					);
 		//pr($leaveApplications); exit;
        // $leaveApplications = $this->paginate($this->LeaveApplications->find()->contain(['LeaveTypes']));
         $this->set(compact('leaveApplications', 'empData', 'Employees'));

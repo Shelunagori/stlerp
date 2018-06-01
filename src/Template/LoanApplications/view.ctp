@@ -55,16 +55,10 @@ margin-bottom: 0;
                     </tr>
 					<?php if($loanApplication->status=="approved"){ ?>
 					 <tr>
-                        <td>Form</td>
+                        <td>Installments start from</td>
                         <td width="20" align="center">:</td>
-                        <td><?= h(date("d-m-Y",strtotime($loanApplication->starting_date_of_loan))) ?></td>
+                        <td><?= h(@$loanApplication->installment_start_month.'-'.$loanApplication->installment_start_year) ?></td>
                     </tr>
-					<tr>
-						<td>To</td>
-						<td width="20" align="center">:</td>
-						<td><?= h(date("d-m-Y",strtotime($loanApplication->ending_date_of_loan))) ?></td>
-					</tr>
-					
 					<tr>
                         <td>Instalment Amount</td>
                         <td width="20" align="center">:</td>

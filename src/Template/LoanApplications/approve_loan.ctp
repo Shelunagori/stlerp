@@ -33,6 +33,7 @@
 				</div>
 			</div>
 		</div>
+		<hr>
 		<div class="row">
 			<div class="col-md-4">
 				<div class="form-group leave_type">
@@ -55,10 +56,16 @@
 			</div>
 		</div>
 		<div class="row">
-			<div class="col-md-4">
+			<div class="col-md-3">
 				<div class="form-group leave_type">
-					<label class="control-label  label-css">Loan Amount</label>
-					<?php echo $this->Form->input('approve_amount_of_loan', ['type'=>'text','label' => false,'class' => 'form-control input-sm approve_amount_of_loan','value'=>$LoanApplications->amount_of_loan]); ?>
+					<label class="control-label  label-css">Applied Loan Amount</label>
+					<?php echo $this->Form->input('amount_of_loan', ['type'=>'text','label' => false,'class' => 'form-control input-sm','value'=>$LoanApplications->amount_of_loan, 'readonly', 'style'=>'text-align:right;']); ?>
+				</div>
+			</div>
+			<div class="col-md-3">
+				<div class="form-group leave_type">
+					<label class="control-label  label-css">Approve Loan Amount</label>
+					<?php echo $this->Form->input('approve_amount_of_loan', ['type'=>'text','label' => false,'class' => 'form-control input-sm approve_amount_of_loan','value'=>$LoanApplications->approve_amount_of_loan, 'style'=>'text-align:right;']); ?>
 				</div>
 			</div>
 			<div class="col-md-4">
@@ -85,34 +92,34 @@
 			<div class="col-md-2">
 				<div class="form-group">
 					<label class="control-label  label-css">No of Instalment</label>
-					<?php echo $this->Form->input('no_of_instalment', ['type'=>'text','label' => false,'class' => 'form-control input-sm no_of_instalment','required']); ?>
+					<?php echo $this->Form->input('no_of_instalment', ['type'=>'text','label' => false,'class' => 'form-control input-sm no_of_instalment','required', 'value'=>$LoanApplications->no_of_instalment]); ?>
 				</div>
 			</div>
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label  label-css">Instalment Amount</label>
-					<?php echo $this->Form->input('instalment_amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm instalment_amount','readonly']); ?>
-				</div>
-			</div>
-			<div class="col-md-3">
-				<div class="form-group">
-					<label class="control-label  label-css">Transaction Date</label>
-					<?php echo $this->Form->input('trans_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','value'=>'','required']); ?>
-
+					<?php echo $this->Form->input('instalment_amount', ['type'=>'text','label' => false,'class' => 'form-control input-sm instalment_amount','readonly', 'value'=>$LoanApplications->instalment_amount]); ?>
 				</div>
 			</div>
 			<div class="col-md-4">
 					<div class="form-group comment1">
 						<label class="control-label  label-css">Comment</label>
-						<?php echo $this->Form->textarea('comment', ['type'=>'text','label' => false,'class' => 'form-control input-sm comment']); ?>
+						<?php echo $this->Form->textarea('comment', ['type'=>'text','label' => false,'class' => 'form-control input-sm comment', 'value'=>$LoanApplications->comment]); ?>
 					</div>
 			</div>
 		</div>
 		<div class="row">
 			<div class="col-md-3">
+				<div class="form-group">
+					<label class="control-label  label-css">Transaction Date</label>
+					<?php echo $this->Form->input('trans_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','value'=>$LoanApplications->trans_date==null?'':$LoanApplications->trans_date->format('d-m-Y'),'required']); ?>
+
+				</div>
+			</div>
+			<div class="col-md-3">
 				<div class="form-group comment1">
-					<label class="control-label  label-css">Bank</label>
-					<select name="bank_id">
+					<label class="control-label  label-css">Bank</label><br/>
+					<select name="bank_id" class="form-control input-sm">
 						<?php foreach($bankCashes as $bankId=>$bankName){
 							echo '<option value="'.$bankId.'">'.$bankName.'</option>';
 						} ?>

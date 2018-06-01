@@ -54,20 +54,30 @@ border:none;
 								<?php } ?>
 						</div>
 					</div>
-			        <div class="col-md-3">
+			        <div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label">Salary</label>
 							<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
-							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary]); ?>
+							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm salaryBox','readonly','id'=>'salary_pm','value'=>$empSallary, 'style'=>'text-align:right']); ?>
 							<?php }else{ ?>
-							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','readonly','id'=>'salary_pm','value'=>$empSallary]); ?>
+							<?php echo $this->Form->input('amount1', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm salaryBox','readonly','id'=>'salary_pm','value'=>$empSallary, 'style'=>'text-align:right']); ?>
 							<?php } ?>
 						</div>
 					</div>
-					<div class="col-md-3">
+					<div class="col-md-2">
+						<div class="form-group">
+							<label class="control-label">Loan Installment</label>
+							<?php if($s_employee_id==16 || $empData->department->name=="HR & Administration"){ ?>
+								<?php echo $this->Form->input('amount3', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm LoanBox','readonly','id'=>'loanBox', 'style'=>'text-align:right']); ?>
+							<?php }else{ ?>
+								<?php echo $this->Form->input('amount2', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm LoanBox','readonly','value'=>$rt, 'style'=>'text-align:right']); ?>
+							<?php } ?>
+						</div>
+					</div>
+					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label">Amount</label>
-							<?php echo $this->Form->input('amount', ['label' => false,'class'=>'form-control input-sm']); ?>
+							<?php echo $this->Form->input('applied_amount', ['label' => false,'class'=>'form-control input-sm','value'=>$salaryAdvance->amount, 'style'=>'text-align:right']); ?>
 						</div>
 					</div>
 			       <div class="col-md-3">
@@ -163,11 +173,18 @@ $(document).ready(function()
 		},
 	
 		submitHandler: function (form) {
-			$('#submitbtn').prop('disabled', true);
-			$('#submitbtn').text('Submitting.....');
-			success3.show();
-			error3.hide();
-			form[0].submit();
+			var s=parseFloat($('.salaryBox').val());
+			var l=parseFloat($('.LoanBox').val());
+			var am=parseFloat($('input[name=applied_amount]').val());
+			if(am>s-l){
+				alert('Salary advance amount cannot be greater then (current salary-loan installment).');
+			}else{
+				$('#submitbtn').prop('disabled', true);
+				$('#submitbtn').text('Submitting.....');
+				success3.show();
+				error3.hide();
+				form[0].submit();
+			}
 		}
 
 	});
