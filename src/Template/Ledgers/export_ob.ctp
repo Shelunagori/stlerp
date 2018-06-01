@@ -218,12 +218,14 @@
 					
 					//$url_path="/invoice-bookings/view/".$ledger->voucher_id;
 					if($ibs->gst=="yes"){ 
+					if(!empty($ibs->invoice_booking_rows)){
 						foreach($ibs->invoice_booking_rows as $ibr)
 						{ 
 							$cgst_amt=$cgst_amt+$ibr->cgst;
 							$sgst_amt=$sgst_amt+$ibr->sgst;
 							$igst_amt=$igst_amt+$ibr->igst;
 						}
+					}
 					}else{
 							$cgst_amt="-";
 							$sgst_amt="-";
@@ -239,7 +241,7 @@
 					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
-				}else if($ledger->voucher_source=="Debit Note"){
+				}else if($ledger->voucher_source=="Debit Notes"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/debit-notes/view/".$ledger->voucher_id;
@@ -285,16 +287,16 @@
 						</td>
 						<td>
 							<?php if($ledger->voucher_source=="Invoice"){ ?>
-								<?php echo $url_link[$ledger->id]->customer->customer_name.' '.$url_link[$ledger->id]->customer->alias; ?>
-							<?php }elseif($ledger->voucher_source=="Invoice Booking"){ ?>
-								<?php echo $url_link[$ledger->id]->vendor->company_name; ?>
+								<?php echo @$url_link[@$ledger->id]->customer->customer_name.' '.@$url_link[$ledger->id]->customer->alias; ?>
+							<?php }elseif(@$ledger->voucher_source=="Invoice Booking"){ ?>
+								<?php echo @$url_link[@$ledger->id]->vendor->company_name; ?>
 							<?php } ?>
 						</td>
 						<td>
 							<?php if($ledger->voucher_source=="Invoice"){ ?>
-								<?php echo $url_link[$ledger->id]->customer->tin_no; ?>
+								<?php echo @$url_link[@$ledger->id]->customer->tin_no; ?>
 							<?php }elseif($ledger->voucher_source=="Invoice Booking"){ ?>
-								<?php echo $url_link[$ledger->id]->vendor->tin_no; ?>
+								<?php echo @$url_link[@$ledger->id]->vendor->tin_no; ?>
 							<?php } ?>
 						</td>
 						<td align="right">

@@ -27,8 +27,8 @@ class ItemsController extends AppController
 		//$where1=[];
 		$item_name=$this->request->query('item_name');
 		$item_category=$this->request->query('item_category');
-		$item_group=$this->request->query('item_group');
-		$item_subgroup=$this->request->query('item_subgroup');
+		$item_group=$this->request->query('item_group_id');
+		$item_subgroup=$this->request->query('item_sub_group_id');
 		//$serial_no=$this->request->query('serial_no');
 		$page=$this->request->query('page');
 		
@@ -64,8 +64,18 @@ class ItemsController extends AppController
 				->where($where)->order(['Items.name' => 'ASC']));
 		//pr($Items->toArray());exit;
 		$ItemCategories = $this->Items->ItemCategories->find('list');
-		$ItemGroups = $this->Items->ItemGroups->find('list');
-		$ItemSubGroups = $this->Items->ItemSubGroups->find('list');
+		if(!empty($item_category)){
+			$ItemGroups = $this->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC'])->where(['item_category_id'=>$item_category]);
+		}else{
+			$ItemGroups = $this->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
+		}	
+		if(!empty($item_group)){
+			$ItemSubGroups = $this->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC'])->where(['item_group_id'=>$item_group]);	
+		}else{
+			$ItemSubGroups = $this->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
+		}
+		//$ItemGroups = $this->Items->ItemGroups->find('list');
+		//Completed$ItemSubGroups = $this->Items->ItemSubGroups->find('list');
 		$serialnos = [];
 		$serialnos= [['text'=>'Enable','value'=>'1'],['text'=>'Disable','value'=>'0']];
         $this->set(compact('Items','ItemCategories','ItemGroups','ItemSubGroups','serialnos'));

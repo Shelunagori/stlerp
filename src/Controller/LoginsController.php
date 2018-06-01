@@ -193,7 +193,7 @@ class LoginsController extends AppController
 			
 			$sms_sender='MOGRAG';
 			
-			$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
+$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
 		  
 		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 

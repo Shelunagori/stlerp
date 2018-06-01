@@ -1053,8 +1053,17 @@ class ItemLedgersController extends AppController
 		
 
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
-		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
-		$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
+		if(!empty($item_category)){
+			$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC'])->where(['item_category_id'=>$item_category]);
+		}else{
+			$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
+		}	
+		if(!empty($item_group)){
+			$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC'])->where(['item_group_id'=>$item_group]);	
+		}else{
+			$ItemSubGroups = $this->ItemLedgers->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
+		}
+		
 		$Items = $this->ItemLedgers->Items->find('list')->order(['Items.name' => 'ASC']);
         $this->set(compact('itemLedgers', 'item_name','item_stocks','items_names','ItemCategories','ItemGroups','ItemSubGroups','item_rate','in_qty','Items','from_date','to_date','ItemDatas','items_unit_names','ItemUnits','url','stockstatus', 'stock_status', 'sumValue','itemSerialNumberStatus','unitRate','totalRate','stockNew','itemRate','itmQty'));
 		$this->set('_serialize', ['itemLedgers']); 

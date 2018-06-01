@@ -7,7 +7,9 @@ table td, table th{
 	color:red;
 }
 </style>
-<?php  $url_excel="/?".$url; ?>
+<?php  $url_excel="/?".$url; 
+
+?>
 <div class="portlet box red">
 	
 	<div class="portlet-title">
@@ -19,11 +21,20 @@ table td, table th{
 		<table class="table table-condensed" width="100%">
 			<tbody>
 				<tr>
+					<?php
+						$EMP_ID =[23,16,17];
+					if(in_array($s_employee_id,$EMP_ID)){ ?>
+							<td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman_name) ]); ?></td>
+					<?php }else{ ?>
+						<td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$s_employee_id) ]); ?></td>
+					<?php } ?>
 					
-						<td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman_name) ]); ?></td>
+					
+						
 						<td>
 								<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 							</td>
+						
 						<td width="15%">
 							<?php 
 							$options = [];
@@ -79,7 +90,9 @@ table td, table th{
 			<?php 
 			$sr=0; $ClosingBalance=0; 
 			$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
-			foreach($LedgerAccounts as $LedgerAccount){ ?>
+			foreach($LedgerAccounts as $LedgerAccount){ 
+			if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+			?>
 			<tr>
 				<td><?php echo ++$sr; ?></td>
 				<td style=" white-space: normal; width: 200px; ">
@@ -171,7 +184,7 @@ table td, table th{
 				<?php	} ?>
 				</td>
 			</tr>
-			<?php } ?>
+			<?php }} ?>
 			</tbody>
 			<tfoot id='tf'>
 				<tr>

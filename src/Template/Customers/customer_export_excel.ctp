@@ -42,7 +42,9 @@
 	<?php 
 			$sr=0; $ClosingBalance=0; 
 			$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
-			foreach($LedgerAccounts as $LedgerAccount){ ?>
+			foreach($LedgerAccounts as $LedgerAccount){ 
+			if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+			?>
 			<tr>
 				<td><?php echo ++$sr; ?></td>
 				<td style=" white-space: normal; width: 200px; ">
@@ -126,7 +128,7 @@
 				</td>
 				
 			</tr>
-			<?php } ?>
+			<?php }} ?>
 			</tbody>
 			<tfoot id='tf'>
 				<tr>

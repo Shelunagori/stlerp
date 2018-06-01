@@ -57,11 +57,19 @@ $url_excel="/?".$url;
 									<?php echo $this->Form->input('ledger_account_id', ['empty'=>'--Select--','options' => $ledger,'empty' => "--Select Ledger Account--",'label' => false,'class' => 'form-control input-sm select2me','required','value'=>@$ledger_account_id]); ?>
 							</div>
 							<div class="col-md-4">
-								<?php echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_from)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+							<?php if(!empty($transaction_from_date)){
+								echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($transaction_from_date)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
+							}else{
+								echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_from)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
+							}  ?>
 								
 							</div>
 							<div class="col-md-4">
-								<?php echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_to)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]); ?>
+							<?php if(!empty($transaction_to_date)){
+								 echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($transaction_to_date)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
+							}else{
+								 echo $this->Form->input('To', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker to_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_to)),'data-date-start-date' => date("d-m-Y",strtotime($financial_year->date_from)),'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
+							} ?>
 							</div>
 						</div>
 					</td>

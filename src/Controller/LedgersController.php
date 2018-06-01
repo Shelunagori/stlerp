@@ -69,7 +69,7 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
-				}else if($ledger->voucher_source=="Debit Note"){
+				}else if($ledger->voucher_source=="Debit Notes"){
 					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Credit Notes"){
 					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id);
@@ -178,6 +178,9 @@ class LedgersController extends AppController
 				})->order(['transaction_date' => 'DESC']);
 				//pr($opening_balance_ar); exit;
 		
+			}
+			
+			
 			$url_link=[];
 			foreach($Ledgers as $ledger){
 				if($ledger->voucher_source=="Journal Voucher"){
@@ -186,42 +189,28 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($ledger->voucher_id);
-					//pr($url_link[$ledger->id]); exit;
 				}else if($ledger->voucher_source=="Contra Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Receipt Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
-				}else if($ledger->voucher_source=="Invoice"){  //pr($ledger->voucher_source); exit;
-					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
-					if($inq->sale_tax_id==0){
-						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id, [
-							'contain' => ['Customers']
-						]);
-					}else{
-						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id, [
-							'contain' => ['Customers','SaleTaxes']
-						]);
-					}
+				}else if($ledger->voucher_source=="Invoice"){
+					$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Invoice Booking"){
-					$ib=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
-					if($ib->cst_vat=='vat'){
-						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id, [
-							'contain' => ['Vendors','InvoiceBookingRows']
-						]);
-					}else{
-						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id, [
-							'contain' => ['Vendors','InvoiceBookingRows']
-						]);
-					}
-				}else if($ledger->voucher_source=="Non Print Payment Voucher"){ 
-						
+					$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
-				}else if($ledger->voucher_source=="Debit Note"){
+				}else if($ledger->voucher_source=="Debit Notes"){
 					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Credit Notes"){
 					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Sale Return"){
+					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Inventory Return"){
+					$url_link[$ledger->id]=$this->Ledgers->Rivs->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Inventory Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->InventoryVouchers->get($ledger->voucher_id);
 				}
 			}
 		}			

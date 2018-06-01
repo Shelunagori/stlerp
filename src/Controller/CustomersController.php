@@ -1088,6 +1088,7 @@ class CustomersController extends AppController
 	
 	
 	public function OutstandingReportCustomer($to_send = null){
+		
 		$to_send = json_decode($to_send, true);
 		$url=$this->request->here();
 		$url=parse_url($url,PHP_URL_QUERY);
@@ -1095,6 +1096,8 @@ class CustomersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$s_employee_id = $this->viewVars['s_employee_id'];
+		
 		$salesman_name = $this->request->query('salesman_name');
 		$where=[];
 		if(!empty($salesman_name)){
@@ -1155,13 +1158,22 @@ class CustomersController extends AppController
 				}
 			}
 		}
-		 $SalesMans = $this->Customers->Employees->find('list')->matching(
-					'Departments', function ($q) use($st_company_id) {
-						return $q->where(['Departments.id' =>1]);
-					}
-				);
+		$EMP_ID =[23,16,17];
+		if(in_array($s_employee_id,$EMP_ID)){
+			 $SalesMans = $this->Customers->Employees->find('list')->matching(
+						'Departments', function ($q) use($st_company_id) {
+							return $q->where(['Departments.id' =>1]);
+						}
+					);
+		}else{
+			$SalesMans = $this->Customers->Employees->find('list')->matching(
+						'Departments', function ($q) use($st_company_id) {
+							return $q->where(['Departments.id' =>1]);
+						}
+					)->where(['Employees.id'=>$s_employee_id]);
+		}			
 		//pr($Outstanding); exit;
-		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','SalesMans','salesman_name','url'));
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','SalesMans','salesman_name','url','s_employee_id'));
 	}
 	
 	public function CustomerExportExcel($url = null){

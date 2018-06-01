@@ -22,12 +22,12 @@
 									<td width="15%">
 										
 										<div id="item_group_div">
-										<?php echo $this->Form->input('item_group', ['empty'=>'--Group--','options' =>$ItemGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Group','value'=> h(@$item_group)]); ?></div>
+										<?php echo $this->Form->input('item_group_id', ['empty'=>'--Group--','options' =>$ItemGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Group','value'=> h(@$item_group)]); ?></div>
 									</td>
 									<td width="15%">
 										
 										<div id="item_sub_group_div">
-										<?php echo $this->Form->input('item_subgroup', ['empty'=>'--Sub-Group--','options' =>$ItemSubGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$item_subgroup)]); ?></div>
+										<?php echo $this->Form->input('item_sub_group_id', ['empty'=>'--Sub-Group--','options' =>$ItemSubGroups,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'Sub-Group','value'=> h(@$item_subgroup)]); ?></div>
 									</td>
 						<td>
 							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>

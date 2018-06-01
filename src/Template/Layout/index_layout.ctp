@@ -724,7 +724,7 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(141,$allowed_pages)){ ?>
+						<?php if(in_array(141,$allowed_pages)|| in_array(163,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -735,8 +735,8 @@ select
 								<!--<?php echo '<li>'.$this->Html->link( 'Overdue Report for Customers', '/Customers/Breakup-Range-Overdue?request=customer' ).'</li>';?>
 								<?php echo '<li>'.$this->Html->link( 'Overdue Report for Supplier', '/Customers/Breakup-Range-Overdue?request=vendor' ).'</li>';?>
 								<hr/>-->
-								<?php echo '<li>'.$this->Html->link( 'Outstandings for Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Outstandings for Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>'; ?>
+								<?php echo '<li>'.$this->Html->link( 'Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>'; ?>
 							</ul>
 						</li>
 						<?php } ?>

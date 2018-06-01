@@ -181,6 +181,7 @@ var $rows = $('#main_tble tbody tr');
 	////////
 	$('select[name="item_category"]').on("change",function() {
 		$('#item_group_div').html('Loading...');
+		$('#item_sub_group_div').html('Loading...');
 		var itemCategoryId=$('select[name="item_category"] option:selected').val();
 		var url="<?php echo $this->Url->build(['controller'=>'ItemGroups','action'=>'ItemGroupDropdown']); ?>";
 		url=url+'/'+itemCategoryId,
@@ -190,6 +191,7 @@ var $rows = $('#main_tble tbody tr');
 		}).done(function(response) {
 			$('#item_group_div').html(response);
 			$('select[name="item_group_id"]').select2();
+			
 		});
 	});	
 	//////
