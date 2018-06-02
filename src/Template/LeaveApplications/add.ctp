@@ -165,14 +165,14 @@ border:none;
 					</div>
 				</div>
 				<div class="col-md-6">
-					<label class="control-label  label-css">Intimated/Uninitiated</label><br/>
+					<!-- <label class="control-label  label-css">Intimated/Uninitiated</label><br/>
 					<?php echo $this->Form->radio(
 						'intimated_or_not',
 						[
 							['value' => 'Intimated', 'text' => 'Intimated','checked'],
 							['value' => 'Uninitiated', 'text' => 'Uninitiated']
 						]
-					); ?>
+					); ?> -->
 				</div>
 			</div>
 		</fieldset>	

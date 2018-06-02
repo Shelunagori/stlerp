@@ -490,9 +490,11 @@ class LeaveApplicationsController extends AppController
 			$approve_full_half_to=$this->request->data['approve_full_half_to'];
 			$paid_leaves=$this->request->data['paid_leaves'];
 			$unpaid_leaves=$this->request->data['unpaid_leaves'];
+			$intimated_leave=$this->request->data['intimated_leave'];
+			$unintimated_leave=$this->request->data['unintimated_leave'];
 			$query = $this->LeaveApplications->query();
 			$query->update()
-				->set(['leave_status' =>'approved','approve_single_multiple'=>$approve_single_multiple,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'approve_full_half_from'=>$approve_full_half_from,'approve_full_half_to'=>$approve_full_half_to,'paid_leaves'=>$paid_leaves,'unpaid_leaves'=>$unpaid_leaves])
+				->set(['leave_status' =>'approved','approve_single_multiple'=>$approve_single_multiple,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'approve_full_half_from'=>$approve_full_half_from,'approve_full_half_to'=>$approve_full_half_to,'paid_leaves'=>$paid_leaves,'unpaid_leaves'=>$unpaid_leaves,'intimated_leave'=>$intimated_leave,'unintimated_leave'=>$unintimated_leave])
 				->where(['id' => $id])
 				->execute();
 			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
@@ -518,6 +520,20 @@ class LeaveApplicationsController extends AppController
 		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
     }
 
+	public function leaveInfo($employee_id=null, $leaveAppId=null){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+		
+		$LeaveApplications=	$this->LeaveApplications->find()
+							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'id !='=>$leaveAppId]);
+		$total=0;
+		foreach($LeaveApplications as $LeaveApplication){
+			$total+=$LeaveApplication->unintimated_leave;
+		}
+		echo $total;
+		exit;
+	}
 	 public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
