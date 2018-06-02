@@ -956,11 +956,7 @@ select
 								<?php echo '<li>'.$this->Html->link( 'View', '/SalaryAdvances' ).'</li>'; ?>
 							</ul>
 						</li>
-						<?php 
-						
-						echo '<li>'.$this->Html->link('<i class="icon-home"></i>Salary Divisions','/EmployeeSalaryDivisions/',array('escape'=>false)).'</li>';
-						
-						?>
+						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Salary Divisions','/EmployeeSalaryDivisions/',array('escape'=>false)).'</li>'; ?>
 						<?php 
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Employee Attendence','/EmployeeAttendances/add',array('escape'=>false)).'</li>';
 						?>
@@ -981,6 +977,7 @@ select
 						<?php 
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i>Pay Slips','/Salaries/paySlip',array('escape'=>false)).'</li>';
 						?>
+						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Leave Sheet','/LeaveApplications/leaveStatus',array('escape'=>false)).'</li>'; ?>
 					</ul>
 				</li>
 				<?php } ?>

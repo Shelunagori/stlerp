@@ -221,6 +221,7 @@ class LeaveApplicationsController extends AppController
 				}
 			}
 			$leaveApplication->company_id=$st_company_id;
+			$leaveApplication->financial_year_id=$st_year_id;
             if ($this->LeaveApplications->save($leaveApplication)) {
 				$target_path = 'attached_file';
 				$file_name   = $_FILES['supporting_attached']['name'];
@@ -330,7 +331,7 @@ class LeaveApplicationsController extends AppController
 		foreach($LeaveApplicationDatas as $LeaveApplicationData){
 			@$TotaalleaveTake[@$LeaveApplicationData->leave_type_id]+=@$LeaveApplicationData->day_no;
 			//$LeaveType[$leavedata->id]=$leavedata->leave_name;
-		} //pr($Totaalleave); exit;
+		}
 	
 		$leavedatas = $this->LeaveApplications->LeaveTypes->find();
 		$Totaalleave=[]; $LeaveType=[];
@@ -534,7 +535,7 @@ class LeaveApplicationsController extends AppController
 		echo $total;
 		exit;
 	}
-	 public function delete($id = null)
+	public function delete($id = null)
     {
         $this->request->allowMethod(['post', 'delete']);
         $salaryAdvance = $this->LeaveApplications->get($id);
@@ -546,4 +547,55 @@ class LeaveApplicationsController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+	
+	public function leaveStatus(){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$st_year_id = $session->read('st_year_id');
+		
+		$Employees=	$this->LeaveApplications->Employees->find()
+					->matching(
+						'EmployeeCompanies', function ($q)  {
+							return $q->where(['EmployeeCompanies.freeze' =>0]);
+						}
+					)
+					->group(['Employees.id']);
+		
+		$currentLeaves=[];
+		foreach($Employees as $Employee){
+			$LeaveApplications=	$this->LeaveApplications->find()
+								->where(['employee_id'=>$Employee->id,'company_id'=>$st_company_id, 'financial_year_id'=>$st_year_id, 'leave_status'=>'approved']);
+			foreach($LeaveApplications as $LeaveApplication){
+				$fm=(int)date('m',strtotime($LeaveApplication->approve_leave_from));
+				$tm=(int)date('m',strtotime($LeaveApplication->approve_leave_to));
+				if($fm==$tm){
+					@$currentLeaves[$Employee->id][$fm][$LeaveApplication->leave_type_id]+=$LeaveApplication->paid_leaves+$LeaveApplication->unpaid_leaves;
+				}else{
+					
+					$lastDateOfMonth = date("Y-m-t", strtotime($LeaveApplication->approve_leave_from));
+					$datediff = strtotime($lastDateOfMonth) - strtotime($LeaveApplication->approve_leave_from);
+					$leaves=round($datediff / (60 * 60 * 24));
+					$leaves++;
+					if($LeaveApplication->approve_full_half_from!="Full Day"){
+						$leaves=$leaves-0.5;
+					}
+					@$currentLeaves[$Employee->id][$fm][$LeaveApplication->leave_type_id]+=$leaves;
+					
+					$firstDateOfMonth = date("Y", strtotime($LeaveApplication->approve_leave_from)).'-'.$tm.'-1';
+					$datediff = strtotime($LeaveApplication->approve_leave_to) - strtotime($firstDateOfMonth);
+					$leaves=round($datediff / (60 * 60 * 24));
+					$leaves++;
+					if($LeaveApplication->approve_full_half_to!="Full Day"){
+						$leaves=$leaves-0.5;
+					}
+					@$currentLeaves[$Employee->id][$tm][$LeaveApplication->leave_type_id]+=$leaves;
+				}
+			}
+		}
+		
+		$LeaveTypes=$this->LeaveApplications->LeaveTypes->find();
+		$this->set(compact('Employees', 'LeaveTypes', 'currentLeaves'));
+	}
 }
