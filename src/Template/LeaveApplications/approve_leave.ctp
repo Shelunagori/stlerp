@@ -116,6 +116,7 @@
 						</div>
 					</td>
 					<td align="center">
+						<div id="qwerty"></div>
 						<table>
 							<tr>
 								<td>
@@ -219,6 +220,13 @@ $(document).ready(function(){
             url: url,
             type: 'GET',
         }).done(function(response) {
+			var res = response.split("-");
+			var ML=res[0];
+			var PPL=res[1];
+			var PUL=res[2];
+			
+			$('div#qwerty').html('ML:'+ML+', PPL:'+PPL+', PUL'+PUL);
+			
 			var p=$('input[name="approve_leave_from"]').val().split('-');
 			var approve_leave_from = new Date(p[2], p[1] - 1, p[0]);
 			
@@ -252,6 +260,7 @@ $(document).ready(function(){
 				}
 			}
 			var T=days;
+			
 			var I=$('input[name="intimated_leave"]').val();
 			
 			if(I>T){
@@ -261,18 +270,30 @@ $(document).ready(function(){
 			var U=T-I;
 			$('input[name="unintimated_leave"]').val(U);
 			
-			var R=5-response;
-			var X=R-T;
+			var PL=0; var UPL=0;
+			var R=5-PUL;
+			
+			var X=R-U;
 			if(X>=0){
-				var PL=T;
+				var Q=ML-PPL;
+				var Z=Q-U;
+				if(Z>=0){ PL=U; }
+				if(Z<0){ PL=Q; UPL=Math.abs(Z); }
 			}else{
-				var PL=R;
+				var Q=ML-PPL;
+				var Z=Q-R;
+				if(Z>=0){ PL=R; UPL=Math.abs(X); }
+				if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
 			}
+			
+			
+			var B=ML-(parseFloat(PPL)+parseFloat(PL));
+			var C=B-I;
+			if(C>=0){ PL+=parseFloat(I);  }
+			if(C<0){ PL+=B; UPL+=Math.abs(C);  }
 			$('input[name="paid_leaves"]').val(PL);
-			$('input[name="unpaid_leaves"]').val(days-PL);
-			$('input[name="total_approved_leaves"]').val(days);
-			
-			
+			$('input[name="unpaid_leaves"]').val(UPL);
+			$('input[name="total_approved_leaves"]').val(T);
         });
 		
 		

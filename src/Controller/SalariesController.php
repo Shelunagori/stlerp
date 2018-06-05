@@ -43,13 +43,59 @@ class SalariesController extends AppController
 			$month_year=explode('-',$month_year);
 			$Employees=$this->Salaries->Employees->find()
 			->contain(['Salaries'=>function($q) use($month_year){
-				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1]])->contain(['EmployeeSalaryDivisions']);
+				return $q->where(['month'=>$month_year[0],'year'=>$month_year[1]])->contain(['EmployeeSalaryDivisions'])
+				->order(['Salaries.id'=>'ASC']);
 			}])
-			->contain(['Designations', 'Departments']);
+			->contain(['Designations', 'Departments'])
+			->matching(
+				'Salaries', function ($q) use($st_company_id) {
+					return $q->where(['Salaries.company_id'=>$st_company_id]);
+				}
+			)
+			->group(['Employees.id']);
+			
+			foreach($Employees as $Employee){
+				$LeaveApplications=	$this->Salaries->LeaveApplications->find()
+								->where(['employee_id'=>$Employee->id,'company_id'=>$st_company_id, 'financial_year_id'=>$st_year_id, 'leave_status'=>'approved']);
+				foreach($LeaveApplications as $LeaveApplication){
+					$fm=(int)date('m',strtotime($LeaveApplication->approve_leave_from));
+					$tm=(int)date('m',strtotime($LeaveApplication->approve_leave_to));
+					if($fm==$tm){
+						@$currentLeaves[$Employee->id][$fm][$LeaveApplication->leave_type_id]+=$LeaveApplication->paid_leaves+$LeaveApplication->unpaid_leaves;
+					}else{
+						
+						$lastDateOfMonth = date("Y-m-t", strtotime($LeaveApplication->approve_leave_from));
+						$datediff = strtotime($lastDateOfMonth) - strtotime($LeaveApplication->approve_leave_from);
+						$leaves=round($datediff / (60 * 60 * 24));
+						$leaves++;
+						if($LeaveApplication->approve_full_half_from!="Full Day"){
+							$leaves=$leaves-0.5;
+						}
+						@$currentLeaves[$Employee->id][$fm][$LeaveApplication->leave_type_id]+=$leaves;
+						
+						$firstDateOfMonth = date("Y", strtotime($LeaveApplication->approve_leave_from)).'-'.$tm.'-1';
+						$datediff = strtotime($LeaveApplication->approve_leave_to) - strtotime($firstDateOfMonth);
+						$leaves=round($datediff / (60 * 60 * 24));
+						$leaves++;
+						if($LeaveApplication->approve_full_half_to!="Full Day"){
+							$leaves=$leaves-0.5;
+						}
+						@$currentLeaves[$Employee->id][$tm][$LeaveApplication->leave_type_id]+=$leaves;
+					}
+				}
+			} 
+			$this->set(compact('month_year', 'currentLeaves'));
 		}
 		
+		$em=$this->Salaries->Employees->find()
+			->matching(
+				'Departments', function ($q) use($st_company_id) {
+					return $q->where(['Departments.id'=>6]);
+				}
+			)->first();
+		
 		$company=$this->Salaries->Companies->get($st_company_id);
-		$this->set(compact('financial_year','Employees', 'company'));
+		$this->set(compact('financial_year','Employees', 'company', 'em'));
 	}
     /**
      * View method

@@ -48,7 +48,7 @@ class SalariesTable extends Table
         ]);
         $this->belongsTo('EmployeeSalaryDivisions', [
             'foreignKey' => 'employee_salary_division_id',
-            'joinType' => 'INNER'
+            'joinType' => 'LEFT'
         ]);
 		
 		$this->belongsTo('EmpSalDivs', [
@@ -57,6 +57,7 @@ class SalariesTable extends Table
 			 'joinType' => 'Left',
 		]);
 		
+		$this->belongsTo('LeaveApplications');
 		$this->belongsTo('FinancialYears');
     }
 

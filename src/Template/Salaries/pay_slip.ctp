@@ -67,8 +67,8 @@
 					<tr>
 						<td width="10%"><b>Employee:</b> </td>
 						<td><?php echo $Employee->name; ?></td>
-						<td width="10%"><b>Dath of birth:</b> </td>
-						<td><?php echo $Employee->dob->format('d-m-Y'); ?></td>
+						<td width="10%"><b>Payslip for:</b> </td>
+						<td><?php echo date('M',strtotime($month_year[1].'-'.$month_year[0].'-1')).'-'.$month_year[1]; ?></td>
 					</tr>
 					<tr>
 						<td width="10%"><b>Designation:</b> </td>
@@ -79,6 +79,8 @@
 					<tr>
 						<td width="10%"><b>Date of joining:</b></td>
 						<td><?php echo $Employee->join_date->format('d-m-Y'); ?></td>
+						<td width="10%"><b>Leave:</b></td>
+						<td><?php echo 'CL-'.@$currentLeaves[$Employee->id][$month_year[0]][1]; echo ' SL-'.@$currentLeaves[$Employee->id][$month_year[0]][2]; ?></td>
 					</tr>
 				</table><br/>
 				<table width="100%" class="table table-bordered">
@@ -88,7 +90,9 @@
 						<th>Amount (₹)</th>
 					</tr>
 					<?php $tot=0; 
-					foreach($Employee->salaries as $salarie){ ?>
+					foreach($Employee->salaries as $salarie){
+						if($salarie->employee_salary_division_id){
+						?>
 						<tr>
 							<td style="width:50%"><?php echo $salarie->employee_salary_division->name; ?></td>
 							<td style="width:30%"><?php echo ucwords($salarie->employee_salary_division->salary_type); ?></td>
@@ -102,10 +106,65 @@
 							<?php echo $salarie->amount; ?>
 							</td>
 						</tr>
+						<?php } ?>
+					<?php } ?>
+					<?php foreach($Employee->salaries as $salarie){ ?>
+						<?php if($salarie->loan_amount>0){ ?>
+						<tr>
+							<td style="width:50%">Loan Installment</td>
+							<td style="width:30%">Deduction</td>
+							<td align="right">
+								(-) <?php echo $salarie->loan_amount; $tot-=$salarie->loan_amount;?>
+							</td>
+						</tr>
+						<?php } ?>
+						
+						<?php if($salarie->other_amount!=0){ ?>
+						<tr>
+							<td style="width:50%">Others</td>
+							<td style="width:30%">
+								<?php if($salarie->other_amount>0){
+									echo 'Addition';
+								}else{
+									echo 'Deduction';
+								} ?>
+							</td>
+							<td align="right">
+								<?php if($salarie->other_amount>0){
+									echo $salarie->other_amount;
+								}else{
+									echo '(-) '.abs($salarie->other_amount);
+								} ?>
+								<?php $tot+=$salarie->other_amount;?>
+							</td>
+						</tr>
+						<?php } ?>
 					<?php } ?>
 					<tr >
 						<th colspan="2" style="text-align:right;">Total</th>
 						<th style="text-align:right;"><?php echo $tot; ?></th>
+					</tr>
+				</table>
+				<table width="100%" class="divFooter">
+					<tr> 
+						<td width="70%" align="left" valign="top">
+						  
+						</td>
+						<td align="right">
+							<table>
+								<tr>
+									<td align="center">
+									<span style="font-weight: bold;">For</span> <span style="font-weight: bold;"><?php echo $company->name; ?><br></span>
+									<?php 
+									 echo $this->Html->Image('/signatures/'.$em->signature,['height'=>'50px','style'=>'height:50px;']); 
+									 ?><br>
+									<span style="font-weight: bold;">Authorised Signatory</span>
+									<br>
+									<span style="font-weight: bold;"><?php echo $em->name; ?></span><br>
+									</td>
+								</tr>
+							</table>
+						</td>
 					</tr>
 				</table>
 				</div>
@@ -119,4 +178,4 @@
 border-top: solid 1px #CCC;
     padding: 5px;
 }
-</style>
+</style>-

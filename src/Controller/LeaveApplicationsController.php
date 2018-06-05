@@ -528,11 +528,12 @@ class LeaveApplicationsController extends AppController
 		
 		$LeaveApplications=	$this->LeaveApplications->find()
 							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'id !='=>$leaveAppId]);
-		$total=0;
+		$PastUnintimated=0; $pastPaidLeaves=0;
 		foreach($LeaveApplications as $LeaveApplication){
-			$total+=$LeaveApplication->unintimated_leave;
+			$PastUnintimated+=$LeaveApplication->unintimated_leave;
+			$pastPaidLeaves+=$LeaveApplication->paid_leaves;
 		}
-		echo $total;
+		echo '30-'.$pastPaidLeaves.'-'.$PastUnintimated;
 		exit;
 	}
 	public function delete($id = null)

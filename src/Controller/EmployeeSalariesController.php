@@ -381,7 +381,7 @@ class EmployeeSalariesController extends AppController
 			}
 			
 			$this->EmployeeSalaries->LoanInstallments->deleteAll(['month' => $month, 'year' => $year]);
-			if($loan_amount2[$dt->id]>0){
+			if(@$loan_amount2[$dt->id]>0){
 				$LoanInstallment = $this->EmployeeSalaries->LoanInstallments->newEntity();
 				$LoanInstallment->loan_application_id=$loan_app[$dt->id];
 				$LoanInstallment->month=$month;
