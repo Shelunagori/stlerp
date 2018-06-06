@@ -46,8 +46,8 @@ class LoginsController extends AppController
 					return $this->redirect(['controller'=>'Logins', 'action' => 'SwitchCompany']);
 				}*/
 				 if(!empty($emp_mobile)){
-					return $this->redirect(['action' => 'Switch-Company']);
-					//return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
+					//return $this->redirect(['action' => 'Switch-Company']);
+					return $this->redirect(['controller'=>'Logins', 'action' => 'otpCodeConfirm',$employee_id,$login_id]);
 				}else{
 					return $this->redirect(['controller'=>'Logins', 'action' => 'errorOtp',$employee_id]);
 				} 
@@ -193,7 +193,7 @@ class LoginsController extends AppController
 			
 			$sms_sender='MOGRAG';
 			
-$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
+			$ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=9829041695&senderid='.$sms_sender.'&channel=Trans&DCS=0&flashsms=0&number='.$mobile_no.'&text='.$sms.'&route=7');
 		  
 		    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
 
@@ -461,7 +461,7 @@ $ch = curl_init('http://103.39.134.40/api/mt/SendSMS?user=phppoetsit&password=98
 		$grns = $this->Logins->Grns->find()->where(['status'=>'Pending'])->where(['Grns.company_id'=>$st_company_id]);
 		$grns = $grns->select(['ct' => $grns->func()->count('Grns.id')])->first();
 		$pending_grn=$grns->ct;
-		if($employee_id==16 || $employee_id==23){
+		if($employee_id==16 || $employee_id==23 || $employee_id==17){
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->contain(['Employees','LeaveTypes'])->where(['leave_status'=>'Pending', 'company_id'=>$st_company_id])->toArray();
 			
 			$PendingTravelRequests = $this->Logins->TravelRequests->find()->where(['TravelRequests.status'=>'Pending'])->contain(['Employees'])->toArray();

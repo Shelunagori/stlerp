@@ -3,6 +3,7 @@ namespace App\Controller;
 
 use App\Controller\AppController;
 use Cake\Event\Event;
+use Cake\Mailer\Email;
 /**
  * Salaries Controller
  *
@@ -187,4 +188,36 @@ class SalariesController extends AppController
 
         return $this->redirect(['action' => 'index']);
     }
+	
+	public function sendPaySlip(){
+		$emailTo=$this->request->data['email'];
+		$html=$this->request->data['qwerty'];
+		if(empty($emailTo)){
+			echo '> Email not found.<br/>'; exit;
+		}
+		$email = new Email('default');
+		$email->transport('gmail');
+		$from_name='STL';
+		$email_to=$emailTo;
+		//$cc_mail=$cust_info->employee->email;
+		$sub="STL - Payslip ";
+		$email->from(['dispatch@mogragroup.com' => $from_name])
+			->to($email_to)
+			//->cc($cc_mail)
+			->replyTo('dispatch@mogragroup.com')
+			->subject($sub)
+			->template('send_payslip')
+			->emailFormat('html')
+			->viewVars(['html'=>$html]);
+		$email->send();
+		echo 'Mail sent';
+		exit;
+	}
+	public function printPaySlip(){
+		$emailTo=$this->request->data['email'];
+		echo $html=$this->request->data['qwerty']; 
+		echo '<script>window.print();</script>';
+		exit;
+		
+	}
 }

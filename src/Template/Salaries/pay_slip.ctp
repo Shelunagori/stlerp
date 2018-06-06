@@ -33,8 +33,6 @@
 			</select>
 			<button type="submit">Print</button>
 		</form>
-		
-		
 	</div>
 </div>
 
@@ -43,11 +41,25 @@
 		foreach($Employees as $Employee){
 			if(sizeof($Employee->salaries)>0){
 			?>
-			<div style="border:solid 1px;background-color: #FFF;padding:2px;">
+			<div style="overflow:auto;" class="hide_at_print">
+				<?php $url= $this->Url->build(['controller'=>'Salaries','action'=>'sendPaySlip']); ?>
+				<form method="post" action="<?php echo $url; ?>" id="f<?php echo $Employee->id; ?>" target="_blank">
+					<input type="hidden" name="email" value="abhilashlohar01@gmail.com" />
+					<textarea name="qwerty" id="t<?php echo $Employee->id; ?>" style="display:none;"></textarea>
+					<button type="button" id="<?php echo $Employee->id; ?>" class="btnsb btn btn-sm btn-primary" style="float: left;">Send by mail</button>
+				</form>
+				<?php $url= $this->Url->build(['controller'=>'Salaries','action'=>'printPaySlip']); ?>
+				<form method="post" action="<?php echo $url; ?>" id="f2<?php echo $Employee->id; ?>" target="_blank">
+					<input type="hidden" name="email" value="abhilashlohar01@gmail.com" />
+					<textarea name="qwerty" id="t2<?php echo $Employee->id; ?>" style="display:none;"></textarea>
+					<button type="button" id="<?php echo $Employee->id; ?>" class="btnprint btn btn-sm btn-info" style="float: left;">Print</button>
+				</form>
+			</div>
+			<div style="border:solid 1px;background-color: #FFF;padding:2px;" id="d<?php echo $Employee->id; ?>">
 				<div>
 					<table width="100%" class="divHeader">
 						<tr>
-							<td width="30%"><?php echo $this->Html->image('/logos/'.$company->logo, ['width' => '30%']); ?></td>
+							<td width="30%"><?php echo $this->Html->image('/logos/'.$company->logo, ['width' => '30%','fullBase' => true]); ?></td>
 							<td align="center" width="40%" style="font-size: 14px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">PAYSLIP</div></td>
 							<td align="right" width="30%" style="font-size: 12px;">
 							<span style="font-size: 14px;"><?= h($company->name) ?></span>
@@ -83,20 +95,20 @@
 						<td><?php echo 'CL-'.@$currentLeaves[$Employee->id][$month_year[0]][1]; echo ' SL-'.@$currentLeaves[$Employee->id][$month_year[0]][2]; ?></td>
 					</tr>
 				</table><br/>
-				<table width="100%" class="table table-bordered">
+				<table width="100%" class="">
 					<tr class="qwerty">
-						<th>Head</th>
-						<th>Type</th>
-						<th>Amount (₹)</th>
+						<th style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Head</th>
+						<th style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Type</th>
+						<th style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Amount (₹)</th>
 					</tr>
 					<?php $tot=0; 
 					foreach($Employee->salaries as $salarie){
 						if($salarie->employee_salary_division_id){
 						?>
 						<tr>
-							<td style="width:50%"><?php echo $salarie->employee_salary_division->name; ?></td>
-							<td style="width:30%"><?php echo ucwords($salarie->employee_salary_division->salary_type); ?></td>
-							<td align="right">
+							<td style="width:50%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;"><?php echo $salarie->employee_salary_division->name; ?></td>
+							<td style="width:30%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;"><?php echo ucwords($salarie->employee_salary_division->salary_type); ?></td>
+							<td align="right" style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">
 							<?php if($salarie->employee_salary_division->salary_type=="deduction"){
 								echo '(-)';
 								$tot-=$salarie->amount;
@@ -111,9 +123,9 @@
 					<?php foreach($Employee->salaries as $salarie){ ?>
 						<?php if($salarie->loan_amount>0){ ?>
 						<tr>
-							<td style="width:50%">Loan Installment</td>
-							<td style="width:30%">Deduction</td>
-							<td align="right">
+							<td style="width:50%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Loan Installment</td>
+							<td style="width:30%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Deduction</td>
+							<td align="right" style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">
 								(-) <?php echo $salarie->loan_amount; $tot-=$salarie->loan_amount;?>
 							</td>
 						</tr>
@@ -121,15 +133,15 @@
 						
 						<?php if($salarie->other_amount!=0){ ?>
 						<tr>
-							<td style="width:50%">Others</td>
-							<td style="width:30%">
+							<td style="width:50%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Others</td>
+							<td style="width:30%;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">
 								<?php if($salarie->other_amount>0){
 									echo 'Addition';
 								}else{
 									echo 'Deduction';
 								} ?>
 							</td>
-							<td align="right">
+							<td align="right" style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">
 								<?php if($salarie->other_amount>0){
 									echo $salarie->other_amount;
 								}else{
@@ -140,9 +152,9 @@
 						</tr>
 						<?php } ?>
 					<?php } ?>
-					<tr >
-						<th colspan="2" style="text-align:right;">Total</th>
-						<th style="text-align:right;"><?php echo $tot; ?></th>
+					<tr>
+						<th colspan="2" style="text-align:right;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Total</th>
+						<th style="text-align:right;border: solid 1px #CCC;border-collapse: collapse;padding:2px;"><?php echo $tot; ?></th>
 					</tr>
 				</table>
 				<table width="100%" class="divFooter">
@@ -156,8 +168,8 @@
 									<td align="center">
 									<span style="font-weight: bold;">For</span> <span style="font-weight: bold;"><?php echo $company->name; ?><br></span>
 									<?php 
-									 echo $this->Html->Image('/signatures/'.$em->signature,['height'=>'50px','style'=>'height:50px;']); 
-									 ?><br>
+									echo $this->Html->Image('/signatures/'.$em->signature,['height'=>'50px','style'=>'height:50px;','fullBase' => true]); 
+									?><br>
 									<span style="font-weight: bold;">Authorised Signatory</span>
 									<br>
 									<span style="font-weight: bold;"><?php echo $em->name; ?></span><br>
@@ -178,4 +190,23 @@
 border-top: solid 1px #CCC;
     padding: 5px;
 }
-</style>-
+
+</style>
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+
+<script>
+$(document).ready(function() {
+	$('.btnsb').die().live("click",function() {
+		var id=$(this).attr('id');
+		var html=$('div#d'+id).html();
+		$('textarea#t'+id).text(html);
+		$('form#f'+id).submit();
+	});
+	$('.btnprint').die().live("click",function() {
+		var id=$(this).attr('id');
+		var html=$('div#d'+id).html();
+		$('textarea#t2'+id).text(html);
+		$('form#f2'+id).submit();
+	});
+});
+</script>

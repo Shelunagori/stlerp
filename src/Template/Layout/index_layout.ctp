@@ -1144,7 +1144,7 @@ select
 		}
 		////
 		//setInterval(function(){  checkFYSession(); }, 5000);
-		function abc1(){
+		/*function abc1(){
 			var year_id= $('input[name="year_id"]').val();
 			var url="<?php echo $this->Url->build(['controller'=>'Logins','action'=>'checkFySession']); ?>";
 				$.ajax({
@@ -1159,7 +1159,7 @@ select
 						window.location=a1;
 					}
 				});
-		}
+		}*/
 	});
 	
 	
