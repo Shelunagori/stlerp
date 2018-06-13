@@ -78,8 +78,7 @@ if(!empty($status)){
 								<input type="text" name="customer" class="form-control input-sm" placeholder="Customer" value="<?php echo @$customer; ?>">
 							</td>
 							<td width="16%">
-								<?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman) ]); ?>
-								
+								<input type="text" name="salesman" class="form-control input-sm" placeholder="Salesman" value="<?php echo @$salesman; ?>">
 							</td>
 							<td width="15%">
 								<input type="text" name="product" class="form-control input-sm" placeholder="Product" value="<?php echo @$product; ?>">
@@ -196,7 +195,7 @@ if(!empty($status)){
 								?></td>	
 							<?php } ?>
 							<td class="actions">
-							<?php if(in_array($quotation->created_by,$allowed_emp)){ ?>
+							<?php //if(in_array($quotation->created_by,$allowed_emp)){ ?>
 							<?php if(in_array(21,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 							<?php } ?>	
@@ -217,7 +216,9 @@ if(!empty($status)){
 										</li>
 									</ul>
 								</div>
-							<?php } } } }?>
+							<?php } } } 
+							//}
+							?>
 								
 								<?php if($status == "Closed" && $pull_request=="true" && $close_status != "close"){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Sales Order','/Sales-Orders/Add?quotation='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
@@ -238,7 +239,7 @@ if(!empty($status)){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Sales Order','/Sales-Orders/Add?quotation='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 									
 								} ?>
-								<?php if(in_array($quotation->created_by,$allowed_emp)){ ?>
+								<?php //if(in_array($quotation->created_by,$allowed_emp)){ ?>
 								<?php 
 								if(in_array(30,$allowed_pages)){
 								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true" && $st_year_id==$quotation->financial_year_id){
@@ -250,7 +251,9 @@ if(!empty($status)){
 								<?php if($quotation->status=='Closed' ){
 								echo $this->Form->postLink('<i class="fa fa-minus-circle"></i> ',['action' =>'reopen', $quotation->id],['escape' => false,'class' => 'btn btn-xs green tooltips','data-original-title'=>'Reopen','confirm' => __('Are you sure, you want to reopen ?', $quotation->id)]
 								);
-								} }?>
+								} 
+								//}
+								?>
 								
 							</td>
 						</tr>
