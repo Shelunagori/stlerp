@@ -236,7 +236,7 @@ class EmployeeSalariesController extends AppController
 			}			
 			
 			$OldVoucherNos=[];
-			$oldVouchers=$this->EmployeeSalaries->Nppayments->find()->where(['salary_month'=>$month,'salary_year'=>$year]);
+			$oldVouchers=$this->EmployeeSalaries->Nppayments->find()->where(['salary_month'=>$month,'salary_year'=>$year, 'company_id'=>$st_company_id, 'financial_year_id'=>$st_year_id]);
 			if($oldVouchers){
 				foreach($oldVouchers as $oldVoucher){
 					$OldVoucherNos[$oldVoucher->emp_id]=$oldVoucher->voucher_no;

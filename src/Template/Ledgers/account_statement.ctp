@@ -58,7 +58,7 @@ $url_excel="/?".$url;
 							</div>
 							<div class="col-md-4">
 							<?php if(!empty($transaction_from_date)){
-								echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($transaction_from_date)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
+								echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => '1-4-'.@date('Y', strtotime($transaction_from_date)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
 							}else{
 								echo $this->Form->input('From', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker from_date','data-date-format' => 'dd-mm-yyyy','value' => @date('d-m-Y', strtotime($financial_year->date_from)),'data-date-start-date' => "01-04-2017",'data-date-end-date' => date("d-m-Y",strtotime($financial_year->date_to))]);
 							}  ?>

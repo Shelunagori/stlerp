@@ -9,7 +9,7 @@
 			<div class="col-md-12">
 				<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
 					<form method="GET" >
-						<table width="70%">
+						<table width="80%">
 							<tr>
 								<td>
 									<input type="text" name="FromDate" class="form-control input-sm date-picker" value="<?php echo @$FromDate; ?>" data-date-format="dd-mm-yyyy" placeholder="From"/>
@@ -25,6 +25,7 @@
 										<option value="">select</option>
 										<option value="approved" <?php if($status=="approved"){ echo "selected='selected'"; } ?>>approved</option>
 										<option value="Pending" <?php if($status=="Pending"){ echo "selected='selected'"; } ?>>Pending</option>
+										<option value="cancle" <?php if($status=="Pending"){ echo "selected='selected'"; } ?>>Canceled</option>
 									</select>
 								</td>
 								<td>
@@ -58,7 +59,7 @@
 							{
 							echo date("d-m-Y",strtotime($leaveApplication->submission_date));} ?></td>
 							<td><?= h($leaveApplication->day_no) ?></td>
-							<td><?= h($leaveApplication->leave_status) ?></td>
+							<td><?= $leaveApplication->leave_status=='cancle'?'Canceled':ucwords($leaveApplication->leave_status) ?></td>
 							<td class="actions">
 								<?php if($leaveApplication->leave_status=="Pending"){?>
 									<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $leaveApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
@@ -75,6 +76,10 @@
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
 									if($leaveApplication->leave_status=="approved"){
 										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									}
+									
+									if($leaveApplication->leave_status=="cancle"){
+										echo $this->Html->link('<i class="fa fa-undo"></i>',['action' => 'markPending', $leaveApplication->id],['escape'=>false,'class'=>'btn btn-xs purple tooltips','data-original-title'=>'Mark as pending ']);
 									}
 								} ?>
 							</td>

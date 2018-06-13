@@ -520,6 +520,24 @@ class LeaveApplicationsController extends AppController
 	
 		return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
     }
+	public function markPending($id = null)
+    {
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$s_employee_id=$this->viewVars['s_employee_id'];
+        $leaveApplication = $this->LeaveApplications->get($id);
+		
+		$EmployeeHierarchies=$this->LeaveApplications->EmployeeHierarchies->find()->contain(['ParentAccountingGroups'])->where(['EmployeeHierarchies.employee_id'=>$leaveApplication->parent_employee_id])->first();
+
+			
+			$query = $this->LeaveApplications->query();
+					$query->update()
+						->set(['leave_status' =>'Pending'])
+						->where(['id' => $id])
+						->execute();
+	
+		return $this->redirect(['controller'=>'LeaveApplications','action' => 'index']);
+    }
 
 	public function leaveInfo($employee_id=null, $leaveAppId=null){
 		$session = $this->request->session();
