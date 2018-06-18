@@ -58,10 +58,10 @@
 						<td><?= h($saleReturn->customer->customer_name);?></td>
 						<td><?php 
 						if($saleReturn->sale_return_type=="GST"){
-							echo $this->Html->link($saleReturn->sr1.'/SR-'.str_pad($saleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->sr3.'/'.$saleReturn->sr4,[
+							echo $this->Html->link($saleReturn->sr1.'/CR-'.str_pad($saleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->sr3.'/'.$saleReturn->sr4,[
 								'controller'=>'SaleReturns','action' => 'gstConfirm',$saleReturn->id],array('target'=>'_blank')); 
 						}else{
-							echo $this->Html->link($saleReturn->sr1.'/SR-'.str_pad($saleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->sr3.'/'.$saleReturn->sr4,[
+							echo $this->Html->link($saleReturn->sr1.'/CR-'.str_pad($saleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->sr3.'/'.$saleReturn->sr4,[
 								'controller'=>'SaleReturns','action' => 'confirm',$saleReturn->id],array('target'=>'_blank')); 
 						}?></td>
 						

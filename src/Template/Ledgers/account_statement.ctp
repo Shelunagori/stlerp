@@ -251,7 +251,7 @@ $url_excel="/?".$url;
 				}else if($ledger->voucher_source=="Sale Return"){ 
 					$salereturn=$url_link[$ledger->id];
 					//pr($salereturn->sale_return_type); exit; 
-					$voucher_no=h(($salereturn->sr1.'/SR-'.str_pad($salereturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$salereturn->sr3.'/'.$salereturn->sr4));
+					$voucher_no=h(($salereturn->sr1.'/CR-'.str_pad($salereturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$salereturn->sr3.'/'.$salereturn->sr4));
 					if($salereturn->sale_return_type=="GST"){
 						$url_path="/sale-returns/gst-confirm/".$ledger->voucher_id;	
 					}else{

@@ -169,7 +169,7 @@ $html = '
 									<tr>
 										<td valign="top" style="vertical-align: top;" >Sales Return No.</td>
 										<td  valign="top">:</td>
-										<td  valign="top" width="20%">'. h(("SR-".str_pad($SaleReturn->sr2, 3, "0", STR_PAD_LEFT)." / ".$SaleReturn->sr3.'/'.$SaleReturn->sr4)) .'</td>
+										<td  valign="top" width="20%">'. h(("CR-".str_pad($SaleReturn->sr2, 3, "0", STR_PAD_LEFT)." / ".$SaleReturn->sr3.'/'.$SaleReturn->sr4)) .'</td>
 									</tr>
 									<tr>
 										<td valign="top" style="vertical-align: top;">Date</td>
