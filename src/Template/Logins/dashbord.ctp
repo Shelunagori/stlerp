@@ -438,6 +438,7 @@ $('.approveLoan').die().live("click",function(e){
 				url: url,
 				type: 'GET',
 			}).done(function(response) { 
+				$("#myModal2").show();
 				$("#show_model").html(response);
 			});
 		//$("#myModal3").show();
@@ -460,7 +461,15 @@ $('.approveLoan').die().live("click",function(e){
 	</div>
 </div>
 
+<div id="myModal2" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display:; padding-right: 12px;">
+	<div class="modal-backdrop fade in" ></div>
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-body" id="result_ajax">
+					<div id="show_model">
 
-<div id="show_model">
-
-</div>
+					</div>
+				</div>
+			</div>		
+		</div>
+</div>	

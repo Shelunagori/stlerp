@@ -115,6 +115,7 @@
 							<th width="15%">Customer</th>
 							<th width="10%">PO No.</th>
 							<th width="10%">Items Name</th>
+							<th width="10%">Items Pending</th>
 							<th width="10%">Amount</th>
 							<th width="10%">Created Date</th>
 							<th width="10%">Actions</th>
@@ -158,6 +159,7 @@
 										</ul>
 								</div>
 							</td>
+							
 							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
@@ -202,7 +204,7 @@
 										</ul>
 								</div>
 							</td>
-							
+							<td><a href="#" class="list-group-item select_term_condition" qwerty="<?php echo $salesOrder->id; ?>">Show Item</a></td>
 							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
@@ -338,3 +340,32 @@
 	</div>
 </div>
 
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<script>
+$(document).ready(function() {
+	
+	$('.select_term_condition').die().live("click",function() { 
+		var sid=$(this).attr('qwerty');
+		open_address(sid);
+    });
+	$('.closebtn2').on("click",function() {  
+		$("#myModal2").hide();
+	});
+	function open_address(sid){
+			
+			var url="<?php echo $this->Url->build(['controller'=>'SalesOrders','action'=>'showPendingItem']); ?>";
+			url=url+'/'+sid,
+			$.ajax({
+				url: url,
+			}).done(function(response) {
+				$("#show_model").html(response);
+			});
+		}
+		
+    });
+	
+</script>
+
+<div id="show_model">
+
+</div>

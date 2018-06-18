@@ -1702,6 +1702,40 @@ class SalesOrdersController extends AppController
 		pr($data);exit;
 	}
 	
+	public function showPendingItem($id=null){
+		
+			$SalesOrders = $this->SalesOrders->find()->contain(['SalesOrderRows'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}]])->where(['SalesOrders.id'=>$id])->where(['SalesOrders.sales_order_status !='=>"Close"]);
+			
+			$sales_order_qty=[];
+			 $invoice_qty=[];
+			$salesData=[];
+			
+				foreach($SalesOrders as $SalesOrder){ $sales_qty=[]; $inc_qty=[]; 
+					foreach($SalesOrder->sales_order_rows as $sales_order_row){ 
+						foreach($sales_order_row->invoice_rows as $invoice_row){ //pr($invoice_row); exit;
+							@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+							@$inc_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+						}
+						@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+						@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+					}
+					
+					
+					foreach(@$sales_qty as $key=>$sales_order_qt){
+							if(@$sales_order_qt > @$inc_qty[$key] ){ 
+								$pen=@$sales_order_qt-@$inc_qty[$key];
+								$itm= $this->SalesOrders->SalesOrderRows->Items->get($key);
+								@$salesData[$itm->name]=$pen;
+							}
+					}
+				}
+		
+		$this->set(compact('salesData'));
+					
+		
+	}
 	public function getproceedqty(){
 		$SalesOrders = $this->SalesOrders->SalesOrderRows->find()->where(['processed_quantity > quantity']);
 		$data=[];
