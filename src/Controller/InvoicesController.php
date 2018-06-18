@@ -4074,7 +4074,7 @@ class InvoicesController extends AppController
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
 					} 
 				)->where(['account_second_subgroup_id'=>6,'cgst'=>'Yes']);
-				
+				//pr($invoiceBookingsGst->toArray()); exit;
 				$PurchaseIgst = $this->Invoices->SaleTaxes->find()->matching(
 					'SaleTaxCompanies', function ($q) use($st_company_id) {
 						return $q->where(['SaleTaxCompanies.company_id' => $st_company_id]);
@@ -4082,7 +4082,7 @@ class InvoicesController extends AppController
 				)->where(['account_second_subgroup_id'=>6,'igst'=>'Yes']);
 				
 				
-				//pr($PurchaseIgst->toArray()); exit;
+			//	pr($PurchaseIgst->toArray()); exit;
 				$invoiceBookingsInterState = $this->Invoices->InvoiceBookings->find()->where($where1)
 							->contain(['Vendors','InvoiceBookingRows'=>function($q){ 
 												return $q->where(['InvoiceBookingRows.igst != '=>0]);
