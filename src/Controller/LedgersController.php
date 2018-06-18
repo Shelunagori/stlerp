@@ -213,7 +213,7 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->InventoryVouchers->get($ledger->voucher_id);
 				}
 			}
-		}			
+					
 			//pr($url_link); exit;
 			$ledger=$this->Ledgers->LedgerAccounts->find('list',
 				['keyField' => function ($row) {
