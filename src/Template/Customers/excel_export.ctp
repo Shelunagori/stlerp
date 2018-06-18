@@ -24,7 +24,10 @@
 			<tr>
 				<th>SN.</th>
 				<th>Customer Name</th>
-				<th>District</th>
+				<th width="10%">District</th>
+				<th width="10%">Customer Seg</th>
+				<th width="10%">Tin No</th>
+				<th width="10%">Gst No</th>
 				<th>Mobile No</th>
 				<th>Email</th>
 				<th>Sales Person Name</th>
@@ -36,6 +39,9 @@
 				<td><?php echo $i; ?></td>
 				<td><?php if(!empty($customer->alias)){ echo $customer->customer_name.'('; echo $customer->alias.')'; }else{ echo $customer->customer_name; } ?></td>
 				<td><?php echo @$customer->district->district; ?></td>
+				<td><?php echo @$customer->customer_seg->name; ?></td>
+				<td><?php echo @$customer->tin_no; ?></td>
+				<td><?php echo @$customer->gst_no; ?></td>
 				<td><?php echo @$customer->customer_contacts[0]->mobile; ?></td>
 				<td><?php echo @$customer->customer_contacts[0]->email; ?></td>
 				<td><?php echo @$customer->employee->name; ?></td>

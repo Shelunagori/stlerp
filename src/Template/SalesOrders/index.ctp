@@ -114,8 +114,7 @@
 							<th width="15%" >Quotation No</th>
 							<th width="15%">Customer</th>
 							<th width="10%">PO No.</th>
-							<th width="10%">Items Name</th>
-							<th width="10%">Items Pending</th>
+							<th width="10%">Pending Items</th>
 							<th width="10%">Amount</th>
 							<th width="10%">Created Date</th>
 							<th width="10%">Actions</th>
@@ -148,7 +147,7 @@
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
 							<td><?= h($salesOrder->customer_po_no); ?></td>
-							<td>
+							<!--<td>
 								<div class="btn-group">
 									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
 										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
@@ -158,7 +157,7 @@
 											<?php }}?>
 										</ul>
 								</div>
-							</td>
+							</td>-->
 							
 							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
