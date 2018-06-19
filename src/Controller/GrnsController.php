@@ -213,6 +213,7 @@ class GrnsController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn = $this->Grns->get($id, [
@@ -365,7 +366,9 @@ class GrnsController extends AppController
 	public function AddNew()
     {
 		$this->viewBuilder()->layout('index_layout');
-		$purchase_order_id=@(int)$this->request->query('purchase-order');
+		$purchase_order_id=$this->request->query('purchase-order');
+		//pr($purchase_order_id); exit;
+		$purchase_order_id = $this->EncryptingDecrypting->decryptData($purchase_order_id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		
@@ -573,6 +576,7 @@ class GrnsController extends AppController
 	
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->Grns->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->Grns->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();

@@ -52,7 +52,7 @@
                     </thead>
                     <tbody>
                         <?php $i=0; foreach ($contravouchers as $contravoucher): $i++; 
-                        
+                        $contravoucher->id = $EncryptingDecrypting->encryptData($contravoucher->id);
                     ?>
                         <tr>
                             <td><?= h(++$page_no) ?></td>

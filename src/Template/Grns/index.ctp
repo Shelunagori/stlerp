@@ -92,15 +92,16 @@
 							<td><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
 							<td>
 							<?php if(in_array($grn->purchase_order->created_by,$allowed_emp)){ ?>
-							<?php echo $this->Html->link($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4,[
-							'controller'=>'PurchaseOrders','action' => 'confirm',$grn->purchase_order->id],array('target'=>'_blank')); ?>
+							<?php $purchase_order_id = $EncryptingDecrypting->encryptData($grn->purchase_order->id);
+							echo $this->Html->link($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4,[
+							'controller'=>'PurchaseOrders','action' => 'confirm',$purchase_order_id],array('target'=>'_blank')); ?>
 							<?php } ?>
 							</td>
 							<td><?= h($grn->vendor->company_name) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($grn->date_created)); ?></td>
 							<td class="actions"> 
 							<?php 
-							
+							$grn->id = $EncryptingDecrypting->encryptData($grn->id);
 							if($pull_request=="true"){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Book Invoice','/InvoiceBookings/Add?grn='.$grn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}else if($grn_pull_request=="true")

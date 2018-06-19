@@ -230,7 +230,7 @@ class PaymentsController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_year_id = $session->read('st_year_id');
         $payment = $this->Payments->get($id, [
@@ -615,7 +615,7 @@ class PaymentsController extends AppController
 	public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');

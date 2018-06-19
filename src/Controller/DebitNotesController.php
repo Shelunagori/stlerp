@@ -120,6 +120,7 @@ class DebitNotesController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $debitNote = $this->DebitNotes->get($id, [
             'contain' => ['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
@@ -528,13 +529,12 @@ class DebitNotesController extends AppController
      */
     public function edit($id = null)
     { 
-	
-	
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$debitNote = $this->DebitNotes->get($id, [
             'contain' => ['Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads']
         ]);

@@ -51,7 +51,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($receipts as $receipt): $i++; 
-						
+						$receipt->id = $EncryptingDecrypting->encryptData($receipt->id);
 					?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>

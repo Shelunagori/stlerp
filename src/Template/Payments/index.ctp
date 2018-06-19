@@ -49,7 +49,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($payments as $payment): $i++; 
-						
+						$payment->id = $EncryptingDecrypting->encryptData($payment->id);
 					?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>

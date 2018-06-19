@@ -163,7 +163,7 @@ margin-bottom: 0;
 						 ?></br>
 						 </hr>
 						 <span><b>Prepared By</b></span><br/>
-						 <span><?= h($receipt->company->name) ?></span><br/>
+						 <span><?= h($receipt->creator->name) ?></span><br/>
 						</td>
 					</tr>
 				</table>

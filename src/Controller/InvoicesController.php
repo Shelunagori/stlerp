@@ -2559,7 +2559,7 @@ class InvoicesController extends AppController
     {
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		 
+		$id = $this->EncryptingDecrypting->decryptData($id); 
 		$this->viewBuilder()->layout('index_layout');
 		$invoice = $this->Invoices->get($id, [
             'contain' => ['ReferenceDetails','SerialNumbers','InvoiceRows','SalesOrders' => ['SalesOrderRows' => ['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
@@ -3169,6 +3169,7 @@ class InvoicesController extends AppController
 	public function DispatchDownload($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$invoice = $this->Invoices->get($id, [
             'contain' => ['InvoiceRows']
 			]);
@@ -3208,10 +3209,12 @@ class InvoicesController extends AppController
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
 		$company_data=$this->Invoices->Companies->get($st_company_id);
+		
 		$invoice = $this->Invoices->get($id, [
             'contain' => [
 							'Companies'=> ['CompanyBanks'=> function ($q) {

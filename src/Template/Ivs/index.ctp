@@ -59,6 +59,7 @@
 					</thead>
 					<tbody>
 						<?php  $i=0; foreach ($ivs as $iv):
+						$iv->id = $EncryptingDecrypting->encryptData($iv->id);
 						if(in_array($iv->created_by,$allowed_emp)){
 						$i++;?>
 						<tr>
@@ -81,10 +82,11 @@
 							<td>
 							<?php
 							if(in_array(10,$allowed_pages)){
-							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit/'.$iv->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit',$iv->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 							} ?>
 							<?php 
 							if(in_array(154,$allowed_pages)){
+								
 							echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $iv->id],array('escape'=>false,'class'=>'btn btn-xs yellow tooltips','target'=>'blank','data-original-title'=>'View')); 
 							} ?>
 							</td>

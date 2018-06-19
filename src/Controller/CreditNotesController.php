@@ -61,6 +61,7 @@ class CreditNotesController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $creditNotes = $this->CreditNotes->get($id, [
             'contain' => ['Creator','FinancialYears','Companies','CreditNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
@@ -480,6 +481,7 @@ class CreditNotesController extends AppController
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$creditNote = $this->CreditNotes->get($id, [
             'contain' => ['Creator','Companies','CreditNotesRows'=>['ReceivedFroms'],'Heads']
         ]);

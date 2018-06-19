@@ -1399,7 +1399,8 @@ class InvoiceBookingsController extends AppController
 			
 			
 			   
-		$grn_id=@(int)$this->request->query('grn');
+		$grn_id=$this->request->query('grn');
+		$grn_id = $this->EncryptingDecrypting->decryptData($grn_id);
 		$grn=array();
 		if(!empty($grn_id)){
 			$grn = $this->InvoiceBookings->Grns->get($grn_id, [
@@ -1679,10 +1680,12 @@ class InvoiceBookingsController extends AppController
     }
 	
 	public function UpdateGstInvoiceBooking($id = null)
-    {
+    {  
 	$this->viewBuilder()->layout('index_layout');
 	$session = $this->request->session();
+	$id = $this->EncryptingDecrypting->decryptData($id);
 	$invoice_booking_id=$id;
+	
 	$st_company_id = $session->read('st_company_id');
 
 	$st_year_id = $session->read('st_year_id');
@@ -1709,7 +1712,7 @@ class InvoiceBookingsController extends AppController
 			$chkdate = 'Not Found';	
 		}
 
-
+		
 		$invoiceBooking = $this->InvoiceBookings->get($id, [
             'contain' => ['ReferenceDetails','InvoiceBookingRows' => ['Items'],'Grns'=>['Companies','Vendors','GrnRows'=>['Items'],'PurchaseOrders'=>['PurchaseOrderRows']]]
         ]);
@@ -2130,7 +2133,7 @@ class InvoiceBookingsController extends AppController
     {
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$this->viewBuilder()->layout('index_layout');
         $invoiceBooking = $this->InvoiceBookings->get($id, [
             'contain' => ['InvoiceBookingRows'=>['Items'],'Vendors','Creator','Companies','Grns'=>['PurchaseOrders']]

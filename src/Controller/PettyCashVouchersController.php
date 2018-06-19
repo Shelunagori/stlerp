@@ -204,6 +204,7 @@ class PettyCashVouchersController extends AppController
     public function view($id = null)
     {
         $this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $pettycashvoucher = $this->PettyCashVouchers->get($id, [
             'contain' => ['BankCashes','FinancialYears'=>['Companies'], 'Companies', 'PettyCashVoucherRows' => ['ReferenceDetails','ReceivedFroms'], 'Creator']
         ]);
@@ -520,7 +521,7 @@ class PettyCashVouchersController extends AppController
     public function edit($id = null)
     {
         $this->viewBuilder()->layout('index_layout');
-        
+        $id = $this->EncryptingDecrypting->decryptData($id);
         $s_employee_id=$this->viewVars['s_employee_id'];
         $session = $this->request->session();
         $st_company_id = $session->read('st_company_id');

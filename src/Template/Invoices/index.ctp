@@ -21,9 +21,6 @@
 				['class' => $class1]
 			); ?>
 			
-			
-			
-				
 			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Invoices/Excel-Export/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 			
 		<?php } ?>
@@ -83,7 +80,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($invoices as $invoice): 
-						 
+						 $invoice->id = $EncryptingDecrypting->encryptData($invoice->id);
 						if($invoice->status=='Pending'){ $tr_color='#FFF'; }
 						if($invoice->status=='Cancel'){ $tr_color='#FFF'; }
 						?>
@@ -97,12 +94,13 @@
 							<td>
 							
 							<?php if(in_array($invoice->sales_order->created_by,$allowed_emp)){
+							$sales_order_id = $EncryptingDecrypting->encryptData($invoice->sales_order->id);	
 							if($invoice->sales_order->gst == 'yes'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
-							'controller'=>'SalesOrders','action' => 'gstConfirm',$invoice->sales_order->id],array('target'=>'_blank')); 
+							'controller'=>'SalesOrders','action' => 'gstConfirm',$sales_order_id],array('target'=>'_blank')); 
 							}else{
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
-							'controller'=>'SalesOrders','action' => 'confirm',$invoice->sales_order->id],array('target'=>'_blank')); 
+							'controller'=>'SalesOrders','action' => 'confirm',$sales_order_id],array('target'=>'_blank')); 
 							} }?>
 							</td>
 							<?php }else{?>

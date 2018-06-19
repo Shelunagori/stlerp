@@ -44,6 +44,8 @@ class AppController extends Controller
         $this->loadComponent('RequestHandler');
         $this->loadComponent('Flash');
 		$this->loadComponent('Csrf');
+		$EncryptingDecrypting=$this->loadComponent('EncryptingDecrypting');
+		$this->set(compact('EncryptingDecrypting'));  /// Use in ctp page
 		//$this->loadComponent('Auth');
 		date_default_timezone_set('Asia/Kolkata');
 		

@@ -31,7 +31,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i=0; foreach ($creditNotes as $creditNote): $i++;  ?>
+                        <?php $i=0; foreach ($creditNotes as $creditNote): $i++; 
+						$creditNote->id = $EncryptingDecrypting->encryptData($creditNote->id);
+						?>
                         <tr>
                             <td><?= h(++$page_no) ?></td>
                             <td><?= h(date("d-m-Y",strtotime($creditNote->transaction_date)))?></td>

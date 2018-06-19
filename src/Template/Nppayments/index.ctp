@@ -50,7 +50,9 @@
                     </thead>
                     <tbody>
                         <?php $i=0;
-                         foreach ($nppayments as $nppayment): $i++; ?>
+                         foreach ($nppayments as $nppayment): $i++; 
+						 $nppayment->id = $EncryptingDecrypting->encryptData($nppayment->id);
+						 ?>
                         <tr>
                             <td><?= h(++$page_no) ?></td>
                             <td><?= h(date("d-m-Y",strtotime($nppayment->transaction_date)))?></td>

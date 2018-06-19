@@ -378,6 +378,7 @@ class QuotationsController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_year_id = $session->read('st_year_id');
 		$quotation = $this->Quotations->get($id, [
@@ -472,10 +473,12 @@ class QuotationsController extends AppController
 				'contain' => ['QuotationRows']
 			]);
 		}elseif(!empty($revision)){
+			$revision = $this->EncryptingDecrypting->decryptData($revision);
 			$quotation = $this->Quotations->get($revision, [
 				'contain' => ['QuotationRows']
 			]);
 			$add_revision=$quotation->revision+1;
+			
 			$quotation_id=$quotation->quotation_id;
 			
 		}else{
@@ -613,6 +616,7 @@ class QuotationsController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $quotation = $this->Quotations->get($id, [
             'contain' => ['QuotationRows']
         ]);

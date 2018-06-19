@@ -51,7 +51,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i=0; foreach ($pettycashvouchers as $pettycashvoucher): $i++;  ?>
+                        <?php $i=0; foreach ($pettycashvouchers as $pettycashvoucher): $i++; 
+						$pettycashvoucher->id = $EncryptingDecrypting->encryptData($pettycashvoucher->id);
+						?>
                         <tr>
                             <td><?= h(++$page_no) ?></td>
                             <td><?= h(date("d-m-Y",strtotime($pettycashvoucher->transaction_date)))?></td>

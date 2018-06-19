@@ -177,7 +177,7 @@ margin-bottom: 0;
                          ?></br>
                          </hr>
                          <span><b>Prepared By</b></span><br/>
-                         <span><?= h($pettycashvoucher->company->name) ?></span><br/>
+                         <span><?= h($pettycashvoucher->creator->name) ?></span><br/>
                         </td>
                     </tr>
                 </table>

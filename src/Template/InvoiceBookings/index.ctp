@@ -88,7 +88,7 @@
 							<?= h($this->Money->indianNumberFormat($invoiceBooking->total))?>
 							</td>
 							<td class="actions">
-							<?php //if(in_array($invoiceBooking->created_by,$allowed_emp)){ ?>
+							<?php $invoiceBooking->id = $EncryptingDecrypting->encryptData($invoiceBooking->id); ?>
 								<?php if(in_array(18,$allowed_pages)){ ?>
 								<?php 
 								if($invoiceBooking->gst=='no'){
@@ -101,6 +101,7 @@
 								
 								<?php if(in_array(123,$allowed_pages)){ ?>
                                 <?php
+								
 								if($invoiceBooking->gst=='no'){
 								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $invoiceBooking->id,],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View'));               
 								}else{

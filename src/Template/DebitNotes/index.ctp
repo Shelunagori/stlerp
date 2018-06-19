@@ -50,7 +50,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <?php $i=0; foreach ($debitNotes as $debitNote): $i++;  ?>
+                        <?php $i=0; foreach ($debitNotes as $debitNote): $i++; 
+						$debitNote->id = $EncryptingDecrypting->encryptData($debitNote->id);
+						?>
                         <tr>
                             <td><?= h(++$page_no) ?></td>
                             <td>

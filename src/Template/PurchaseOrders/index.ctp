@@ -144,6 +144,7 @@
 						
 							<td class="actions">
 							<?php
+							 $purchaseOrder->id = $EncryptingDecrypting->encryptData($purchaseOrder->id);
 							if(in_array($purchaseOrder->created_by,$allowed_emp)){
 							if(in_array(31,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
@@ -165,7 +166,9 @@
 						</tr>
 						<?php }} endforeach; ?>
 						
-						<?php foreach ($purchaseOrders as $purchaseOrder): ?>
+						<?php foreach ($purchaseOrders as $purchaseOrder): 
+						
+						?>
 						<tr <?php if($status=='Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id){ echo 'style="background-color:#f4f4f4"';   
 							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){ 
 						?>>
@@ -201,7 +204,9 @@
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 							<td class="actions">
-							<?php if(in_array($purchaseOrder->created_by,$allowed_emp)){
+							<?php
+							$purchaseOrder->id = $EncryptingDecrypting->encryptData($purchaseOrder->id);
+							if(in_array($purchaseOrder->created_by,$allowed_emp)){
 								if(in_array(31,$allowed_pages)){ ?>
 									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 							<?php } } ?>
@@ -261,12 +266,12 @@
 						
 							<td class="actions">
 							<?php 
-							
+								$purchaseOrder->id = $EncryptingDecrypting->encryptData($purchaseOrder->id);
 								if($pull_request!="true" and in_array(31,$allowed_pages)){ ?>
 									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $purchaseOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								<?php } ?>
 							
-								<?php
+								<?php 
 									if($status != 'Converted-Into-GRN') {
 									if($pull_request!="true" and in_array(14,$allowed_pages)){ 
 									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $purchaseOrder->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
@@ -276,7 +281,7 @@
 										if($dd < date("Y-m-d",strtotime($td))){?>
 										
 										<?php //echo $this->Html->link('<i class="fa fa-envelope"></i>',array('escape'=>false,'class'=>'btn btn-primary btn-xs send_mail','data-original-title'=>'Send Mail','ledger_id'=$purchaseOrder->id,'totalPo'=$totalPo)); ?>
-										<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-primary btn-xs send_mail" data-original-title="Edit" onclick="myFunction()"><i class="fa fa-envelope"></i></button>
+										
 									<?php 
 									
 									} 

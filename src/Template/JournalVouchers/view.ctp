@@ -197,7 +197,8 @@ margin-bottom: 0;
 		             echo $this->Html->Image('/signatures/'.$journalVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 		             ?></br>		
 							
-						Authorised Signatory</span>
+						<span><b>Prepared By</b></span><br/>
+                         <span><?= h($journalVoucher->creator->name) ?></span><br/>
 						
 						</td>
 					</tr>

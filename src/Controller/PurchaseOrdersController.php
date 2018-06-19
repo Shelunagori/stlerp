@@ -561,7 +561,7 @@ class PurchaseOrdersController extends AppController
     {
 		$this->viewBuilder()->layout('index_layout');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_company_id = $session->read('st_company_id');
@@ -760,6 +760,7 @@ class PurchaseOrdersController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 			$purchaseOrder = $this->PurchaseOrders->get($id, [
             'contain' => ['PurchaseOrderRows']
 			]);

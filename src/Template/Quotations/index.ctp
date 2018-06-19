@@ -154,6 +154,7 @@ if(!empty($status)){
 					</thead>
 					<tbody>
 						<?php $total_amount=0; $i=0; foreach ($quotations as $quotation):  $i++;
+						$quotation->id = $EncryptingDecrypting->encryptData($quotation->id);
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
