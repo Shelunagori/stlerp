@@ -28,7 +28,7 @@ class JobCardsController extends AppController
 		$Created_To=$this->request->query('Created_To');
 		$items=$this->request->query('items');
 		$customer_id=$this->request->query('customers');
-
+		$st_year_id = $session->read('st_year_id');
 		$this->set(compact('items','jc_no','so_no','jc_file_no','so_file_no','Required_From','Required_To','Created_From','Created_To','customer_id','status'));
 		if(!empty($jc_no)){
 			$where1['JobCards.jc2']=$jc_no;
@@ -68,9 +68,9 @@ class JobCardsController extends AppController
 			if(in_array($st_year_id,$styear)){ 
 				$wheree['JobCards.financial_year_id'] = $st_year_id;
 			}else{
-				$wheree[];
+				$wheree=[];
 			}
-		
+		//pr($wheree);exit;
 		$where=[];
 		if($status==null or $status=='Pending'){
 			if(!empty($items)){ 
@@ -94,7 +94,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC']);
 			}
 		}elseif($status=='Closed'){ 
 			if(!empty($items)){ 
@@ -105,12 +105,13 @@ class JobCardsController extends AppController
 							return $q->where(['Items.id' =>$items]);
 						}
 					)
+				->where($wheree)	
 				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])
 				->order(['JobCards.jc2' => 'DESC'])	
 				;
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
@@ -118,7 +119,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
 			}
 		} 
 		
@@ -170,9 +171,9 @@ class JobCardsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		pr($status);exit;
 		$inventory_voucher_status=$this->request->query('inventory_voucher');
-		
+		$st_year_id = $session->read('st_year_id');
 		$where1=[];
 		$jc_no=$this->request->query('jc_no');
 		$so_no=$this->request->query('so_no');
@@ -220,7 +221,12 @@ class JobCardsController extends AppController
 			$Created_To=date("Y-m-d",strtotime($this->request->query('Created_To')));
 			$where1['JobCards.created_on <=']=$Created_To;
 		}
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['JobCards.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 				$where=[];
 		if($status==null or $status=='Pending'){
 			if(!empty($items)){ 
@@ -232,10 +238,11 @@ class JobCardsController extends AppController
 						}
 					)
 				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])
+				->where($wheree)
 				->order(['JobCards.jc2' => 'DESC']);
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
@@ -243,7 +250,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC']);
 			}
 		}elseif($status=='Closed'){ 
 			if(!empty($items)){ 
@@ -254,12 +261,13 @@ class JobCardsController extends AppController
 							return $q->where(['Items.id' =>$items]);
 						}
 					)
+				->where($wheree)	
 				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])
 				->order(['JobCards.jc2' => 'DESC'])	
 				;
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
@@ -267,7 +275,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
 			}
 		} 
 		

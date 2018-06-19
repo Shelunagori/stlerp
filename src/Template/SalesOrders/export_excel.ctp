@@ -66,7 +66,7 @@
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?= h($salesOrder->customer->customer_name) ?></td>
 							<td><?= h($salesOrder->customer_po_no) ?></td>
-							<td><?= h($salesOrder->total) ?></td>
+							<td><?= h($this->Money->indianNumberFormat($salesOrder->total)) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							<td>
 								<?php 
