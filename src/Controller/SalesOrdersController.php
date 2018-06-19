@@ -1378,7 +1378,7 @@ class SalesOrdersController extends AppController
 			
 			//$salesOrder->id=724;
 			
-			
+			$status=$this->sendEmail($salesOrder->id);
 			if ($this->SalesOrders->save($salesOrder)) {
 				$status=$this->sendEmail($salesOrder->id);
 				$status_close=$this->request->query('status');
@@ -1552,7 +1552,7 @@ class SalesOrdersController extends AppController
 		$salesOrder = $this->SalesOrders->get($id, [
             'contain' => ['Companies','Carrier','Creator','Courier','Customers'=>['CustomerAddress']]
         ]);
-		
+		pr($salesOrder); exit;
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->SalesOrders->Companies->get($st_company_id);
