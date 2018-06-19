@@ -27,7 +27,8 @@
 		$source_model=$itemLedger->source_model;
 		//pr($source_model);exit;
 		if($source_model=='Challan')
-		{
+		{	
+			$created_by = $itemLedger->voucher_info->created_by;
 			if($itemLedger->party_type=='Vendor'){
 				$party_name=$itemLedger->party_info->company_name;
 			}else{
@@ -39,8 +40,10 @@
 		else if($party=='Customer')
 		{ 
 			$party_name=$itemLedger->party_info->customer_name;
+			$created_by = $itemLedger->voucher_info->created_by;
 			$voucher_no=$itemLedger->voucher_info->in1.'/IN-'.str_pad($itemLedger->voucher_info->in2, 3, '0', STR_PAD_LEFT).'/'.$itemLedger->voucher_info->in3.'/'.$itemLedger->voucher_info->in4;
-			if($itemLedger->voucher_info->invoice_type=='GST'){
+			
+			if($itemLedger->voucher_info->invoice_type=='GST'){ 
 				$url_path="/Invoices/gst-confirm/".$itemLedger->voucher_info->id;
 			
 			}else{
@@ -52,6 +55,7 @@
 		{
 			$data=$itemLedger->voucher_info->transaction_date;
 			//pr($data);exit;
+			$created_by = $itemLedger->voucher_info->created_by;
 			$party_name=$itemLedger->party_info->company_name;
 			$voucher_no='-';
 			
@@ -63,12 +67,14 @@
 		}
 		else if($source_model=='Purchase Return')
 		{
-			$created_by = $itemLedger->voucher_info->created_by;
+			$created_by = $itemLedger->voucher_info->created_by; 
 			$party_name=$itemLedger->party_info->company_name;
-			$voucher_no= 
-			 $this->Html->link( '#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT),[
-			'controller'=>'PurchaseReturns','action' => 'view', $itemLedger->voucher_info->id],array('target'=>'_blank')); 
-			;
+			$voucher_no= '#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT); 
+			if($itemLedger->voucher_info->gst_type == "Non-GST"){
+				$url_path="/PurchaseReturns/view/".$itemLedger->voucher_info->id;
+			}else{
+				$url_path="/PurchaseReturns/gstView/".$itemLedger->voucher_info->id;
+			}
 		}
 		else if($source_model=='Sale Return')
 		{ 
@@ -154,8 +160,8 @@
 			<td><?= h($party_name) ?></td>
 			<td><?= h($itemLedger->source_model) ?></td>
 			<td>
-			<?php if(in_array(@$created_by,$allowed_emp)){ 
-					if(!empty($url_path)){
+			<?php  if(in_array(@$created_by,$allowed_emp)){ 
+					if(!empty($url_path)){ 
 						echo $this->Html->link($voucher_no ,$url_path,['target' => '_blank']); 
 					}}else{
 					echo $voucher_no;
