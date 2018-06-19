@@ -61,7 +61,12 @@ class InvoicesController extends AppController
 		if(!empty($total_From)){
 			$where['Invoices.total_after_pnf']=$total_From;
 		}
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Invoices.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 	
         $this->paginate = [
             'contain' => ['Customers', 'Companies']
@@ -92,8 +97,9 @@ class InvoicesController extends AppController
 							})
 				->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])
 				->autoFields(true)
-				->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])
-				->where($where);
+				->where(['Invoices.company_id'=>$st_company_id])
+				->where($where)
+				->where($wheree);
 		}
 		else if($inventory_voucher=='true'){
 			$invoices=[];
@@ -103,7 +109,7 @@ class InvoicesController extends AppController
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
 				}
 				]])
-				->where(['Invoices.company_id'=>$st_company_id])
+				->where(['Invoices.company_id'=>$st_company_id])->where($wheree)
 				->order(['Invoices.id' => 'DESC']);
 				
 				foreach($invoice1 as $invoice){
@@ -117,9 +123,9 @@ class InvoicesController extends AppController
 				
 			//pr($invoices);exit;
 		}else if($sales_return=='true'){
-			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where($wheree)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])->order(['Invoices.in2' => 'DESC']);
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where($wheree)->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])->order(['Invoices.in2' => 'DESC']);
 		} 
 		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
@@ -620,7 +626,12 @@ class InvoicesController extends AppController
 		$page=$this->request->query('page');
 		$items=$this->request->query('items');
 		$this->set(compact('customer','total_From','From','To','page','invoice_no','file','items'));
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Invoices.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		if(!empty($invoice_no)){
 			$where['Invoices.in2 LIKE']=$invoice_no;
 		}
@@ -673,7 +684,8 @@ class InvoicesController extends AppController
 				->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])
 				->autoFields(true)
 				->where(['Invoices.company_id'=>$st_company_id])
-				->where($where);
+				->where($where)
+				->where($wheree);
 		}
 		else if($inventory_voucher=='true'){
 			$invoices=[];
@@ -683,7 +695,7 @@ class InvoicesController extends AppController
 				return $q->where(['SalesOrderRows.source_type !='=>'Purchessed']);
 				}
 				]])
-				->where(['Invoices.company_id'=>$st_company_id])
+				->where(['Invoices.company_id'=>$st_company_id])->where($wheree)
 				->order(['Invoices.id' => 'DESC']);
 				
 				foreach($invoice1 as $invoice){
@@ -696,9 +708,9 @@ class InvoicesController extends AppController
 				
 			//pr($invoices);exit;
 		}else if($sales_return=='true'){
-			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.id' => 'DESC']);
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->where($wheree)->order(['Invoices.id' => 'DESC']);
 		} else{ 
-			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->order(['Invoices.in2' => 'DESC']);
+			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id])->where($wheree)->order(['Invoices.in2' => 'DESC']);
 		} 
 		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);

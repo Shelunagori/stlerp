@@ -171,7 +171,7 @@ class JobCardsController extends AppController
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		pr($status);exit;
+		//pr($status);exit;
 		$inventory_voucher_status=$this->request->query('inventory_voucher');
 		$st_year_id = $session->read('st_year_id');
 		$where1=[];

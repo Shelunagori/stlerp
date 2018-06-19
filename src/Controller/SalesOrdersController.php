@@ -108,6 +108,7 @@ class SalesOrdersController extends AppController
             'contain' => ['Customers']
         ];
 		//
+		//pr($where1);exit;
 		$styear=[1,3,2];
 			if(in_array($st_year_id,$styear)){ 
 				if(!empty($items) && empty($Actionstatus) || !empty($item_group) || !empty($item_subgroup)){ 
