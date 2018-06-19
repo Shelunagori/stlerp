@@ -354,6 +354,7 @@ class JobCardsController extends AppController
     public function view($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $jobCard = $this->JobCards->get($id, [
             'contain' => ['SalesOrders'=>['Customers','SalesOrderRows'=>['Items'=>function ($q){
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);
@@ -487,7 +488,7 @@ class JobCardsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$jobCard = $this->JobCards->get($id, [
             'contain' => ['SalesOrders'=>['Customers','SalesOrderRows'=>['Items'=>function ($q){
 					return $q->where(['SalesOrderRows.source_type != ' => 'Purchessed','Items.source !='=>'Purchessed']);

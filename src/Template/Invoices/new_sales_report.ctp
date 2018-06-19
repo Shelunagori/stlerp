@@ -74,6 +74,7 @@
 				
 					<?php $SalesTotal=[];$SalesgstTotal=[];$gstRowTotal=[]; $gstTotal=[];$i=1; $SigstRowTotal=[];$SigstTotal=[];
 					foreach ($invoices as $invoice):
+					$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
 						foreach($invoice->invoice_rows as $invoice_row)
 						{ 
 							 if($invoice_row['igst_percentage'] == 0){
@@ -96,7 +97,7 @@
 						<td>
 							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', 	STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
-								'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+								'controller'=>'Invoices','action' => 'gstConfirm',$invoice_id],array('target'=>'_blank')); ?>
 							<?php } else { ?>
 								<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4; ?>
 							<?php } ?>

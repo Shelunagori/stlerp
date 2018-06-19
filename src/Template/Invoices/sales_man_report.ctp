@@ -82,6 +82,7 @@
 				
 					<?php $SalesTotal=[];$SalesgstTotal=[];$gstRowTotal=[]; $gstTotal=[];$i=1; $SigstRowTotal=[];$SigstTotal=[];
 					foreach ($invoices as $invoice):
+						$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
 						foreach($invoice->invoice_rows as $invoice_row)
 						{ 
 							 if($invoice_row['igst_percentage'] == 0){
@@ -104,7 +105,7 @@
 						<td>
 							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', 	STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
-								'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+								'controller'=>'Invoices','action' => 'gstConfirm',$invoice_id],array('target'=>'_blank')); ?>
 							<?php } else { ?>
 								<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4; ?>
 							<?php } ?>
@@ -191,6 +192,7 @@
 				
 					<?php $SalesOrderTotal=[];$SalesOrdergstTotal=[];$SalesOrdergstRowTotal=[]; $SalesOrdergstTotal=[];$i=1; $SalesOrderigstRowTotal=[];$SalesOrderigstTotal=[];
 					foreach ($SalesOrders as $SalesOrder):
+						$SalesOrder_id = $EncryptingDecrypting->encryptData($SalesOrder->id);
 						foreach($SalesOrder->sales_order_rows as $sales_order_rows)
 						{ 
 							 if($sales_order_rows['igst_per'] == 0){
@@ -211,7 +213,7 @@
 						<td>
 							<?php if(in_array($SalesOrder->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4,[
-								'controller'=>'SalesOrders','action' => 'gstConfirm',$SalesOrder->id],array('target'=>'_blank')); ?>
+								'controller'=>'SalesOrders','action' => 'gstConfirm',$SalesOrder_id],array('target'=>'_blank')); ?>
 							<?php } else { ?>
 							<?php echo $SalesOrder->so1.'/SO-'.str_pad($SalesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$SalesOrder->so3.'/'.$SalesOrder->so4; ?>
 							<?php } ?>
@@ -291,7 +293,9 @@
 						</tr>
 					</thead>
 					<?php $i=1; $total=0;
-					foreach ($OpenQuotations as $openquotation):    ?>
+					foreach ($OpenQuotations as $openquotation):  
+					$openquotation_id = $EncryptingDecrypting->encryptData($openquotation->id);
+						?>
 					<tbody>
 						<tr>
 							<td>
@@ -300,7 +304,7 @@
 							<td>
 							<?php if(in_array($openquotation->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $openquotation->qt1.'/QT-'.str_pad($openquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$openquotation->qt3.'/'.$openquotation->qt4,[
-								'controller'=>'Quotations','action' => 'Confirm',$openquotation->id],array('target'=>'_blank')); ?>
+								'controller'=>'Quotations','action' => 'Confirm',$openquotation_id],array('target'=>'_blank')); ?>
 							<?php } else { ?>
 								<?php echo $openquotation->qt1.'/QT-'.str_pad($openquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$openquotation->qt3.'/'.$openquotation->qt4;?>
 							<?php }  ?>
@@ -362,7 +366,9 @@
 						</tr>
 					</thead>
 					<?php $i=1; $total=0;
-					foreach ($ClosedQuotations as $closedquotation):    ?>
+					foreach ($ClosedQuotations as $closedquotation):   
+					$closedquotation_id = $EncryptingDecrypting->encryptData($closedquotation->id);
+					?>
 					<tbody>
 						<tr>
 							<td>
@@ -371,7 +377,7 @@
 							<td>
 							<?php if(in_array($closedquotation->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $closedquotation->qt1.'/QT-'.str_pad($closedquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$closedquotation->qt3.'/'.$closedquotation->qt4,[
-								'controller'=>'Quotations','action' => 'Confirm',$closedquotation->id],array('target'=>'_blank')); ?>
+								'controller'=>'Quotations','action' => 'Confirm',$closedquotation_id],array('target'=>'_blank')); ?>
 							<?php } else {?>
 							<?php echo $closedquotation->qt1.'/QT-'.str_pad($closedquotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$closedquotation->qt3.'/'.$closedquotation->qt4;?>
 							<?php }?>

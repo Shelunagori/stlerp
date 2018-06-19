@@ -73,6 +73,7 @@
 				
 					<?php $SalesTotal=[];$SalesgstTotal=[];$gstRowTotal=[];  $gstTotal=[];$i=1;
 					foreach ($invoices as $invoice): $frigtData=[]; $frigtAmount=[];
+						$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
 						foreach($invoice->invoice_rows as $invoice_row)
 						{
 							if($invoice_row['igst_percentage'] == 0){
@@ -94,7 +95,7 @@
 						<td>
 							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
 							<?php echo $this->Html->link( $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4,[
-							'controller'=>'Invoices','action' => 'gstConfirm',$invoice->id],array('target'=>'_blank')); ?>
+							'controller'=>'Invoices','action' => 'gstConfirm',$invoice_id],array('target'=>'_blank')); ?>
 							<?php } else{ ?>
 							<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4 ;?>
 							<?php }  ?>
@@ -169,7 +170,9 @@
 					</tr>
 				</thead>
 				<?php $SalesIgstTotal=[]; $SalesIgstRowTotal=[]; $j=1;	
-				foreach ($interStateInvoice as $invoiceigsts){  ?>
+				foreach ($interStateInvoice as $invoiceigsts){  
+				$invoiceigsts_id = $EncryptingDecrypting->encryptData($invoiceigsts->id);
+				?>
 				<tbody>
 					<?php $SigstRowTotal=[]; $SigstTotal=[]; $frigtData=[]; $frigtAmount=[];
 					if(!empty($invoiceigsts->invoice_rows)){  
@@ -195,7 +198,7 @@
 						<td>
 							<?php if(in_array($invoiceigsts->created_by,$allowed_emp)){  ?>
 								<?php echo $this->Html->link( $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4,[
-								'controller'=>'Invoices','action' => 'gstConfirm',$invoiceigsts->id],array('target'=>'_blank')); ?>
+								'controller'=>'Invoices','action' => 'gstConfirm',$invoiceigsts_id],array('target'=>'_blank')); ?>
 							<?php } else { ?>
 								<?php echo $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4; ?>
 							<?php }  ?>
@@ -282,6 +285,7 @@
 				<tbody>
 					<?php $PurchaseBookingTotal=[];$PurchaseBookinggstTotal=[];$PurchaseBookingRowTotal=[]; $PurchaseBookingTotals=[];$i=1;$data=[];
 					foreach ($invoiceBookings as $invoicebooking):
+						$invoicebooking_id = $EncryptingDecrypting->encryptData($invoicebooking->id);
 						foreach($invoicebooking->invoice_booking_rows as $invoice_booking_row_data)
 						{
 							
@@ -304,7 +308,7 @@
 						<td>
 						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
 							<?php echo $this->Html->link( $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4,[
-							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoicebooking->id],array('target'=>'_blank')); ?>
+							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoicebooking_id],array('target'=>'_blank')); ?>
 						<?php }else{ ?>
 							<?php echo $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4; ?>
 						<?php } ?>
@@ -378,7 +382,9 @@
 					</tr>
 				</thead>
 				<?php $PurchaseIgstTotal=[]; $PurchaseTotal=[]; $i=1;
-				foreach ($invoiceBookingsInterState as $invoiceBooking):   ?>
+				foreach ($invoiceBookingsInterState as $invoiceBooking):   
+				$invoiceBooking_id1 = $EncryptingDecrypting->encryptData($invoice->id);
+				?>
 				<tbody>
 					<?php $igstRowTotal=[]; $igstTotal=[];
 					if(!empty($invoiceBooking->invoice_booking_rows)){  
@@ -395,7 +401,7 @@
 						<td>
 						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
 							<?php echo $this->Html->link( $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4,[
-							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoiceBooking->id],array('target'=>'_blank')); ?>
+							'controller'=>'InvoiceBookings','action' => 'gst-invoice-booking-view',$invoiceBooking_id1],array('target'=>'_blank')); ?>
 						<?php }else{ ?>
 							<?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?>
 						<?php } ?>

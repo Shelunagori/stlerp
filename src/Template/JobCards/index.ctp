@@ -105,6 +105,7 @@
 			
 			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
 				if($so != $in || $so != $iv || $in != $iv ){
+					$jobCard->id = $EncryptingDecrypting->encryptData($jobCard->id);
 			?>
 				<tr>
 					<td><?= h(++$page_no) ?></td>

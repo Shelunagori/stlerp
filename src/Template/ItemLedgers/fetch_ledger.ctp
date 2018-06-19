@@ -19,6 +19,9 @@
 
 		<?php $page_no=0; 
 		 foreach ($itemLedgers as $itemLedger): 
+		 
+		
+		 
 		$rate = $itemLedger->rate;
 		$in_out_type=$itemLedger->in_out;
 		$party=$itemLedger->party_type;
@@ -26,6 +29,9 @@
 		$data="";
 		$source_model=$itemLedger->source_model;
 		//pr($source_model);exit;
+		if($party!='Item'){
+			  $itemLedger->voucher_info->id = $EncryptingDecrypting->encryptData($itemLedger->voucher_info->id);
+		 }
 		if($source_model=='Challan')
 		{	
 			$created_by = $itemLedger->voucher_info->created_by;

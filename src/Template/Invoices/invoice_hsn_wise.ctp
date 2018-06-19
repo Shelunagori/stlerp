@@ -46,7 +46,8 @@
 				</thead>
 				<tbody>
 					<?php $i=0;// pr( $Invoices);exit; 
-						foreach ($Invoices as $invoice): 	 
+						foreach ($Invoices as $invoice):
+						$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
 						$i++; 
 						$invoiceROwsSize=sizeof($invoice->invoice_rows);
 					

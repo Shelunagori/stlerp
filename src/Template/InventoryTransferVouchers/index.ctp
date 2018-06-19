@@ -81,7 +81,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($inventory_transfer_vouchs as $inventory_transfer_vouch_data): $i++; 
-						
+						$inventory_transfer_vouch_data->id = $EncryptingDecrypting->encryptData($inventory_transfer_vouch_data->id);
 					?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>

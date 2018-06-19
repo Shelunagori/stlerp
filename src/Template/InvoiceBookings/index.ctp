@@ -75,7 +75,9 @@
 							<td><?= h(++$page_no) ?></td>
 							<td><?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?></td>
 							<td>
-							<?php if(in_array($invoiceBooking->grn->created_by,$allowed_emp)){ ?>
+							<?php if(in_array($invoiceBooking->grn->created_by,$allowed_emp)){ 
+							$invoiceBooking->grn->id = $EncryptingDecrypting->encryptData($invoiceBooking->grn->id);
+							?>
 							<?php echo $this->Html->link( $invoiceBooking->grn->grn1.'/GRN-'.str_pad($invoiceBooking->grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->grn3.'/'.$invoiceBooking->grn->grn4,[
 							'controller'=>'Grns','action' => 'view', $invoiceBooking->grn->id],array('target'=>'_blank')); ?>
 							<?php  } ?>

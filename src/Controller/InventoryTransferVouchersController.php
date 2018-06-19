@@ -82,7 +82,7 @@ class InventoryTransferVouchersController extends AppController
         $this->set('_serialize', ['inventoryTransferVouchers']);
     }
 	
-	public function DataMigrate()
+/* 	public function DataMigrate()
 	{
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -228,7 +228,7 @@ class InventoryTransferVouchersController extends AppController
 		exit;
 		
 	}
-
+ */
 	public function excelExport(){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
@@ -280,7 +280,7 @@ class InventoryTransferVouchersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-
+		$id = $this->EncryptingDecrypting->decryptData($id);
        $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
             'contain' => ['Creator','Companies','Vendors','Customers','InventoryTransferVoucherRows'=>['SerialNumbers','Items'=>['SerialNumbers','ItemCompanies' =>function($q) use($st_company_id){
 									return $q->where(['company_id'=>$st_company_id]);
@@ -305,6 +305,7 @@ class InventoryTransferVouchersController extends AppController
     public function outView($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $inventoryTransferVoucher = $this->InventoryTransferVouchers->get($id, [
@@ -320,6 +321,7 @@ class InventoryTransferVouchersController extends AppController
 	  public function inView($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 
@@ -600,6 +602,7 @@ class InventoryTransferVouchersController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$display_items = $this->InventoryTransferVouchers->Items->find()->contain([
@@ -1320,6 +1323,7 @@ class InventoryTransferVouchersController extends AppController
  public function editInventoryOut($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
@@ -1450,6 +1454,7 @@ class InventoryTransferVouchersController extends AppController
 	public function editInventoryIn($id=null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
