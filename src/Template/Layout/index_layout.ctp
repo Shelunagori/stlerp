@@ -1103,7 +1103,7 @@ select
 <?php echo $this->Html->script('/assets/global/plugins/bootstrap-maxlength/bootstrap-maxlength.min.js'); ?>
 <?php echo $this->Html->script('/assets/global/plugins/bootstrap-touchspin/bootstrap.touchspin.js'); ?>
 <?php echo $this->Html->script('/assets/global/plugins/typeahead/handlebars.min.js'); ?>
-<?php echo $this->Html->script('/assets/global/plugins/typeahead/typeahead.bundle.min.js'); ?>
+<?php //echo $this->Html->script('/assets/global/plugins/typeahead/typeahead.bundle.min.js'); ?>
 <?php //echo $this->Html->script('/assets/global/plugins/icheck/icheck.min.js'); ?>
 <?php //echo $this->Html->script('/assets/global/plugins/bootstrap-wysihtml5/wysihtml5-0.3.0.js'); ?>
 <!-- END PAGE LEVEL PLUGINS -->

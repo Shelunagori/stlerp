@@ -268,7 +268,7 @@ class SalesOrdersController extends AppController
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_idx])
+					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'yes'])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					//pr($salesOrders->toArray()); exit;
@@ -387,45 +387,139 @@ class SalesOrdersController extends AppController
             'contain' => ['Customers']
         ];
 		//pr($status); exit;
-		
-		
-		if(!empty($items) && empty($Actionstatus)){ 
-			
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				if(!empty($items) && empty($Actionstatus) || !empty($item_group) || !empty($item_subgroup)){ 
+				//$where1['Items.id']=$items;
+				//pr($where1); exit;
 				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-				$salesOrders = $this->SalesOrders->find();
+				$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
 
-				$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 				->innerJoinWith('SalesOrderRows')
 				->group(['SalesOrders.id'])
-				->matching('SalesOrderRows.Items', function ($q) use($items,$st_company_id) {
-											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+				->matching('SalesOrderRows.Items', function ($q) use($where1,$st_company_id) {
+											return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id,$st_year_id){
+												return $e->where(['ItemCompanies.company_id'=>$st_company_id,'ItemCompanies.financial_year_id'=>$st_year_id]);
+											}]);
 							})
-				->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+				->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 				->autoFields(true)
-				->where(['SalesOrders.company_id'=>$st_company_id])
+				->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
 				->where($where);
-		
+		//pr($salesOrders->toArray());exit;
 		}else{
-				if($gst=="true" || $Actionstatus=="GstInvoice"){ 
+				if($gst=="true" || $Actionstatus=="GstInvoice"){
+					$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
+					//pr($tdate); exit;
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where)
-					->where(['gst'=>'yes'])
+					->where(['SalesOrders.gst'=>'yes','SalesOrders.created_on <= '=>$tdate])
 					->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="GstInvoice";
 				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
+					->where($where)
+					->where(['gst'=>'no'])
+					->order(['SalesOrders.id'=>'DESC']);
+					$Actionstatus="NonGstInvoice";
+				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
+					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
+					->where(['gst'=>'no'])
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					$Actionstatus="NonGstCopy";
+				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
+					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
+					->where(['gst'=>'yes'])
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					//pr($salesOrders->toArray()); exit;
+					$Actionstatus="GstCopy";
+				}else { 
+					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
+					$Actionstatus="IndexPage";
+					//pr($salesOrders->toArray()); exit;
+				}
+				//	exit;
+		}
+			}else{
+				if(!empty($items) && empty($Actionstatus) || !empty($item_group) || !empty($item_subgroup)){ 
+				//$where1['Items.id']=$items;
+				//pr($where1); exit;
+				$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+				$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
+
+				$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+				->innerJoinWith('SalesOrderRows')
+				->group(['SalesOrders.id'])
+				->matching('SalesOrderRows.Items', function ($q) use($where1,$st_company_id) {
+											return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id,$st_year_id){
+												return $e->where(['ItemCompanies.company_id'=>$st_company_id]);
+											}]);
+							})
+				->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+				->autoFields(true)
+				->where(['SalesOrders.company_id'=>$st_company_id])
+				->where($where);
+		//pr($salesOrders->toArray());exit;
+		}else{
+				if($gst=="true" || $Actionstatus=="GstInvoice"){
+					$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
+					//pr($tdate); exit;
+					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find();
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where($where)
+					->where(['SalesOrders.gst'=>'yes','SalesOrders.created_on <= '=>$tdate])
+					->order(['SalesOrders.id'=>'DESC']);
+					$Actionstatus="GstInvoice";
+				}else if($pull_request=="true" || $Actionstatus=="NonGstInvoice"){ 
+					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					->innerJoinWith('SalesOrderRows')
+					->group(['SalesOrders.id'])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where($where)
@@ -435,10 +529,10 @@ class SalesOrdersController extends AppController
 				}else if($copy_request=="copy" || $Actionstatus=="NonGstCopy"){ 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
 					->where(['SalesOrders.company_id'=>$st_company_id])
 					->where(['gst'=>'no'])
@@ -447,36 +541,32 @@ class SalesOrdersController extends AppController
 				}else if($gst_copy_request=="copy" || $Actionstatus=="GstCopy"){
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
 					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where(['SalesOrders.company_id'=>$st_company_idx])
 					->where(['gst'=>'yes'])
 					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					//pr($salesOrders->toArray()); exit;
 					$Actionstatus="GstCopy";
-				}else { //exit;   
+				}else { 
 					$SalesOrderRows = $this->SalesOrders->SalesOrderRows->find();
-					$salesOrders = $this->SalesOrders->find();
-					$salesOrders->select(['id','total','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
+					$salesOrders = $this->SalesOrders->find()->where(['SalesOrders.sales_order_status !='=>"Close"]);
+					$salesOrders->select(['id','total_sales'=>$SalesOrderRows->func()->sum('SalesOrderRows.quantity')])
 					->innerJoinWith('SalesOrderRows')
 					->group(['SalesOrders.id'])
-					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items']])
-					->autoFields(true);
-					if($status=='Converted Into Invoice'){
-						$salesOrders->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id]);
-					}else{
-						$salesOrders->where(['SalesOrders.company_id'=>$st_company_id]);
-					}
-					$salesOrders->where($where)->order(['SalesOrders.id'=>'DESC']);
+					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
+					->autoFields(true)
+					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where($where)->order(['SalesOrders.id'=>'DESC']);
 					$Actionstatus="IndexPage";
 					//pr($salesOrders->toArray()); exit;
 				}
 				//	exit;
 		}
-		
+			}
 		$total_sales=[]; $total_qty=[];
 		foreach($salesOrders as $salesorder){
 			$total_sales[$salesorder->id]=$salesorder->total_sales;

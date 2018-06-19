@@ -159,7 +159,7 @@
 								</div>
 							</td>
 							
-							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
+							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total) )?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">
@@ -194,7 +194,7 @@
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
 							<td><?= h($salesOrder->customer_po_no); ?></td>
-							<td style="display:none;">
+							<td >
 								<div class="btn-group">
 									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
 										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
@@ -205,12 +205,14 @@
 										</ul>
 								</div>
 							</td>
-							<td><a href="#" class="list-group-item select_term_condition" qwerty="<?php echo $salesOrder->id; ?>">Show Item</a></td>
-							<td align="center"><?= h($this->Number->format($salesOrder->total,['places'=>2])) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
+							
+							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total)) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
-						<td class="actions">
+						<td class="actions" width="20%">
+						<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $salesOrder->id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
 							<?php if(in_array(22,$allowed_pages)){
+								$sid = $salesOrder->id;
 								$salesOrder->id = $EncryptingDecrypting->encryptData($salesOrder->id);
 							?>
 								<?php if($Actionstatus=='GstInvoice' ){ 
@@ -331,7 +333,7 @@
 					<tfoot>
 						<tr>
 							<td colspan="6" style="text-align:right"><b>Total</b></td>
-							<td style="text-align:right"><b><?php echo $this->Number->format($total_amount,['places'=>2]);?></b></td>
+							<td style="text-align:right"><b><?php echo $this->Money->indianNumberFormat($total_amount);?></b></td>
 							<td style="text-align:right"><b></b></td>
 							<td style="text-align:right"><b></b></td>
 						</tr>
@@ -347,8 +349,9 @@
 <script>
 $(document).ready(function() {
 	
-	$('.select_term_condition').die().live("click",function() { 
-		var sid=$(this).attr('qwerty');
+	$('.select_term_condition').die().live("click",function() {  
+		var sid=$('.select_term_condition').attr('qwerty');
+		
 		open_address(sid);
     });
 	$('.closebtn2').on("click",function() {  

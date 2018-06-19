@@ -64,6 +64,12 @@ class JobCardsController extends AppController
 			$Created_To=date("Y-m-d",strtotime($this->request->query('Created_To')));
 			$where1['JobCards.created_on <=']=$Created_To;
 		}
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['JobCards.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree[];
+			}
 		
 		$where=[];
 		if($status==null or $status=='Pending'){
@@ -76,10 +82,11 @@ class JobCardsController extends AppController
 						}
 					)
 				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])
+				->where($wheree)
 				->order(['JobCards.jc2' => 'DESC']);
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status'=>'Pending'])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
