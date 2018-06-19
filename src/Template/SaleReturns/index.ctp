@@ -51,7 +51,7 @@
 				</thead>
 				<tbody>
 						<?php foreach ($saleReturns as $saleReturn): 
-						
+						$saleReturn->id = $EncryptingDecrypting->encryptData($saleReturn->id);
 						?>
 					<tr>
 						<td><?= h(++$page_no) ?></td>
@@ -66,6 +66,7 @@
 						}?></td>
 						
 						<td><?php 
+							$saleReturn->invoice->id = $EncryptingDecrypting->encryptData($saleReturn->invoice->id);
 							if($saleReturn->invoice->invoice_type == 'GST'){
 								echo $this->Html->link($saleReturn->invoice->in1.'/IN-'.str_pad($saleReturn->invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$saleReturn->invoice->in3.'/'.$saleReturn->invoice->in4,[
 								'controller'=>'Invoices','action' => 'gstConfirm',$saleReturn->invoice->id],array('target'=>'_blank'));
@@ -83,10 +84,11 @@
 						
 						<td class="actions">
 							<?php if(in_array(134,$allowed_pages)){
-								 if($saleReturn->sale_return_type=="GST"){
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesEdit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+								
+								 if($saleReturn->sale_return_type=="GST"){ 
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstSalesEdit',$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
 								}else{
-									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit/'.$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit',$saleReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));
 								}
 								if($saleReturn->sale_return_type=="GST"){
 									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'GstConfirm', $saleReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 

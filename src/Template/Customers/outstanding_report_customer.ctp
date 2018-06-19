@@ -178,6 +178,7 @@ table td, table th{
 				</td>
 				<td style="text-align:center;">
 					<?php 
+					$ClosingBalance= round($ClosingBalance,2);
 					if($ClosingBalance > 0){ ?>
 						
 						<a href="#" class="btn-primary btn-sm send_mail" title="Send Email " amt=<?php echo $ClosingBalance; ?> ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i></a>

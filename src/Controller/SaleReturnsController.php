@@ -128,6 +128,7 @@ class SaleReturnsController extends AppController
     }
 
 	public function Confirm($id=null){
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$this->viewBuilder()->layout('pdf_layout');
 		$SaleReturns = $this->SaleReturns->get($id, [
             'contain' => ['SaleTaxes','SaleReturnRows']
@@ -139,14 +140,14 @@ class SaleReturnsController extends AppController
 	public function Pdf($id=null){
 		$this->viewBuilder()->layout('');
 		
-		 $SaleReturn= $this->SaleReturns->get($id, [
-				'contain' => ['SaleReturnRows'=>['Items'],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator','SaleTaxes']
+		 $invoice= $this->SaleReturns->get($id, [
+				'contain' => ['SaleReturnRows'=>['Items'=>['Units']],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator','SaleTaxes']
 			]); 
 			
 				$cgst_per=[];
 		$sgst_per=[];
 		$igst_per=[];
-		foreach($SaleReturn->sale_return_rows as $invoice_row){
+		foreach($invoice->sale_return_rows as $invoice_row){
 			if($invoice_row->cgst_percentage > 0){
 				$cgst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->cgst_percentage);
 			}
@@ -157,15 +158,16 @@ class SaleReturnsController extends AppController
 				$igst_per[$invoice_row->id]=$this->SaleReturns->SaleTaxes->get(@$invoice_row->igst_percentage);
 			}
 		}
-			//pr($SaleReturn); exit;
-			$this->set(compact('SaleReturn','fright_ledger_account','cgst_per','sgst_per','igst_per'));
+			//pr($invoice->toArray()); exit;
+			$this->set(compact('invoice','fright_ledger_account','cgst_per','sgst_per','igst_per'));
 	}
 		
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$SaleReturns = $this->SaleReturns->get($id, [
-           'contain' => ['SaleTaxes','SaleReturnRows']
+           'contain' => ['SaleReturnRows']
 			]);
 		
 		$this->set(compact('SaleReturns','id','termsConditions'));
@@ -593,6 +595,7 @@ class SaleReturnsController extends AppController
     public function edit($id = null)
     {
 		$session = $this->request->session();
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$st_company_id = $session->read('st_company_id');
 		$this->viewBuilder()->layout('index_layout');
         //$saleReturn = $this->SaleReturns->newEntity();
@@ -1470,6 +1473,7 @@ class SaleReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$saleReturn = $this->SaleReturns->get($id, [
 				'contain' => ['ReferenceDetails','Customers']]);
 		$saleReturn_id = $this->SaleReturns->get($id);

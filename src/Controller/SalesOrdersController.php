@@ -665,6 +665,7 @@ class SalesOrdersController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$salesorder = $this->SalesOrders->get($id, [
             'contain' => ['SalesOrderRows']
 			]);
@@ -1319,11 +1320,12 @@ class SalesOrdersController extends AppController
 		$this->set(compact('quotation','process_status'));
 		
 		$sales_id=$this->request->query('copy');
+		
 		$job_id=$this->request->query('job');
 		//pr($process_status); exit;
 		
 		if(!empty($sales_id)){ 
-			
+			$sales_id = $this->EncryptingDecrypting->decryptData($sales_id);
 			$salesOrder_data = $this->SalesOrders->newEntity();
 			
 			$salesOrder = $this->SalesOrders->get($sales_id, [
@@ -1376,10 +1378,11 @@ class SalesOrdersController extends AppController
 			$salesOrder->company_id=$st_company_id;
 			$salesOrder->financial_year_id=$st_year_id;
 			
-			//$salesOrder->id=724;
-			
+			$salesOrder->id=808;
 			$status=$this->sendEmail($salesOrder->id);
+			
 			if ($this->SalesOrders->save($salesOrder)) {
+				
 				$status=$this->sendEmail($salesOrder->id);
 				$status_close=$this->request->query('status');
 				$totalSalesOrderIDs=[];
@@ -1550,9 +1553,9 @@ class SalesOrdersController extends AppController
 
 	public function sendEmail($id=null){ 
 		$salesOrder = $this->SalesOrders->get($id, [
-            'contain' => ['Companies','Carrier','Creator','Courier','Customers'=>['CustomerAddress']]
+            'contain' => ['Companies','Carrier','Creator','Courier','Customers'=>['CustomerAddress','Employees']]
         ]);
-		pr($salesOrder); exit;
+		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$company_data=$this->SalesOrders->Companies->get($st_company_id);
@@ -1561,11 +1564,9 @@ class SalesOrdersController extends AppController
 		$email->transport('gmail');
 		$email_to=$salesOrder->dispatch_email;
 		//$email_to='dimpaljain892@gmail.com';
-		$cc_mail=$salesOrder->creator->email;
+		$cc_mail=$salesOrder->customer->employee->email;
 		//$cc_mail='dimpaljain892@gmail.com';
-		//pr($email_to);
-		//pr($cc_mail); exit;
-
+		
 		$name='last_so'; 
 		$attachments='';
 		$attachments='Invoice_email/'.$name.'.pdf';
@@ -1573,7 +1574,7 @@ class SalesOrdersController extends AppController
 		//pr($email_to);
 		//pr($cc_mail); exit;
 		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
+		//$cc_mail="dimpaljain892@gmail.com";
 		//$member_name="Gopal";
 		$from_name=$company_data->alias;
 		$sub="Purchase order acknowledgement";
@@ -1886,6 +1887,78 @@ class SalesOrdersController extends AppController
 		}
 		pr($data);exit;
 	}
+	
+	public function showPendingItemForInvoice(){
+			$this->viewBuilder()->layout('index_layout');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			
+			$SalesOrders = $this->SalesOrders->find()->contain(['SalesOrderRows'=>['InvoiceRows' => function($q) {
+				return $q->select(['invoice_id','sales_order_row_id','item_id','total_qty' => $q->func()->sum('InvoiceRows.quantity')])->group('InvoiceRows.sales_order_row_id');
+			}]])->where(['SalesOrders.company_id'=>$st_company_id])->where(['SalesOrders.sales_order_status !='=>"Close"]);
+			
+			$sales_order_qty=[];
+			$invoice_qty=[];
+			$itemName=[];
+			$itemSoQty=[];
+
+			foreach($SalesOrders as $SalesOrder){ $sales_qty=[]; $inc_qty=[]; 
+				foreach($SalesOrder->sales_order_rows as $sales_order_row){ 
+					foreach($sales_order_row->invoice_rows as $invoice_row){ //pr($invoice_row); exit;
+						@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+						@$inc_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+					}
+					@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+					@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+				}
+				
+				
+				foreach(@$sales_qty as $key=>$sales_order_qt){
+						if(@$sales_order_qt > @$inc_qty[$key] ){ 
+							$pen=@$sales_order_qt-@$inc_qty[$key];
+								$itm= $this->SalesOrders->SalesOrderRows->Items->get($key);
+								@$itemName[$key]=$itm->name;
+								@$itemSoQty[$key]+=$pen;
+						}
+				}
+			}
+			
+			$ItemLedgers = $this->SalesOrders->SalesOrderRows->Items->ItemLedgers->find();
+				$totalInCase = $ItemLedgers->newExpr()
+					->addCase(
+						$ItemLedgers->newExpr()->add(['in_out' => 'In']),
+						$ItemLedgers->newExpr()->add(['quantity']),
+						'integer'
+					);
+				$totalOutCase = $ItemLedgers->newExpr()
+					->addCase(
+						$ItemLedgers->newExpr()->add(['in_out' => 'Out']),
+						$ItemLedgers->newExpr()->add(['quantity']),
+						'integer'
+					);
+
+				$ItemLedgers->select([
+					'total_in' => $ItemLedgers->func()->sum($totalInCase),
+					'total_out' => $ItemLedgers->func()->sum($totalOutCase),'id','item_id'
+				])
+				->group('item_id')
+				->autoFields(true)
+				->where(['company_id'=>$st_company_id])
+				->contain(['Items' => function($q) use($st_company_id){
+					return $q->where(['Items.source'=>'Purchessed/Manufactured'])->orWhere(['Items.source'=>'Purchessed'])->contain(['ItemCompanies'=>function($p) use($st_company_id){
+						return $p->where(['company_id'=>$st_company_id,'ItemCompanies.freeze' => 0]);
+					}]);
+				}]);
+			
+			foreach ($ItemLedgers as $itemLedger){ 
+				$Current_Stock[$itemLedger->item->id]=$itemLedger->total_in-$itemLedger->total_out;
+			}
+		
+		$this->set(compact('itemSoQty','Current_Stock','itemName'));
+					
+		
+	}
+	
 	
 	public function showPendingItem($id=null){
 		
