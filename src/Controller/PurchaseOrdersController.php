@@ -871,7 +871,7 @@ class PurchaseOrdersController extends AppController
 		//$email_to="dimpaljain892@gmail.com";
 		//$cc_mail="dimpaljain892@gmail.com";
 		$url = Router::Url(['controller' => 'PurchaseOrders', 'action' => 'confirmForMail'], true);
-		$delevery_date=[]; $po_no=[]; $due_day=[];
+		$delevery_date=[]; $po_no=[]; $due_day=[]; $so_no=[];
 		foreach($totalPo as $data){
 			$purchaseOrder = $this->PurchaseOrders->get($data);
 			$delevery_date[$purchaseOrder->id]=date("d-m-Y",strtotime($purchaseOrder->delivery_date));
@@ -887,6 +887,7 @@ class PurchaseOrdersController extends AppController
 			$diff=date_diff($date2,$date1);
 			echo $diff->format("%R%a days");
 			$due_day[$purchaseOrder->id]=$diff->format("%R%a days");
+			$so_no[$purchaseOrder->id]=$purchaseOrder->customer_so_no;
 			//pr($diff); 
 		}
 		//pr($due_day); exit;
@@ -897,9 +898,9 @@ class PurchaseOrdersController extends AppController
 		$sub="STL-Purchase Order Delivery Reminder";
 		//pr($email_to);
 		//pr($cc_mail);exit; 
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
-		//pr($due_day);exit; 
+		$email_to="gopalkrishanp3@gmail.com";
+		$cc_mail="gopal@phppoets.in";
+		//pr($email_to);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
 		->cc($cc_mail)
@@ -907,7 +908,7 @@ class PurchaseOrdersController extends AppController
 		->subject($sub)
 		->template('send_purchase_order')
 		->emailFormat('html')
-		->viewVars(['PurchaseOrders'=>$PurchaseOrders,'company'=>$company_data->name,'due_day'=>$due_day,'delevery_date'=>$delevery_date,'po_no'=>$po_no,'po_date'=>$po_date,'url'=>$url]);  
+		->viewVars(['PurchaseOrders'=>$PurchaseOrders,'company'=>$company_data->name,'due_day'=>$due_day,'delevery_date'=>$delevery_date,'po_no'=>$po_no,'po_date'=>$po_date,'url'=>$url,'so_no'=>$so_no]);  
 		$email->send();
 		echo "Email Send successfully ";
 		exit;

@@ -220,6 +220,11 @@
 									</div>
 								</div>
 							</div>
+							<div class="row">
+								<div class="col-md-10 padding-right-decrease" style="padding-right: 1px; padding-top: 2px;">
+									<?php echo $this->Form->input('customer_item_code[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code','value' => @$sales_order_rows->customer_item_code]); ?>
+								</div>
+							</div>
 							<?php echo $this->Form->input('sales_order_rows.'.$q.'.height', ['type' => 'hidden','value' => @$sales_order_rows->height]); ?>
 							
 							
@@ -464,6 +469,11 @@
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px; padding-top: 2px;">
+						<?php echo $this->Form->input('customer_item_code[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code']); ?>
 					</div>
 				</div>
 			</td>
@@ -812,6 +822,7 @@ $(document).ready(function() {
 			$(this).find('span.help-block-error').remove();
 			$(this).find("td:nth-child(1)").html(++i); i--;
 			
+			$(this).find("td:nth-child(2) input.customer_item_code").attr({name:"sales_order_rows["+i+"][customer_item_code]", id:"sales_order_rows-"+i+"-customer_item_code"});
 			$(this).find("td:nth-child(2) select").select2().attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).rules('add', {
 						required: true
 					});

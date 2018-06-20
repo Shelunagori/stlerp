@@ -41,9 +41,31 @@
 	</thead>
 	<tbody>
 	<?php 
+		$ClosingBalanceLedgerWise=[];
+			foreach($LedgerAccounts as $LedgerAccount){
+				
+					$ttlamt=round(@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount'],2);
+					
+					if($amountType=='Zero' && $ttlamt==0){
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Positive' && $ttlamt > 0 ){ 
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Negative' && $ttlamt < 0 ){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='All'){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else{
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
+					}
+				
+			}
 	$sr=0; $ClosingBalance=0; 
 	$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
-	foreach($LedgerAccounts as $LedgerAccount){ ?>
+	foreach($LedgerAccounts as $LedgerAccount){ 
+		if($ClosingBalanceLedgerWise[$LedgerAccount->id]=="Yes"){
+	?>
 	<tr>
 		<td><?php echo ++$sr; ?></td>
 		<td style=" white-space: normal; width: 200px; "><?php echo $LedgerAccount->name.' <br/> '.$LedgerAccount->alias; ?></td>
@@ -118,7 +140,7 @@
 		?>
 		</td>
 	</tr>
-	<?php } ?>
+	<?php } } ?>
 	</tbody>
 	<tfoot>
 		<tr>

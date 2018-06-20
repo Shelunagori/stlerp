@@ -174,7 +174,7 @@ $html = '
 									<tr>
 										<td valign="top" style="vertical-align: top;">Date</td>
 										<td valign="top">:</td>
-										<td valign="top" >'. h(date("d-m-Y",strtotime($SaleReturn->date_created))) .'</td>
+										<td valign="top" >'. h(date("d-m-Y",strtotime($SaleReturn->transaction_date))) .'</td>
 									</tr>
 									<tr>
 										<td valign="top" style="vertical-align: top;">LR No.</td>

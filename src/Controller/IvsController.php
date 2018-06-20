@@ -300,7 +300,7 @@ class IvsController extends AppController
 				$chkdate = 'Not Found';	
 			}
 		/////
-		
+		$invoice_id = $this->EncryptingDecrypting->decryptData($invoice_id);
 		$Invoice=$this->Ivs->Invoices->get($invoice_id, [
 			'contain' => ['InvoiceRows'=>['Items'=>function($p) use($st_company_id){
 				return $p->where(['Items.source IN'=>['Assembled','Manufactured','Purchessed/Manufactured']])->contain(['ItemCompanies']);

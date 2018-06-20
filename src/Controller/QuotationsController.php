@@ -549,8 +549,8 @@ class QuotationsController extends AppController
 					$lastQuotation->quotation_id=$quotation->id;
 					$this->Quotations->save($lastQuotation);
 				}
-				
-                return $this->redirect(['action' => 'confirm/'.$quotation->id]);
+				$quotation->id = $this->EncryptingDecrypting->encryptData($quotation->id);
+                return $this->redirect(['action' => 'confirm',$quotation->id]);
             } else {
                 $this->Flash->error(__('The quotation could not be saved. Please, try again.'));
             }
@@ -665,8 +665,8 @@ class QuotationsController extends AppController
 				if ($this->Quotations->save($quotation)) {
 				     
 					 $this->Flash->success(__('The quotation has been saved.'));
-
-					return $this->redirect(['action' => 'confirm/'.$quotation->id]);
+					$quotation->id = $this->EncryptingDecrypting->encryptData($quotation->id);
+					return $this->redirect(['action' => 'confirm',$quotation->id]);
 				} else { 
 					$this->Flash->error(__('The quotation could not be saved. Please, try again.'));
 				}

@@ -1099,6 +1099,11 @@ class CustomersController extends AppController
 		$s_employee_id = $this->viewVars['s_employee_id'];
 		
 		$salesman_name = $this->request->query('salesman_name');
+		$amountType = $this->request->query('total1');
+		if(empty($amountType)){
+		$amountType="All";
+		}
+		//pr($amountType); exit;
 		$where=[];
 		if(!empty($salesman_name)){
 			$where['Customers.employee_id']=$salesman_name;
@@ -1173,7 +1178,7 @@ class CustomersController extends AppController
 					)->where(['Employees.id'=>$s_employee_id]);
 		}			
 		//pr($Outstanding); exit;
-		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','SalesMans','salesman_name','url','s_employee_id'));
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','SalesMans','salesman_name','url','s_employee_id','amountType'));
 	}
 	
 	public function CustomerExportExcel($url = null){
@@ -1183,6 +1188,7 @@ class CustomersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$salesman_name = $this->request->query('salesman_name');
+		$amountType = $this->request->query('total1');
 		$where=[];
 		if(!empty($salesman_name)){
 			$where['Customers.employee_id']=$salesman_name;
@@ -1241,8 +1247,8 @@ class CustomersController extends AppController
 				}
 			}
 		}
-		
-		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding'));
+		//pr($amountType); exit;
+		$this->set(compact('LedgerAccounts', 'CustmerPaymentTerms', 'to_send', 'Outstanding','amountType'));
 		$this->set('_serialize', ['LedgerAccounts']);
 	}
 	public function sendMail($id = null,$amount=null){ 

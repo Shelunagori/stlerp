@@ -2179,15 +2179,20 @@ class InvoiceBookingsController extends AppController
 	public function entryCount(){
 		$this->viewBuilder()->layout('');
 		$session = $this->request->session();
-        $st_company_id = $session->read('st_company_id');
+		$st_company_id = $session->read('st_company_id');
 
 		$InvoiceBookings=$this->InvoiceBookings->find()->contain(['Grns']);
-		
-		  foreach($InvoiceBookings as $InvoiceBooking){ 
-			
-			pr($InvoiceBooking); exit;
-				
-			} 
+
+		foreach($InvoiceBookings as $InvoiceBooking){ 
+			$query1 = $this->InvoiceBookings->Grns->ItemLedgers->query();
+			$query1->update()
+			->set(['processed_on' => $InvoiceBooking->supplier_date])
+			->where(['source_model' => 'Grns','source_id'=>$InvoiceBooking->grn->id])
+			->execute();
+
+			//pr($InvoiceBooking); exit;
+
+		} 
 		  
 		 exit;
 	}

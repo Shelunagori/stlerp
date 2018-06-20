@@ -289,6 +289,12 @@ if(!empty($copy))
 										</div>
 									</div>
 								</div>
+								</div>
+								<div class="row">
+									<div class="col-md-10 padding-right-decrease" style="padding-right: 1px; padding-top: 2px;">
+										<?php echo $this->Form->input('customer_item_code[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code']); ?>
+									</div>
+								</div>
 							</td>
 							<td><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','value' => @$MaxQty[@$quotation_rows->id]]); ?></td>
 							<td width="200Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','min'=>'0.01','value' => @$quotation_rows->rate,'r_popup_id'=>$q]); ?></td>
@@ -346,7 +352,11 @@ if(!empty($copy))
 										</div>
 									</div>
 							</div>
-							
+							<div class="row">
+								<div class="col-md-10 padding-right-decrease" style="padding-right: 1px; padding-top: 2px;">
+									<?php echo $this->Form->input('customer_item_code[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code','value' => @$sales_order_rows->customer_item_code]); ?>
+								</div>
+							</div>
 							</td>
 							<td width="100"><?php echo $this->Form->input('sales_order_rows.'.$q.'.quantity', ['type'=>'text','label' => false,'class' => 'form-control input-sm quantity','placeholder'=>'Quantity','value' => @$sales_order_rows->quantity]); ?></td>
 							<td width="150Px"><?php echo $this->Form->input('sales_order_rows.'.$q.'.rate', ['type'=>'text','label' => false,'class' => 'form-control input-sm rate','placeholder'=>'Rate','value' => @$sales_order_rows->rate,'r_popup_id'=>$q]); ?></td>
@@ -597,6 +607,11 @@ if(!empty($copy))
 								</div>
 							</div>
 						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-10 padding-right-decrease" style="padding-right: 1px; padding-top: 2px;">
+						<?php echo $this->Form->input('customer_item_code[]', ['type' => 'type','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code']); ?>
 					</div>
 				</div>
 			</td>
@@ -924,6 +939,7 @@ $(document).ready(function() {
 			$(this).find("td:nth-child(1)").html(++i); --i;
 			$(this).find("td:nth-child(2) input.rowid").attr({name:"sales_order_rows["+i+"][quotation_row_id]", id:"sales_order_rows-"+i+"-quotation_row_id"});
 			$(this).find("td:nth-child(2) input.itemsid").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id"});
+			$(this).find("td:nth-child(2) input.customer_item_code").attr({name:"sales_order_rows["+i+"][customer_item_code]", id:"sales_order_rows-"+i+"-customer_item_code"});
 			//$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules("add", "required");
 			$(this).find("td:nth-child(2) select").attr({name:"sales_order_rows["+i+"][item_id]", id:"sales_order_rows-"+i+"-item_id",popup_id:i}).select2().rules('add', {
 						required: true

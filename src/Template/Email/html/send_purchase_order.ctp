@@ -46,6 +46,7 @@ p { margin-top : 0px;  }
 						<tr>
 								<th>S.No.</th>
 								<th>Our PO No.</th>
+								<th>SO no.</th>
 								<th>PO Date</th>
 								<th>Delivery Date</th>
 								<th>Overdue Days</th>
@@ -60,7 +61,9 @@ p { margin-top : 0px;  }
 								<td style="text-align:center;">
 								<a href="<?php echo $url.'/'.base64_encode($key); ?>"><?php echo $po_no; ?></a>
 								</td>
+								<td  width="20%"  align="center"><?php echo $so_no[$key]; ?></td>
 								<td  width="20%"  align="center"><?php echo $po_date[$key]; ?></td>
+								
 								<?php if($delevery_date[$key]=="01-01-1970"){ ?>
 								<td  width="20%"  align="center"><?php echo "-"; ?></td>
 								<td   width="20%" align="center"><?php echo "-"; ?></td>

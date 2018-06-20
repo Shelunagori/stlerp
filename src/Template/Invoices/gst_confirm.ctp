@@ -7,7 +7,7 @@ if($invoice->invoice_type=="GST"){
 	$Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
 }
 $mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
-
+$id = $EncryptingDecrypting->encryptData($id);
 //pr($pdf_url); exit;
 ?>
 <table width="100%">

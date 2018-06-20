@@ -2,6 +2,8 @@
 $pdf_url=$this->Url->build(['controller'=>'Quotations','action'=>'pdf']);
 $list_url=$this->Url->build(['controller'=>'Quotations','action'=>'index']);
 $edit_url=$this->Url->build(['controller'=>'Quotations','action'=>'Add']);
+$id = $EncryptingDecrypting->encryptData($id);
+
 ?>
 <table width="100%">
 	<tr>
@@ -29,7 +31,8 @@ $edit_url=$this->Url->build(['controller'=>'Quotations','action'=>'Add']);
 							 ?>
 						</li>
 						<li>
-							<?php echo $this->Html->link('<i class="fa fa-repeat"></i>Save as old version ',['action' => 'edit', $quotation->id],array('escape'=>false,'class'=>'')); ?>
+							<?php  $quotation->id = $EncryptingDecrypting->encryptData($quotation->id);
+								echo $this->Html->link('<i class="fa fa-repeat"></i>Save as old version ',['action' => 'edit', $quotation->id],array('escape'=>false,'class'=>'')); ?>
 						</li>
 						
 					</ul>

@@ -2142,7 +2142,8 @@ class InvoicesController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		//$st_year_id = $session->read('st_year_id');
 		//pr($session->read()); exit;
-		$sales_order_id=@(int)$this->request->query('sales-order');
+		$sales_order_id=$this->request->query('sales-order');
+		$sales_order_id = $this->EncryptingDecrypting->decryptData($sales_order_id);
 		$sales_order=array(); $process_status='New';
 		if(!empty($sales_order_id)){
 			$sales_order = $this->Invoices->SalesOrders->get($sales_order_id, [
@@ -2497,8 +2498,8 @@ class InvoicesController extends AppController
 					
 				
                 $this->Flash->success(__('The invoice has been saved.'));
-
-                return $this->redirect(['action' => 'GstConfirm/'.$invoice->id]);
+				$invoice->id = $this->EncryptingDecrypting->encryptData($invoice->id);
+                return $this->redirect(['action' => 'GstConfirm',$invoice->id]);
             } else { //pr($invoice); exit;
 
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
@@ -6374,9 +6375,9 @@ class InvoicesController extends AppController
 		$cc_mail=[];
 		$cc_mail[]=$invoice->creator->email;
 		$cc_mail[]=$invoice->customer->employee->email;
-		
-		
-		 	/* $email->from(['dispatch@mogragroup.com' => $from_name])
+		//$email_to="gopalkrishanp3@gmail.com";
+		//$cc_mail="harkawat.priyanka0@gmail.com";
+		/* $email->from(['dispatch@mogragroup.com' => $from_name])
 					->to($email_to)
 					->cc($cc_mail)
 					->replyTo('dispatch@mogragroup.com')

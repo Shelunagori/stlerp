@@ -28,26 +28,25 @@ table td, table th{
 					<?php }else{ ?>
 						<td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$s_employee_id) ]); ?></td>
 					<?php } ?>
-					
+						<td width="15%">
+							<?php 
+							$options = [];
+							$options = [['text'=>'All','value'=>'All'],['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
+							echo $this->Form->input('total1', ['options' => $options,'label' => false,'class' => 'form-control input-sm select2me stock1','placeholder'=>'Sub-Group','value'=> h(@$amountType)]); ?>
+						</td>
 					
 						
 						<td>
 								<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 							</td>
 						
-						<td width="15%">
-							<?php 
-							$options = [];
-							$options = [['text'=>'Zero','value'=>'Zero'],['text'=>'Negative','value'=>'Negative'],['text'=>'Positive','value'=>'Positive']];
-							echo $this->Form->input('total', ['empty'=>'--Select--','options' => $options,'label' => false,'class' => 'form-control input-sm select2me stock','placeholder'=>'Sub-Group','value'=> h(@$stock)]); ?>
-						</td>
 					   <td align="right" width="10%"><input type="text" class="form-control input-sm pull-right" placeholder="Search..." id="search3"  style="width: 100%;"></td>
 					   <td align="right" width="8%">
 							<?php $url=json_encode($to_send, true);
 						if(!empty($salesman_name)){
-							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'?salesman_name='.$salesman_name,['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
+							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'?salesman_name='.$salesman_name.'&total1='.$amountType,['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
 						}else{
-							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
+							 echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Customers/Customer-Export-Excel/'.$url.'?total1='.$amountType,['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']);
 						}	
 			             ?>
 					   </td>
@@ -88,10 +87,37 @@ table td, table th{
 			</thead>
 			<tbody>
 			<?php 
+			$ClosingBalanceLedgerWise=[];
+			foreach($LedgerAccounts as $LedgerAccount){
+				if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+					$ttlamt=round(@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount'],2);
+					
+					if($amountType=='Zero' && $ttlamt==0){
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Positive' && $ttlamt > 0 ){ 
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Negative' && $ttlamt < 0 ){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='All'){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else{
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
+					}
+				}
+			}
+			//pr($amountType);
+			
+
+
 			$sr=0; $ClosingBalance=0; 
 			$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
 			foreach($LedgerAccounts as $LedgerAccount){ 
 			if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+			
+				if($ClosingBalanceLedgerWise[$LedgerAccount->id]=="Yes"){
+			
 			?>
 			<tr>
 				<td><?php echo ++$sr; ?></td>
@@ -185,7 +211,7 @@ table td, table th{
 				<?php	} ?>
 				</td>
 			</tr>
-			<?php }} ?>
+			<?php }} } ?>
 			</tbody>
 			<tfoot id='tf'>
 				<tr>

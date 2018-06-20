@@ -1379,9 +1379,10 @@ class SalesOrdersController extends AppController
 			$salesOrder->company_id=$st_company_id;
 			$salesOrder->financial_year_id=$st_year_id;
 			
-			$salesOrder->id=808;
-			$status=$this->sendEmail($salesOrder->id);
-			
+			//$salesOrder->id=808;
+			//$salesOrder->id = $this->EncryptingDecrypting->encryptData($salesOrder->id);
+			//$status=$this->sendEmail($salesOrder->id);
+			//pr($salesOrder->id); exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				
 				$status=$this->sendEmail($salesOrder->id);
@@ -1437,9 +1438,9 @@ class SalesOrdersController extends AppController
 					}
 				}
 					
-				
+				$salesOrder->id = $this->EncryptingDecrypting->encryptData($salesOrder->id);
 				$this->Flash->success(__('The sales order has been saved.'));
-				return $this->redirect(['action' => 'gstConfirm/'.$salesOrder->id]);
+				return $this->redirect(['action' => 'gstConfirm',$salesOrder->id]);
 
             } else {
                 $this->Flash->error(__('The sales order could not be saved. Please, try again.'));
@@ -1574,8 +1575,8 @@ class SalesOrdersController extends AppController
 		
 		//pr($email_to);
 		//pr($cc_mail); exit;
-		//$email_to="gopalkrishanp3@gmail.com";
-		//$cc_mail="dimpaljain892@gmail.com";
+		$email_to="gopalkrishanp3@gmail.com";
+		$cc_mail="dimpaljain892@gmail.com";
 		//$member_name="Gopal";
 		$from_name=$company_data->alias;
 		$sub="Purchase order acknowledgement";
@@ -1738,9 +1739,9 @@ class SalesOrdersController extends AppController
 						->set(['job_card_status' => 'Pending'])
 						->where(['id' => $id])
 						->execute();
-					
+					$salesOrder->id = $this->EncryptingDecrypting->encryptData($salesOrder->id);
 					$this->Flash->success(__('The sales order has been saved.'));
-					return $this->redirect(['action' => 'gstConfirm/'.$salesOrder->id]);
+					return $this->redirect(['action' => 'gstConfirm',$salesOrder->id]);
 				} else { 
 					$this->Flash->error(__('The sales order could not be saved. Please, try again.'));
 				}

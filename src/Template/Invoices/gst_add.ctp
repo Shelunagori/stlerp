@@ -273,6 +273,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<td>
 								<?php echo $this->Form->input('q', ['label' => false,'type' => 'hidden','value' => @$sales_order_rows->item_id,'readonly','class'=>'item_ids']); 
 								echo $this->Form->input('item_id', ['type'=>'hidden','value'=>$sales_order_rows->item->item_companies[0]->serial_number_enable,'class'=>'serial_nos']); ?>
+								<?php echo $this->Form->input('customer_item_code[]', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm customer_item_code','placeholder' => 'Item Code','value' => @$sales_order_rows->customer_item_code]); ?>
 								<?php echo $sales_order_rows->item->name; ?>
 							</td>
 							<td>
@@ -772,6 +773,7 @@ $(document).ready(function() {
 				i++;
 				$(this).find('td:nth-child(1) input').attr("name","invoice_rows["+val+"][sales_order_row_id]").attr("id","invoice_rows-"+val+"-sales_order_row_id");
 				$(this).find('td:nth-child(2) input.item_ids').attr("name","invoice_rows["+val+"][item_id]").attr("id","invoice_rows-"+val+"-item_id").rules("add", "required");
+				$(this).find("td:nth-child(2) input.customer_item_code").attr({name:"invoice_rows["+val+"][customer_item_code]", id:"invoice_rows-"+val+"-customer_item_code"});
 				$(this).find('td:nth-child(3) input.quantity').removeAttr("readonly").attr("name","invoice_rows["+val+"][quantity]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-quantity").rules("add", "required");
 				$(this).find('td:nth-child(4) input').attr("name","invoice_rows["+val+"][rate]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-rate").rules("add", "required");
 				$(this).find('td:nth-child(5) input').attr("name","invoice_rows["+val+"][amount]").attr("id","q"+val).attr("id","invoice_rows-"+val+"-amount").rules("add", "required");

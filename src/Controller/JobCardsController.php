@@ -451,8 +451,8 @@ class JobCardsController extends AppController
 						->where(['id' => $jobCard->sales_order_id])
 						->execute();
                 $this->Flash->success(__('The job card has been saved.'));
-
-				return $this->redirect(['action' => 'view/'.$jobCard->id]);
+				$jobCard->id = $this->EncryptingDecrypting->encryptData($jobCard->id);
+				return $this->redirect(['action' => 'view',$jobCard->id]);
             } else { 
                 $this->Flash->error(__('The job card could not be saved. Please, try again.'));
             }
@@ -530,8 +530,9 @@ class JobCardsController extends AppController
 							->set(['job_card_status' => 'Converted'])
 							->where(['id' => $jobCard->sales_order_id])
 							->execute();
+					$jobCard->id = $this->EncryptingDecrypting->encryptData($jobCard->id);
 					$this->Flash->success(__('The job card has been saved.'));
-					return $this->redirect(['action' => 'view/'.$jobCard->id]);
+					return $this->redirect(['action' => 'view',$jobCard->id]);
 				} else { 
 					$this->Flash->error(__('The job card could not be saved. Please, try again.'));
 				}
