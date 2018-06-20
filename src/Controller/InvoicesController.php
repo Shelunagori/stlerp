@@ -615,7 +615,7 @@ class InvoicesController extends AppController
 		$sales_return=$this->request->query('sales_return');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$where=[];
 		$invoice_no=$this->request->query('invoice_no');
 		$file=$this->request->query('file');

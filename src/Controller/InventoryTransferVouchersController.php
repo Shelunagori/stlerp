@@ -57,7 +57,13 @@ class InventoryTransferVouchersController extends AppController
 		/* $this->paginate = [
             'contain' => ['Companies']
         ]; */
-		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies','Customers','Vendors'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['InventoryTransferVouchers.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
+		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies','Customers','Vendors'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
 		
 		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
 			return $q
@@ -261,8 +267,13 @@ class InventoryTransferVouchersController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['InventoryTransferVouchers.transaction_date <=']=$To;
 		}
-		
-		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies','Customers','Vendors']);
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['InventoryTransferVouchers.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
+		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies','Customers','Vendors']);
 		//pr($inventory_transfer_vouchs->toArray());exit;
 		
 
@@ -802,11 +813,26 @@ class InventoryTransferVouchersController extends AppController
 				
 					}else{
 						
-						$query1 = $this->InventoryTransferVouchers->ItemLedgers->query();
+						/* $query1 = $this->InventoryTransferVouchers->ItemLedgers->query();
 						$query1->update()
 						->set(['rate' =>$inventory_transfer_voucher_row_data['amount'],'quantity'=>$inventory_transfer_voucher_row_data['quantity'],'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']])
 						->where(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','item_id'=>$inventory_transfer_voucher_row_data['item_id'],'in_out'=>'In'])
-						->execute();
+						->execute(); */
+						
+						$query= $this->InventoryTransferVouchers->ItemLedgers->query();
+							$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','company_id','processed_on','source_id','source_row_id'])
+								  ->values([
+												'item_id' => $inventory_transfer_voucher_row_data['item_id'],
+												'quantity' => $inventory_transfer_voucher_row_data['quantity'],
+												'rate' =>$inventory_transfer_voucher_row_data['amount'],
+												'source_model' => 'Inventory Transfer Voucher',
+												'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
+												'in_out'=>'In',
+												'company_id'=>$st_company_id,
+												'source_id'=>$inventoryTransferVoucher->id,
+												'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']
+											])
+							->execute();
 					}
 			
 				} 
