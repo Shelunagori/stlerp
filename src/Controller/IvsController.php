@@ -56,7 +56,13 @@ class IvsController extends AppController
             'contain' => ['Invoices'=>['Customers'],'IvRows', 'Companies']
         ];
 		 */
-		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows', 'Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id,'Ivs.financial_year_id'=>$st_year_id])->order(['Ivs.id' => 'DESC']);
+		 $styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Ivs.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows', 'Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->where($wheree)->order(['Ivs.id' => 'DESC']);
         $this->set(compact('ivs','url'));
         $this->set('_serialize', ['ivs']);
     }
@@ -99,8 +105,13 @@ class IvsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['Ivs.transaction_date <=']=$To;
 		}
-        
-		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows','Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id,'Ivs.financial_year_id'=>$st_year_id])->order(['Ivs.id' => 'DESC']);
+         $styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Ivs.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
+		$ivs = $this->Ivs->find()->contain(['Invoices'=>['Customers'],'IvRows','Companies'])->where($where)->where(['Ivs.company_id'=>$st_company_id])->where($wheree)->order(['Ivs.id' => 'DESC']);
       
         $this->set(compact('ivs','url','From','To'));
 	} 

@@ -70,7 +70,12 @@ class PurchaseOrdersController extends AppController
 		}
 		$where1=[];
 		$purchaseOrders=[];
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['PurchaseOrders.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		if($status==null or $status=='Pending'){
 			$having=['total_sales >' => 0];
 			//$where1=['PurchaseOrderRows.processed_quantity < PurchaseOrderRows.quantity'];
@@ -93,6 +98,7 @@ class PurchaseOrdersController extends AppController
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
 			if($pull_request=="true"){ 
@@ -106,6 +112,7 @@ class PurchaseOrdersController extends AppController
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.date_created <='=>$tdate])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 				//pr($purchaseOrders); exit;
 			}
@@ -117,8 +124,9 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			else { 
@@ -131,6 +139,7 @@ class PurchaseOrdersController extends AppController
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 				
 				$purchaseOrderDatas = $this->PurchaseOrders->find();
@@ -141,6 +150,7 @@ class PurchaseOrdersController extends AppController
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 				
 				$supplier_total_po=[];
@@ -193,7 +203,7 @@ class PurchaseOrdersController extends AppController
 				}
 			}
 		}	
-		//pr($supplier_total_po); exit;
+		
 		$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find()->toArray();
 		$Items = $this->PurchaseOrders->PurchaseOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
         $this->set(compact('purchaseOrders','pull_request','status','PurchaseOrderRows','PurchaseItems','Items','financial_month_first','financial_month_last','total_qty','total_sales','st_year_id','supplier_total_po'));
@@ -254,7 +264,12 @@ class PurchaseOrdersController extends AppController
 			//$where1=['PurchaseOrderRows.processed_quantity = PurchaseOrderRows.quantity'];
 		}
 		
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['PurchaseOrders.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		if(!empty($items)){ 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
@@ -268,6 +283,7 @@ class PurchaseOrdersController extends AppController
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
 				->where($where)
+				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 		}else{	
 			if($pull_request=="true"){
@@ -279,7 +295,7 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where)
+				->where($where)->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			if($status==null || $status=="Converted-Into-GRN" ){
@@ -290,8 +306,8 @@ class PurchaseOrdersController extends AppController
 				->group(['PurchaseOrders.id'])
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
-				->where(['PurchaseOrders.company_id'=>$st_company_id,'PurchaseOrders.financial_year_id'=>$st_year_id])
-				->where($where)
+				->where(['PurchaseOrders.company_id'=>$st_company_id])
+				->where($where)->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			if($status==null || $status=="Pending" ){ 
@@ -303,7 +319,7 @@ class PurchaseOrdersController extends AppController
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
 				->where(['PurchaseOrders.company_id'=>$st_company_id])
-				->where($where)
+				->where($where)->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
 			}
 			

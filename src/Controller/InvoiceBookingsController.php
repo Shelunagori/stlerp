@@ -73,12 +73,17 @@ class InvoiceBookingsController extends AppController
         $this->paginate = [
             'contain' => ['Grns','Vendors']
         ];
-		
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['InvoiceBookings.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		if($purchase_return=='true'){
 			
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}else{ 
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}
 		//pr($invoiceBookings);exit;
         $this->set(compact('invoiceBookings','status','purchase_return'));
@@ -518,8 +523,18 @@ class InvoiceBookingsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['InvoiceBookings.created_on <=']=$To;
 		}
-		
-			$invoiceBookings = $this->InvoiceBookings->find()->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC'])->contain(['Grns','Vendors']);
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['InvoiceBookings.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
+		if($purchase_return=='true'){
+			
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+		}else{ 
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+		}
 		
 			
 		//pr($invoiceBookings);exit;
@@ -583,19 +598,28 @@ class InvoiceBookingsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$purchase_return=$this->request->query('purchase-return');
 		$status=$this->request->query('status');
 		@$book_no = $this->request->query('book_no');
 		$where=[];
 		$status = 0 ;
+		$styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['InvoiceBookings.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		if(!empty($book_no)){
 			$book_no=$this->request->query('book_no');
 			if(!empty($book_no)){
 				$where['InvoiceBookings.ib2 LIKE']=$book_no;
 			}
-			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'yes'])->toArray();
+			$invoiceBookings =$this->InvoiceBookings->find()->contain(['Grns','Vendors'])->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.gst'=>'yes'])->toArray();
 			$status=1;
 		}	
+		
+		
 		//pr($invoiceBookings[0]); exit;
 		$InvoiceBookingExist="No";
 		if(!empty($invoiceBookings)){

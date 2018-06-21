@@ -140,7 +140,7 @@
 							}else{
 								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
 							} ?></td>
-							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+							<td align="right"><?= $this->Money->indianNumberFormat($purchaseOrder->total) ?></td>
 						
 							<td class="actions">
 							<?php
@@ -171,6 +171,7 @@
 						?>
 						<tr <?php if($status=='Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id){ echo 'style="background-color:#f4f4f4"';   
 							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){ 
+						
 						?>>
 							<td><?= h(++$page_no) ?></td>
 							
@@ -201,7 +202,7 @@
 							}else{
 								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
 							} ?></td>
-							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+							<td align="right"><?= $this->Money->indianNumberFormat($purchaseOrder->total) ?></td>
 						
 							<td class="actions">
 							<?php
@@ -262,7 +263,7 @@
 								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
 							} ?></td>
 						
-							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
+							<td align="right"><?= $this->Money->indianNumberFormat($purchaseOrder->total) ?></td>
 						
 							<td class="actions">
 							<?php 

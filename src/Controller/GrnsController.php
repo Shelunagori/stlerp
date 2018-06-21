@@ -59,7 +59,12 @@ class GrnsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where1['Grns.date_created <=']=$To;
 		}
-      
+      $styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Grns.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		$where=[];
 		if($status==null or $status=='Pending'){
 			$where['status']='Pending';
@@ -68,10 +73,10 @@ class GrnsController extends AppController
 		}
 		//$tdate=date('d-m-Y',strtotime($financial_year->date_to)); 
 		if($grn_pull_request=="true"){
-			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
 		}else{ 
 			
-			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->order(['Grns.id' => 'DESC']);
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
 		}
 		
 		
@@ -167,6 +172,7 @@ class GrnsController extends AppController
 		$po_no=$this->request->query('po_no');
 		$vendor=$this->request->query('vendor');
 		$From=$this->request->query('From');
+		$st_year_id = $session->read('st_year_id');
 		$To=$this->request->query('To');
 		$this->set(compact('grn_no','vendor','From','po_no','To','grn_pull_request','pull_request'));
 		if(!empty($grn_no)){
@@ -190,7 +196,12 @@ class GrnsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where1['Grns.date_created <=']=$To;
 		}
-      
+      $styear=[1,3,2];
+			if(in_array($st_year_id,$styear)){ 
+				$wheree['Grns.financial_year_id'] = $st_year_id;
+			}else{
+				$wheree=[];
+			}
 		$where=[];
 		if($status==null or $status=='Pending'){
 			$where['status']='Pending';
@@ -198,7 +209,15 @@ class GrnsController extends AppController
 			$where['status']='Invoice-Booked';
 		}
 		
-		$grns =$this->Grns->find()->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->contain(['PurchaseOrders', 'Companies','Vendors'])->order(['Grns.id' => 'DESC']);
+		if($grn_pull_request=="true"){
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
+		}else{ 
+			
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
+		}
+		
+		
+		//$grns =$this->Grns->find()->where($where)->where($where1)->where($wheree)->where(['Grns.company_id'=>$st_company_id])->contain(['PurchaseOrders', 'Companies','Vendors'])->order(['Grns.id' => 'DESC']);
         $this->set(compact('grns','pull_request','status','grn_pull_request','url'));
         $this->set('_serialize', ['grns']);
 	}

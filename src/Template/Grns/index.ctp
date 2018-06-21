@@ -85,7 +85,8 @@
 					<tbody>
 					
 						<?php foreach ($grns as $grn): 
-						  if(date("Y-m-d",strtotime($financial_year->date_to)) > date("Y-m-d",strtotime($grn->transaction_date))){ ?>
+						  if(date("Y-m-d",strtotime($financial_year->date_to)) > date("Y-m-d",strtotime($grn->transaction_date))){ 
+						  ?>
 						 
 						<tr>
 							<td><?= h(++$page_no) ?></td>
@@ -123,7 +124,9 @@
                              <?php } ?>
 							</td>
 						</tr>
-						  <?php } endforeach; ?>
+						  <?php 
+						  }
+						  endforeach; ?>
 					</tbody>
 				</table>
 					</div>

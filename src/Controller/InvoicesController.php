@@ -172,17 +172,24 @@ class InvoicesController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$sales_return=$this->request->query('sales_return');
 		$status=$this->request->query('status');
 		@$invoice_no=$this->request->query('invoice_no');	
 		$where=[];
 		$status = 0 ;
+		$styear=[1,3,2];
+		if(in_array($st_year_id,$styear)){ 
+			$wheree['InvoiceBookings.financial_year_id'] = $st_year_id;
+		}else{
+			$wheree=[];
+		}
 			if(!empty($invoice_no)){
 			$invoice_no=$this->request->query('invoice_no');	
 			if(!empty($invoice_no)){
 				$where['Invoices.in2 LIKE']=$invoice_no;
 			}
-			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST'])->toArray();
+			$invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items']])->where($where)->where($wheree)->where(['Invoices.company_id'=>$st_company_id,'invoice_type'=>'GST'])->toArray();
 			$status=1;
 		}
 		$InvoiceExist="No";
