@@ -350,7 +350,7 @@ class SalesOrdersController extends AppController
 		$pull_request=$this->request->query('pull-request');
 		$gst=$this->request->query('gst');
 		$Actionstatus=$this->request->query('Actionstatus');
-		$this->set(compact('sales_order_no','customer','po_no','product','From','To','file','pull_request','items','gst'));
+		$this->set(compact('sales_order_no','customer','po_no','product','From','To','file','pull_request','items','gst','st_year_id'));
 		/* if(!empty($company_alise)){
 			$where['SalesOrders.so1 LIKE']='%'.$company_alise.'%';
 		} */

@@ -35,8 +35,8 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($salesOrders as $salesOrder){ 
-						if($status=='Converted Into Invoice'){
-							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id]){ 
+						if($status=='Converted Into Invoice' ){
+							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
 						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
