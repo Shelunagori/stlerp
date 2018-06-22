@@ -6310,7 +6310,7 @@ class InvoicesController extends AppController
 						//$terms = $this->Invoices->DispatchDocuments->get($d);
 						@$message_web2.= '
 						<tr>
-							<td colspan="2" style=" font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
+							<td colspan="2" style=" text-align:justify !important;font-family:Palatino Linotype; font-size:'. h(($invoice->pdf_font_size)) .';"><br/>'.h((++$p)).'. '. h(($d)).'</td>
 						</tr>
 						';
 						
@@ -6327,7 +6327,7 @@ class InvoicesController extends AppController
 				if($otherData){
 						$message_web3.= '
 						<tr>
-							<td style=" font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'. h(($otherData)) .'</td>
+							<td style="text-align:justify !important; font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'. h(($otherData)) .'</td>
 						</tr>
 					'; 
 					$message_web.=$message_web3;
@@ -6400,12 +6400,12 @@ class InvoicesController extends AppController
 				$SendEmail->send_data=$message_web1;
 				$SendEmail->invoice_id=$id;
 				$this->Invoices->SendEmails->save($SendEmail); */ 
-				$email_to = "dimpaljain892@gmail.com";
+				//$email_to = "dimpaljain892@gmail.com";
 				if(!empty($email_to)){		
 					try { 
 							$email->from(['dispatch@mogragroup.com' => $from_name])
 							->to($email_to)
-							//->cc($cc_mail)
+							->cc($cc_mail)
 							->replyTo('dispatch@mogragroup.com')
 							->subject($sub)
 							->template('notice_send_email')
@@ -6427,6 +6427,7 @@ class InvoicesController extends AppController
 					}	
 				}
 		//$this->Flash->success(__('The Mail has been Sent.'));
+		$id = $EncryptingDecrypting->encryptData($id);
 		return $this->redirect(['action' => 'GstConfirm/'.$id]);
 		
 // pr($id);exit;

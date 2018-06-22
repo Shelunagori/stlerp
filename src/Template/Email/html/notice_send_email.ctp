@@ -1,1 +1,2 @@
-<?php echo $content; ?>
+<p><?php echo $content; ?></p>
+

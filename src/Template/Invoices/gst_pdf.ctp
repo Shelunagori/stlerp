@@ -268,8 +268,8 @@ $html.='
 		<div style="height:'.$invoiceRows->height.'"></div></span>
 		<span>'.$invoiceRows->description .'<div style="height:'.$invoiceRows->height.'"></div></span></td>
 		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($invoiceRows->quantity) .'</td>
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->rate,[ 'places' => 2]) .'</td>
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->amount,[ 'places' => 2]) .'</td>';
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->rate) .'</td>
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->amount) .'</td>';
 		
 		if($invoiceRows->discount_amount==0){ 
 		$html.='
@@ -277,8 +277,8 @@ $html.='
 			<td style="padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->discount_percentage) .'%</td>
-			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->discount_amount,[ 'places' => 2]) .'</td>';	
+			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->discount_percentage) .'%</td>
+			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->discount_amount) .'</td>';	
 		}
 		
 		if($invoiceRows->pnf_amount==0){ 
@@ -287,21 +287,21 @@ $html.='
 			<td style="padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->pnf_percentage) .'%</td>
-			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->pnf_amount,[ 'places' => 2]) .'</td>';	
+			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->pnf_percentage) .'%</td>
+			<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->pnf_amount) .'</td>';	
 		
 		}
 		
 		$html.='
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->taxable_value,[ 'places' => 2]) .'</td>';
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->taxable_value) .'</td>';
 		if($invoiceRows->cgst_amount==0){ 
 		$html.='
 			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>
 			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$cgst_per[$invoiceRows->id]['tax_figure']) .'%</td>
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->cgst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$cgst_per[$invoiceRows->id]['tax_figure']) .'%</td>
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->cgst_amount) .'</td>';
 		}
 		if($invoiceRows->sgst_amount==0){ 
 		$html.='
@@ -309,8 +309,8 @@ $html.='
 			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$sgst_per[$invoiceRows->id]['tax_figure']) .'%</td>
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->sgst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$sgst_per[$invoiceRows->id]['tax_figure']) .'%</td>
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->sgst_amount) .'</td>';
 		}
 		if($invoiceRows->igst_amount==0){ 
 		$html.='
@@ -318,12 +318,12 @@ $html.='
 			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$igst_per[$invoiceRows->id]['tax_figure']) .'%</td>
-			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->igst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$igst_per[$invoiceRows->id]['tax_figure']) .'%</td>
+			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->igst_amount) .'</td>';
 		}
 		$html.='
 
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->row_total,[ 'places' => 2]) .'</td>
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($invoiceRows->row_total) .'</td>
 	</tr>';
 	$total_taxable_value+=$invoiceRows->taxable_value;
 endforeach; 
@@ -331,7 +331,7 @@ $fright_total=$invoice->fright_amount+$invoice->fright_cgst_amount+$invoice->fri
 if($invoice->fright_amount != 0){ 
 $html.='<tr>
 			<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="right" colspan="9" >Freight  Amount</td>
-			<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Number->format($invoice->fright_amount,[ 'places' => 2]) .'</td>';
+			<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Money->indianNumberFormat($invoice->fright_amount) .'</td>';
 		
 		if($invoice->fright_cgst_amount==0){ 
 		$html.='
@@ -339,8 +339,8 @@ $html.='<tr>
 			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$fright_ledger_cgst->tax_figure) .'%</td>
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Number->format($invoice->fright_cgst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$fright_ledger_cgst->tax_figure) .'%</td>
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Money->indianNumberFormat($invoice->fright_cgst_amount) .'</td>';
 		}
 		
 		if($invoice->fright_sgst_amount==0){ 
@@ -349,8 +349,8 @@ $html.='<tr>
 			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$fright_ledger_sgst->tax_figure) .'%</td>
-			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Number->format($invoice->fright_sgst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$fright_ledger_sgst->tax_figure) .'%</td>
+			<td style="'.$gst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Money->indianNumberFormat($invoice->fright_sgst_amount) .'</td>';
 		}
 		
 		if($invoice->fright_igst_amount==0){ 
@@ -359,12 +359,12 @@ $html.='<tr>
 			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="center" valign="top">'. h($h) .'</td>';
 		}else{
 		$html.='
-			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format(@$fright_ledger_igst->tax_figure) .'%</td>
-			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Number->format($invoice->fright_igst_amount,[ 'places' => 2]) .'</td>';
+			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat(@$fright_ledger_igst->tax_figure) .'%</td>
+			<td style="'.$igst_hide.'"';$html.='padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Money->indianNumberFormat($invoice->fright_igst_amount) .'</td>';
 		}
 		$html.='	
 			
-			<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Number->format($fright_total,[ 'places' => 2]) .'</td>
+			<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="right"  >'. $this->Money->indianNumberFormat($fright_total) .'</td>
 		</tr>';
 }
 	$html.='</tbody>';
@@ -418,27 +418,27 @@ $html.='
 							<tr>
 								<td  >Total CGST</td>
 								<td>:</td>
-								<td style="text-align:right;" valign="">'. $this->Number->format($invoice->total_cgst_amount,[ 'places' => 2]) .'</td>
+								<td style="text-align:right;" valign="">'. $this->Money->indianNumberFormat($invoice->total_cgst_amount) .'</td>
 								
 							</tr>
 							<tr>
 								<td  >Total SGST</td>
 								<td>:</td>
-								<td style="text-align:right;" valign="">'. $this->Number->format($invoice->total_sgst_amount,[ 'places' => 2]) .'</td>
+								<td style="text-align:right;" valign="">'. $this->Money->indianNumberFormat($invoice->total_sgst_amount) .'</td>
 							</tr>';
 					}else{
 						$html.='
 							<tr>
 								<td  >Total IGST</td>
 								<td>:</td>
-								<td style="text-align:right;" valign="">'. $this->Number->format($invoice->total_igst_amount,[ 'places' => 2]) .'</td>
+								<td style="text-align:right;" valign="">'. $this->Money->indianNumberFormat($invoice->total_igst_amount) .'</td>
 							</tr>';
 						}
 						$html.='
 						<tr>
 							<td >Grand Total</td>
 							<td>:</td>
-							<td style="text-align:right;" valign="">'. $this->Number->format($invoice->grand_total,[ 'places' => 2]) .'</td>
+							<td style="text-align:right;" valign="">'. $this->Money->indianNumberFormat($invoice->grand_total) .'</td>
 						</tr>
 						</table>
 				</td>

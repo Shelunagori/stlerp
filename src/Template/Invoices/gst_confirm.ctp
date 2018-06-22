@@ -7,6 +7,7 @@ if($invoice->invoice_type=="GST"){
 	$Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
 }
 $mail_url=$this->Url->build(['controller'=>'Invoices','action'=>'sendMail']);
+$id1 =($id);
 $id = $EncryptingDecrypting->encryptData($id);
 //pr($pdf_url); exit;
 ?>
@@ -139,11 +140,11 @@ $(document).ready(function() {
 		var textdata=$('.textdata').val(); 
 		var json_data=JSON.stringify(send_data);
 		
-		 var id="<?php echo $id; ?>";
+		 var id="<?php echo $id1; ?>";
 		
 		var url="<?php echo $this->Url->build(['controller'=>'Invoices','action'=>'sendMail']); ?>";
 		url=url+'?id='+id+'&data='+json_data+'&otherData='+textdata;
-	
+	alert(url);
 		$.ajax({
 			url: url,
 			type: "GET",
