@@ -1,6 +1,6 @@
 <?php 
 $list_url=$this->Url->build(['controller'=>'Invoices','action'=>'Index']);
-$pdf_url=$this->Url->build(['controller'=>'Invoices','action'=>'GstDispatchPdf']);
+$pdf_url=$this->Url->build(['controller'=>'Invoices','action'=>'GstDispatchPdf']); 
 ?>
 <table width="100%">
 	<tr>

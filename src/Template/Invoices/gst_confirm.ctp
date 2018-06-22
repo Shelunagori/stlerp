@@ -185,7 +185,7 @@ $(document).ready(function() {
 						 <div class="checkbox-list">
 							<label>
 								
-								<textarea name="delivery_description" class="form-control input-sm textdata" placeholder="Other Description" id="delivery-description" rows="7"><?= h('We now request you to collect the material from transporter and process our invoice for payment of Rs'. h(number_format($invoice->grand_total,2)).'/- in favour of '. h(($company_data->name)).'. in our account No '
+								<textarea name="delivery_description" class="form-control input-sm textdata" placeholder="Other Description" id="delivery-description" rows="7" style="text-align: justify;"><?= h('We now request you to collect the material from transporter and process our invoice for payment of Rs'. h(number_format($invoice->grand_total,2)).'/- in favour of '. h(($company_data->name)).'. in our account No '
 									. h(($invoice->company->company_banks[0]->account_no)).' of '.h($invoice->company->company_banks[0]->bank_name) .','. h( $invoice->company->company_banks[0]->branch).',IFSC Code: '.h($invoice->company->company_banks[0]->ifsc_code).', MICR Code:313026002 Branch Code 539406 and our PAN No. is '.h(($invoice->company->pan_no))) ?></textarea>
 							</label> 
 						 </div>
