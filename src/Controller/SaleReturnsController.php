@@ -139,7 +139,7 @@ class SaleReturnsController extends AppController
 	
 	public function Pdf($id=null){
 		$this->viewBuilder()->layout('');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		 $invoice= $this->SaleReturns->get($id, [
 				'contain' => ['SaleReturnRows'=>['Items'=>['Units']],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator','SaleTaxes']
 			]); 
@@ -175,7 +175,7 @@ class SaleReturnsController extends AppController
 	public function GstPdf($id = null)
     {
 		$this->viewBuilder()->layout('');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		 $SaleReturn= $this->SaleReturns->get($id, [
 				'contain' => ['SaleReturnRows'=>['Items'],'Transporters','Customers'=>['Districts'=>['States']],'Companies'=>['CompanyBanks'],'Creator']
 			]); 

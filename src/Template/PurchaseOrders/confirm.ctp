@@ -2,6 +2,7 @@
 $pdf_url=$this->Url->build(['controller'=>'PurchaseOrders','action'=>'pdf']);
 $list_url=$this->Url->build(['controller'=>'PurchaseOrders','action'=>'index']);
 $Edit_url=$this->Url->build(['controller'=>'PurchaseOrders','action'=>'Edit']);
+$id = $EncryptingDecrypting->encryptData($id);
 ?>
 <table width="100%">
 	<tr>

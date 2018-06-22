@@ -144,6 +144,7 @@
 						
 							<td class="actions">
 							<?php
+							 $purchaseOrder_id =$purchaseOrder->id;
 							 $purchaseOrder->id = $EncryptingDecrypting->encryptData($purchaseOrder->id);
 							if(in_array($purchaseOrder->created_by,$allowed_emp)){
 							if(in_array(31,$allowed_pages)){ ?>
@@ -159,7 +160,7 @@
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into GRN','/Grns/AddNew?purchase-order='.$purchaseOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								} ?>
 								
-								
+								<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $purchaseOrder_id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
 								
 
 							</td>
@@ -266,6 +267,7 @@
 							<td align="right"><?= $this->Money->indianNumberFormat($purchaseOrder->total) ?></td>
 						
 							<td class="actions">
+							<?php $purchaseOrder_id =$purchaseOrder->id; ?>
 							<?php 
 								$purchaseOrder->id = $EncryptingDecrypting->encryptData($purchaseOrder->id);
 								if($pull_request!="true" and in_array(31,$allowed_pages)){ ?>
@@ -287,7 +289,8 @@
 									
 									} 
 									?>
-
+								     <a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $purchaseOrder_id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
+							
 									<button type="button" ledger_id="<?php echo $purchaseOrder->id;  ?>" totalPo="<?php echo @$totalPo;  ?>" class="btn btn-xs blue tooltips send_mail" title="Send Mail"><i class="fa fa-envelope"></i></button>
 
 									
@@ -344,3 +347,33 @@ $(document).ready(function() {
 
 });
 </script>
+<script>
+$(document).ready(function() {
+	
+	$('.select_term_condition').die().live("click",function() {  
+		var sid=$(this).attr('qwerty');
+		
+		open_address(sid);
+    });
+	$('.closebtn2').on("click",function() {  
+		$("#myModal2").hide();
+	});
+	function open_address(sid){
+			
+			var url="<?php echo $this->Url->build(['controller'=>'PurchaseOrders','action'=>'showPendingItem']); ?>";
+			var url1= url+'/'+sid;//alert(url1);
+			url=url+'/'+sid, 
+			$.ajax({
+				url: url,
+			}).done(function(response) {
+				$("#show_model").html(response);
+			});
+		}
+		
+    });
+	
+</script>
+
+<div id="show_model">
+
+</div>

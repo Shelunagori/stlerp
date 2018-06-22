@@ -168,21 +168,21 @@ margin-bottom: 0;
 			<td>&nbsp;<?= h(++$page_no) ?></td>
 			<td ><?= $invoice_booking_row->item->name; ?></td>
 			<td align="center" width="6%"><?= $invoice_booking_row->quantity; ?></td>
-			<td align="right"><?=  number_format($invoice_booking_row->unit_rate_from_po, 2, '.', '');?></td>
-			<td align="right"><?= number_format($invoice_booking_row->quantity*$invoice_booking_row->unit_rate_from_po, 2, '.', '');?></td>
+			<td align="right"><?=  $this->Money->indianNumberFormat($invoice_booking_row->unit_rate_from_po);?></td>
+			<td align="right"><?= $this->Money->indianNumberFormat($invoice_booking_row->quantity*$invoice_booking_row->unit_rate_from_po);?></td>
 			<?php if($invoice_booking_row->gst_discount_per==0){ ?>
 			<td align="right"></td>
 			<td align="right"></td>
 			<?php }else{ ?>
-			<td align="right"><?=number_format($invoice_booking_row->gst_discount_per, 2, '.', '');?></td>
-			<td align="right"><?=number_format($invoice_booking_row->discount, 2, '.', '');?></td>
+			<td align="right"><?=$this->Money->indianNumberFormat($invoice_booking_row->gst_discount_per);?></td>
+			<td align="right"><?=$this->Money->indianNumberFormat($invoice_booking_row->discount);?></td>
 			<?php } ?>
 			<?php if($invoice_booking_row->gst_pnf_per==0){ ?>
 			<td align="right"></td>
 			<td align="right"></td>
 			<?php }else{ ?>
-			<td align="right"><?= number_format($invoice_booking_row->gst_pnf_per, 2, '.', ''); ?></td>
-			<td align="right"><?= number_format($invoice_booking_row->pnf, 2, '.', ''); ?></td>
+			<td align="right"><?= $this->Money->indianNumberFormat($invoice_booking_row->gst_pnf_per); ?></td>
+			<td align="right"><?= $this->Money->indianNumberFormat($invoice_booking_row->pnf); ?></td>
 			<?php } ?>
 			
 			<td align="right"><?= $invoice_booking_row->taxable_value; $total_taxable=$total_taxable+$invoice_booking_row->taxable_value; ?></td>
@@ -237,37 +237,37 @@ margin-bottom: 0;
 			<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="4"> Total</td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total_amount, 2, '.', '');
+			$this->Money->indianNumberFormat($total_amount);
 			 ?></td>
 			 <?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="4"> </td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total_taxable, 2, '.', '');
+			$this->Money->indianNumberFormat($total_taxable);
 			 ?></td>
 			 <?php if($purchase_acc->name=='Purchase GST'){ ?>
 			<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="1"> </td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total_cgst, 2, '.', '');
+			$this->Money->indianNumberFormat($total_cgst);
 			 ?></td>
 			<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="1"> </td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total_sgst, 2, '.', '');
+			$this->Money->indianNumberFormat($total_sgst);
 			 ?></td>
 		<?php }else { ?>
 			<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="1"> </td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total_igst, 2, '.', '');
+			$this->Money->indianNumberFormat($total_igst);
 			 ?></td>
 		<?php } ?>
 		<?php $col_span=13; if($purchase_acc->name=='Purchase GST'){ $col_span=15;} ?>
 			<td style="font-size:14px; font-weight:bold;"  align="right" colspan="1"> <?= 
-			number_format($other_charges, 2, '.', '');
+			$this->Money->indianNumberFormat($other_charges);
 			 ?></td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($invoiceBooking->total, 2, '.', '');
+			$this->Money->indianNumberFormat($invoiceBooking->total);
 			 ?></td>
 		</tr>
 		

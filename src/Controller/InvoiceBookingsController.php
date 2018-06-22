@@ -652,7 +652,7 @@ class InvoiceBookingsController extends AppController
     {
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$this->viewBuilder()->layout('index_layout');
         $invoiceBooking = $this->InvoiceBookings->get($id, [
             'contain' => ['InvoiceBookingRows'=>['Items'],'Vendors','Creator','Companies']
@@ -997,6 +997,7 @@ class InvoiceBookingsController extends AppController
     {
 	$this->viewBuilder()->layout('index_layout');
 	$session = $this->request->session();
+	$id = $this->EncryptingDecrypting->decryptData($id);
 	$invoice_booking_id=$id;
 	$st_company_id = $session->read('st_company_id');
 

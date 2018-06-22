@@ -3271,6 +3271,7 @@ class InvoicesController extends AppController
 						->where(['id' => $id])
 						->execute();
 			}
+			$id = $this->EncryptingDecrypting->encryptData($id);
 			return $this->redirect(['action' => 'GstConfirm/'.$id]);
         }
 		$termsConditions = $this->Invoices->DispatchDocuments->find('all',['limit' => 200]);

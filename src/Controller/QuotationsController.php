@@ -425,7 +425,8 @@ class QuotationsController extends AppController
 		$this->viewBuilder()->layout('');
 		$send_email=$this->request->query('sendemail');
 		$quotation_id=$this->request->query('quotaionid');
-		
+		//$quotation_id = $this->EncryptingDecrypting->decryptData($quotation_id);
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		
 		if(!empty($send_email))
 		{

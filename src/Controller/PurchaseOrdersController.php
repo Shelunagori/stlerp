@@ -868,6 +868,41 @@ class PurchaseOrdersController extends AppController
 		pr($data);exit;
 	}
 	
+	public function showPendingItem($id=null){
+		
+			$PurchaseOrders = $this->PurchaseOrders->find()->contain(['PurchaseOrderRows'=>['GrnRows' => function($q) {
+				return $q->select(['grn_id','purchase_order_row_id','item_id','total_qty' => $q->func()->sum('GrnRows.quantity')])->group('GrnRows.purchase_order_row_id');
+			}]])->where(['PurchaseOrders.id'=>$id]);
+			
+			$sales_order_qty=[];
+			 $invoice_qty=[];
+			$salesData=[];
+			
+				foreach($PurchaseOrders as $SalesOrder){ $sales_qty=[]; $inc_qty=[]; 
+					foreach($SalesOrder->purchase_order_rows as $sales_order_row){ 
+						foreach($sales_order_row->grn_rows as $invoice_row){ //pr($invoice_row); exit;
+							@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+							@$inc_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+						}
+						@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+						@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+					}
+					
+					
+					foreach(@$sales_qty as $key=>$sales_order_qt){
+							if(@$sales_order_qt > @$inc_qty[$key] ){ 
+								$pen=@$sales_order_qt-@$inc_qty[$key];
+								$itm= $this->PurchaseOrders->PurchaseOrderRows->Items->get($key);
+								@$salesData[$itm->name]=$pen;
+							}
+					}
+				}
+		
+		$this->set(compact('salesData'));
+					
+		
+	}
+	
 	public function sendMail(){
 		$totalPo=$this->request->query('totalPo');
 		$totalPo = explode(",", $totalPo); 
@@ -915,12 +950,12 @@ class PurchaseOrdersController extends AppController
 		$sub="STL-Purchase Order Delivery Reminder";
 		//pr($email_to);
 		//pr($cc_mail);exit; 
-		$email_to="gopalkrishanp3@gmail.com";
+		$email_to="dimpaljain892@gmail.com";
 		$cc_mail="gopal@phppoets.in";
 		//pr($email_to);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
-		->cc($cc_mail)
+		//->cc($cc_mail)
 		->replyTo('dispatch@mogragroup.com')
 		->subject($sub)
 		->template('send_purchase_order')

@@ -7,7 +7,7 @@ if($SaleReturns->sale_return_type=="GST"){
 	$Edit_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'Edit']);
 }
 $mail_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'sendMail']);
-
+$id = $EncryptingDecrypting->encryptData($id);
 //pr($pdf_url); exit;
 ?>
 <table width="100%">

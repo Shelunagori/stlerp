@@ -197,8 +197,8 @@ $html.='
 		'<br/><br/><p>'.$purchase_order_rows->description.'</p><div style="height:'.$purchase_order_rows->height.'"></div></td>
 		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" valign="top" align="center">'. h($purchase_order_rows->item->unit->name) .'</td>
 		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" valign="top" align="center">'. h($purchase_order_rows->quantity) .'</td>
-		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" align="right" valign="top">'. $this->Number->format($purchase_order_rows->rate,[ 'places' => 2]) .'</td>
-		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" align="right" valign="top">'. $this->Number->format($purchase_order_rows->amount,[ 'places' => 2]) .'</td>
+		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" align="right" valign="top">'. $this->Money->indianNumberFormat($purchase_order_rows->rate) .'</td>
+		<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" style="padding-top:10px;" align="right" valign="top">'. $this->Money->indianNumberFormat($purchase_order_rows->amount) .'</td>
 	</tr>';
 	
 endforeach; 
@@ -221,7 +221,7 @@ $html.='</table>';
 				<tr>
 					
 					<td  width="100%" style="text-align:right; font-size:'. h(($purchaseOrder->pdf_font_size)) .';">Total</td>
-					<td  style="text-align:right; font-size:'. h(($purchaseOrder->pdf_font_size)) .';">'. $this->Number->format($purchaseOrder->total,[ 'places' => 2]).'</td>
+					<td  style="text-align:right; font-size:'. h(($purchaseOrder->pdf_font_size)) .';">'. $this->Money->indianNumberFormat($purchaseOrder->total).'</td>
 				</tr>
 					
 				

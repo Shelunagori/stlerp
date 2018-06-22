@@ -350,7 +350,7 @@
 $(document).ready(function() {
 	
 	$('.select_term_condition').die().live("click",function() {  
-		var sid=$('.select_term_condition').attr('qwerty');
+		var sid=$(this).attr('qwerty');
 		
 		open_address(sid);
     });
@@ -360,6 +360,7 @@ $(document).ready(function() {
 	function open_address(sid){
 			
 			var url="<?php echo $this->Url->build(['controller'=>'SalesOrders','action'=>'showPendingItem']); ?>";
+			var url1=url+'/'+sid; //alert(url1);
 			url=url+'/'+sid,
 			$.ajax({
 				url: url,
