@@ -765,6 +765,7 @@ class PurchaseOrdersController extends AppController
 		public function pdf($id = null)
     {
 		$this->viewBuilder()->layout('');
+		$id = $this->EncryptingDecrypting->decryptData($id);
          $purchaseOrder = $this->PurchaseOrders->get($id, [
             'contain' => ['Companies','Vendors','PurchaseOrderRows'=> ['Items'=>['Units']],'Transporters','Creator']
 			]);

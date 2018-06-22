@@ -3136,7 +3136,7 @@ class InvoicesController extends AppController
 	public function GstPdf($id = null)
     {
 		$this->viewBuilder()->layout('');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		 $invoice = $this->Invoices->get($id, [
 			'contain' => ['Customers'=>['Districts'=>['States']],
 							'Employees',

@@ -260,7 +260,12 @@ $html.='
 	<tr class="odd">
 		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center" >'. h($sr) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;line-height:20px " valign="top">
-		<span> HSN Code : '.$invoiceRows->item->hsn_code .'<div style="height:'.$invoiceRows->height.'"></div></span>
+		<span> HSN Code : '.$invoiceRows->item->hsn_code;
+		if($invoiceRows->customer_item_code){
+			$html.=' <b>/</b> Customer  Item Code : '.$invoiceRows->customer_item_code; 
+		}
+		$html.='		
+		<div style="height:'.$invoiceRows->height.'"></div></span>
 		<span>'.$invoiceRows->description .'<div style="height:'.$invoiceRows->height.'"></div></span></td>
 		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($invoiceRows->quantity) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($invoiceRows->rate,[ 'places' => 2]) .'</td>
@@ -498,7 +503,7 @@ $html.='
 </body>
 </html>';
 
-	//echo $html; exit; 
+	echo $html; exit; 
 
 $name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4));
 

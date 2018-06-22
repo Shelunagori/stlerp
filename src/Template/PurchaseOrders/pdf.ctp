@@ -160,8 +160,15 @@ $html.='
 							<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top" style="vertical-align: top;">CIN</td>
 							<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top">:</td>
 							<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top">'. h($purchaseOrder->company->cin_no) .'</td>
-						</tr>
-					</table>
+						</tr>';
+						if($purchaseOrder->customer_so_no){
+						$html.='<tr>
+									<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top" style="vertical-align: top;">So No.</td>
+									<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top">:</td>
+									<td style="font-size:'. h(($purchaseOrder->pdf_font_size)) .';" valign="top">'. h($purchaseOrder->customer_so_no) .'</td>
+								</tr>';
+						}
+					$html.='</table>
 			</td>
 		</tr>
 		
