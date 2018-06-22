@@ -2,7 +2,7 @@
 $pdf_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'pdf']);
 $list_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'index']);
 if($SaleReturns->sale_return_type=="GST"){
-	$Edit_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'GstEdit']);
+	$Edit_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'gstSalesEdit']);
 }else{
 	$Edit_url=$this->Url->build(['controller'=>'SaleReturns','action'=>'Edit']);
 }

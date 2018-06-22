@@ -212,6 +212,43 @@ class QuotationsController extends AppController
 		$this->set(compact('url'));
 	}
 	
+	
+	public function showPendingItem($id=null){
+		
+			$Quotations = $this->Quotations->find()->contain(['QuotationRows'=>['SalesOrderRows' => function($q) {
+				return $q->select(['sales_order_id','quotation_row_id','item_id','total_qty' => $q->func()->sum('SalesOrderRows.quantity')])->group('SalesOrderRows.quotation_row_id');
+			}]])->where(['Quotations.id'=>$id]);
+			
+			$sales_order_qty=[];
+			 $invoice_qty=[];
+			$salesData=[];
+			
+				foreach($Quotations as $SalesOrder){ $sales_qty=[]; $inc_qty=[]; 
+					foreach($SalesOrder->quotation_rows as $sales_order_row){  
+						foreach($sales_order_row->sales_order_rows as $invoice_row){ //pr($invoice_row); exit;
+							@$invoice_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+							@$inc_qty[$invoice_row['item_id']]+=$invoice_row['total_qty'];
+						}
+						@$sales_order_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+						@$sales_qty[$sales_order_row['item_id']]+=$sales_order_row['quantity'];
+					}
+					
+					
+					foreach(@$sales_qty as $key=>$sales_order_qt){
+							if(@$sales_order_qt > @$inc_qty[$key] ){ 
+								$pen=@$sales_order_qt-@$inc_qty[$key];
+								$itm= $this->Quotations->QuotationRows->Items->get($key);
+								@$salesData[$itm->name]=$pen;
+							}
+					}
+				}
+		
+		$this->set(compact('salesData'));
+					
+		
+	}
+	
+	
 	 public function exportExcel($status=null)
     {	
 		$this->viewBuilder()->layout('');
@@ -410,6 +447,7 @@ class QuotationsController extends AppController
 					$this->Quotations->QuotationRows->save($quotationRow);
 			}
 			}
+			$id = $this->EncryptingDecrypting->encryptData($id);
 			return $this->redirect(['action' => 'confirm/'.$id]);
         }
 		

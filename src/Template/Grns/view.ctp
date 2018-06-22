@@ -13,6 +13,10 @@ margin-bottom: 0;
 .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
     padding: 5px !important;
 }
+.tabitem thead tr th {
+    color: #FFF;
+    background-color: #254b73;
+}
 </style>
 <style type="text/css" media="print">
 @page {

@@ -7,6 +7,7 @@ if($PurchaseReturns->invoice_type=="GST"){
 	$Edit_url=$this->Url->build(['controller'=>'PurchaseReturns','action'=>'Edit']);
 }
 $mail_url=$this->Url->build(['controller'=>'PurchaseReturns','action'=>'sendMail']);
+$id = $EncryptingDecrypting->encryptData($id);
 
 //pr($pdf_url); exit;
 ?>

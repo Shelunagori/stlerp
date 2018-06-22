@@ -174,14 +174,14 @@ margin-bottom: 0;
 			<td align="right"></td>
 			<td align="right"></td>
 			<?php }else{ ?>
-			<td align="right"><?=$this->Money->indianNumberFormat($invoice_booking_row->gst_discount_per);?></td>
+			<td align="right"><?=$this->Number->format($invoice_booking_row->gst_discount_per);?></td>
 			<td align="right"><?=$this->Money->indianNumberFormat($invoice_booking_row->discount);?></td>
 			<?php } ?>
 			<?php if($invoice_booking_row->gst_pnf_per==0){ ?>
 			<td align="right"></td>
 			<td align="right"></td>
 			<?php }else{ ?>
-			<td align="right"><?= $this->Money->indianNumberFormat($invoice_booking_row->gst_pnf_per); ?></td>
+			<td align="right"><?= $this->Number->format($invoice_booking_row->gst_pnf_per); ?></td>
 			<td align="right"><?= $this->Money->indianNumberFormat($invoice_booking_row->pnf); ?></td>
 			<?php } ?>
 			
@@ -277,13 +277,13 @@ margin-bottom: 0;
 <div style="border:solid 1px ;margin-top: 12px;"></div>
 <table width="100%" class="divFooter">
 	<tr>
-		<td style="vertical-align: top !important;">
-			<table width="100%">
+		<td  style="vertical-align: top !important;">
+			<table width="85%">
 			    <tr>
 					<td><b>Narration :</b>&nbsp;&nbsp;<?php echo $invoiceBooking->narration;?></td>
 				</tr>
 			</table>
-			<table width="100%">
+			<table width="50%">
 			    <tr>
 					<td colspan="2"><b>Reference Numbers:</b></td>
 				</tr>
@@ -310,7 +310,7 @@ margin-bottom: 0;
 				<?php } ?>
 			</table>
 		</td>
-		<td align="right">
+		<td  style="vertical-align: top !important;" width="20%">
 		<table>
 			<tr>
 				<td align="center">

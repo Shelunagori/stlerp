@@ -623,6 +623,7 @@ class SalesOrdersController extends AppController
 	public function pdf($id = null)
     {
 		$this->viewBuilder()->layout('');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $salesOrder = $this->SalesOrders->get($id, [
             'contain' => ['Customers', 'Companies','Carrier','Creator','Editor','Courier','Employees','SalesOrderRows' => function($q){
 				return $q->order(['SalesOrderRows.id' => 'ASC'])->contain(['SaleTaxes','Items'=>['Units']]);
@@ -677,6 +678,7 @@ class SalesOrdersController extends AppController
 				$salesOrderRow->height=$value["height"];
 				$this->SalesOrders->SalesOrderRows->save($salesOrderRow);
 			}
+			$id = $this->EncryptingDecrypting->encryptData($id);
 			return $this->redirect(['action' => 'confirm/'.$id]);
         }
 		
@@ -1865,7 +1867,8 @@ class SalesOrdersController extends AppController
 				$salesOrderRow->height=$value["height"];
 				$this->SalesOrders->SalesOrderRows->save($salesOrderRow);
 			}
-			return $this->redirect(['action' => 'confirm/'.$id]);
+			$id = $this->EncryptingDecrypting->encryptData($id);
+			return $this->redirect(['action' => 'gstConfirm/'.$id]);
         }
 		
 		$this->set(compact('salesorder','id','st_year_id'));

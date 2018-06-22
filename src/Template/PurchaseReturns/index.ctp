@@ -59,31 +59,32 @@
 							<td><?php
 							if($purchaseReturn->gst_type=="Gst"){
 								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
-								'action' => 'gstView', $purchaseReturn->id],array('target'=>'_blank'));
+								'action' => 'gstView', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('target'=>'_blank'));
 							}else{
 								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
-								'action' => 'View', $purchaseReturn->id],array('target'=>'_blank'));
+								'action' => 'View', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('target'=>'_blank'));
 							}		?></td>
 							<td>
 								<?php 
 								if($purchaseReturn->invoice_booking->gst=='no'){
 									echo $this->Html->link($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4,[
-								'controller'=>'InvoiceBookings','action' => 'view', $purchaseReturn->invoice_booking->id],array('target'=>'_blank'));
+								'controller'=>'InvoiceBookings','action' => 'view', $EncryptingDecrypting->encryptData($purchaseReturn->invoice_booking->id)],array('target'=>'_blank'));
 								}else{
 										echo $this->Html->link($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4,[
-								'controller'=>'InvoiceBookings','action' => 'GstInvoiceBookingView', $purchaseReturn->invoice_booking->id],array('target'=>'_blank'));
+								'controller'=>'InvoiceBookings','action' => 'GstInvoiceBookingView', $EncryptingDecrypting->encryptData($purchaseReturn->invoice_booking->id)],array('target'=>'_blank'));
 								}	?>
 							</td>
 							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->created_on)); ?></td>
 						<td class="actions">
 							<?php 
+							$purchaseReturn->id = $EncryptingDecrypting->encryptData($purchaseReturn->id);
 							if($purchaseReturn->gst_type=="Gst"){
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstView', $purchaseReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstEdit?purchaseReturn='.$purchaseReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstView', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstEdit?purchaseReturn='.$EncryptingDecrypting->encryptData($purchaseReturn->id),],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 							}
 							else{
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'View', $purchaseReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit?purchaseReturn='.$purchaseReturn->id,],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'View', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit?purchaseReturn='.$EncryptingDecrypting->encryptData($purchaseReturn->id),],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 							}		?>
 							
 						</td>

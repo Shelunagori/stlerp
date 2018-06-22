@@ -438,6 +438,7 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
 		$purchase_return_id=@(int)$this->request->query('purchase-return');
+		$purchase_return_id = $this->EncryptingDecrypting->decryptData($purchase_return_id);
 		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, ['contain'=>['ReferenceDetails']]);
 		
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
