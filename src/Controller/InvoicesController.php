@@ -6400,11 +6400,12 @@ class InvoicesController extends AppController
 				$SendEmail->send_data=$message_web1;
 				$SendEmail->invoice_id=$id;
 				$this->Invoices->SendEmails->save($SendEmail); */ 
+				$email_to = "dimpaljain892@gmail.com";
 				if(!empty($email_to)){		
 					try { 
 							$email->from(['dispatch@mogragroup.com' => $from_name])
 							->to($email_to)
-							->cc($cc_mail)
+							//->cc($cc_mail)
 							->replyTo('dispatch@mogragroup.com')
 							->subject($sub)
 							->template('notice_send_email')
