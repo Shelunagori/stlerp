@@ -420,7 +420,7 @@ class SalesOrdersController extends AppController
 					->group(['SalesOrders.id'])
 					->contain(['Customers','Quotations','SalesOrderRows.InvoiceRows','SalesOrderRows'=>['Items'=>['InvoiceRows']]])
 					->autoFields(true)
-					->where(['SalesOrders.company_id'=>$st_company_id])
+					->where(['SalesOrders.company_id'=>$st_company_id,'SalesOrders.financial_year_id'=>$st_year_id])
 					->where($where)
 					->where(['SalesOrders.gst'=>'yes','SalesOrders.created_on <= '=>$tdate])
 					->order(['SalesOrders.id'=>'DESC']);
