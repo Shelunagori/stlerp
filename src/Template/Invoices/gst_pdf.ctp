@@ -503,7 +503,7 @@ $html.='
 </body>
 </html>';
 
-	echo $html; exit; 
+	//echo $html; exit; 
 
 $name='Invoice-'.h(($invoice->in1.'_IN'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'_'.$invoice->in3.'_'.$invoice->in4));
 
