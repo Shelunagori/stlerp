@@ -154,6 +154,7 @@ if(!empty($status)){
 					</thead>
 					<tbody>
 						<?php $total_amount=0; $i=0; foreach ($quotations as $quotation):  $i++;
+						$quotation_id = $quotation->id;
 						$quotation->id = $EncryptingDecrypting->encryptData($quotation->id);
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
@@ -176,13 +177,13 @@ if(!empty($status)){
 									<button id="btnGroupVerticalDrop5" type="button" class="btn  btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">Items <i class="fa fa-angle-down"></i></button>
 										<ul class="dropdown-menu" role="menu" aria-labelledby="btnGroupVerticalDrop5">
 										<?php foreach($quotation->quotation_rows as $quotation_rows){ 
-											if($quotation_rows->quotation_id == $quotation->id){?>
+											if($quotation_rows->quotation_id == $quotation_id){?>
 											<li><p><?= h($quotation_rows->item->name) ?></p></li>
 											<?php }}?>
 										</ul>
 								</div>
 							</td>
-							<td align="center"><?= h($this->Number->format($quotation->total,['places'=>2])) ?><?php $total_amount=$total_amount+$quotation->total; ?></td>
+							<td align="center"><?= h($this->Money->indianNumberFormat($quotation->total)) ?><?php $total_amount=$total_amount+$quotation->total; ?></td>
 							
 							<?php if($pull_request=="true" ){ ?>
 							<td><?php echo date("d-m-Y",strtotime($quotation->created_on)); ?></td>
@@ -244,7 +245,7 @@ if(!empty($status)){
 								<?php 
 								if(in_array(30,$allowed_pages)){
 								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true" && $st_year_id==$quotation->financial_year_id){
-								echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Close','role'=>'button','quote_id'=>$quotation->id));
+								echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Close','role'=>'button','quote_id'=>$quotation_id));
 								} }?>
 								<?php if($copy_request=="copy"){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Copy','/Quotations/Add?copy='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
@@ -264,7 +265,7 @@ if(!empty($status)){
 					<tfoot>
 						<tr>
 							<td colspan="6" style="text-align:right"><b>Total</b></td>
-							<td style="text-align:right"><b><?php echo $this->Number->format($total_amount,['places'=>2]);?></b></td>
+							<td style="text-align:right"><b><?php echo $this->Money->indianNumberFormat($total_amount);?></b></td>
 							<td style="text-align:right"><b></b></td>
 							<td style="text-align:right"><b></b></td>
 						</tr>

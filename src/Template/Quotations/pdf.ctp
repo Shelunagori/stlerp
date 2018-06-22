@@ -223,8 +223,8 @@ $html.='
 		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px; font-size:16px;" valign="top" width="100%" class="main">'. $quotationRows->description .'<div style="height:'.$quotationRows->height.'"></div></td>
 		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="center" valign="top"class="main">'. h($quotationRows->item->unit->name) .'</td>
 		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="center" valign="top" class="main">'. h($quotationRows->quantity) .'</td>
-		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="right" valign="top"class="main">'. $this->Number->format($quotationRows->rate,[ 'places' => 2]).'</td>
-		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="right" valign="top" class="main">'. $this->Number->format($quotationRows->amount,[ 'places' => 2]) .'</td>
+		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="right" valign="top"class="main">'. $this->Money->indianNumberFormat($quotationRows->rate,[ 'places' => 2]).'</td>
+		<td style="font-size:'. h(($quotation->pdf_font_size)) .';" style="padding-top:8px;padding-bottom:5px;" align="right" valign="top" class="main">'. $this->Money->indianNumberFormat($quotationRows->amount,[ 'places' => 2]) .'</td>
 	</tr>';
 endforeach;
 
@@ -234,7 +234,7 @@ $html.='
 	<tfoot>
 			<tr>
 				<td colspan="5" style="text-align:right;border-top: 1px solid #000;">Total</td>
-				<td style="text-align:right;border-top: 1px solid #000;" >'. $this->Number->format($quotation->total,[ 'places' => 2]) .'</td>
+				<td style="text-align:right;border-top: 1px solid #000;" >'. $this->Money->indianNumberFormat($quotation->total,[ 'places' => 2]) .'</td>
 			</tr>
 		</tfoot>
 	</table>';

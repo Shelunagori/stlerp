@@ -234,21 +234,21 @@ $html.='
 		$html.='</td>
 		<td align="right" valign="top"  style="padding-top:10px;">'. h($salesOrderRows->item->unit->name) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($salesOrderRows->quantity) .'</td>
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->rate,[ 'places' => 2]) .'</td>
-		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->amount,[ 'places' => 2]) .'</td>';
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->rate) .'</td>
+		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->amount) .'</td>';
 		if($salesOrderRows->discount==0){
 		$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>
 		<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>';
 		}else{
 			$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->discount_per) .'</td>
-		<td align="center" valign="top" style="padding-top:10px;">'. $this->Number->format($salesOrderRows->discount,[ 'places' => 2]) .'</td>';
+		<td align="center" valign="top" style="padding-top:10px;">'. $this->Money->indianNumberFormat($salesOrderRows->discount) .'</td>';
 		}
 		if($salesOrderRows->pnf==0){
 		$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>
 		<td align="center" valign="top" style="padding-top:10px;">'. h($h) .'</td>';
 		}else{
 			$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->pnf_per) .'</td>
-		<td align="center" valign="top" style="padding-top:10px;">'. $this->Number->format($salesOrderRows->pnf,[ 'places' => 2]) .'</td>';
+		<td align="center" valign="top" style="padding-top:10px;">'. $this->Money->indianNumberFormat($salesOrderRows->pnf) .'</td>';
 		}
 		
 		$html.='<td align="center" valign="top" style="padding-top:10px;">'. h($salesOrderRows->taxable_value) .'</td>';
@@ -258,7 +258,7 @@ $html.='
 			{
 				$html.=$cgst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
-			$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->cgst_amount,['places'=>2]) .'</td>';
+			$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->cgst_amount) .'</td>';
 		}
 		
 		if($salesOrderRows->sgst_per > 0){ 
@@ -267,7 +267,7 @@ $html.='
 			{
 				$html.=$sgst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
-		$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->sgst_amount,['places'=>2]) .'</td>';
+		$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->sgst_amount) .'</td>';
 		}
 		
 		if($salesOrderRows->igst_per > 0){ 
@@ -276,10 +276,10 @@ $html.='
 			{
 				$html.=$igst_per[$salesOrderRows->id]['tax_figure'].'%';
 			}
-			$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->igst_amount,['places'=>2]) .'</td>';
+			$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->igst_amount) .'</td>';
 		}
 		
-		$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Number->format($salesOrderRows->total,['places'=>2]) .'</td>
+		$html.='</td><td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($salesOrderRows->total) .'</td>
 	</tr>';
 	
 endforeach;
@@ -293,17 +293,17 @@ $html.='
 		if(!empty($salesOrder->discount)){
 		$html.='<tr>
 					<td style="text-align:right;">'.$discount_text.'</td>
-					<td style="text-align:right;" width="104">'. $this->Number->format($salesOrder->discount,[ 'places' => 2]).'</td>
+					<td style="text-align:right;" width="104">'. $this->Money->indianNumberFormat($salesOrder->discount).'</td>
 				</tr>';
 		}
 		$html.='<tr>
 				<td style="text-align:right;">Total</td>
-				<td style="text-align:right;" width="125">'. $this->Number->format($salesOrder->total,[ 'places' => 2]).'</td>
+				<td style="text-align:right;" width="125">'. $this->Money->indianNumberFormat($salesOrder->total).'</td>
 			</tr>';
 		if(!empty($salesOrder->pnf)){
 		$html.='<tr>
 					<td style="text-align:right;">Total after P&F</td>
-					<td style="text-align:right;" width="104">'. $this->Number->format($salesOrder->total_after_pnf,[ 'places' => 2]).'</td>
+					<td style="text-align:right;" width="104">'. $this->Money->indianNumberFormat($salesOrder->total_after_pnf).'</td>
 				</tr>';
 		}
 			
