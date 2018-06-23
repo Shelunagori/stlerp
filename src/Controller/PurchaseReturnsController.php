@@ -437,8 +437,9 @@ class PurchaseReturnsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
-		$purchase_return_id=@(int)$this->request->query('purchase-return');
+		$purchase_return_id=$this->request->query('purchaseReturn');
 		$purchase_return_id = $this->EncryptingDecrypting->decryptData($purchase_return_id);
+		//pr($purchase_return_id); exit;
 		$purchaseReturn = $this->PurchaseReturns->get($purchase_return_id, ['contain'=>['ReferenceDetails']]);
 		
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
@@ -1091,11 +1092,11 @@ class PurchaseReturnsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
-		 
+		$id = $this->EncryptingDecrypting->decryptData($id); 
 		$purchaseReturn = $this->PurchaseReturns->get($id,[
 		'contain'=>['Vendors','Creator','Companies','PurchaseReturnRows'=>['Items'],'InvoiceBookings'=>['Creator']]
 		]);
-		//pr($purchaseReturn); exit;
+		
 		$purchase_acc='';
 		if($purchaseReturn->purchase_ledger_account > 0){
 			$purchase_acc=$this->PurchaseReturns->LedgerAccounts->get($purchaseReturn->purchase_ledger_account);
