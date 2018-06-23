@@ -28,9 +28,10 @@
 		$url_path="";
 		$data="";
 		$source_model=$itemLedger->source_model;
+		$itemLedger->voucher_info->id = $EncryptingDecrypting->encryptData($itemLedger->voucher_info->id);
 		//pr($source_model);exit;
 		if($party!='Item'){
-			  $itemLedger->voucher_info->id = $EncryptingDecrypting->encryptData($itemLedger->voucher_info->id);
+			  $itemLedger->voucher_info->id = $itemLedger->voucher_info->id;
 		 }
 		if($source_model=='Challan')
 		{	
