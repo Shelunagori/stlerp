@@ -112,7 +112,7 @@ class PurchaseReturnsController extends AppController
     {
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$this->viewBuilder()->layout('index_layout');
 		
         $purchaseReturn = $this->PurchaseReturns->get($id, [
@@ -1124,8 +1124,9 @@ class PurchaseReturnsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
         $purchaseReturn = $this->PurchaseReturns->newEntity();
-		$purchase_return_id=@(int)$this->request->query('purchase-return');
-		
+		$purchase_return_id=$this->request->query('purchaseReturn');
+		$purchase_return_id = $this->EncryptingDecrypting->decryptData($purchase_return_id);
+		//echo $purchase_return_id;exit;
 		$PurchaseReturn= $this->PurchaseReturns->get($purchase_return_id, [
             'contain' => ['PurchaseReturnRows','InvoiceBookings'=>['InvoiceBookingRows'=>['PurchaseReturnRows']]]
         ]);

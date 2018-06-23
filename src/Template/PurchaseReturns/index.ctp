@@ -82,11 +82,12 @@
 								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstView', $purchaseReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
 							
 								//echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'gstEdit?purchaseReturn='.$purchaseReturn->id.],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i> ','/PurchaseReturns/gstEdit?purchaseReturn='.$purchaseReturn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i> ','/PurchaseReturns/gstEdit?purchaseReturn='.$purchaseReturn->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips'));
 							}
 							else{
-								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'View', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
-								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'Edit?purchaseReturn='.$EncryptingDecrypting->encryptData($purchaseReturn->id),],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'View',$purchaseReturn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 	
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',
+								'/PurchaseReturns/Edit?purchaseReturn='.$purchaseReturn->id,array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
 							}		?>
 							
 						</td>

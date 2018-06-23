@@ -126,8 +126,8 @@ margin-bottom: 0;
 			<td><?= $purchase_return_row->item->name; ?></td>
 			<td align="center"><?= $purchase_return_row->quantity; ?></td>
 			
-			<td align="right"><?=  number_format($item_ledger->rate, 2, '.', ',');?></td>
-			<td align="right"><?= number_format($purchase_return_row->quantity*$item_ledger->rate, 2, '.', ',');?></td>
+			<td align="right"><?=  $this->Money->indianNumberFormat($item_ledger->rate);?></td>
+			<td align="right"><?= $this->Money->indianNumberFormat($purchase_return_row->quantity*$item_ledger->rate);?></td>
 		</tr>
 		<?php $total=$total+($purchase_return_row->quantity*$item_ledger->rate); endforeach; endforeach; ?>
 	</tbody>
@@ -152,7 +152,7 @@ margin-bottom: 0;
 			<td colspan="3"></td>
 			<td style="font-size:14px; font-weight:bold;"  align="right"> Total</td>
 			<td style="font-size:14px; font-weight:bold; "  align="right"><?= 
-			number_format($total, 2, '.', ',');
+			$this->Money->indianNumberFormat($total);
 			 ?></td>
 		</tr>
 	</tfoot>
