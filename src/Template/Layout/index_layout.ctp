@@ -230,11 +230,11 @@ select
 			</ul>
 		</div>
 		<!-- BEGIN RESPONSIVE MENU TOGGLER -->
-		<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse">
+		<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse" data-target=".navbar-collapse" >
 		</a>
 		<!-- END RESPONSIVE MENU TOGGLER -->
 		<!-- BEGIN TOP NAVIGATION MENU -->
-		<div class="top-menu">
+		<div class="top-menu" >
 			<ul class="nav navbar-nav pull-right">
 				<!-- BEGIN NOTIFICATION DROPDOWN -->
 				<!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
@@ -298,6 +298,7 @@ select
 			<!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
 			<!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
 			<!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+			
 			<ul class="page-sidebar-menu" data-keep-expanded="false" data-auto-scroll="false" data-slide-speed="200">
 				<!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
 				
@@ -716,7 +717,7 @@ select
 					</ul>
 				</li>
 				<?php } ?>
-				<?php if(in_array(141,$allowed_pages)|| in_array(128,$allowed_pages) ||in_array(36,$allowed_pages) || in_array(37,$allowed_pages) || in_array(38,$allowed_pages) || in_array(41,$allowed_pages) || in_array(39,$allowed_pages) || in_array(40,$allowed_pages) || in_array(126,$allowed_pages) || in_array(162,$allowed_pages) || in_array(164,$allowed_pages)|| in_array(163,$allowed_pages)|| in_array(175,$allowed_pages)){ ?>
+				<?php if(in_array(142,$allowed_pages)|| in_array(128,$allowed_pages) ||in_array(36,$allowed_pages) || in_array(37,$allowed_pages) || in_array(38,$allowed_pages) || in_array(41,$allowed_pages) || in_array(39,$allowed_pages) || in_array(40,$allowed_pages) || in_array(126,$allowed_pages) || in_array(162,$allowed_pages) || in_array(164,$allowed_pages)|| in_array(163,$allowed_pages)|| in_array(175,$allowed_pages) || in_array(178,$allowed_pages)|| in_array(179,$allowed_pages)|| in_array(180,$allowed_pages)|| in_array(181,$allowed_pages) ||in_array(182,$allowed_pages) || in_array(176,$allowed_pages) || in_array(183,$allowed_pages)){ ?>
 				<li>
 					<a href="javascript:;">
 					<i class="fa fa-bar-chart-o"></i>
@@ -724,7 +725,7 @@ select
 					<span class="arrow "></span>
 					</a>
 					<ul class="sub-menu">
-						<?php if(in_array(141,$allowed_pages)|| in_array(163,$allowed_pages)){ ?>
+						<?php if(in_array(142,$allowed_pages)|| in_array(178,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -732,15 +733,16 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<!--<?php echo '<li>'.$this->Html->link( 'Overdue Report for Customers', '/Customers/Breakup-Range-Overdue?request=customer' ).'</li>';?>
-								<?php echo '<li>'.$this->Html->link( 'Overdue Report for Supplier', '/Customers/Breakup-Range-Overdue?request=vendor' ).'</li>';?>
-								<hr/>-->
-								<?php echo '<li>'.$this->Html->link( 'Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>'; ?>
+								<?php if(in_array(142,$allowed_pages)){
+									echo '<li>'.$this->Html->link( 'Customers', '/Customers/Breakup-Range-Overdue-New?request=customer' ).'</li>'; 
+								} ?>
+								<?php if(in_array(178,$allowed_pages)){
+									echo '<li>'.$this->Html->link( 'Vendors', '/Customers/Breakup-Range-Overdue-New?request=vendor' ).'</li>';
+								} ?>
 							</ul>
 						</li>
 						<?php } ?>
-						<?php if(in_array(128,$allowed_pages)){ ?>
+						<?php if(in_array(128,$allowed_pages) || in_array(179,$allowed_pages)|| in_array(180,$allowed_pages)|| in_array(181,$allowed_pages)){ ?>
 						
 						<li>
 							<a href="javascript:;">
@@ -749,34 +751,53 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
+								<?php if(in_array(128,$allowed_pages)){ ?>
 									<li><?php $today =date('d-m-Y'); $firstday =date('01-m-Y');
-										echo $this->Html->link('Non GST Sales Report',array('controller'=>'Invoices','action'=>'salesReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?>
+									
+										echo $this->Html->link('Non GST Sales Report',array('controller'=>'Invoices','action'=>'salesReport','From'=>$today,'To'=>$today),array('escape'=>false));
+									 ?>
 									</li>
+								<?php } 
+									if(in_array(179,$allowed_pages)){
+								?>	
 									<li><?php $today =date('d-m-Y');
-										echo $this->Html->link('GST Sales Report',array('controller'=>'Invoices','action'=>'gstSalesReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); ?>
+										echo $this->Html->link('GST Sales Report',array('controller'=>'Invoices','action'=>'gstSalesReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); 
+									 ?>
 									</li>
+								<?php }  
+								if(in_array(180,$allowed_pages)){
+								?>	
 									<li><?php $today =date('d-m-Y');
-										echo $this->Html->link('GST Sales Man Report',array('controller'=>'Invoices','action'=>'salesManReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); ?>
+									
+										echo $this->Html->link('GST Sales Man Report',array('controller'=>'Invoices','action'=>'salesManReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); 
+										?>
 									</li>
+								<?php }
+								if(in_array(181,$allowed_pages)){
+								?>	
 									<li><?php $today =date('d-m-Y');
-										echo $this->Html->link('Sales Report Segment Wise',array('controller'=>'Invoices','action'=>'newSalesReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); ?>
+									
+										echo $this->Html->link('Sales Report Segment Wise',array('controller'=>'Invoices','action'=>'newSalesReport','From'=>$firstday,'To'=>$today),array('escape'=>false)); 
+									 ?>
 									</li>
+								<?php } ?>	
 							</ul>
 						</li>
-					<?php if(in_array(163,$allowed_pages)){ ?>	
+						<?php } 
+						if(in_array(182,$allowed_pages)){ ?>	
 						<li>
 							<?php $today =date('d-m-Y');
 							echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Purchase Report',array('controller'=>'InvoiceBookings','action'=>'purchaseBookingReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?>
 						</li>
-					
+					<?php }
+					if(in_array(163,$allowed_pages)){
+					?>
 						<li>
 					
 						<?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Inventory Daily Report',array('controller'=>'ItemLedgers','action'=>'inventoryDailyReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
-						<?php }} ?>
+						<?php } ?>
 						<?php if(in_array(36,$allowed_pages)){?>
-						
-						
 						<li><?php echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Stock Report',array('controller'=>'ItemLedgers','action'=>'stockSummery','stock'=>'Positive','to_date'=>@$today),array('escape'=>false)); ?></li>	
 						
 						<?php } ?>
@@ -800,7 +821,9 @@ select
 						<?php if(in_array(175,$allowed_pages)){?>
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> HSN Wise Sale',array('controller'=>'Invoices','action'=>'HsnWiseReport','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
-						
+						<?php }
+						if(in_array(176,$allowed_pages)){
+						?>
 						<li><?php $today =date('d-m-Y');
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Invoice Wise HSN Details',array('controller'=>'Invoices','action'=>'InvoiceHsnWise','From'=>$today,'To'=>$today),array('escape'=>false)); ?></li>
 						<?php } ?>
@@ -811,7 +834,7 @@ select
 						<?php if(in_array(40,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Account Statement','/Ledgers/Account-Statement',array('escape'=>false)); ?></li>	
 						<?php } ?>
-						<?php if(in_array(40,$allowed_pages)){?>
+						<?php if(in_array(183,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Account Statement Ref.','/Ledgers/AccountStatementRefrence',array('escape'=>false)); ?></li>	
 						<?php } ?>
 						<?php if(in_array(164,$allowed_pages)){ echo '<li>'.$this->Html->link( '<i class="fa fa-users"></i>User Logs Report', '/UserLogs/',array('escape'=>false) ).'</li>';}?>
@@ -898,7 +921,7 @@ select
 					</ul>-->
 				</li>
 				<?php } ?>
-				<?php if($s_employee_id==16 || $s_employee_id==23 || $s_employee_id==14 || 1==1){?>
+				<?php if(in_array(184,$allowed_pages)|| in_array(185,$allowed_pages)|| in_array(188,$allowed_pages)|| in_array(191,$allowed_pages)|| in_array(192,$allowed_pages)|| in_array(197,$allowed_pages)|| in_array(216,$allowed_pages)|| in_array(217,$allowed_pages)|| in_array(202,$allowed_pages)|| in_array(205,$allowed_pages)|| in_array(211,$allowed_pages)|| in_array(212,$allowed_pages)|| in_array(213,$allowed_pages)|| in_array(214,$allowed_pages)|| in_array(215,$allowed_pages)){?>
 				
 				<li>
 					<a href="javascript:;">
@@ -911,7 +934,7 @@ select
 						
 						<ul class="page-sidebar-menu page-sidebar-menu-hover-submenu" data-keep-expanded="false" data-auto-scroll="true" data-slide-speed="200">
 						
-						
+				<?php if(in_array(184,$allowed_pages) || in_array(185,$allowed_pages)){ ?>
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -919,10 +942,17 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/LeaveApplications/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/LeaveApplications' ).'</li>'; ?>
+							<?php if(in_array(184,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'Add', '/LeaveApplications/add' ).'</li>'; 
+							} 
+							if(in_array(185,$allowed_pages)){	
+							?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/LeaveApplications' ).'</li>'; 
+							} ?>
 							</ul>
 						</li>
+				<?php } ?>	
+				<?php if(in_array(188,$allowed_pages) || in_array(191,$allowed_pages)){ ?>		
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -930,10 +960,16 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
+							<?php if(in_array(188,$allowed_pages)){ ?>
 								<?php echo '<li>'.$this->Html->link( 'Add', '/TravelRequests/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/TravelRequests' ).'</li>'; ?>
+							<?php } ?>
+							<?php if(in_array(191,$allowed_pages)){ ?>	
+								<?php echo '<li>'.$this->Html->link( 'View', '/TravelRequests' ).'</li>'; 
+							}	?>
 							</ul>
 						</li>
+				<?php } ?>
+				<?php if(in_array(192,$allowed_pages) || in_array(197,$allowed_pages)){ ?>					
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -941,10 +977,17 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/LoanApplications/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/LoanApplications' ).'</li>'; ?>
+							<?php if(in_array(192,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'Add', '/LoanApplications/add' ).'</li>'; 
+							}	?>
+							<?php if(in_array(197,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/LoanApplications' ).'</li>'; 
+							} ?>
 							</ul>
 						</li>
+				<?php } 
+				if(in_array(202,$allowed_pages) || in_array(205,$allowed_pages)){ ?>					
+		
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
@@ -952,32 +995,52 @@ select
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Add', '/SalaryAdvances/add' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'View', '/SalaryAdvances' ).'</li>'; ?>
+						<?php if(in_array(202,$allowed_pages)){ ?>	
+								<?php echo '<li>'.$this->Html->link( 'Add', '/SalaryAdvances/add' ).'</li>'; 
+						}	?>
+						<?php if(in_array(205,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'View', '/SalaryAdvances' ).'</li>'; 
+						}	?>
 							</ul>
 						</li>
-						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Salary Divisions','/EmployeeSalaryDivisions/',array('escape'=>false)).'</li>'; ?>
+				<?php }
+				if(in_array(211,$allowed_pages) || in_array(212,$allowed_pages)){ ?>	
+						<?php if(in_array(211,$allowed_pages)){ ?>				
+	
+						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Salary Divisions','/EmployeeSalaryDivisions/',array('escape'=>false)).'</li>'; 
+						}	?>
+						<?php if(in_array(212,$allowed_pages)){ ?>
 						<?php 
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i> Employee Attendence','/EmployeeAttendances/add',array('escape'=>false)).'</li>';
-						?>
-
+						} ?>
+				<?php }
+				if(in_array(213,$allowed_pages) || in_array(214,$allowed_pages)|| in_array(215,$allowed_pages)){ ?>	
 						<li>
 							<a href="javascript:;">
 							<i class="fa fa-file-code-o"></i>
-							<span class="title">Employee Sallary</span>
+							<span class="title">Employee Salary</span>
 							<span class="arrow "></span>
 							</a>
 							<ul class="sub-menu">
-								<?php echo '<li>'.$this->Html->link( 'Generate Salary Sheet', '/EmployeeSalaries/paidSallary' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Print Salary Sheet', '/EmployeeSalaries/printSallary' ).'</li>'; ?>
-								<?php echo '<li>'.$this->Html->link( 'Employees For Salary', '/Employees/listForSalary' ).'</li>'; ?>
+							<?php if(in_array(213,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'Generate Salary Sheet', '/EmployeeSalaries/paidSallary' ).'</li>'; 
+							}	?>
+							<?php if(in_array(214,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'Print Salary Sheet', '/EmployeeSalaries/printSallary' ).'</li>'; 
+							} ?>
+							<?php if(in_array(215,$allowed_pages)){ ?>
+								<?php echo '<li>'.$this->Html->link( 'Employees For Salary', '/Employees/listForSalary' ).'</li>'; 
+							}	?>
 						</li>
-						
+				<?php } ?>			
 						</ul>
+					<?php if(in_array(216,$allowed_pages)){ ?>
 						<?php 
 						echo '<li>'.$this->Html->link('<i class="icon-home"></i>Pay Slips','/Salaries/paySlip',array('escape'=>false)).'</li>';
-						?>
-						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Leave Sheet','/LeaveApplications/leaveStatus',array('escape'=>false)).'</li>'; ?>
+					} ?>
+					<?php if(in_array(217,$allowed_pages)){ ?>
+						<?php echo '<li>'.$this->Html->link('<i class="icon-home"></i>Leave Sheet','/LeaveApplications/leaveStatus',array('escape'=>false)).'</li>'; 
+					} ?>
 					</ul>
 				</li>
 				<?php } ?>

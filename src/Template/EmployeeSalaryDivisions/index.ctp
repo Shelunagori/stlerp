@@ -8,6 +8,7 @@
 	<div class="portlet-body form">
 		<!-- BEGIN FORM-->
 		<div class="row ">
+		<?php if(in_array(208,$allowed_pages)){ ?>
 		<div class="col-md-6">
 		 <?= $this->Form->create($employeeSalaryDivision,array("class"=>"form-horizontal","id"=>"form_sample_3")) ?>
 			<div class="form-body">
@@ -78,6 +79,7 @@
 			</div>
 		<?= $this->Form->end() ?>
 		</div>
+		<?php } ?>
 		<div class="col-md-6">
 			<div class="portlet-body">
 			<div class="table-scrollable">
@@ -108,7 +110,13 @@
 							<td><?= h(@$employeeSalaryDivision->ledger_account->name) ?></td>
 							<td><?= h($employeeSalaryDivision->cr_dr) ?></td>
 							<td class="actions">
-							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $employeeSalaryDivision->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
+							<?php 
+							
+							if(in_array(209,$allowed_pages)){
+							echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $employeeSalaryDivision->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); 
+							} 
+							if(in_array(210,$allowed_pages)){
+							?>
 							<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $employeeSalaryDivision->id], 
 								[
@@ -119,7 +127,7 @@
 								]
 							) ?>
 							
-							
+							<?php } ?>
 						</td>			
 							
 						</tr>

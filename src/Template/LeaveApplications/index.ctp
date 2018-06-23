@@ -61,8 +61,12 @@
 							<td><?= h($leaveApplication->day_no) ?></td>
 							<td><?= $leaveApplication->leave_status=='cancle'?'Canceled':ucwords($leaveApplication->leave_status) ?></td>
 							<td class="actions">
-								<?php if($leaveApplication->leave_status=="Pending"){?>
-									<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $leaveApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
+								<?php if($leaveApplication->leave_status=="Pending"){
+									if(in_array(198,$allowed_pages)){ ?>
+									<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $leaveApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); 
+									} 
+									if(in_array(199,$allowed_pages)){ ?>
+									
 									<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 										['action' => 'delete', $leaveApplication->id], 
 										[
@@ -71,15 +75,22 @@
 											'confirm' => __('Are you sure ?', $leaveApplication->id)
 										]
 									) ?>
+									<?php } ?>
 								<?php } ?>
-								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $leaveApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
+								<?php 
+								if(in_array(187,$allowed_pages)){
+									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $leaveApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+								}	?>
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
 									if($leaveApplication->leave_status=="approved"){
-										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+										if(in_array(186,$allowed_pages)){
+											echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
 									}
-									
+								}	
 									if($leaveApplication->leave_status=="cancle"){
-										echo $this->Html->link('<i class="fa fa-undo"></i>',['action' => 'markPending', $leaveApplication->id],['escape'=>false,'class'=>'btn btn-xs purple tooltips','data-original-title'=>'Mark as pending ']);
+										if(in_array(199,$allowed_pages)){
+											echo $this->Html->link('<i class="fa fa-undo"></i>',['action' => 'markPending', $leaveApplication->id],['escape'=>false,'class'=>'btn btn-xs purple tooltips','data-original-title'=>'Mark as pending ']);
+										}
 									}
 								} ?>
 							</td>

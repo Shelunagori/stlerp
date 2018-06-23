@@ -313,7 +313,7 @@ class UserRightsController extends AppController
 						])
 						->execute();
 			}
-			if($user_rights[141]['page_id']>0){
+			/* if($user_rights[141]['page_id']>0){
 				$query = $this->UserRights->query();
 					$query->insert(['login_id', 'page_id'])
 						->values([
@@ -321,7 +321,7 @@ class UserRightsController extends AppController
 							'page_id' => 142
 						])
 						->execute();
-			}
+			} */
 			
 			if($user_rights[137]['page_id']>0){
 				$query = $this->UserRights->query();

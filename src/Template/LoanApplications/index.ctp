@@ -79,7 +79,13 @@
 							<td><?= h(@$loanApplication->installment_start_month.'-'.$loanApplication->installment_start_year) ?></td>
 							<td class="actions">
 							<?php if($loanApplication->status!="approved"){ ?>
-								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $loanApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
+								<?php 
+								if(in_array(195,$allowed_pages)){
+								
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $loanApplication->id],array('escape'=>false,'class'=>'btn btn-xs blue')); 
+								} 
+								if(in_array(196,$allowed_pages)){
+								?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $loanApplication->id], 
 								[
@@ -88,12 +94,18 @@
 									'confirm' => __('Are you sure ?', $loanApplication->id)
 								]
 							) ?>
-							<?php } ?>
-							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $loanApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
+							<?php }} 
+							if(in_array(194,$allowed_pages)){
+							?>
+							
+							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $loanApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
+							} ?>
 							
 							<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
 								if($loanApplication->status=="approved"){
-									echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLoan', $loanApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									if(in_array(193,$allowed_pages)){
+										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLoan', $loanApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									}
 								}
 							} ?>
 							</td>

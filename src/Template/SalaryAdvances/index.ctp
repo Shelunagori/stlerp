@@ -39,7 +39,12 @@
 							<td><?= h($salaryAdvance->reason) ?></td>
 							<td class="actions">
 								<?php if($salaryAdvance->status=="Pending"){?>
-								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salaryAdvance->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
+								<?php 
+								if(in_array(203,$allowed_pages)){
+								echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $salaryAdvance->id],array('escape'=>false,'class'=>'btn btn-xs blue')); 
+								} 
+								if(in_array(207,$allowed_pages)){
+								?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $salaryAdvance->id], 
 								[
@@ -48,11 +53,16 @@
 									'confirm' => __('Are you sure ?', $salaryAdvance->id)
 								]
 							) ?>
-								<?php } ?>
-								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $salaryAdvance->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
+								<?php }}
+								if(in_array(204,$allowed_pages)){
+								?>
+									<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $salaryAdvance->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  
+								} ?>
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
 									if($salaryAdvance->status=="approve"){
+										 if(in_array(206,$allowed_pages)){
 										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approve', $salaryAdvance->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+										 }
 									}
 								} ?>
 							</td>

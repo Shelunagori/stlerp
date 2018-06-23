@@ -64,7 +64,12 @@
 							<td><?= h($travelRequest->status) ?></td>
 							<td class="actions" >
 								<?php if($travelRequest->status=="Pending"){?>
-								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $travelRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
+								<?php 
+								if(in_array(200,$allowed_pages)){
+									echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $travelRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue'));
+								}	
+								if(in_array(201,$allowed_pages)){
+								?>
 								<?= $this->Form->postLink('<i class="fa fa-trash"></i> ',
 								['action' => 'delete', $travelRequest->id], 
 								[
@@ -72,12 +77,18 @@
 									'class' => 'btn btn-xs btn-danger',
 									'confirm' => __('Are you sure ?', $travelRequest->id)
 								]
-							) ?>
-								<?php } ?>
-							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $travelRequest->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>
+							) 
+								
+							?>
+								<?php }} ?>
+							<?php 
+							if(in_array(190,$allowed_pages)){
+								echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $travelRequest->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); } ?>
 							<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
 								if($travelRequest->status=='approve'){
-									echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approve', $travelRequest->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									if(in_array(189,$allowed_pages)){
+										echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approve', $travelRequest->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
+									}	
 								}
 							} ?>
 							</td>
