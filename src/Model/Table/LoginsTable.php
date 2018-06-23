@@ -26,6 +26,8 @@ class LoginsTable extends Table
 		$this->belongsTo('TravelRequests');
 		$this->belongsTo('LoanApplications');
 		$this->belongsTo('Grns');
+		$this->belongsTo('FinancialYears');
+		$this->belongsTo('FinancialMonths');
 		
     }
 	

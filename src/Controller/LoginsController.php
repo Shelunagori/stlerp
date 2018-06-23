@@ -325,24 +325,33 @@ class LoginsController extends AppController
 	}
 	public function dashbord()
     {
-       $this->viewBuilder()->layout('index_layout');
-	   $session = $this->request->session();
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$employee_id=$this->viewVars['s_employee_id'];
-	   $quotations = $this->Logins->Quotations->find()->contain(['QuotationRows'=>['Items']])->where(['company_id'=>$st_company_id,'status'=>'Pending','Quotations.revision '=> 0])->order(['Quotations.id' => 'DESC']);
-	  // pr($quotations->toArray()); exit;
-	   $quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
-	   $pending_quotation=$quotations->ct;
+		$quotations = $this->Logins->Quotations->find()->contain(['QuotationRows'=>['Items']])->where(['company_id'=>$st_company_id,'status'=>'Pending','Quotations.revision '=> 0])->order(['Quotations.id' => 'DESC']);
+		// pr($quotations->toArray()); exit;
+		$quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
+		$pending_quotation=$quotations->ct;
 	   
-		$first_day_this_month = date('Y-m-d',strtotime(date('01-m-Y'))); 
-		$last_day_this_month  = date('t-m-Y');
-		$last_day_this_month = date('Y-m-d',strtotime($last_day_this_month)); 
+		$st_year_id = $session->read('st_year_id');
+		$financial_year = $this->Logins->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_month_first = $this->Logins->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
+		$financial_month_last = $this->Logins->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
+	    $first="01";
+		$last="31";
+		$start_date=$first.'-'.$financial_month_first->month;
+		$end_date=$last.'-'.$financial_month_last->month;
+	  // pr($start_date);  pr($end_date); exit;
+		$first_day_this_month = date('Y-m-d',strtotime($start_date)); 
+		//$last_day_this_month  = date('t-m-Y');
+		$last_day_this_month = date('Y-m-d',strtotime($end_date)); 
 		
 		$query=$this->Logins->Invoices->find();
-		$query->select(['sum' => $query->func()->sum('Invoices.grand_total')])
+		$query->select(['sum' => $query->func()->sum('Invoices.total_after_pnf')])
 			->where(['date_created >='=>$first_day_this_month,'date_created <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray(); 
 		 $monthelySaleForInvoice=$query->first()->sum;
-		 
+		 pr($monthelySaleForInvoice); exit;
 		$query=$this->Logins->SalesOrders->find();
 		$query->select(['sum' => $query->func()->sum('SalesOrders.total')])
 			->where(['created_on >='=>$first_day_this_month,'created_on <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray();
