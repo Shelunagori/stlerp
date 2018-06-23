@@ -351,7 +351,7 @@ class LoginsController extends AppController
 		$query->select(['sum' => $query->func()->sum('Invoices.total_after_pnf')])
 			->where(['date_created >='=>$first_day_this_month,'date_created <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray(); 
 		 $monthelySaleForInvoice=$query->first()->sum;
-		 pr($monthelySaleForInvoice); exit;
+		// pr($monthelySaleForInvoice); exit;
 		$query=$this->Logins->SalesOrders->find();
 		$query->select(['sum' => $query->func()->sum('SalesOrders.total')])
 			->where(['created_on >='=>$first_day_this_month,'created_on <='=>$last_day_this_month,'company_id'=>$st_company_id])->toArray();
