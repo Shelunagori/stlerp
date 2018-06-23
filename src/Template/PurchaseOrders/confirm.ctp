@@ -6,7 +6,7 @@ $id = $EncryptingDecrypting->encryptData($id);
 ?>
 <table width="100%">
 	<tr>
-		<td valign="top" style="background: #FFF;">
+		<td valign="top" style="background: #FFF; width: 272px; overflow:auto;">
 		<div class="list-group">
 			<a href="<?php echo $list_url; ?>" class="list-group-item"><i class="fa fa-chevron-left"></i> Back to PurchaseOrders </a>
 			<?php if(in_array(14,$allowed_pages)){  ?>
@@ -30,7 +30,7 @@ $id = $EncryptingDecrypting->encryptData($id);
 		
 		<?= $this->Form->end() ?>
 		</div>
-		<div style="padding:5px;">
+		<div style="padding:5px; height:220px;">
 			<h4>Adjust height of rows</h4>
 			<?= $this->Form->create($purchaseOrder) ?>
 				<?php $sr=0; foreach ($purchaseOrder->purchase_order_rows as $purchaseOrderRows): $sr++;
@@ -41,7 +41,7 @@ $id = $EncryptingDecrypting->encryptData($id);
 			<?= $this->Form->end() ?>
 		</div>
 		</td>
-		<td width="80%">
+		<td width="80%" style="vertical-align: middle;">
 			<object data="<?php echo $pdf_url.'/'.$id; ?>" type="application/pdf" width="100%" height="613px">
 			  <p>Wait a while, PDf is loading...</p>
 			</object>
