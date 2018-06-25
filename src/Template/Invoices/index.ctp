@@ -93,15 +93,17 @@
 							<?php if($invoice->sales_order_id != 0){ ?>
 							<td>
 							
-							<?php if(in_array($invoice->sales_order->created_by,$allowed_emp)){
+							<?php if(in_array($invoice->customer->employee_id,$allowed_emp)){
 							$sales_order_id = $EncryptingDecrypting->encryptData($invoice->sales_order->id);	
 							if($invoice->sales_order->gst == 'yes'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'gstConfirm',$sales_order_id],array('target'=>'_blank')); 
-							}else{
+							}else if($invoice->sales_order->gst == 'no'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'confirm',$sales_order_id],array('target'=>'_blank')); 
-							} }?>
+							} }else{
+								 echo $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4; 
+							}?>
 							</td>
 							<?php }else{?>
 							<td></td><?php } ?>
@@ -123,7 +125,7 @@
 							<td align="right"><?= h($this->Money->indianNumberFormat($invoice->total_after_pnf)) ?></td>
 							<td class="actions">
 							<?php
-							if(in_array($invoice->created_by,$allowed_emp)){
+							if(in_array($invoice->customer->employee_id,$allowed_emp)){
 								if($invoice->invoice_type=='GST'){ ?>
 									<?php 
 									if(in_array(27,$allowed_pages)){

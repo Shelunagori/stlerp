@@ -204,14 +204,14 @@ if(!empty($status)){
 							<?php if($status=='Converted into Sales Order' && in_array(21,$allowed_pages)){?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
 							} ?>
-							<?php //if(in_array($quotation->created_by,$allowed_emp)){ ?>
+							<?php if(in_array($quotation->customer->employee_id,$allowed_emp)){ ?>
 							
 							<?php if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date && date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  { ?>
 								<?php if($quotation->status=='Pending' and $gst_pull_request!="true" and in_array(2,$allowed_pages) and $pull_request!="true" && $copy_request!="copy"){ ?>
 								<?php if(in_array(21,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								
-							<?php } ?>	
+								<?php }} ?>	
 							<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $quotation_id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
 								<?php
 								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id)
@@ -251,13 +251,13 @@ if(!empty($status)){
 									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Sales Order','/Sales-Orders/Add?quotation='.$quotation->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 									
 								} ?>
-								<?php //if(in_array($quotation->created_by,$allowed_emp)){ ?>
+								<?php if(in_array($quotation->customer->employee_id,$allowed_emp)){ ?>
 								<?php 
 								if(in_array(30,$allowed_pages)){
 								if($quotation->status=='Pending' && $copy_request!="copy" && $pull_request!="true" && $gst_pull_request!="true" && $st_year_id==$quotation->financial_year_id){
 								echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Close','role'=>'button','quote_id'=>$quotation_id));
 								
-								} }?>
+								} } } ?>
 								
 								
 								<?php if($copy_request=="copy"){

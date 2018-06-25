@@ -140,9 +140,10 @@
 							 //if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
 						?>
 						
-						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
+						<tr <?php 
+							if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
 							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
-							
+							//if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
 						?> > 
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
@@ -216,7 +217,7 @@
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 						<td class="actions" width="20%">
-						<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $salesOrder->id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
+						
 							<?php if(in_array(22,$allowed_pages)){
 								$sid = $salesOrder->id;
 								$salesOrder->id = $EncryptingDecrypting->encryptData($salesOrder->id);
@@ -250,7 +251,11 @@
 											echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'gstConfirm', $salesOrder->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
 										}
 									}
-								} }
+								} ?>
+								<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $salesOrder->id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
+								
+								
+								<?php }
 								
 								?>
 								
