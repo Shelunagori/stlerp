@@ -83,7 +83,7 @@ class InvoiceBookingsController extends AppController
 			
 			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}else{ 
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}
 		//pr($invoiceBookings);exit;
         $this->set(compact('invoiceBookings','status','purchase_return'));
@@ -533,7 +533,7 @@ class InvoiceBookingsController extends AppController
 			
 			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}else{ 
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}
 		
 			

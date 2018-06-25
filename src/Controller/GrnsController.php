@@ -74,6 +74,8 @@ class GrnsController extends AppController
 		//$tdate=date('d-m-Y',strtotime($financial_year->date_to)); 
 		if($grn_pull_request=="true"){
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
+		}if($status=="Invoice-Booked"){
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->where($wheree)->order(['Grns.id' => 'DESC']);
 		}else{ 
 			
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
@@ -211,6 +213,8 @@ class GrnsController extends AppController
 		
 		if($grn_pull_request=="true"){
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);
+		}if($status=="Invoice-Booked"){
+			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id,'Grns.financial_year_id'=>$st_year_id])->where($wheree)->order(['Grns.id' => 'DESC']);
 		}else{ 
 			
 			$grns = $this->Grns->find()->contain(['PurchaseOrders', 'Companies','Vendors'])->where($where)->where($where1)->where(['Grns.company_id'=>$st_company_id])->where($wheree)->order(['Grns.id' => 'DESC']);

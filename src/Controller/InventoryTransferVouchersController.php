@@ -63,7 +63,7 @@ class InventoryTransferVouchersController extends AppController
 			}else{
 				$wheree=[];
 			}
-		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies','Customers','Vendors'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
+		$inventory_transfer_vouchs = $this->InventoryTransferVouchers->find()->contain(['Companies','Customers','Vendors'])->where($where)->where(['InventoryTransferVouchers.company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC']);
 		
 		$customers = $this->InventoryTransferVouchers->Customers->find('all')->order(['Customers.customer_name' => 'ASC'])->contain(['CustomerAddress'=>function($q){
 			return $q
@@ -273,7 +273,7 @@ class InventoryTransferVouchersController extends AppController
 			}else{
 				$wheree=[];
 			}
-		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies','Customers','Vendors']);
+		$inventory_transfer_vouchs =$this->InventoryTransferVouchers->find()->where($where)->where(['company_id'=>$st_company_id,'InventoryTransferVouchers.financial_year_id'=>$st_year_id])->where($wheree)->order(['InventoryTransferVouchers.voucher_no' => 'DESC'])->contain(['Companies','Customers','Vendors']);
 		//pr($inventory_transfer_vouchs->toArray());exit;
 		
 

@@ -106,12 +106,12 @@ class JobCardsController extends AppController
 						}
 					)
 				->where($wheree)	
-				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])
+				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending','JobCards.financial_year_id'=>$st_year_id]])
 				->order(['JobCards.jc2' => 'DESC'])	
 				;
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
@@ -119,7 +119,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
 			}
 		} 
 		
@@ -262,12 +262,12 @@ class JobCardsController extends AppController
 						}
 					)
 				->where($wheree)	
-				->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])
+				->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])
 				->order(['JobCards.jc2' => 'DESC'])	
 				;
 			}else if(!empty($customer_id)){
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC'])
 				->matching(
 						'SalesOrders.Customers', function ($q) use($customer_id) {
 							return $q->where(['Customers.id' =>$customer_id]);
@@ -275,7 +275,7 @@ class JobCardsController extends AppController
 				);
 			}else{ 
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
 			}
 		} 
 		
