@@ -106,17 +106,17 @@ class QuotationsController extends AppController
 		$styear=[1,3,2];
 		if(in_array($st_year_id,$styear)){ 
 			if(sizeof($max_ids)>0){ 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups',	'QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups',	'QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 				
 			}else{  
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']); 
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']); 
 			}
 		}else{
 			if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids ])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids ])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 					
 			}else{  
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 			}
 		}
 		
@@ -143,7 +143,7 @@ class QuotationsController extends AppController
 				
 				$quotations=$this->paginate($this->Quotations->find()
 				->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])
-				->where($wherre)
+				
 				->matching(
 						'QuotationRows.Items', function ($q) use($items,$st_company_id,$where1) {
 							return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id){
@@ -155,13 +155,13 @@ class QuotationsController extends AppController
 					//pr($quotations->toArray());exit;
 			}else if($gst_pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 			}else{   
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->where($wherre)->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->where($wherre)->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			
 											
@@ -171,7 +171,7 @@ class QuotationsController extends AppController
 				
 				$quotations=$this->paginate($this->Quotations->find()
 				->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])
-				->where($wherre)
+				
 				->matching(
 						'QuotationRows.Items', function ($q) use($items,$st_company_id,$where1) {
 							return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id){
@@ -183,28 +183,28 @@ class QuotationsController extends AppController
 					//pr($quotations->toArray());exit;
 			}else if($gst_pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
 			}else{   
 			if($status=='Converted into Sales Order'){
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}else if($status=='Closed'){
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where($wherre)->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}else{
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}
 											
@@ -377,10 +377,10 @@ class QuotationsController extends AppController
 		} 
 		
 		if(sizeof($max_ids)>0){
-			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
 				
 		}else{  
-			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+			$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 		}
 		 
 		/* if(sizeof($max_ids)>0){ echo"hello";
@@ -412,7 +412,7 @@ class QuotationsController extends AppController
 				
 				$quotations=$this->paginate($this->Quotations->find()
 				->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])
-				->where($wherre)
+				
 				->matching(
 						'QuotationRows.Items', function ($q) use($items,$st_company_id,$where1) {
 							return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id){
@@ -424,13 +424,13 @@ class QuotationsController extends AppController
 					//pr($quotations->toArray());exit;
 			}else if($gst_pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 			}else{   
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			
 											
@@ -440,7 +440,7 @@ class QuotationsController extends AppController
 				
 				$quotations=$this->paginate($this->Quotations->find()
 				->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])
-				->where($wherre)
+				
 				->matching(
 						'QuotationRows.Items', function ($q) use($items,$st_company_id,$where1) {
 							return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id){
@@ -452,28 +452,28 @@ class QuotationsController extends AppController
 					//pr($quotations->toArray());exit;
 			}else if($gst_pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
-				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
+				$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['Quotations.company_id'=>$st_company_id,'Quotations.created_on <='=>$tdate])->order(['Quotations.id' => 'DESC']);
 			}else{   
 			if($status=='Converted into Sales Order'){
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($wherre)->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}else if($status=='Closed'){
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where($wherre)->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}else{
 				if(sizeof($max_ids)>0){
-					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
+					$quotations = $this->Quotations->find()->contain(['Customers','Employees','ItemGroups','QuotationRows'=>['Items']])->where($where)->where(['Quotations.id IN' =>$max_ids])->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']);
 						
 				}else{  
-					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where($wherre)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
+					$quotations = $this->Quotations->find()->contain(['QuotationRows'=>['Items']])->where($where)->where(['company_id'=>$st_company_id])->order(['Quotations.id' => 'DESC']); 
 				}
 			}
 											
@@ -721,12 +721,12 @@ class QuotationsController extends AppController
 				);
 		//$employees = $this->Quotations->Employees->find('list', ['limit' => 200])->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC']);
 		
-		/* $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+		 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
 						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
 					}
-				); */
-		$EMP_ID =[23,16,17];
+				); 
+		/* $EMP_ID =[23,16,17];
 		if(in_array($s_employee_id,$EMP_ID)){
 			 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -739,7 +739,7 @@ class QuotationsController extends AppController
 						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
 					}
 				)->where(['Employees.id'=>$s_employee_id]);
-		}		
+		}	 */	
 		$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		
 		$items = $this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->matching(
@@ -847,13 +847,13 @@ class QuotationsController extends AppController
 							return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
 						}
 					);
-			/* $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+			 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 						'EmployeeCompanies', function ($q) use($st_company_id) {
 							return $q->where(['EmployeeCompanies.company_id' => $st_company_id]);
 						}
-					); */
+					); 
 					
-			$EMP_ID =[23,16,17];
+			/* $EMP_ID =[23,16,17];
 		if(in_array($s_employee_id,$EMP_ID)){
 			 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -866,7 +866,7 @@ class QuotationsController extends AppController
 						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
 					}
 				)->where(['Employees.id'=>$s_employee_id]);
-		}			
+		}	 */		
 			$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 			
 			$Items = $this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->matching(

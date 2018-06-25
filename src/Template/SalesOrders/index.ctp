@@ -137,6 +137,7 @@
 								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
 							}
 							@$salesOrder->quotation->id = $EncryptingDecrypting->encryptData(@$salesOrder->quotation->id);
+							 //if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
@@ -168,7 +169,7 @@
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">
-							<?php if(in_array($salesOrder->created_by,$allowed_emp)){ 
+							<?php if(in_array($salesOrder->customer->employee_id,$allowed_emp)){ 
 								$salesOrder->id = $EncryptingDecrypting->encryptData($salesOrder->id);
 							?>
 									<?php if(in_array(22,$allowed_pages)){
@@ -190,7 +191,7 @@
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
 							<?php if($salesOrder->quotation_id != 0){ ?>
 							<td>
-							<?php if(in_array($salesOrder->quotation->created_by,$allowed_emp)){  
+							<?php if(in_array($salesOrder->customer->employee_id,$allowed_emp)){  
 							//$quotation_id = $EncryptingDecrypting->encryptData($salesOrder->quotation->id);
 							?>
 							<?php echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
@@ -229,7 +230,7 @@
 								}elseif($Actionstatus=='GstCopy'){ 
 									echo $this->Html->link('<i class="fa fa-repeat "></i>  Copy','/SalesOrders/gstSalesOrderAdd?copy='.$salesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 								}else{
-								 if(in_array($salesOrder->created_by,$allowed_emp) ){ 
+								 if(in_array($salesOrder->customer->employee_id,$allowed_emp) ){ 
 									if(in_array(4,$allowed_pages) && $st_year_id==$salesOrder->financial_year_id){
 										if($salesOrder->gst=="no")
 										{
@@ -332,7 +333,8 @@
 							
 							<?php } ?> 
 								
-						<?php } 
+							 <?php } 
+							 //}
 						endforeach; ?>
 					</tbody>
 					<tfoot>
