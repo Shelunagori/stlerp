@@ -61,6 +61,7 @@
 					$emp_id="No";
 					foreach($AllData as $key2=>$itemData) { 
 					$row_count=count($itemData->invoice_rows); 
+					$itemData->id = $EncryptingDecrypting->encryptData($itemData->id);
 					if($key1=='Invoice'){
 						$date=$itemData['date_created'];
 						@$voucher=($itemData->in1.'/IN-'.str_pad($itemData->in2, 3, '0', STR_PAD_LEFT).'/'.$itemData->in3.'/'.$itemData->in4);
@@ -79,7 +80,7 @@
 					
 					if($key1=='SaleReturns'){
 						$date=$itemData['date_created'];
-						@$voucher=($itemData->sr1.'/IN-'.str_pad($itemData->sr2, 3, '0', STR_PAD_LEFT).'/'.$itemData->sr3.'/'.$itemData->sr4);
+						@$voucher=($itemData->sr1.'/CR-'.str_pad($itemData->sr2, 3, '0', STR_PAD_LEFT).'/'.$itemData->sr3.'/'.$itemData->sr4);
 						if($itemData['sale_return_type']=="GST"){
 							$location='/sale-returns/gst-sales-edit/'.$itemData->id;
 						}else{
@@ -133,7 +134,7 @@
 					{  
 						$date=$itemData['transaction_date'];
 						@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
-						$location='/InventoryVouchers/View/'.$itemData->id; //pr($itemData);
+						$location='/Ivs/View/'.$itemData->id; //pr($itemData);
 						foreach($itemData->iv_rows as $iv_row)
 						{ 
 							$IVRs[$iv_row->id]=['item_name'=>$iv_row->item->name,'item_qty'=>$iv_row->quantity,'status'=>'In'];

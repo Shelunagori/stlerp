@@ -57,7 +57,9 @@
 						</tr>
 					</thead>
 					<tbody>
-						<?php foreach ($invoices as $invoice):   ?>
+						<?php foreach ($invoices as $invoice):   
+						$invoice->sales_order->id = $EncryptingDecrypting->encryptData($invoice->sales_order->id);
+						?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
 							<td><?= h(($invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4)) ?></td>

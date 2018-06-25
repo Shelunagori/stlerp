@@ -88,6 +88,7 @@
 					<tbody>
 					<?php $total=0;$totalamt=0; $i=0;foreach ($invoiceBookings as $invoiceBooking):
 					$invoiceBooking_id = $EncryptingDecrypting->encryptData($invoiceBooking->id);
+					$invoiceBooking->grn->purchase_order->id = $EncryptingDecrypting->encryptData($invoiceBooking->grn->purchase_order->id);
 					$total+=$invoiceBooking->taxable_value;
 					$totalamt+=$invoiceBooking->grn->purchase_order->total;
 					?>
@@ -102,7 +103,7 @@
 							<?php  }else{
 								echo $this->Html->link($invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4,['controller'=>'InvoiceBookings','action' => 'GstInvoiceBookingView', $invoiceBooking_id,],array('escape'=>false,'target'=>'_blank'));
 							}} ?></td>
-							<td><?php echo $this->Html->link($invoiceBooking->grn->purchase_order->po1.'/PO-'.str_pad($invoiceBooking->grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->purchase_order->po3.'/'.$invoiceBooking->grn->purchase_order->po4,['controller'=>'PurchaseOrders','action' => 'confirm', $invoiceBooking->grn->purchase_order->id,],array('escape'=>false,'target'=>'_blank')); ?></td>
+							<td><?php echo $this->Html->link($invoiceBooking->grn->purchase_order->po1.'/PO-'.str_pad($invoiceBooking->grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->grn->purchase_order->po3.'/'.$invoiceBooking->grn->purchase_order->po4,['controller'=>'PurchaseOrders','action' => 'confirm', $invoiceBooking->grn->purchase_order->id],array('escape'=>false,'target'=>'_blank')); ?></td>
 							<td><?= h($invoiceBooking->invoice_no) ?></td>
 							<td><?= h($invoiceBooking->vendor->company_name) ?></td>
 							<td  style="text-align:right;">

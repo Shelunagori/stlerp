@@ -53,6 +53,7 @@
 					</thead>
 					<tbody>
 					<?php foreach ($invoiceBookings as $invoiceBooking):
+					$invoiceBooking->grn->id = $EncryptingDecrypting->encryptData($invoiceBooking->grn->id);
 						if($invoiceBooking->grn->status=='Converted Into Invoice Booking'){ $tr_color='#f4f4f4'; }
 						if($invoiceBooking->grn->status=='Pending'){ $tr_color='#FFF'; }
 					?>

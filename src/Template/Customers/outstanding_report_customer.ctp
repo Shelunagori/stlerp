@@ -207,7 +207,7 @@ table td, table th{
 					$ClosingBalance= round($ClosingBalance,2);
 					if($ClosingBalance > 0){ ?>
 						
-						<a href="#" class="btn-primary btn-sm send_mail" title="Send Email " amt=<?php echo $ClosingBalance; ?> ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i></a>
+						<a href="#" class="btn-primary btn-sm send_mail" title="Send Email " amt=<?php echo $ClosingBalance; ?>  ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i></a>
 				<?php	} ?>
 				</td>
 			</tr>
@@ -232,19 +232,23 @@ table td, table th{
 $(document).ready(function() {
 	
 $('.send_mail').die().live("click",function() {
-	var amt=$(this).attr('amt');
-	var ledger_id=$(this).attr('ledger_id');
-	
-	var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'sendMail']); ?>";
-	url=url+'?id='+ledger_id+'&amount='+amt;
-	
-	$.ajax({
-		url: url,
-		type: "GET",
-	}).done(function(response) { 
-	//alert(response);
-		alert("Email Send successfully")
-	}); 
+	if(confirm("Are you sure you want to Send Email?")){
+		var amt=$(this).attr('amt');
+		var ledger_id=$(this).attr('ledger_id');
+		
+		var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'sendMail']); ?>";
+		url=url+'?id='+ledger_id+'&amount='+amt;
+		
+		$.ajax({
+			url: url,
+			type: "GET",
+		}).done(function(response) { 
+		//alert(response);
+			alert("Email Send successfully")
+		}); 
+	}else{
+		  return false;
+	}	
 	
 });	
 	
