@@ -60,6 +60,7 @@
 					<tbody>
 						<?php  $i=0; foreach ($ivs as $iv):
 						$iv->id = $EncryptingDecrypting->encryptData($iv->id);
+						$iv->invoice->id = $EncryptingDecrypting->encryptData($iv->invoice->id);
 						if(in_array($iv->created_by,$allowed_emp)){
 						$i++;?>
 						<tr>

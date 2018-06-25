@@ -428,11 +428,11 @@ $html .= '<div id="footer" class="avoid_break">';
 							</td>
 							<td align="right" >
 								<div align="center" style="font-size:'. h(($invoice->pdf_font_size)) .';">
-									<span>For <b>'. h($invoice->company->name) .'</b></span><br/>
-									<img src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.$invoice->creator->signature.' height="50px" style="height:50px;"/>
+									<span>For <b>'. h(@$invoice->company->name) .'</b></span><br/>
+									<img src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.@$invoice->creator->signature.' height="50px" style="height:50px;"/>
 									<br/>
 									<span><b>Authorised Signatory</b></span><br/>
-									<span>'. h($invoice->creator->name) .'</span><br/>
+									<span>'. h(@$invoice->creator->name) .'</span><br/>
 									
 								</div>
 							</td>

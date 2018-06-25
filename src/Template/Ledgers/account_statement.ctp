@@ -307,24 +307,49 @@ $url_excel="/?".$url;
 							$emp_id="Yes";
 					}
 				}else if($ledger->voucher_source=="Debit Notes"){
-					$Receipt=$url_link[$ledger->id];
+					/* $Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+					$url_path="/debit-notes/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					} */
+					$Receipt=$url_link[$ledger->id];
+					$voucher=('DR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;					
 					$url_path="/debit-notes/view/".$ledger->voucher_id;
 					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
 				}else if($ledger->voucher_source=="Credit Notes"){
 					//pr($ledger['id']);exit;
-					$Receipt=@$url_link[@$ledger->id];
+					/* $Receipt=@$url_link[@$ledger->id];
 					$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					$url_path="/credit-notes/view/".@$ledger->voucher_id;
 					if(in_array(@$Receipt->created_by,$allowed_emp)){
+							$emp_id="Yes";
+					} */
+					$Receipt=$url_link[$ledger->id];
+					$voucher=('CR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;					
+					$url_path="/credit-notes/view/".$ledger->voucher_id;
+					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$Receipt=$url_link[$ledger->id];
 					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
-					$url_path="/purchase-returns/view/".$ledger->voucher_id;
+					if($Receipt->gst_type=="Gst"){
+						$url_path="/PurchaseReturns/gstView/".$ledger->voucher_id;	
+					}else{
+						$url_path="/PurchaseReturns/View/".$ledger->voucher_id;	
+					}
+					//$url_path="/purchase-returns/view/".$ledger->voucher_id;
 					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
