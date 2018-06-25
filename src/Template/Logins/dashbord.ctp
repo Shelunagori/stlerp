@@ -218,7 +218,7 @@
 									
 								]
 							) ?>
-							<?= $this->Html->link(' Cancle ',
+							<?= $this->Html->link(' Cancel ',
 								['controller'=>'LeaveApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
 									'escape' => false,'class'=>'fa fa-times'
@@ -274,7 +274,7 @@
 						<td>
 							<?php echo $this->Html->link('Approve',['controller' => 'LoanApplications','action' => 'approveLoan', $PendingRequest->id],array('escape'=>false,'class'=>'btn btn-xs blue')); ?>
 							
-							<?= $this->Html->link(' Cancle ',
+							<?= $this->Html->link(' Cancel ',
 								['controller'=>'LoanApplications', 'action' => 'cancle', $PendingRequest->id],
 								[
 									'escape' => false,'class'=>'fa fa-times'

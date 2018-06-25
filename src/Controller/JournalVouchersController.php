@@ -166,6 +166,7 @@ class JournalVouchersController extends AppController
     {
 		
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $journalVoucher = $this->JournalVouchers->get($id, [
             'contain' => ['Companies','FinancialYears'=>['Companies'],'JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator']
         ]);
@@ -441,7 +442,7 @@ class JournalVouchersController extends AppController
 		$financial_year = $this->JournalVouchers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->JournalVouchers->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
 		$financial_month_last = $this->JournalVouchers->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->last();
-    
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $journalVoucher = $this->JournalVouchers->get($id, [
             'contain' => ['Companies','JournalVoucherRows'=>['LedgerAccounts','ReceivedFroms','ReferenceDetails'],'Companies','Creator']
         ]);

@@ -77,9 +77,13 @@ if(!empty($status)){
 							<td width="15%">
 								<input type="text" name="customer" class="form-control input-sm" placeholder="Customer" value="<?php echo @$customer; ?>">
 							</td>
-							<td width="16%">
-								<input type="text" name="salesman" class="form-control input-sm" placeholder="Salesman" value="<?php echo @$salesman; ?>">
-							</td>
+							<?php
+							$EMP_ID =[23,16,17];
+							if(in_array($s_employee_id,$EMP_ID)){ ?>
+								<td width="15%"><?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman) ]); ?></td>
+							<?php }else{ ?>
+								<td width="15%"><?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$s_employee_id) ]); ?></td>
+							<?php } ?>
 							<td width="15%">
 								<input type="text" name="product" class="form-control input-sm" placeholder="Product" value="<?php echo @$product; ?>">
 							</td>
