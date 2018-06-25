@@ -187,19 +187,17 @@ margin-bottom: 0;
 	<table width="100%" class="divFooter">
 		<tr>
 			<td></td>
-			<td align="right" valign="top" width="35%">
-				<table style="margin-top:3px;">
+			<td align="right">
+				<table>
 					<tr>
-						<td width="15%" align="center">
-						For <?= h($journalVoucher->company->name) ?>
-							<br/>
-					 <?php 
-		             echo $this->Html->Image('/signatures/'.$journalVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
-		             ?></br>		
-							
-						<span><b>Prepared By</b></span><br/>
-                         <span><?= h($journalVoucher->creator->name) ?></span><br/>
-						
+						<td align="center">
+						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($journalVoucher->company->name)?><br/></span>
+						<?php 
+						 echo $this->Html->Image('/signatures/'.$journalVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
+						 ?></br>
+						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($journalVoucher->creator->name) ?></span><br/>
 						</td>
 					</tr>
 				</table>

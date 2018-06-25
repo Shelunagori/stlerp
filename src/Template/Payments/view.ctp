@@ -210,20 +210,23 @@ margin-bottom: 0;
 					</tr>
 				</table>
 			</td>
-		    <td align="right" valign="top" width="35%">
-				<table style="margin-top:3px;">
+			<td align="right">
+				<table>
 					<tr>
-					   <td width="15%" align="center"> 
+						<td align="center">
+						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($payment->company->name)?><br/></span>
 						<?php 
-						 echo $this->Html->Image('/signatures/'.$payment->creator->signature,['height'=>'40px','style'=>'height:40px;']); 
+						 echo $this->Html->Image('/signatures/'.$payment->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 						 ?></br>
-						 </hr>
-						 <span><b>Prepared By</b></span><br/>
-						 <span><?= h($payment->creator->name) ?></span><br/>
+						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($payment->creator->name) ?></span><br/>
 						</td>
 					</tr>
 				</table>
-			 </td>
+			</td>
+			
+		    
 		</tr>
 	</table>
 </div>

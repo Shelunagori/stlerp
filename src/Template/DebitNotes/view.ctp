@@ -236,21 +236,21 @@ margin-bottom: 0;
 	<div style="border:solid 1px ;"></div>
 	<table width="100%" class="divFooter">
 		<tr>
-		    <td align="right" valign="top">
-				<table style="margin-top:3px;">
+		   <td align="right">
+				<table>
 					<tr>
-					   <td width="100%" align="center" style="float: right;"> 
+						<td align="center">
+						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($debitNote->company->name)?><br/></span>
 						<?php 
-						 echo $this->Html->Image('/signatures/'.$debitNote->creator->signature,['height'=>'40px','style'=>'height:40px;']); 
+						 echo $this->Html->Image('/signatures/'.$debitNote->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 						 ?></br>
-						 </hr>
-						 <span><b>Prepared By</b></span><br/>
-						 <span><b><?= h($debitNote->creator->name)?></span><br/>
-						 <span><?= h($debitNote->company->name) ?></span></b><br/>
+						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($debitNote->creator->name) ?></span><br/>
 						</td>
 					</tr>
 				</table>
-			 </td>
+			</td>
 		</tr>
 	</table>
 </div>

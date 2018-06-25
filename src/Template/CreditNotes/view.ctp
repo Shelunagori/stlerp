@@ -258,21 +258,21 @@ margin-bottom: 0;
 					</tr>
 				</table>
 			</td>
-		    <td align="right" valign="top">
-				<table style="margin-top:3px;">
+		    <td align="right">
+				<table>
 					<tr>
-					   <td width="100%" align="center" style="float: right;"> 
+						<td align="center">
+						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($creditNotes->company->name)?><br/></span>
 						<?php 
-						 echo $this->Html->Image('/signatures/'.$creditNotes->creator->signature,['height'=>'40px','style'=>'height:40px;']); 
+						 echo $this->Html->Image('/signatures/'.$creditNotes->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 						 ?></br>
-						 </hr>
-						 <span><b>Prepared By</b></span><br/>
-						 <span><b><?= h($creditNotes->creator->name)?></span><br/>
-						 <span><?= h($creditNotes->company->name) ?></span></b><br/>
+						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($creditNotes->creator->name) ?></span><br/>
 						</td>
 					</tr>
 				</table>
-			 </td>
+			</td>
 		</tr>
 	</table>
 </div>

@@ -149,20 +149,21 @@ margin-bottom: 0;
                     </tr>
                 </table>
             </td>
-            <td align="right" valign="top" width="35%">
-                <table style="margin-top:3px;">
-                    <tr>
-                       <td width="15%" align="center"> 
-                        <?php 
-                         echo $this->Html->Image('/signatures/'.$contravoucher->creator->signature,['height'=>'40px','style'=>'height:40px;']); 
-                         ?></br>
-                         </hr>
-                         <span><b>Prepared By</b></span><br/>
-                         <span><?= h($contravoucher->creator->name) ?></span><br/>
-                        </td>
-                    </tr>
-                </table>
-             </td>
+            <td align="right">
+				<table>
+					<tr>
+						<td align="center">
+						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($contravoucher->company->name)?><br/></span>
+						<?php 
+						 echo $this->Html->Image('/signatures/'.$contravoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
+						 ?></br>
+						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($contravoucher->creator->name) ?></span><br/>
+						</td>
+					</tr>
+				</table>
+			</td>
         </tr>
     </table>
 </div>
