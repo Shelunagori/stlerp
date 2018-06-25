@@ -721,12 +721,25 @@ class QuotationsController extends AppController
 				);
 		//$employees = $this->Quotations->Employees->find('list', ['limit' => 200])->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC']);
 		
-		$employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+		/* $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
+					}
+				); */
+		$EMP_ID =[23,16,17];
+		if(in_array($s_employee_id,$EMP_ID)){
+			 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
 						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
 					}
 				);
-		
+		}else{
+			$employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
+					}
+				)->where(['Employees.id'=>$s_employee_id]);
+		}		
 		$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		
 		$items = $this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->matching(
@@ -834,11 +847,26 @@ class QuotationsController extends AppController
 							return $q->where(['CustomerCompanies.company_id' => $st_company_id]);
 						}
 					);
-			$employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+			/* $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
 						'EmployeeCompanies', function ($q) use($st_company_id) {
 							return $q->where(['EmployeeCompanies.company_id' => $st_company_id]);
 						}
-					);
+					); */
+					
+			$EMP_ID =[23,16,17];
+		if(in_array($s_employee_id,$EMP_ID)){
+			 $employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
+					}
+				);
+		}else{
+			$employees = $this->Quotations->Employees->find('list')->where(['dipartment_id' => 1])->order(['Employees.name' => 'ASC'])->matching(
+					'EmployeeCompanies', function ($q) use($st_company_id) {
+						return $q->where(['EmployeeCompanies.company_id' => $st_company_id,'EmployeeCompanies.freeze' => 0]);
+					}
+				)->where(['Employees.id'=>$s_employee_id]);
+		}			
 			$ItemGroups = $this->Quotations->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 			
 			$Items = $this->Quotations->Items->find()->order(['Items.name' => 'ASC'])->matching(
