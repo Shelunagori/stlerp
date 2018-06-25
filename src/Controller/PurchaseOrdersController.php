@@ -918,7 +918,7 @@ class PurchaseOrdersController extends AppController
 		$email = new Email('default');
 		$email->transport('gmail');
 		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
-		$cc_mail=$PurchaseOrders->creator->email;
+		$cc_mail=$PurchaseOrders->creator->company_email;
 		
 		//$email_to="dimpaljain892@gmail.com";
 		//$cc_mail="dimpaljain892@gmail.com";
@@ -950,12 +950,12 @@ class PurchaseOrdersController extends AppController
 		$sub="STL-Purchase Order Delivery Reminder";
 		//pr($email_to);
 		//pr($cc_mail);exit; 
-		$email_to="dimpaljain892@gmail.com";
-		$cc_mail="gopal@phppoets.in";
+		//$email_to="dimpaljain892@gmail.com";
+		//$cc_mail="gopal@phppoets.in";
 		//pr($email_to);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)
-		//->cc($cc_mail)
+		->cc($cc_mail)
 		->replyTo('dispatch@mogragroup.com')
 		->subject($sub)
 		->template('send_purchase_order')

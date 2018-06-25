@@ -28,7 +28,10 @@
 					<th>S.No</th>
 					<th>Purchase No.</th>
 					<th>Supplier Name</th>
+					<?php if($status != "Converted-Into-GRN"){ ?>
 					<th>Created Date</th>
+					<?php } ?>
+					<th>Delivery Date</th>
 					<th style="text-align:right">Total</th>
 					<th>Status</th>
 				</tr>
@@ -45,7 +48,17 @@
 							
 							<td><?= h($purchaseOrder->vendor->company_name) ?></td>
 							
-							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><?php if(date("d-m-Y",strtotime($purchaseOrder->date_created)) == "01-01-1970"){
+								echo "-";
+							}else{
+								echo date("d-m-Y",strtotime($purchaseOrder->date_created));
+							} ?></td>
+							<td style="text-align:center;"><?php 
+					if(date("d-m-Y",strtotime( $purchaseOrder->delivery_date)) == "01-01-1970"){
+								echo "-";
+							}else{
+								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
+							} ?></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 						<td>
@@ -65,7 +78,12 @@
 							
 							<td><?= h($purchaseOrder->vendor->company_name) ?></td>
 							
-							<td><?php echo date("d-m-Y",strtotime( $purchaseOrder->date_created)) 	 ?></td>
+							<td><td style="text-align:center;"><?php 
+					if(date("d-m-Y",strtotime( $purchaseOrder->delivery_date)) == "01-01-1970"){
+								echo "-";
+							}else{
+								echo date("d-m-Y",strtotime( $purchaseOrder->delivery_date));
+							} ?></td></td>
 							<td align="right"><?= $this->Number->format($purchaseOrder->total,['places'=>2]) ?></td>
 						
 						<td>
