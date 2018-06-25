@@ -26,7 +26,7 @@ class CreditNotesController extends AppController
             'contain' => []
         ];
         
-		$creditNotes = $this->paginate($this->CreditNotes->find()->where(['company_id'=>$st_company_id,'cancle_status'=>'No'])->order(['voucher_no'=>'DESC']));
+		$creditNotes = $this->paginate($this->CreditNotes->find()->where(['CreditNotes.company_id'=>$st_company_id,'CreditNotes.cancle_status'=>'No'])->contain(['FinancialYears'])->order(['voucher_no'=>'DESC']));
         
 		//pr($creditNotes->toArray());exit;
 		
@@ -483,7 +483,7 @@ class CreditNotesController extends AppController
 		$st_year_id = $session->read('st_year_id');
 		$id = $this->EncryptingDecrypting->decryptData($id);
 		$creditNote = $this->CreditNotes->get($id, [
-            'contain' => ['Creator','Companies','CreditNotesRows'=>['ReceivedFroms'],'Heads']
+            'contain' => ['Creator','Companies','FinancialYears','CreditNotesRows'=>['ReceivedFroms'],'Heads']
         ]);
 		
 		$ReferenceDetail = $this->CreditNotes->ReferenceDetails->find()->where(['credit_note_id'=>$id]);

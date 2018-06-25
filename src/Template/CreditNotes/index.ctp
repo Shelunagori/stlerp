@@ -37,8 +37,16 @@
                         <tr>
                             <td><?= h(++$page_no) ?></td>
                             <td><?= h(date("d-m-Y",strtotime($creditNote->transaction_date)))?></td>
-							<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
-							<td><?= h('CR/'.str_pad($creditNote->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$FY) ?></td>
+							
+							
+							<?php $voucher=('CR/'.str_pad($creditNote->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+							<?php 
+							$s_year_from = date("Y",strtotime($creditNote->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($creditNote->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+							?>
+							<td><?= h($voucher.'/'.$fy) ?>
+							</td>
 						
                             <td class="actions">
 							<?php if(in_array(108,$allowed_pages)){

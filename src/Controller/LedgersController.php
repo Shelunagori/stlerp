@@ -72,7 +72,9 @@ class LedgersController extends AppController
 				}else if($ledger->voucher_source=="Debit Notes"){
 					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Credit Notes"){
-					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Sale Return"){

@@ -111,8 +111,12 @@ margin-bottom: 0;
 					<tr>
 						<td><b>Voucher No</b></td>
 						<td width="20" align="center">:</td>
-						<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
-						<td><?= h('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT).'/'.$FY) ?></td>
+						<?php 
+							$voucher=('CR/'.str_pad($creditNotes->voucher_no, 4, '0', STR_PAD_LEFT)); $s_year_from = date("Y",strtotime($creditNotes->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($creditNotes->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+						?>
+						<td><?= h($voucher.'/'.$fy) ?></td>
 					</tr>
 					
 					<tr>

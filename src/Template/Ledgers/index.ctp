@@ -137,7 +137,11 @@
 					}
 				}else if($ledger->voucher_source=="Credit Note"){
 					$Receipt=$url_link[$ledger->id];
-					$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+					$voucher=('CR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;					
 					$url_path="/credit-notes/view/".$ledger->voucher_id;
 					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
@@ -145,12 +149,17 @@
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$url_path="/purchase-returns/view/".$ledger->voucher_id;
 					
-				}else if($ledger->voucher_source=="Sale Return"){
-					$invoice=$url_link[$ledger->id];
-					$voucher_no=h(($invoice->sr1.'/SR-'.str_pad($invoice->sr2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sr3.'/'.$invoice->sr4));
-					$url_path="/purchase-returns/view/".$ledger->voucher_id;
-					$url_path="Sale Return";
-					if(in_array($invoice->created_by,$allowed_emp)){
+				}else if($ledger->voucher_source=="Sale Return"){ 
+					$Receipt=$url_link[$ledger->id];
+					$voucher_no=$Receipt->sr1.'/SR-'.str_pad($Receipt->sr2, 3, '0', STR_PAD_LEFT).'/'.$Receipt->sr3.'/'.$Receipt->sr4;
+					if($Receipt->sale_return_type=="GST"){
+						$url_path="/sale-returns/gst-confirm/".$ledger->voucher_id;	
+					}else{
+						$url_path="/sale-returns/confirm/".$ledger->voucher_id;	
+					}
+					//$url_path="/purchase-returns/view/".$ledger->voucher_id;
+					//$url_path="Sale Return";
+					if(in_array($Receipt->created_by,$allowed_emp)){
 							$emp_id="Yes";
 					}
 				}else if($ledger->voucher_source=="Inventory Return"){
@@ -184,17 +193,14 @@
 						
 						<?php 
 							if($emp_id=="Yes"){
-								if($url_path=='Sale Return'){
-									echo $voucher_no;
-								}else if(!empty($url_path)){
+								if(!empty($url_path)){
 									echo $this->Html->link(@$voucher_no ,$url_path,['target' => '_blank']);
 								}else{
-									echo str_pad($ledger->voucher_id,4,'0',STR_PAD_LEFT);
+									echo @$voucher_no;
 								}
 							}else{
-								echo @$voucher_no;
-							}
-						
+									echo @$voucher_no;
+								}
 						?>
 						</td>
 						<td align="right"><?= $this->Number->format($ledger->debit,['places'=>2]) ?></td>
