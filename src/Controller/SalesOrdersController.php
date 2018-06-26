@@ -1351,7 +1351,10 @@ class SalesOrdersController extends AppController
 			
 				
 
-		$quotation_id=@(int)$this->request->query('quotation');
+		$quotation_id=$this->request->query('quotation');
+		if(!empty($quotation_id)){
+				$quotation_id = $this->EncryptingDecrypting->decryptData($quotation_id);
+		}
 		$quotation=array(); 
 		$process_status='New';
 		if(!empty($quotation_id)){

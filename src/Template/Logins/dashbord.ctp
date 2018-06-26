@@ -347,7 +347,67 @@
 </div>
 <?php }?> -->
 <?php }else{ ?>
-
+<?php if($PendingleaveRequests){ ?>
+<div class="col-md-12 col-sm-12">
+	<div class="portlet grey-cascade box">
+		<div class="portlet-title">
+			<div class="caption">
+				<i class="fa fa-cogs"></i>Leave Request
+			</div>
+			<div class="actions">
+				
+			</div>
+		</div>
+		<div class="portlet-body">
+			<div class="table-responsive">
+				<table class="table table-hover table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>S.No</th>
+						<th>Leave Type</th>
+						<th>No of Days</th>
+						<th>Reason</th>
+						<th>Leave Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<?php $i=1;	foreach($PendingleaveRequests as $PendingRequest){ ?>
+					<tr>
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $PendingRequest->leave_type->leave_name; ?></td>
+						<td><?php echo $PendingRequest->day_no; ?>
+							<span>( From <?php echo $PendingRequest->from_leave_date->format('d-m-Y'); ?> To <?php echo $PendingRequest->to_leave_date->format('d-m-Y'); ?> )</span>
+						</td>
+						<td style="text-align:justify;"><?php echo $PendingRequest->leave_reason; ?></td>
+						<td><span class="label label-sm label-success"><?php echo $PendingRequest->leave_status; ?></span>
+						</td>
+						
+					</tr>
+					<?php } ?>
+				</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+<?php }else{ ?>
+	<div class="col-md-12 col-sm-12">
+		<div class="portlet grey-cascade box">
+			<div class="portlet-title">
+				<div class="caption">
+					<i class="fa fa-cogs"></i>Leave Request
+				</div>
+				<div class="actions">
+					
+				</div>
+			</div>
+			<div class="portlet-body">
+				<h1>No Leave Found</h1>
+			</div>
+		</div>
+	</div>	
+	
+<?php } ?>
 
 
 
