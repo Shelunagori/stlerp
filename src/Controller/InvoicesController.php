@@ -760,7 +760,7 @@ class InvoicesController extends AppController
 	public function pdf($id = null)
     {
 		$this->viewBuilder()->layout('');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $invoice = $this->Invoices->get($id, [
 		'contain' => ['SaleTaxes',
 					'Customers',
@@ -780,6 +780,7 @@ class InvoicesController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
+		 $id = $this->EncryptingDecrypting->decryptData($id);
 		$invoice = $this->Invoices->get($id, [
             'contain' => ['InvoiceRows']
 			]);
@@ -812,8 +813,8 @@ class InvoicesController extends AppController
 						->where(['id' => $id])
 						->execute();
 			}
-			
-			return $this->redirect(['action' => 'confirm/'.$id]);
+			$id = $this->EncryptingDecrypting->encryptData($id);
+			return $this->redirect(['action' => 'confirm',$id]);
         }
 		$this->set(compact('invoice','id'));
     }
@@ -3229,7 +3230,8 @@ class InvoicesController extends AppController
 	public function GstConfirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
-		$id = $this->EncryptingDecrypting->decryptData($id);
+		 $id = $this->EncryptingDecrypting->decryptData($id);
+		// echo $id;exit;
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
@@ -3272,7 +3274,7 @@ class InvoicesController extends AppController
 						->execute();
 			}
 			$id = $this->EncryptingDecrypting->encryptData($id);
-			return $this->redirect(['action' => 'GstConfirm/'.$id]);
+			return $this->redirect(['action' => 'GstConfirm',$id]);
         }
 		$termsConditions = $this->Invoices->DispatchDocuments->find('all',['limit' => 200]);
 		$this->set(compact('invoice','id','termsConditions','company_data','st_year_id'));

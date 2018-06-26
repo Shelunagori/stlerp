@@ -799,7 +799,8 @@ class PurchaseOrdersController extends AppController
 					$this->PurchaseOrders->PurchaseOrderRows->save($purchaseOrderRow);
 				}
 			}
-			return $this->redirect(['action' => 'confirm/'.$id]);
+			$id = $this->EncryptingDecrypting->encryptData($id);
+			return $this->redirect(['action' => 'confirm',$id]);
         }
 		$this->set(compact('purchaseOrder','id'));
         $this->set('id', $id);
