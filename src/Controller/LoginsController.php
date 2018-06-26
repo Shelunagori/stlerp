@@ -477,9 +477,12 @@ class LoginsController extends AppController
 			$PendingLoanApplications = $this->Logins->LoanApplications->find()->where(['LoanApplications.status'=>'Pending','company_id'=>$st_company_id])->contain(['Employees'])->toArray();
 			//pr($PendingLoanApplications); exit;
 			
+		}else{
+			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id])->toArray();
+			
 		}
 		
-
+//pr($PendingleaveRequests);exit;
 		$PendingleaveStatus = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id])->contain(['empData'])->toArray();
 
 		$PendingTravelRequestStatus = $this->Logins->TravelRequests->find()->where(['TravelRequests.employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();

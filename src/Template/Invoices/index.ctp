@@ -98,12 +98,10 @@
 							if($invoice->sales_order->gst == 'yes'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'gstConfirm',$sales_order_id],array('target'=>'_blank')); 
-							}else if($invoice->sales_order->gst == 'no'){
+							}else{
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'confirm',$sales_order_id],array('target'=>'_blank')); 
-							} }else{
-								 echo $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4; 
-							}?>
+							} }?>
 							</td>
 							<?php }else{?>
 							<td></td><?php } ?>

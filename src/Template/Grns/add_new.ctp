@@ -104,6 +104,7 @@
 						<?php 
 						if(!empty($purchase_order->purchase_order_rows)){
 							$q=0; foreach ($purchase_order->purchase_order_rows as $purchase_order_rows): 
+						
 							if(@$actuleQty[$purchase_order_rows->id]>0){
 							?>
 							<tr class="tr1" row_no='<?php echo @$purchase_order_rows->id; ?>'>
@@ -134,7 +135,7 @@
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$purchase_order_rows->id; ?>'>
 								<td colspan="3">
-									<?php echo $this->Text->autoParagraph($purchase_order_rows->description); ?>
+									<?php //echo $this->Text->autoParagraph($purchase_order_rows->description); ?>
 								</td>
 								
 							</tr>

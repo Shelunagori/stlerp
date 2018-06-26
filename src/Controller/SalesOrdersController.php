@@ -315,12 +315,12 @@ class SalesOrdersController extends AppController
 		
 	
 		$Items = $this->SalesOrders->SalesOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
-        /* $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
+        $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
 					'Departments', function ($q) use($items,$st_company_id) {
 						return $q->where(['Departments.id' =>1]);
 					}
-				); */
-		$EMP_ID =[23,16,17];
+				);
+		/* $EMP_ID =[23,16,17];
 		if(in_array($s_employee_id,$EMP_ID)){
 			 $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
 						'Departments', function ($q) use($st_company_id) {
@@ -333,7 +333,7 @@ class SalesOrdersController extends AppController
 							return $q->where(['Departments.id' =>1]);
 						}
 					)->where(['Employees.id'=>$s_employee_id]);
-		}			
+		}		 */	
 		$ItemGroups = $this->SalesOrders->SalesOrderRows->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->SalesOrders->SalesOrderRows->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);		
 	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty','Actionstatus','st_year_id','ItemGroups','ItemSubGroups','item_subgroup','item_group','item_category'));
