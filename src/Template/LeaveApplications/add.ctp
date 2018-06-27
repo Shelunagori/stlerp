@@ -334,6 +334,8 @@ $(document).ready(function()
 	
 	$('.leave_type').live("change",function(){
 		var leave_type = $(this).val();
+		var empId=$('.empDropDown').find('option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveData']); ?>";
 		if(leave_type=='2')
 		{
 			$('.attache_file').show();

@@ -563,7 +563,7 @@ class QuotationsController extends AppController
 			}
 			}
 			$id = $this->EncryptingDecrypting->encryptData($id);
-			return $this->redirect(['action' => 'confirm/'.$id]);
+			return $this->redirect(['action' => 'confirm',$id]);
         }
 		
 		

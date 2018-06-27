@@ -722,7 +722,7 @@ class SalesOrdersController extends AppController
 				$this->SalesOrders->SalesOrderRows->save($salesOrderRow);
 			}
 			$id = $this->EncryptingDecrypting->encryptData($id);
-			return $this->redirect(['action' => 'confirm/'.$id]);
+			return $this->redirect(['action' => 'confirm',$id]);
         }
 		
 		$this->set(compact('salesorder','id'));
@@ -1942,7 +1942,7 @@ class SalesOrdersController extends AppController
 				$this->SalesOrders->SalesOrderRows->save($salesOrderRow);
 			}
 			$id = $this->EncryptingDecrypting->encryptData($id);
-			return $this->redirect(['action' => 'gstConfirm/'.$id]);
+			return $this->redirect(['action' => 'gstConfirm',$id]);
         }
 		
 		$this->set(compact('salesorder','id','st_year_id'));

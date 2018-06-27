@@ -330,7 +330,9 @@ class LoginsController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$employee_id=$this->viewVars['s_employee_id'];
 		$s_year_from=$this->viewVars['s_year_from'];
+		$s_year_from_date=$this->viewVars['s_year_from_date'];
 		$s_year_to=$this->viewVars['s_year_to'];
+		$s_year_to_date=$this->viewVars['s_year_to_date'];
 		$quotations = $this->Logins->Quotations->find()->contain(['QuotationRows'=>['Items']])->where(['company_id'=>$st_company_id,'status'=>'Pending','Quotations.revision '=> 0])->order(['Quotations.id' => 'DESC']);
 		// pr($quotations->toArray()); exit;
 		$quotations = $quotations->select(['ct' => $quotations->func()->count('Quotations.id')])->first();
@@ -481,19 +483,10 @@ class LoginsController extends AppController
 			
 		}else{
 			
-            
-				$year = date("Y",strtotime($s_year_to));
-				$year_form = date("Y",strtotime($s_year_from));
-                $start_date = date(($year-1).'-04-01');
-                $end_date = date(($year_form+1).'-03-31');
-             
+			$s_year_from_date=date('Y-m-d',strtotime($s_year_from_date));
+			$s_year_to_date=date('Y-m-d',strtotime($s_year_to_date));
 			
-			echo $start_date;
-			echo $end_date;
-			
-			exit;
-			
-			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$start_date,'to_leave_date <='=>$end_date])->contain(['Employees','LeaveTypes'])->toArray();
+			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'])->toArray();
 			
 		}
 		

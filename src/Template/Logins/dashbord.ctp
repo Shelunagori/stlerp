@@ -402,7 +402,7 @@
 				</div>
 			</div>
 			<div class="portlet-body">
-				<h1>No Leave Found</h1>
+				<h4>No Leave Found</h4>
 			</div>
 		</div>
 	</div>	
