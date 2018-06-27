@@ -409,7 +409,8 @@ class JobCardsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		$sales_order_id=@(int)$this->request->query('sales-order');
+		$sales_order_id=$this->request->query('sales-order');
+		$sales_order_id = $this->EncryptingDecrypting->decryptData($sales_order_id);
 		if(!empty($sales_order_id)){
 			$salesOrder = $this->JobCards->SalesOrders->get($sales_order_id, [
 				'contain' => ['Customers','SalesOrderRows'=>['Items'=>function ($q) use($st_company_id){
@@ -659,6 +660,7 @@ class JobCardsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$sales_order_id=$this->request->query('sales-order');
 		$sales_order_id=$this->request->query('sales-order');
+		$sales_order_id = $this->EncryptingDecrypting->decryptData($sales_order_id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$count_sales_item = 0;   
@@ -709,6 +711,7 @@ class JobCardsController extends AppController
 					else
 					{
 						$this->Flash->success(__('The job card has been saved.'));
+						$sales_order_id = $this->EncryptingDecrypting->encryptData($sales_order_id);
 						$this->redirect(['controller' =>'JobCards','action' => 'Add?Sales-Order='.$sales_order_id]);
 					}
 					

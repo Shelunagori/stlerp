@@ -62,7 +62,9 @@
 					<td><?php echo $SalesOrder->customer_po_no; ?></td> 
 					
 					<td class="actions">
-						<?php if(in_array($SalesOrder->created_by,$allowed_emp)){ ?>
+						<?php 
+						$SalesOrder->id = $EncryptingDecrypting->encryptData($SalesOrder->id);
+						if(in_array($SalesOrder->created_by,$allowed_emp)){ ?>
 						<?php if(sizeof($SalesOrder->job_card)==0){
 							if(sizeof($SalesOrder->sales_order_rows)>0){
 								echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Pre-Add?sales-order='.$SalesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
