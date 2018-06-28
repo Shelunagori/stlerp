@@ -343,7 +343,10 @@ $(document).ready(function()
             url: url,
             type: 'GET',
         }).done(function(response) { 
+			var single_multiple=$('input[name=single_multiple]:checked').val();
 			if(response == "yes"){
+				$('.attache_file').show();
+			}else if(response == "no" && single_multiple == "Multiple"){
 				$('.attache_file').show();
 			}else{
 				$('.attache_file').hide();

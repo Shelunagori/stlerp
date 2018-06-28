@@ -218,14 +218,21 @@ $html.='
 				}
 				
 				$html .='</tr>';
-$sr=0; $h="-"; foreach ($salesOrder->sales_order_rows as $salesOrderRows): $sr++; 
+$sr=0; $h="-"; foreach ($salesOrder->sales_order_rows as $salesOrderRows): 
+if(!empty($salesOrderRows->customer_item_code)){
+	$customer_item_code = "Your Item Code is:".' '.$salesOrderRows->customer_item_code;
+}else{
+	$customer_item_code = "";
+}
+
+$sr++; 
 $html.='
 	<tr class="odd">
 	    <td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($sr) .'</td>
 		<td style="padding-top:8px;" class="even" width="100%">';
 		
 		if(!empty($salesOrderRows->description)){
-			$html.= h($salesOrderRows->item->name).$salesOrderRows->description.'<div style="height:'.$salesOrderRows->height.'"></div>'
+			$html.= h($salesOrderRows->item->name).$salesOrderRows->description.$customer_item_code.'<div style="height:'.$salesOrderRows->height.'"></div>'
 		;
 		}else{
 			$html.= h($salesOrderRows->item->name).'<div style="height:'.$salesOrderRows->height.'"></div> ';
