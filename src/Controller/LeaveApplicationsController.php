@@ -343,6 +343,22 @@ class LeaveApplicationsController extends AppController
         $this->set(compact('leaveApplication','empData','leavetypes','Totaalleave','leavedatas','TotaalleaveTake','financial_year','financial_month_first','financial_month_last','s_employee_id','employees'));
         $this->set('_serialize', ['leaveApplication']);
     }
+	
+	public function getsickleaveData($empId=null,$leave_type=null){
+	 $first_day_this_month = date('Y-m-01'); 
+	 $last_day_this_month  = date('Y-m-t');
+
+		if($leave_type == 2){
+			$empData=$this->LeaveApplications->exists(['employee_id'=>$empId,'leave_type_id'=>$leave_type,'from_leave_date >='=>$first_day_this_month,'to_leave_date <='=>$last_day_this_month]);
+			if($empData){
+				echo "yes";
+			}else{
+				echo "no";
+			}
+			exit;
+		}
+		
+	}
 
     /**
      * Edit method

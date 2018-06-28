@@ -1000,6 +1000,16 @@ fieldset legend {
 							</label>
 						</div>
 				</div>
+				<div class="col-md-3">
+					<div class="titletext"><b>Events</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(218,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.218.page_id', ['label' => 'Add','class' => '','type'=>'checkbox','value'=>218,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
 				<!--<div class="col-md-3">
 					<div class="titletext"><b>Item Price Factor</b></div>
 						<div class="checkbox-list">

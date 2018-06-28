@@ -1,3 +1,4 @@
+<?php echo $this->Html->css('/assets/global/plugins/fullcalendar/fullcalendar.min.css');?>
 <?php if($employee_id==23 or $employee_id==16 or $employee_id==17){ ?>
 <div class="row">
 	<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12 ">
@@ -407,8 +408,24 @@
 		</div>
 	</div>	
 	
+	
 <?php } ?>
-
+<div class="col-md-6 col-sm-6">
+					<!-- BEGIN PORTLET-->
+					<div class="portlet light calendar ">
+						<div class="portlet-title ">
+							<div class="caption">
+								<i class="icon-calendar font-green-sharp"></i>
+								<span class="caption-subject font-green-sharp bold uppercase">Calender</span>
+							</div>
+						</div>
+						<div class="portlet-body">
+							<div id="calendar">
+							</div>
+						</div>
+					</div>
+					<!-- END PORTLET-->
+				</div>
 
 
 
@@ -418,10 +435,13 @@
 <div id="SalaryAdvancesContainer"></div>
 	
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
-
+<?php echo $this->Html->script('/assets/global/plugins/bootstrap-daterangepicker/moment.min.js'); ?>
+<?php echo $this->Html->script('/assets/global/plugins/fullcalendar/fullcalendar.min.js'); ?>
+<?php echo $this->Html->script('/assets/admin/pages/scripts/index.js'); ?>
 <?php if($employee_id==23 or $employee_id==16 or $employee_id==17){ ?>
 <script>
 $(document).ready(function() {
+	Index.initCalendar();
 	$("#TravelRequestsContainer").html('<div align="center"><?php echo $this->Html->image('/img/wait.gif', ['alt' => 'wait']); ?> Loading</div>');
 	var url="<?php echo $this->Url->build(['controller'=>'TravelRequests','action'=>'pending']); ?>";
 	$.ajax({
@@ -442,9 +462,46 @@ $(document).ready(function() {
 <?php } ?>
 <script>
 $(document).ready(function() {
-
- 
-
+//Index.initCalendar();
+var url="<?php echo $this->Url->build(['controller'=>'Events','action'=>'getEvents']); ?>";
+  $('#calendar').fullCalendar({
+        header: {
+            left: 'title',
+            center: '',
+            right: 'month prev,next'
+        },
+        defaultView: 'month',
+        fixedWeekCount: false,
+        scrollTime: "08:00:00",
+        aspectRatio: 2,
+		selectable: true,
+        events: function(start, end, timezone, callback) {
+			jQuery.ajax({
+            url: url, //navigate to this url to see json feed array
+            type: 'POST',
+           dataType: 'json',
+            success: function (data) {
+               var data1 = data.eventlist;
+			   var events = [];
+				 $.map(data1,function(value){
+				
+					events.push({
+						title: value.title,
+						start: value.start, // will be parsed
+						end: value.end // will be parsed
+					});
+				});
+				 callback(events);
+            },
+            error: function (data) {
+                console.log(data);
+            }
+			});
+        },
+		eventRender: function(event, element) {
+      $(element).tooltip({title: event.title});             
+  }
+    });
     $('.onhover').die().live("click",function() { 
 		
 		var employee_id=$(this).attr('employee_id');

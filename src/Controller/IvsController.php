@@ -422,7 +422,7 @@ class IvsController extends AppController
 							}
 							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
-							$unit_rate = $this->weightedAvgCostIvs(@$iv_row_item->item_id); 
+							$unit_rate = $this->weightedAvgCostIvs(@$iv_row_item->item_id,$transaction_date); 
 						}
 						
 						$unit_rate = round($unit_rate,2);
@@ -745,7 +745,7 @@ class IvsController extends AppController
 							}
 							$unit_rate = round($unit_rate,2)/@$iv_row_item->quantity;
 						}else{
-							$unit_rate = $this->weightedAvgCostIvs($iv_row_item->item_id,$transaction_date); 
+							$unit_rate = $this->weightedAvgCostIvs(@$iv_row_item->item_id,$transaction_date); 
 						}
 						
 						$unit_rate = round($unit_rate,2);

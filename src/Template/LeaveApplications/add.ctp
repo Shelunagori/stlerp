@@ -333,17 +333,23 @@ $(document).ready(function()
 	}
 	
 	$('.leave_type').live("change",function(){
-		var leave_type = $(this).val();
+		var leave_type = $('.leave_type option:selected').val();
+		//alert(leave_type);
 		var empId=$('.empDropDown').find('option:selected').val();
-		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveData']); ?>";
-		if(leave_type=='2')
-		{
-			$('.attache_file').show();
-		}
-		else
-		{
-			$('.attache_file').hide();
-		}
+		//alert(empId);
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
+		url=url+'/'+empId+'/'+leave_type;
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { 
+			if(response == "yes"){
+				$('.attache_file').show();
+			}else{
+				$('.attache_file').hide();
+			}
+        });
+		
 	});
 	
 	
