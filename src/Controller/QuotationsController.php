@@ -622,6 +622,7 @@ class QuotationsController extends AppController
 		$revision=$this->request->query('revision');
 		
 		$id=$this->request->query('copy');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		if(!empty($id)){
 			$quotation = $this->Quotations->get($id, [
 				'contain' => ['QuotationRows']
@@ -712,6 +713,7 @@ class QuotationsController extends AppController
 		$Filenames = $this->Quotations->Filenames->find()->where(['customer_id' => $quotation->customer_id]);
 
 		$copy=$this->request->query('copy');
+		$copy = $this->EncryptingDecrypting->decryptData($copy);
 		$companies = $this->Quotations->Companies->find('all');
 		
         $customers = $this->Quotations->Customers->find('all')->contain(['Filenames'])->order(['Customers.customer_name' => 'ASC'])->matching(

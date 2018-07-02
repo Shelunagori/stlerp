@@ -38,7 +38,7 @@
 		<hr/>
 		
 		<form method="post">
-			<table width="100%">
+			<table width="100%" >
 				<tr>
 					<td>
 						<div class="row">
@@ -73,7 +73,7 @@
 							</div>
 							<div class="col-md-4">
 								<div class="form-group" id="from_half">
-									<label class="control-label  label-css">.</label>  
+									<label class="control-label  label-css"></label>  
 									<?php
 									if($LeaveApplication->leave_status=='approved'){
 										$from_full_half=$LeaveApplication->approve_full_half_from;
@@ -117,19 +117,32 @@
 					</td>
 					<td align="center">
 						<div id="qwerty"></div>
-						<table>
+						<table class="table">
 							<tr>
 								<td>
 									<label class="control-label  label-css">Intimated  Leaves </label>   
-									<?php echo $this->Form->input('intimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
+									
 								</td>
 								<td>
-									<label class="control-label  label-css">Unintimated Leaves </label>   
-									<?php echo $this->Form->input('unintimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm unintimated_leave','readonly']); ?>
+									<label class="control-label  label-css">Prior Approval </label>   
+									<?php echo $this->Form->input('prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
 								</td>
+								<td>
+									<label class="control-label  label-css">Without Prior Approval </label>   
+									<?php echo $this->Form->input('without_prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
+								</td>
+								
 								<td>
 									
 								</td>
+							</tr>
+							<tr>
+								<td>
+									<label class="control-label  label-css">Unintimated Leaves </label>   
+									
+								</td>
+								<td><?php echo $this->Form->input('unintimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm unintimated_leave','readonly']); ?></td>
+								<td></td>
 							</tr>
 							<tr>
 								<td>
