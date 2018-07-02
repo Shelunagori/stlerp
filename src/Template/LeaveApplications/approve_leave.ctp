@@ -216,14 +216,17 @@ $(document).ready(function(){
 		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfo']); ?>";
         url=url+'/'+employee_id+'/'+leaveAppId; 
+		//alert(url);
         $.ajax({
             url: url,
             type: 'GET',
         }).done(function(response) {
+			//alert(response);
 			var res = response.split("-");
 			var ML=res[0];
 			var PPL=res[1];
 			var PUL=res[2];
+			var EMPTYPE=res[3];
 			
 			$('div#qwerty').html('ML:'+ML+', PPL:'+PPL+', PUL'+PUL);
 			
@@ -259,6 +262,7 @@ $(document).ready(function(){
 					days-=0.5;
 				}
 			}
+			
 			var T=days;
 			
 			var I=$('input[name="intimated_leave"]').val();
@@ -268,29 +272,48 @@ $(document).ready(function(){
 				$('input[name="intimated_leave"]').val(0);
 			}
 			var U=T-I;
+			
 			$('input[name="unintimated_leave"]').val(U);
 			
 			var PL=0; var UPL=0;
 			var R=5-PUL;
-			
 			var X=R-U;
-			if(X>=0){
-				var Q=ML-PPL;
-				var Z=Q-U;
-				if(Z>=0){ PL=U; }
-				if(Z<0){ PL=Q; UPL=Math.abs(Z); }
+			if(EMPTYPE == "probabtion"){ 
+				if(X>=0){
+					var Q=ML-PPL; 
+					var Z=Q-U;
+					if(Z>=0){ PL=U; }
+					if(Z<0){ PL=Q; UPL=Math.abs(Z); }alert(UPL);alert(PL);
+				}else{
+					var Q=ML-PPL;
+					var Z=Q-R;
+					if(Z>=0){ PL=R; UPL=Math.abs(X); }
+					if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
+				}
 			}else{
-				var Q=ML-PPL;
-				var Z=Q-R;
-				if(Z>=0){ PL=R; UPL=Math.abs(X); }
-				if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
+				if(X>=0){
+					var Q=ML-PPL;
+					var Z=Q-U;
+					if(Z>=0){ PL=U; }
+					if(Z<0){ PL=Q; UPL=Math.abs(Z); }
+				}else{
+					var Q=ML-PPL;
+					var Z=Q-R;
+					if(Z>=0){ PL=R; UPL=Math.abs(X); }
+					if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
+				}
 			}
+			
+			
+			
 			
 			
 			var B=ML-(parseFloat(PPL)+parseFloat(PL));
 			var C=B-I;
 			if(C>=0){ PL+=parseFloat(I);  }
 			if(C<0){ PL+=B; UPL+=Math.abs(C);  }
+			//alert(PL);
+
 			$('input[name="paid_leaves"]').val(PL);
 			$('input[name="unpaid_leaves"]').val(UPL);
 			$('input[name="total_approved_leaves"]').val(T);

@@ -347,17 +347,22 @@ class LeaveApplicationsController extends AppController
 	public function getsickleaveData($empId=null,$leave_type=null){
 	 $first_day_this_month = date('Y-m-01'); 
 	 $last_day_this_month  = date('Y-m-t');
-
-		if($leave_type == 2){
+		$empDatas=$this->LeaveApplications->find()->where(['employee_id'=>$empId,'leave_type_id'=>$leave_type,'from_leave_date >='=>$first_day_this_month,'to_leave_date <='=>$last_day_this_month]);
+		$day_no=0;
+		foreach($empDatas as $emp){
+			$day_no+= $emp->day_no;
+		}
+		//echo $day_no;exit;
+		if($leave_type == 2 ){
 			$empData=$this->LeaveApplications->exists(['employee_id'=>$empId,'leave_type_id'=>$leave_type,'from_leave_date >='=>$first_day_this_month,'to_leave_date <='=>$last_day_this_month]);
-			if($empData){
+			if($empData && $day_no > 1){
 				echo "yes";
 			}else{
 				echo "no";
 			}
 			exit;
 		}
-		
+		exit;
 	}
 
     /**
@@ -559,15 +564,31 @@ class LeaveApplicationsController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$st_year_id = $session->read('st_year_id');
+		$current_date = strtotime(date('d-m-Y'));
+		$employeesData = $this->LeaveApplications->Employees->get($employee_id);
+		$permanent_join_date = strtotime($employeesData->permanent_join_date);
+		$empType='';
+		 
+		if($permanent_join_date  > $current_date){
+			$empType= "probabtion";
+			
+		}else{
+			$empType= "permanent";
+		}
 		
 		$LeaveApplications=	$this->LeaveApplications->find()
 							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'id !='=>$leaveAppId]);
 		$PastUnintimated=0; $pastPaidLeaves=0;
 		foreach($LeaveApplications as $LeaveApplication){
 			$PastUnintimated+=$LeaveApplication->unintimated_leave;
-			$pastPaidLeaves+=$LeaveApplication->paid_leaves;
+			if($empType == "probabtion"){
+				$pastPaidLeaves=0;
+			}else{
+				$pastPaidLeaves+=$LeaveApplication->paid_leaves;
+			}
 		}
-		echo '30-'.$pastPaidLeaves.'-'.$PastUnintimated;
+		echo '30-'.$pastPaidLeaves.'-'.$PastUnintimated.'-'.$empType;
+		//echo $empType;
 		exit;
 	}
 	public function delete($id = null)

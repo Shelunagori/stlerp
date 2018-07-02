@@ -83,7 +83,7 @@ class InvoiceBookingsController extends AppController
 			
 			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($where)->where($wheree)->where(['InvoiceBookings.company_id'=>$st_company_id])->order(['InvoiceBookings.id' => 'DESC']));
 		}else{ 
-			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.id' => 'DESC']));
+			$invoiceBookings = $this->paginate($this->InvoiceBookings->find()->where($wheree)->where($where)->where(['InvoiceBookings.company_id'=>$st_company_id,'InvoiceBookings.financial_year_id'=>$st_year_id])->order(['InvoiceBookings.ib2' => 'DESC']));
 		}
 		//pr($invoiceBookings);exit;
         $this->set(compact('invoiceBookings','status','purchase_return'));
@@ -2214,7 +2214,12 @@ class InvoiceBookingsController extends AppController
 			->set(['processed_on' => $InvoiceBooking->supplier_date])
 			->where(['source_model' => 'Grns','source_id'=>$InvoiceBooking->grn->id])
 			->execute();
-
+			
+			$query1 = $this->InvoiceBookings->Grns->query();
+			$query1->update()
+			->set(['transaction_date' => $InvoiceBooking->supplier_date])
+			->where(['id'=>$InvoiceBooking->grn->id])
+			->execute();
 			//pr($InvoiceBooking); exit;
 
 		} 

@@ -94,7 +94,7 @@ border:none;
 						$options[]=['text' =>'Full Day', 'value' => 'Full Day'];
 						$options[]=['text' =>'First Half Day', 'value' => 'First Half Day'];
 						$options[]=['text' =>'Second Half Day', 'value' => 'Second Half Day'];
-						echo $this->Form->input('from_full_half', ['label' => false,'options' => $options,'class' => 'form-control input-sm','value' => $leaveApplication->from_full_half]); ?>
+						echo $this->Form->input('from_full_half', ['label' => false,'options' => $options,'class' => 'form-control input-sm from_full_half','value' => $leaveApplication->from_full_half]); ?>
 					</div>
 				</div>
 			</div>
@@ -109,7 +109,7 @@ border:none;
 					<div class="form-group" id="to_half">
 						<label class="control-label  label-css">.</label>
 						<?php 
-						echo $this->Form->input('to_full_half', ['label' => false,'options' => $options,'class' => 'form-control input-sm','value' => $leaveApplication->to_full_half]); ?>
+						echo $this->Form->input('to_full_half', ['label' => false,'options' => $options,'class' => 'form-control input-sm to_full_half','value' => $leaveApplication->to_full_half]); ?>
 					</div>
 				</div>
 			</div>
@@ -266,7 +266,7 @@ $(document).ready(function()
 		}
 	}
 	
-	$('.leave_type').live("change",function(){
+	/* $('.leave_type').live("change",function(){
 		var leave_type = $(this).val();
 		if(leave_type=='2')
 		{
@@ -276,6 +276,58 @@ $(document).ready(function()
 		{
 			$('.attache_file').hide();
 		}
+	}); */
+	$('.leave_type').live("change",function(){
+		var leave_type = $('.leave_type option:selected').val();
+		//alert(leave_type);
+		var empId=$('.empDropDown').find('option:selected').val();
+		//alert(empId);
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
+		url=url+'/'+empId+'/'+leave_type;
+		//alert(url);
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { 
+			var single_multiple=$('input[name=single_multiple]:checked').val();
+			var last_day_this_month=$('input[name=last_day_this_month]').val();
+			var first_day_this_month=$('input[name=first_day_this_month]').val();
+			var from_leave_date=$('input[name=from_leave_date]').val();
+			var to_leave_date=$('input[name=to_leave_date]').val();
+			//alert(last_day_this_month);
+			if(response == "yes"){
+				$('.attache_file').show();
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ alert();
+				$('.attache_file').show();
+			}else{
+				$('.attache_file').hide();
+			}
+        });
+		
 	});
+	
+	
+	$('.to_full_half').live("change",function(){
+		var to_full_half=$('.to_full_half option:selected').val(); 
+		var from_full_half=$('.from_full_half option:selected').val();  
+		if(to_full_half == "Full Day" && from_full_half == "Full Day"){
+		var single_multiple=$('input[name=single_multiple]:checked').val();
+		var last_day_this_month=$('input[name=last_day_this_month]').val();
+		var first_day_this_month=$('input[name=first_day_this_month]').val();
+		var from_leave_date=$('input[name=from_leave_date]').val();
+		var to_leave_date=$('input[name=to_leave_date]').val();
+		if(single_multiple == "Multiple"){ 
+		var leave_type = $('.leave_type option:selected').val();
+			if(leave_type == 2){ 
+					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
+						$('.attache_file').show();
+					}
+				}
+			}
+		}else{
+			$('.attache_file').hide();
+		}
+		
+	}); 
 });
 </script>

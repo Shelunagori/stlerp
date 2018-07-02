@@ -686,7 +686,7 @@ class InventoryTransferVouchersController extends AppController
 					$inventory_transfer_voucher_rows[$key]['row_id'] = $inventory_transfer_voucher_row->id;
 				}
 			$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id,'ItemLedgers.in_out'=>'Out']);
-			
+			//$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id,'ItemLedgers.in_out'=>'In']);
 			$this->InventoryTransferVouchers->Items->SerialNumbers->deleteAll(['itv_id'=>$inventoryTransferVoucher->id,'company_id'=>$st_company_id,'SerialNumbers.status'=>'Out']);
 			
 			$no=1;

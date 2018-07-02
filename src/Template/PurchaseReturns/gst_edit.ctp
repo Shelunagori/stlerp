@@ -784,7 +784,7 @@ $(document).ready(function() {
 
 	
 	var gst_type=$('.gst_type').val();
-		if(gst_type=='GST') {
+		if(gst_type=='GST') 
 		{  
 				$('.igst_display').css("display", "none");
 				$('.cgst_display').css("display", "");
@@ -924,7 +924,7 @@ $(document).ready(function() {
 	
 	//ref no //
 	//add_ref_row();
-	$('.addrefrow').live("click",function() {
+	$('.addrefrow').live("click",function() { 
 		add_ref_row();
 	});
 	

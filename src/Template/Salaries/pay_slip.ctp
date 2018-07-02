@@ -17,7 +17,7 @@
 	<div class="panel-body">
 		<?php $yearFrom=date('Y',strtotime($financial_year->date_from)); ?>
 		<form method="post">
-			<select name="month_year">
+			<select name="month_year" class='form-control select2me' style="width:25%;">
 				<option value="4-<?php echo $yearFrom; ?>">April-<?php echo $yearFrom; ?></option>
 				<option value="5-<?php echo $yearFrom; ?>">May-<?php echo $yearFrom; ?></option>
 				<option value="6-<?php echo $yearFrom; ?>">June-<?php echo $yearFrom; ?></option>
@@ -31,7 +31,7 @@
 				<option value="2-<?php echo $yearFrom+1; ?>">February-<?php echo $yearFrom+1; ?></option>
 				<option value="3-<?php echo $yearFrom+1; ?>">March-<?php echo $yearFrom+1; ?></option>
 			</select>
-			<button type="submit">Print</button>
+			<button class="btn btn-primary " type="submit">Print</button>
 		</form>
 	</div>
 </div>

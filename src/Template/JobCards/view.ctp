@@ -69,7 +69,9 @@ margin-bottom: 0;
 					<td><label ><b>Required Date</b></label></td>
 					<td>:</td>
 					<td><?= h($jobCard->required_date=date("d-m-Y",strtotime($jobCard->required_date))) ?></td>
-					
+					<td><label ><b>Created Date</b></label></td>
+					<td>:</td>
+					<td><?= h($jobCard->created_on=date("d-m-Y",strtotime($jobCard->created_on))) ?></td>
 				</tr>
 				<tr>
 					<td valign="top"><label ><b>Dispatch Destination</b></label></td>

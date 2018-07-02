@@ -250,7 +250,7 @@ if($transaction_date <  $start_date ) {
 			</div>
 		</div>
 	    </div>
-		<button type="submit" class="btn btn-primary">Submit</button>
+		<button type="submit" id="add_submit" class="btn btn-primary">Submit</button>
 	<?= $this->Form->end(); ?>
 </div>
 </div>
@@ -348,6 +348,8 @@ $(document).ready(function() {
 		},
 
 		submitHandler: function (form) {
+			$('#add_submit').prop('disabled', true);
+			$('#add_submit').text('Submitting.....');
 			validate_serial();
 			success3.show();
 			error3.hide();

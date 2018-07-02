@@ -262,7 +262,7 @@ $html.='
 		<td style="padding-top:8px;padding-bottom:5px;line-height:20px " valign="top">
 		<span> HSN Code : '.$invoiceRows->item->hsn_code;
 		if($invoiceRows->customer_item_code){
-			$html.=' <b>/</b> Your  Item Code is : '.$invoiceRows->customer_item_code; 
+			$html.=' <b><br/></b> Your  Item Code : '.$invoiceRows->customer_item_code; 
 		}
 		$html.='		
 		<div style="height:'.$invoiceRows->height.'"></div></span>

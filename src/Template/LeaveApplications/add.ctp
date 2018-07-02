@@ -131,7 +131,7 @@ border:none;
 			   <div class="col-md-2">
 					<div class="form-group" id="from_half">
 						<label class="control-label  label-css">.</label>  
-						<select name="from_full_half" class="form-control input-sm cr_dr" >
+						<select name="from_full_half" class="form-control input-sm cr_dr from_full_half" >
 							<option value="Full Day">Full Day</option>
 							<option value="First Half Day">First Half Day</option>
 							<option value="Second Half Day">Second Half Day</option>
@@ -149,7 +149,8 @@ border:none;
 			   <div class="col-md-2">
 					<div class="form-group" id="to_half">
 						<label class="control-label  label-css">.</label>  
-						<select name="to_full_half" class="form-control input-sm cr_dr" >
+						<select name="to_full_half" class="form-control input-sm cr_dr to_full_half" >
+							<option value="">Select</option>
 							<option value="Full Day">Full Day</option>
 							<option value="First Half Day">First Half Day</option>
 							<option value="Second Half Day">Second Half Day</option>
@@ -187,6 +188,10 @@ border:none;
 			</div>
 			<?php echo $this->Form->end(); ?>
 			</div>
+	<?php $first_day_this_month = date('01-m-Y'); 
+	 $last_day_this_month  = date('t-m-Y'); ?>	
+<input type="hidden" name="first_day_this_month" class="first_day_this_month"  value="<?php echo $first_day_this_month; ?>">	 
+<input type="hidden" name="last_day_this_month" class="last_day_this_month" value="<?php echo $last_day_this_month; ?>">	 
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 
 <script>
@@ -339,14 +344,20 @@ $(document).ready(function()
 		//alert(empId);
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
 		url=url+'/'+empId+'/'+leave_type;
+		//alert(url);
         $.ajax({
             url: url,
             type: 'GET',
         }).done(function(response) { 
 			var single_multiple=$('input[name=single_multiple]:checked').val();
+			var last_day_this_month=$('input[name=last_day_this_month]').val();
+			var first_day_this_month=$('input[name=first_day_this_month]').val();
+			var from_leave_date=$('input[name=from_leave_date]').val();
+			var to_leave_date=$('input[name=to_leave_date]').val();
+			//alert(last_day_this_month);
 			if(response == "yes"){
 				$('.attache_file').show();
-			}else if(response == "no" && single_multiple == "Multiple"){
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ alert();
 				$('.attache_file').show();
 			}else{
 				$('.attache_file').hide();
@@ -355,7 +366,50 @@ $(document).ready(function()
 		
 	});
 	
-	
+	$('.to_full_half').live("change",function(){
+		var to_full_half=$('.to_full_half option:selected').val(); 
+		var from_full_half=$('.from_full_half option:selected').val();  
+		if(to_full_half == "Full Day" && from_full_half == "Full Day"){
+		var single_multiple=$('input[name=single_multiple]:checked').val();
+		var last_day_this_month=$('input[name=last_day_this_month]').val();
+		var first_day_this_month=$('input[name=first_day_this_month]').val();
+		var from_leave_date=$('input[name=from_leave_date]').val();
+		var to_leave_date=$('input[name=to_leave_date]').val();
+		if(single_multiple == "Multiple"){ 
+		var leave_type = $('.leave_type option:selected').val();
+			if(leave_type == 2){ 
+					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
+						$('.attache_file').show();
+					}
+				}
+			}
+		}else{
+			$('.attache_file').hide();
+		}
+		
+	}); 
+	$('.to_full_half').live("each",function(){
+		var to_full_half=$('.to_full_half option:selected').val(); 
+		var from_full_half=$('.from_full_half option:selected').val(); 
+		if(to_full_half == "Full Day" && from_full_half == "Full Day"){
+		var single_multiple=$('input[name=single_multiple]:checked').val();
+		var last_day_this_month=$('input[name=last_day_this_month]').val();
+		var first_day_this_month=$('input[name=first_day_this_month]').val();
+		var from_leave_date=$('input[name=from_leave_date]').val();
+		var to_leave_date=$('input[name=to_leave_date]').val();
+		if(single_multiple == "Multiple"){ 
+		var leave_type = $('.leave_type option:selected').val();
+			if(leave_type == 2){ 
+					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
+						$('.attache_file').show();
+					}
+				}
+			}
+		}else{
+			$('.attache_file').hide();
+		}
+		
+	}); 
 	
 	$('.empDropDown').live("change",function(){
 		$('#leaveData').html('Loading...');
