@@ -208,7 +208,7 @@ class EmployeeSalariesController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$st_year_id = $session->read('st_year_id');
 		
-		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['id'=>$st_year_id])->first();
+		$financial_year = $this->EmployeeSalaries->FinancialYears->find()->where(['FinancialYears.id'=>$st_year_id])->first();
 		
 		
 		//Save the salary
@@ -281,7 +281,7 @@ class EmployeeSalariesController extends AppController
 			
 		
 		
-		$employees = $this->EmployeeSalaries->Employees->find()->where(['id !='=>23])->where(['salary_company_id'=>$st_company_id])
+		$employees = $this->EmployeeSalaries->Employees->find()->where(['Employees.id !='=>23])->where(['salary_company_id'=>$st_company_id])
 		->contain(['EmployeeCompanies'])
 			->matching(
 					'EmployeeCompanies', function ($q) use($st_company_id) {
@@ -417,7 +417,11 @@ class EmployeeSalariesController extends AppController
 			
 			
 			$From=date('Y-m-d',strtotime($From)); 
-			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['id'=>'DESC'])->first();   
+			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['EmployeeSalaries.id'=>'DESC'])
+			->matching('EmployeeSalaryRows.EmployeeSalaryDivisions', function ($q) use($st_company_id){
+				return $q->where(['EmployeeSalaryDivisions.company_id' => $st_company_id]);
+			})
+			->first();  
 			
 			$EmployeeAttendance = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['employee_id'=>$dt->id,'month'=>$month,'financial_year_id'=>$financial_year->id])->first();  
 			$EmployeeAtten[$dt->id]=@$EmployeeAttendance->present_day;
