@@ -35,8 +35,10 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($salesOrders as $salesOrder){ 
+						if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
 						if($status=='Converted Into Invoice' ){
 							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
+							
 						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
@@ -47,7 +49,7 @@
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?= h($salesOrder->customer->customer_name) ?></td>
 							<td><?= h($salesOrder->customer_po_no) ?></td>
-							<td><?= h($salesOrder->total) ?></td>
+							<td><?= h($salesOrder->total_taxable_value) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							<td>
 								<?php 
@@ -66,7 +68,7 @@
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?= h($salesOrder->customer->customer_name) ?></td>
 							<td><?= h($salesOrder->customer_po_no) ?></td>
-							<td><?= h($this->Money->indianNumberFormat($salesOrder->total)) ?></td>
+							<td><?= h($this->Money->indianNumberFormat($salesOrder->total_taxable_value)) ?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							<td>
 								<?php 
@@ -75,7 +77,7 @@
 							</td>
 						</tr>
 							
-							<?php } } } ?>
+						<?php } } }} ?>
 					</tbody>
 				</table>
 				

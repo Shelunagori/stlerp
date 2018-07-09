@@ -347,7 +347,7 @@ class EmployeeSalariesController extends AppController
 				$ledger->ledger_account_id = $LedgerAccount->id;
 				$ledger->credit = 0;
 				$ledger->debit =abs($other_amounts[$dt->id]);
-				$total_dr=$total_dr+$other_amounts[$dt->id];
+				$total_dr=$total_dr+abs($other_amounts[$dt->id]);
 				$ledger->voucher_id = $Nppayment->id;
 				$ledger->voucher_source = 'Non Print Payment Voucher';
 				$ledger->transaction_date = $Nppayment->transaction_date;

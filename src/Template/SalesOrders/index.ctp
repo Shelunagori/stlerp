@@ -165,7 +165,7 @@
 								</div>
 							</td>
 							
-							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total) )?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
+							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total_taxable_value) )?><?php $total_amount = $total_amount+$salesOrder->total_taxable_value;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 							<td class="actions">
@@ -214,7 +214,7 @@
 								</div>
 							</td>
 							
-							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total)) ?><?php $total_amount = $total_amount+$salesOrder->total;?></td>
+							<td align="center"><?= h($this->Money->indianNumberFormat($salesOrder->total_taxable_value)) ?><?php $total_amount = $total_amount+$salesOrder->total_taxable_value;?></td>
 							<td><?php echo date("d-m-Y",strtotime($salesOrder->created_on)); ?></td>
 							
 						<td class="actions" width="20%">

@@ -67,7 +67,7 @@ margin-bottom: 0;
 	<table width="100%" class="divHeader">
 		<tr>
 			<td width="30%"><?php echo $this->Html->image('/logos/'.$debitNote->company->logo, ['width' => '40%']); ?></td>
-			<td align="center" width="40%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">DEBIT NOTE VOUCHER</div></td>
+			<td align="center" width="40%" style="font-size: 12px;"><div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">DEBIT NOTE</div></td>
 			<td align="right" width="40%" style="font-size: 12px;">
 			<span style="font-size: 14px;"><?= h($debitNote->company->name) ?></span>
 			<span><?= $this->Text->autoParagraph(h($debitNote->company->address)) ?>

@@ -268,7 +268,7 @@
 					</div>
 					<div class="col-md-3">
 						<div class="form-group">
-							<label class="control-label">Customer SO No</label>
+							<label class="control-label">Supplier SO No</label>
 							<?php 
 							echo $this->Form->input('customer_so_no',['label' => false,'class' => 'form-control input-sm','placeholder'=>'Customer SO No']); ?>
 						</div>
