@@ -76,7 +76,12 @@
 		{
 			$created_by = $itemLedger->voucher_info->created_by; 
 			$party_name=$itemLedger->party_info->company_name;
-			$voucher_no= '#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT); 
+			$voucher=('DN/'.str_pad(@$itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$itemLedger->voucher_info->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$itemLedger->voucher_info->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;
+			//$voucher_no= '#'.str_pad($itemLedger->voucher_info->voucher_no, 4, '0', STR_PAD_LEFT); 
 			if($itemLedger->voucher_info->gst_type == "Non-GST"){
 				$url_path="/PurchaseReturns/view/".$itemLedger->voucher_info->id;
 			}else{
@@ -177,7 +182,7 @@
 			</td>
 			<td><?php if($in_out_type=='In'){ echo $itemLedger->quantity; } else { echo '-'; } ?></td>
 			<td><?php echo $status; ?></td>
-			<td align="right"><?php echo $this->Number->format($rate,['places'=>2]); ?></td>
+			<td align="right"><?php echo $this->Money->indianNumberFormat($rate); ?></td>
 		</tr>
 		<?php endforeach; ?>
 	</tbody>

@@ -153,8 +153,12 @@
 					}
 					if($key1=='PurchaseReturns'){
 						$date=$itemData['created_on'];
-						@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
-						
+						//@$voucher=('#'.str_pad($itemData->voucher_no, 4, '0', STR_PAD_LEFT));
+						@$voucher=('DN/'.str_pad(@$itemData->voucher_no, 4, '0', STR_PAD_LEFT)); 
+						$s_year_from = date("Y",strtotime(@$itemData->financial_year->date_from));
+						$s_year_to = date("Y",strtotime(@$itemData->financial_year->date_to));
+						$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+						$voucher=$voucher.'/'.$fy;
 						if($itemData['gst_type']=="Gst"){
 							$location='/PurchaseReturns/gst-view/'.$itemData->id;
 						}else{

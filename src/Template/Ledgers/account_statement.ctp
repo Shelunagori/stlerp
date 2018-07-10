@@ -314,7 +314,7 @@ $url_excel="/?".$url;
 							$emp_id="Yes";
 					} */
 					$Receipt=$url_link[$ledger->id];
-					$voucher=('DR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$voucher=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
 					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
 					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
 					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
@@ -343,7 +343,12 @@ $url_excel="/?".$url;
 					}
 				}else if($ledger->voucher_source=="Purchase Return"){
 					$Receipt=$url_link[$ledger->id];
-					$voucher_no=h(str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+					$voucher=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;
+					//$voucher_no=h('DN/',str_pad($Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 					if($Receipt->gst_type=="Gst"){
 						$url_path="/PurchaseReturns/gstView/".$ledger->voucher_id;	
 					}else{
@@ -354,13 +359,18 @@ $url_excel="/?".$url;
 							$emp_id="Yes";
 					}
 				}
-				
+				$vouchersNames = array();
+				$vouchersNames=['Non Print Payment Voucher','Receipt Voucher','Contra Voucher','Petty Cash Payment Voucher','Payment Voucher'];
 				if($ledger->voucher_source != 'Opening Balance')	
 				{
 				?>
 				<tr>
 						<td><?php echo date("d-m-Y",strtotime($ledger->transaction_date)); ?></td>
-						<td><?= h($ledger->voucher_source); ?></td>
+						<td><?php if(in_array($ledger->voucher_source,$vouchersNames)) { ?>
+							<button type="button" class="btn btn-xs tooltips revision_show" value="<?=$ledger->voucher_id ?>" attrsource = "<?= $ledger->voucher_source?>" style="margin-left:5px;" data-original-title="Narration"><i class="fa fa-plus-circle"></i></button>
+							<button type="button" class="btn btn-xs tooltips revision_hide" id="revision_hide" value="<?=$ledger->voucher_id ?>" attrsource = "<?= $ledger->voucher_source?>" style="margin-left:5px; display:none;"><i class="fa fa-minus-circle"></i></button><?php } ?><?= h($ledger->voucher_source); ?>
+							
+						</td>
 						<td>
 						
 						<?php
@@ -470,5 +480,31 @@ $('.send_mail').die().live("click",function() {
 	}); 
 	
 });
+/////
+$('.revision_show').die().live("click",function() {
+		//$("#revision_hide").show();
+		//$("#revision_show").hide();
+		$(this).hide();
+		$(this).closest('td').find(".revision_hide").show();
+		var entity=$(this).closest('tr');
+		var voucher_id=$(this).val();
+		var attrsource=$(this).attr('attrsource');
+		var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'getVoucherNarration']);
+		?>";
+		url=url+'/'+voucher_id+'/'+attrsource,
+		
+		$.ajax({
+			url: url,
+		}).done(function(response) {
+			entity.after(response);
+			//$("#view_revision").html(response);
+		});		
+    });
+	
+	$('.revision_hide').die().live("click",function() {
+		$(this).closest('tr').next().remove();
+		$(this).hide();
+		$(this).closest('td').find(".revision_show").show();
+	});
 });
 </script>

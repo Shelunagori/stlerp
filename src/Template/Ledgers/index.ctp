@@ -136,7 +136,7 @@
 				}else if($ledger->voucher_source=="Debit Notes"){
 					
 					$Receipt=$url_link[$ledger->id];
-					$voucher=('DR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$voucher=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
 					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
 					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
 					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
@@ -160,7 +160,12 @@
 				}else if($ledger->voucher_source=="Purchase Return"){
 					//$url_path="/purchase-returns/view/".$ledger->voucher_id;
 					$Receipt=$url_link[$ledger->id];
-					$voucher_no='#'.str_pad($Receipt->voucher_no, 4, '0', STR_PAD_LEFT);
+					//$voucher_no='#'.str_pad($Receipt->voucher_no, 4, '0', STR_PAD_LEFT);
+					$voucher=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+					$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+					$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+					$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+					$voucher_no=$voucher.'/'.$fy;
 					if($Receipt->gst_type=="Gst"){
 						$url_path="/PurchaseReturns/gstView/".$ledger->voucher_id;	
 					}else{

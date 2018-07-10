@@ -39,7 +39,15 @@
 							<td>
 								<?= h($purchaseReturn->vendor->company_name);?>
 							</td>
-							<td><?= h('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
+							<td>
+							<?php $voucher=('DN/'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+							<?php 
+							$s_year_from = date("Y",strtotime($purchaseReturn->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($purchaseReturn->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+							echo $voucher.'/'.$fy;
+							?>
+							</td>
 							<td>
 								<?= h($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4);?>
 							</td>

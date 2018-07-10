@@ -56,12 +56,21 @@
 							<td>
 								<?= h($purchaseReturn->vendor->company_name);?>
 							</td>
+							
+							<?php $voucher=('DN/'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+							<?php 
+							$s_year_from = date("Y",strtotime($purchaseReturn->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($purchaseReturn->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+							?>
+							
+							
 							<td><?php
 							if($purchaseReturn->gst_type=="Gst"){
-								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
+								echo $this->Html->link($voucher.'/'.$fy,['controller'=>'PurchaseReturns',
 								'action' => 'gstView', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('target'=>'_blank'));
 							}else{
-								echo $this->Html->link('#'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT),['controller'=>'PurchaseReturns',
+								echo $this->Html->link($voucher.'/'.$fy,['controller'=>'PurchaseReturns',
 								'action' => 'View', $EncryptingDecrypting->encryptData($purchaseReturn->id)],array('target'=>'_blank'));
 							}		?></td>
 							<td>

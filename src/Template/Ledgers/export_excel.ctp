@@ -59,15 +59,35 @@
 							}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 										$Receipt=$url_link[$ledger->id];
 										$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
-							}else if($ledger->voucher_source=="Debit Note"){
+							}else if($ledger->voucher_source=="Debit Notes"){
 										$Receipt=$url_link[$ledger->id];
-										$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
-							}else if($ledger->voucher_source=="Credit Note"){
+										$voucher_no=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+										$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+										$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+										$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+										$voucher_no=$voucher.'/'.$fy;
+										//$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+							}else if($ledger->voucher_source=="Credit Notes"){
 										$Receipt=$url_link[$ledger->id];
-										$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
+										$voucher_no=('CR/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+										$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+										$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+										$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+										$voucher_no=$voucher.'/'.$fy;
+										//$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));
 							}else if($ledger->voucher_source=="Sale Return"){
 										$invoice=$url_link[$ledger->id];
-										$voucher_no=h(($invoice->sr1.'/SR-'.str_pad($invoice->sr2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sr3.'/'.$invoice->sr4));
+										$voucher_no=h(($invoice->sr1.'/CR-'.str_pad($invoice->sr2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sr3.'/'.$invoice->sr4));
+							}else if($ledger->voucher_source=="Purchase Return"){
+							//$url_path="/purchase-returns/view/".$ledger->voucher_id;
+								$Receipt=$url_link[$ledger->id];
+								//$voucher_no='#'.str_pad($Receipt->voucher_no, 4, '0', STR_PAD_LEFT);
+								$voucher=('DN/'.str_pad(@$Receipt->voucher_no, 4, '0', STR_PAD_LEFT)); 
+								$s_year_from = date("Y",strtotime(@$Receipt->financial_year->date_from));
+								$s_year_to = date("Y",strtotime(@$Receipt->financial_year->date_to));
+								$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2));
+								$voucher_no=$voucher.'/'.$fy;
+								
 							}else if($ledger->voucher_source=="Inventory Return"){
 										$Receipt=$url_link[$ledger->id];
 										$voucher_no=h(str_pad(@$Receipt->voucher_no,4,'0',STR_PAD_LEFT));

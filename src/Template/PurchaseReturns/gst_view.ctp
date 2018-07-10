@@ -52,9 +52,16 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="left">
 				<table>
 					<tr>
+					<?php $voucher=('DN/'.str_pad($purchaseReturn->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+							<?php 
+							$s_year_from = date("Y",strtotime($purchaseReturn->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($purchaseReturn->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+							?>
+							
 						<td><b>Voucher No</b></td>
 						<td width="20" align="center">:</td>
-						<td><?= h('#'.str_pad($purchaseReturn->voucher_no,4,'0',STR_PAD_LEFT)); ?></td>
+						<td><?php echo $voucher.'/'.$fy; ?></td>
 					</tr>
 				</table>
 			</td>

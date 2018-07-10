@@ -127,7 +127,9 @@ class ItemLedgersController extends AppController
 			return ['voucher_info'=>$Challan,'party_type'=>$Challan->challan_for,'party_info'=>$Party];
 		}
 		if($source_model=="Purchase Return"){
-			$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->get($source_id);
+			$PurchaseReturn=$this->ItemLedgers->PurchaseReturns->get($source_id,[
+						'contain'=>['FinancialYears']
+					]);
 			
 			$Vendor=$this->ItemLedgers->Vendors->get($PurchaseReturn->vendor_id);
 			return ['voucher_info'=>$PurchaseReturn,'party_type'=>'Purchase','party_info'=>$Vendor];
@@ -1968,14 +1970,14 @@ class ItemLedgersController extends AppController
 				$AllDatas[$To]['InventoryVouchers']=$Ivs;
 			}
 			
-			$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+			$SaleReturns=$this->ItemLedgers->SaleReturns->find()->contain(['SaleReturnRows'=>['Items','SerialNumbers'],'FinancialYears'])->where(function($exp) use($From ,$To) {
 						return $exp->between('date_created',$From ,$To, 'date');
 					})->where(['SaleReturns.company_id' => $st_company_id])->toArray();
 			if(!empty($SaleReturns)){
 				$AllDatas[$To]['SaleReturns']=$SaleReturns;
 			}
 			
-			$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+			$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers'],'FinancialYears'])->where(function($exp) use($From ,$To) {
 						return $exp->between('created_on',$From ,$To, 'date');
 					})->where(['PurchaseReturns.company_id' => $st_company_id])->toArray();
 					//pr($PurchaseReturns);exit;
@@ -2057,7 +2059,7 @@ class ItemLedgersController extends AppController
 			$AllDatas[$To]['SaleReturns']=$SaleReturns;
 		}
 		
-		$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers']])->where(function($exp) use($From ,$To) {
+		$PurchaseReturns=$this->ItemLedgers->PurchaseReturns->find()->contain(['PurchaseReturnRows'=>['Items','SerialNumbers'],'FinancialYears'])->where(function($exp) use($From ,$To) {
 					return $exp->between('created_on',$From ,$To, 'date');
 				})->toArray();
 				//pr($PurchaseReturns);exit;

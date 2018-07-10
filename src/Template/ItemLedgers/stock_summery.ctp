@@ -118,7 +118,7 @@
 								<?php 
 								 if(@$itemSerialNumberStatus[$key]==1){
 									if($item_stocks[$key] > 0){
-										echo $this->Money->indianNumberFormat(@$unitRate);
+										echo $this->Number->format(@$unitRate,['places'=>2]);
 										$RowTotal=@$unitRate*@$itmQty[$key];
 										$totalColumn+=@$unitRate*@$itmQty[$key];
 									}else{
@@ -127,7 +127,7 @@
 									}
 								}else{
 									if($item_stocks[$key] > 0){
-										echo $this->Money->indianNumberFormat(@$unitRate);
+										echo $this->Number->format(@$unitRate,['places'=>2]);
 										$RowTotal=@$unitRate*@$itmQty[$key];
 										$totalColumn+=@$unitRate*@$itmQty[$key];
 									}else{

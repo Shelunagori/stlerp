@@ -53,7 +53,7 @@ class PurchaseReturnsController extends AppController
 		
 		
         $this->paginate = [
-            'contain' => ['InvoiceBookings', 'Companies','Vendors']
+            'contain' => ['InvoiceBookings', 'Companies','Vendors','FinancialYears']
         ];
         $purchaseReturns = $this->paginate($this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->order(['PurchaseReturns.id' => 'DESC']));
 //pr($purchaseReturns->toArray());exit;
@@ -96,7 +96,7 @@ class PurchaseReturnsController extends AppController
 		
 		
        
-        $purchaseReturns = $this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->contain(['InvoiceBookings','Vendors'])->order(['PurchaseReturns.id' => 'DESC']);
+        $purchaseReturns = $this->PurchaseReturns->find()->where($where)->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id])->contain(['InvoiceBookings','Vendors','FinancialYears'])->order(['PurchaseReturns.id' => 'DESC']);
 
         $this->set(compact('purchaseReturns'));
         $this->set('_serialize', ['purchaseReturns']);
@@ -1094,7 +1094,7 @@ class PurchaseReturnsController extends AppController
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$id = $this->EncryptingDecrypting->decryptData($id); 
 		$purchaseReturn = $this->PurchaseReturns->get($id,[
-		'contain'=>['Vendors','Creator','Companies','PurchaseReturnRows'=>['Items'],'InvoiceBookings'=>['Creator']]
+		'contain'=>['Vendors','FinancialYears','Creator','Companies','PurchaseReturnRows'=>['Items'],'InvoiceBookings'=>['Creator']]
 		]);
 		
 		$purchase_acc='';

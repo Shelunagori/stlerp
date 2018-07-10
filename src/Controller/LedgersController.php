@@ -78,7 +78,9 @@ class LedgersController extends AppController
 						'contain'=>['FinancialYears']
 					]);
 				}else if($ledger->voucher_source=="Purchase Return"){
-					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Sale Return"){
 					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Inventory Return"){
@@ -204,11 +206,17 @@ class LedgersController extends AppController
 				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Debit Notes"){
-					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Credit Notes"){
-					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Purchase Return"){
-					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Sale Return"){
 					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Inventory Return"){
@@ -287,12 +295,18 @@ class LedgersController extends AppController
 					$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Non Print Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
-				}else if($ledger->voucher_source=="Debit Note"){
-					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id);
-				}else if($ledger->voucher_source=="Credit Note"){
-					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Debit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Credit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Purchase Return"){
-					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Sale Return"){
 					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Inventory Return"){
@@ -1230,7 +1244,9 @@ class LedgersController extends AppController
 				if($ledger->voucher_source=="Journal Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($ledger->voucher_id);
 				}else if($ledger->voucher_source=="Payment Voucher"){
-					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id,
+						['contain'=>['PaymentRows']]
+					);
 				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
 					$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($ledger->voucher_id);
 					//pr($url_link[$ledger->id]); exit;
@@ -1272,7 +1288,9 @@ class LedgersController extends AppController
 						'contain'=>['FinancialYears']
 					]);
 				}else if($ledger->voucher_source=="Purchase Return"){
-					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id);
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
 				}else if($ledger->voucher_source=="Sale Return"){
 					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
 				}
@@ -1297,7 +1315,45 @@ class LedgersController extends AppController
 		
 	}
 	
-
+	public function getVoucherNarration($voucher_id=null,$voucher_source=null){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$voucher_id = $this->EncryptingDecrypting->decryptData($voucher_id);
+		$Ledgers = $this->Ledgers->find()
+				->where(['voucher_id'=>$voucher_id,'company_id'=>$st_company_id,'voucher_source'=>$voucher_source])->order(['transaction_date' => 'ASC']);
+				//pr($opening_balance_ar); exit;
+		
+		foreach ($Ledgers as $ledger){
+			if($voucher_source=="Non Print Payment Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($voucher_id,[
+					'contain'=>['NppaymentRows']
+				]);
+			}else if($voucher_source=="Contra Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($voucher_id,[
+					'contain'=>['ContraVoucherRows']
+				]);
+			}else if($voucher_source=="Petty Cash Payment Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($voucher_id,[
+					'contain'=>['PettyCashVoucherRows']
+				]);
+			}else if($voucher_source=="Receipt Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($voucher_id,[
+					'contain'=>['ReceiptRows']
+				]);
+			}else if($voucher_source=="Journal Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($voucher_id,[
+					'contain'=>['JournalVoucherRows']
+				]);
+			}else if($voucher_source=="Payment Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->Payments->get($voucher_id,[
+					'contain'=>['PaymentRows']
+				]);
+			}
+		}	
+		
+		
+		$this->set(compact('Ledgers','voucher_source','url_link'));	
+	}
 	
 	public function openingBalanceView (){
 		$this->viewBuilder()->layout('index_layout');
