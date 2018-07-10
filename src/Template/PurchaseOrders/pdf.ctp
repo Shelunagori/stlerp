@@ -209,7 +209,7 @@ $paisa_text="";
 if(sizeof($total)==2){
 	$total[1]=str_pad($total[1], 2, '0', STR_PAD_RIGHT);
 	$paisa=(int)$total[1];
-	$paisa_text=' and'. h(ucwords($this->NumberWords->convert_number_to_words($paisa))) .' Paisa';
+	$paisa_text=h(ucwords($this->NumberWords->convert_number_to_words($paisa))) .' Paisa';
 }else{ $paisa=""; }
 
 $html.='</table>';

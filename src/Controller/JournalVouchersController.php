@@ -382,7 +382,8 @@ class JournalVouchersController extends AppController
 				}
 				
 					$this->Flash->success(__('The Journal-Voucher:'.str_pad($journalVoucher->voucher_no, 4, '0', STR_PAD_LEFT)).' has been genereted.');
-					return $this->redirect(['action' => 'view/'.$journalVoucher->id]);
+					$journalVoucher->id = $this->EncryptingDecrypting->encryptData($journalVoucher->id);
+					return $this->redirect(['action' => 'view/',$journalVoucher->id]);
             
 				} 
 			
@@ -752,7 +753,9 @@ class JournalVouchersController extends AppController
 					}
 					$i++;
 					} */
-					return $this->redirect(['action' => 'view/'.$journalVoucher->id]);
+					$journalVoucher_id = $journalVoucher->id;
+					$journalVoucher_id = $this->EncryptingDecrypting->encryptData($journalVoucher_id);
+					return $this->redirect(['action' => 'view/',$journalVoucher_id]);
 				} else {
                 $this->Flash->error(__('The journal voucher could not be saved. Please, try again.'));
             }
@@ -768,7 +771,7 @@ class JournalVouchersController extends AppController
 			$where[]=$data->ledger_account_id;
 		}
 
-		/* $ReceivedFroms_selected='yes';
+		$ReceivedFroms_selected='yes';
 		if(sizeof($where)>0){
 			$receivedFroms = $this->JournalVouchers->ReceivedFroms->find('list',
 				['keyField' => function ($row) {
@@ -784,11 +787,11 @@ class JournalVouchersController extends AppController
 				}])->where(['ReceivedFroms.id IN' => $where]);
 		}else{
 			$ReceivedFroms_selected='no';
-		} */
+		}
 				
-		$receivedFroms=[];
+		//$receivedFroms=[];
 		
-		$ReceivedFroms_selected='yes';
+		/* $ReceivedFroms_selected='yes';
 		if(sizeof($where)>0){
 			$receivedDatas = $this->JournalVouchers->ReceivedFroms->find()->where(['ReceivedFroms.id IN' => $where]);
 			foreach($receivedDatas as $receivedData){
@@ -797,6 +800,7 @@ class JournalVouchersController extends AppController
 		}else{
 			$ReceivedFroms_selected='no';
 		}		
+		 */
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$grn=$this->JournalVouchers->Grns->find()->where(['company_id' => $st_company_id]);

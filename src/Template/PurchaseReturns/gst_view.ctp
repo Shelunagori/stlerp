@@ -61,7 +61,7 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
-						<td><b>Date</b></td>
+						<td><b>Transaction Date</b></td>
 						<td width="20" align="center">:</td>
 						<td><?= h(date('d-m-Y',strtotime($purchaseReturn->transaction_date))) ?></td>
 					</tr>
