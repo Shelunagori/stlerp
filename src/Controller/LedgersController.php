@@ -1315,7 +1315,7 @@ class LedgersController extends AppController
 		
 	}
 	
-	public function getVoucherNarration($voucher_id=null,$voucher_source=null){
+	public function getVoucherNarration($voucher_id=null,$voucher_source=null,$ledger_acc_id=null){
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$voucher_id = $this->EncryptingDecrypting->decryptData($voucher_id);
@@ -1326,25 +1326,35 @@ class LedgersController extends AppController
 		foreach ($Ledgers as $ledger){
 			if($voucher_source=="Non Print Payment Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($voucher_id,[
-					'contain'=>['NppaymentRows']
+					'contain'=>['NppaymentRows'=>function($q) use($ledger_acc_id){
+						return $q->where(['NppaymentRows.received_from_id'=>$ledger_acc_id]);
+					}]
 				]);
 			}else if($voucher_source=="Contra Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($voucher_id,[
-					'contain'=>['ContraVoucherRows']
+					'contain'=>['ContraVoucherRows'=>function($q) use($ledger_acc_id){
+						return $q->where(['ContraVoucherRows.received_from_id'=>$ledger_acc_id]);
+					}]
 				]);
 			}else if($voucher_source=="Petty Cash Payment Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($voucher_id,[
-					'contain'=>['PettyCashVoucherRows']
+					'contain'=>['PettyCashVoucherRows'=>function($q) use($ledger_acc_id){
+						return $q->where(['PettyCashVoucherRows.received_from_id'=>$ledger_acc_id]);
+					}]
 				]);
 			}else if($voucher_source=="Receipt Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($voucher_id);
 			}else if($voucher_source=="Journal Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($voucher_id,[
-					'contain'=>['JournalVoucherRows']
+					'contain'=>['JournalVoucherRows'=>function($q) use($ledger_acc_id){
+						return $q->where(['JournalVoucherRows.received_from_id'=>$ledger_acc_id]);
+					}]
 				]);
 			}else if($voucher_source=="Payment Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->Payments->get($voucher_id,[
-					'contain'=>['PaymentRows']
+					'contain'=>['PaymentRows'=>function($q) use($ledger_acc_id){
+						return $q->where(['PaymentRows.received_from_id'=>$ledger_acc_id]);
+					}]
 				]);
 			}
 		}	

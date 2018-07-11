@@ -25,9 +25,11 @@
 			}else if($voucher_source=="Journal Voucher"){
 				$Receipt=$url_link[$ledger->id];
 				$rowsData = $Receipt->journal_voucher_rows;
+				//pr($rowsData);
 			}else if($voucher_source=="Payment Voucher"){
 				$Receipt=$url_link[$ledger->id];
 				$rowsData = $Receipt->payment_rows;
+				//pr($rowsData);
 			}
 		}
 		$j=1;

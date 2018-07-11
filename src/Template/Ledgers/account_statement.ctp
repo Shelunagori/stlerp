@@ -367,7 +367,7 @@ $url_excel="/?".$url;
 				<tr>
 						<td><?php echo date("d-m-Y",strtotime($ledger->transaction_date)); ?></td>
 						<td><?php if(in_array($ledger->voucher_source,$vouchersNames)) { ?>
-							<button type="button" class="btn btn-xs tooltips revision_show" value="<?=$ledger->voucher_id ?>" attrsource = "<?= $ledger->voucher_source?>" style="margin-left:5px;" data-original-title="Narration"><i class="fa fa-plus-circle"></i></button>
+							<button type="button" class="btn btn-xs tooltips revision_show" value="<?=$ledger->voucher_id ?>" attrsource = "<?= $ledger->voucher_source?>" attrledgeraccountid = "<?= $ledger_account_id ?>" style="margin-left:5px;" data-original-title="Narration"><i class="fa fa-plus-circle"></i></button>
 							<button type="button" class="btn btn-xs tooltips revision_hide" id="revision_hide" value="<?=$ledger->voucher_id ?>" attrsource = "<?= $ledger->voucher_source?>" style="margin-left:5px; display:none;"><i class="fa fa-minus-circle"></i></button><?php } ?><?= h($ledger->voucher_source); ?>
 							
 						</td>
@@ -489,10 +489,11 @@ $('.revision_show').die().live("click",function() {
 		var entity=$(this).closest('tr');
 		var voucher_id=$(this).val();
 		var attrsource=$(this).attr('attrsource');
+		var attrledgeraccountid=$(this).attr('attrledgeraccountid');
 		var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'getVoucherNarration']);
 		?>";
-		url=url+'/'+voucher_id+'/'+attrsource,
-		
+		url=url+'/'+voucher_id+'/'+attrsource+'/'+attrledgeraccountid,
+		//alert(attrledgeraccountid);
 		$.ajax({
 			url: url,
 		}).done(function(response) {
