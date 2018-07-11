@@ -135,7 +135,14 @@ margin-bottom: 0;
 		$total=$total_cr-$total_dr;
 		endforeach; ?>
 	</table>
-	
+	<td colspan="3" style="border-top:none !important;">
+			<table width="100%">
+				<tr>
+					<td><b>Narration : </b></td>
+					<td style="text-align:justify;"><?php echo $receipt->narration;?></td>
+				</tr>
+			</table>
+	</td>		
 	
 	
 	<div style="border:solid 1px ;"></div>

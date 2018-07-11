@@ -360,7 +360,7 @@ $url_excel="/?".$url;
 					}
 				}
 				$vouchersNames = array();
-				$vouchersNames=['Non Print Payment Voucher','Receipt Voucher','Contra Voucher','Petty Cash Payment Voucher','Payment Voucher'];
+				$vouchersNames=['Non Print Payment Voucher','Receipt Voucher','Contra Voucher','Petty Cash Payment Voucher','Payment Voucher','Journal Voucher'];
 				if($ledger->voucher_source != 'Opening Balance')	
 				{
 				?>

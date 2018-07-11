@@ -17,7 +17,7 @@
 	<div class="panel-body">
 		<?php $yearFrom=date('Y',strtotime($financial_year->date_from)); ?>
 		<form method="post">
-			<select name="month_year" class='form-control select2me' style="width:25%;">
+			<select name="month_year">
 				<option value="4-<?php echo $yearFrom; ?>">April-<?php echo $yearFrom; ?></option>
 				<option value="5-<?php echo $yearFrom; ?>">May-<?php echo $yearFrom; ?></option>
 				<option value="6-<?php echo $yearFrom; ?>">June-<?php echo $yearFrom; ?></option>
@@ -31,7 +31,7 @@
 				<option value="2-<?php echo $yearFrom+1; ?>">February-<?php echo $yearFrom+1; ?></option>
 				<option value="3-<?php echo $yearFrom+1; ?>">March-<?php echo $yearFrom+1; ?></option>
 			</select>
-			<button class="btn btn-primary " type="submit">Print</button>
+			<button type="submit">Print</button>
 		</form>
 	</div>
 </div>
@@ -144,17 +144,19 @@
 							<td align="right" style="border: solid 1px #CCC;border-collapse: collapse;padding:2px;">
 								<?php if($salarie->other_amount>0){
 									echo $salarie->other_amount;
+									$tot-=$salarie->other_amount;
 								}else{
 									echo '(-) '.abs($salarie->other_amount);
+									 $tot+=abs($salarie->other_amount);
 								} ?>
-								<?php $tot+=$salarie->other_amount;?>
+								<?php?>
 							</td>
 						</tr>
 						<?php } ?>
 					<?php } ?>
 					<tr>
 						<th colspan="2" style="text-align:right;border: solid 1px #CCC;border-collapse: collapse;padding:2px;">Total</th>
-						<th style="text-align:right;border: solid 1px #CCC;border-collapse: collapse;padding:2px;"><?php echo $tot; ?></th>
+						<th style="text-align:right;border: solid 1px #CCC;border-collapse: collapse;padding:2px;"><?php echo round($tot); ?></th>
 					</tr>
 				</table>
 				<table width="100%" class="divFooter">

@@ -21,6 +21,7 @@
 			}else if($voucher_source=="Receipt Voucher"){
 				$Receipt=$url_link[$ledger->id];
 				$rowsData = $Receipt;
+				//pr($rowsData);
 			}else if($voucher_source=="Journal Voucher"){
 				$Receipt=$url_link[$ledger->id];
 				$rowsData = $Receipt->journal_voucher_rows;
@@ -31,13 +32,21 @@
 		}
 		$j=1;
 	if(sizeof($rowsData) >0 ){
-		foreach($rowsData as $row){ ?>
+		if($voucher_source=="Receipt Voucher"){ ?>
+			<tr>
+			<td style="text-align:justify;"><?php echo $j.' . '.$rowsData->narration; ?></td>
+			
+			</tr>
+		<?php }else{
+			foreach($rowsData as $row){ ?>
 			<tr>
 			<td style="text-align:justify;"><?php echo $j.' . '.$row->narration; ?></td>
 			
 			</tr>
 			
 		<?php $j++; } 
+		}
+		
 	}else{
 		echo "No Data Found!!!";
 	}	

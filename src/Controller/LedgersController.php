@@ -1337,9 +1337,7 @@ class LedgersController extends AppController
 					'contain'=>['PettyCashVoucherRows']
 				]);
 			}else if($voucher_source=="Receipt Voucher"){
-				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($voucher_id,[
-					'contain'=>['ReceiptRows']
-				]);
+				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($voucher_id);
 			}else if($voucher_source=="Journal Voucher"){
 				$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($voucher_id,[
 					'contain'=>['JournalVoucherRows']
