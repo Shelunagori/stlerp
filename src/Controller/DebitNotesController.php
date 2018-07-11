@@ -54,7 +54,7 @@ class DebitNotesController extends AppController
 			$where['DebitNotes.transaction_date <=']=$To;
 		}
         $this->paginate = [
-            'contain' => ['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads']
+            'contain' => ['CustomerSuppilers','Creator','Companies','FinancialYears','DebitNotesRows'=>['ReceivedFroms'],'Heads']
         ];
         
 		$debitNotes = $this->paginate($this->DebitNotes->find()->where(['DebitNotes.company_id'=>$st_company_id])->where($where)->order(['voucher_no'=>'DESC']));
@@ -102,7 +102,7 @@ class DebitNotesController extends AppController
 			$where['DebitNotes.transaction_date <=']=$To;
 		}
         
-		$debitNotes =$this->DebitNotes->find()->where(['DebitNotes.company_id'=>$st_company_id])->where($where)->contain(['CustomerSuppilers','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads'])->order(['voucher_no'=>'DESC']);
+		$debitNotes =$this->DebitNotes->find()->where(['DebitNotes.company_id'=>$st_company_id])->where($where)->contain(['CustomerSuppilers','FinancialYears','Creator','Companies','DebitNotesRows'=>['ReceivedFroms'],'Heads'])->order(['voucher_no'=>'DESC']);
          
 		//pr($debitNotes->toArray());exit;
 		

@@ -35,7 +35,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				<div class="form-group">
 					<label class="control-label">Voucher no<span class="required" aria-required="true">*</span></label><br/>
 					<?php echo $this->Form->input('voucher_no', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm']); ?>
-					<?php echo  "DR/".str_pad($voucher_no,4,'0',STR_PAD_LEFT); ?>
+					<?php $FY=substr($s_year_from, -2).'-'.substr($s_year_to, -2); ?>
+					<?php echo  ("DN/".str_pad($voucher_no,4,'0',STR_PAD_LEFT).'/'.$FY); ?>
 					
 				</div>
 			</div>

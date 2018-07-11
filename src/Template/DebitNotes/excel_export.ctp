@@ -43,7 +43,16 @@
 								echo $debitNote->head->name;
 							} ?>
 							</td>
-							 <td><?= h('#'.str_pad($debitNote->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
+							 <td><?php $voucher=('DN/'.str_pad($debitNote->voucher_no, 4, '0', STR_PAD_LEFT)); ?>
+							<?php 
+							$s_year_from = date("Y",strtotime($debitNote->financial_year->date_from));
+							$s_year_to = date("Y",strtotime($debitNote->financial_year->date_to));
+							$fy=(substr($s_year_from, -2).'-'.substr($s_year_to, -2)); 
+							?>
+							 
+							 
+							 
+							 <?php echo $voucher.'/'.$fy;?></td>
                             <td><?= h(date("d-m-Y",strtotime($debitNote->transaction_date)))?></td>
                            
 						

@@ -21,7 +21,7 @@
 							</td>
 							<td width="20%">
 								<div class="input-group" style="" id="pnf_text">
-								<span class="input-group-addon">PR</span><input type="text" name="vouch_no" class="form-control input-sm" placeholder="Voucher No" value="<?php echo @$vouch_no; ?>">
+								<span class="input-group-addon">DN</span><input type="text" name="vouch_no" class="form-control input-sm" placeholder="Voucher No" value="<?php echo @$vouch_no; ?>">
 								</div>
 							</td>
 							<td width="15%">
