@@ -1,3 +1,10 @@
+<style>
+.disabledbutton {
+    pointer-events: none;
+    //opacity: 0.4;
+}
+</style>
+
 <div class="portlet light bordered">
 	<div class="portlet-title">
 		<div class="caption">
@@ -38,83 +45,82 @@
 		<hr/>
 		
 		<form method="post">
+			<div class="row">
+				<div class="col-md-5"></div>
+				<div class="col-md-6">
+					<?php 
+					if($LeaveApplication->single_multiple == "Single"){
+						echo $this->Form->radio(
+						'approve_single_multiple',
+						[
+							['value' => 'Single', 'text' => 'Single Day'],
+							
+						],['value'=>$LeaveApplication->single_multiple]
+					);
+					}else if($LeaveApplication->single_multiple == "Multiple"){
+						echo $this->Form->radio(
+						'approve_single_multiple',
+						[
+							['value' => 'Multiple', 'text' => 'Multiple Days']
+						],['value'=>$LeaveApplication->single_multiple]
+					);
+					}else{
+						echo $this->Form->radio(
+						'approve_single_multiple',
+						[
+							['value' => 'Single', 'text' => 'Single Day'],
+							['value' => 'Multiple', 'text' => 'Multiple Days']
+						],['value'=>$LeaveApplication->single_multiple]
+					);
+					}
+					 ?>
+				</div>
+			</div>
+			<div class="row">
+				<div id="date_from">
+					<div class="col-md-3">
+						<div class="form-group" >
+							<label class="control-label  label-css">Date of Leave Required (From)</label>   
+							<?php 
+							
+							echo $this->Form->input('approve_leave_from', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker disabledbutton','data-date-format'=>'dd-mm-yyyy','value'=>$LeaveApplication->from_leave_date->format('d-m-Y')]); ?>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="form-group" id="from_half">
+							<label class="control-label  label-css">&nbsp;</label>  
+							<?php
+							
+							$options[]=['text' =>'Full Day', 'value' => 'Full Day'];
+							$options[]=['text' =>'First Half Day', 'value' => 'First Half Day'];
+							$options[]=['text' =>'Second Half Day', 'value' => 'Second Half Day'];
+							echo $this->Form->input('approve_full_half_from', ['label' => false,'options' => $options,'class' => 'form-control input-sm disabledbutton','value' => $LeaveApplication->from_full_half]); ?>
+						</div>
+					</div>
+				</div>	
+				<div id="date_to">
+					<div class="col-md-3">
+						<div class="form-group" >
+							<label class="control-label  label-css">Date of Leave Required (To)</label>   
+							<?php 
+							
+							echo $this->Form->input('approve_leave_to', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker disabledbutton','data-date-format'=>'dd-mm-yyyy','value'=>$LeaveApplication->to_leave_date->format('d-m-Y')]); ?>
+						</div>
+					</div>
+				   <div class="col-md-3">
+						<div class="form-group" id="to_half">
+							<label class="control-label  label-css">.</label>  
+							<?php 
+							
+							echo $this->Form->input('approve_full_half_to', ['label' => false,'options' => $options,'class' => 'form-control input-sm disabledbutton','value' => $LeaveApplication->to_full_half]); ?>
+						</div>
+					</div>
+				</div>
+			</div>
+			
 			<table width="100%" >
 				<tr>
-					<td>
-						<div class="row">
-							<div class="col-md-12">
-								<?php 
-								if($LeaveApplication->leave_status=='approved'){
-									$single_multiple=$LeaveApplication->approve_single_multiple;
-								}else{
-									$single_multiple=$LeaveApplication->single_multiple;
-								}
-								echo $this->Form->radio(
-									'approve_single_multiple',
-									[
-										['value' => 'Single', 'text' => 'Single Day'],
-										['value' => 'Multiple', 'text' => 'Multiple Days']
-									],['value'=>$single_multiple]
-								); ?>
-							</div>
-						</div>
-						<div class="row" id="date_from">
-							<div class="col-md-8">
-								<div class="form-group" >
-									<label class="control-label  label-css">Date of Leave Required (From)</label>   
-									<?php 
-									if($LeaveApplication->leave_status=='approved'){
-										$from_leave_date=$LeaveApplication->approve_leave_from;
-									}else{
-										$from_leave_date=$LeaveApplication->from_leave_date;
-									}
-									echo $this->Form->input('approve_leave_from', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','value'=>$from_leave_date->format('d-m-Y')]); ?>
-								</div>
-							</div>
-							<div class="col-md-4">
-								<div class="form-group" id="from_half">
-									<label class="control-label  label-css"></label>  
-									<?php
-									if($LeaveApplication->leave_status=='approved'){
-										$from_full_half=$LeaveApplication->approve_full_half_from;
-									}else{
-										$from_full_half=$LeaveApplication->from_full_half;
-									}
-									$options[]=['text' =>'Full Day', 'value' => 'Full Day'];
-									$options[]=['text' =>'First Half Day', 'value' => 'First Half Day'];
-									$options[]=['text' =>'Second Half Day', 'value' => 'Second Half Day'];
-									echo $this->Form->input('approve_full_half_from', ['label' => false,'options' => $options,'class' => 'form-control input-sm','value' => $from_full_half]); ?>
-								</div>
-							</div>
-						</div>
-						<div class="row" id="date_to">
-							<div class="col-md-8">
-								<div class="form-group" >
-									<label class="control-label  label-css">Date of Leave Required (To)</label>   
-									<?php 
-									if($LeaveApplication->leave_status=='approved'){
-										$to_leave_date=$LeaveApplication->approve_leave_to;
-									}else{
-										$to_leave_date=$LeaveApplication->to_leave_date;
-									}
-									echo $this->Form->input('approve_leave_to', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','value'=>$to_leave_date->format('d-m-Y')]); ?>
-								</div>
-							</div>
-						   <div class="col-md-4">
-								<div class="form-group" id="to_half">
-									<label class="control-label  label-css">.</label>  
-									<?php 
-									if($LeaveApplication->leave_status=='approved'){
-										$to_full_half=$LeaveApplication->approve_full_half_to;
-									}else{
-										$to_full_half=$LeaveApplication->to_full_half;
-									}
-									echo $this->Form->input('approve_full_half_to', ['label' => false,'options' => $options,'class' => 'form-control input-sm','value' => $to_full_half]); ?>
-								</div>
-							</div>
-							
-						</div>
-					</td>
+					
 					<td align="center">
 						<div id="qwerty"></div>
 						<table class="table">
@@ -136,14 +142,14 @@
 									
 								</td>
 							</tr>
-							<tr>
+							<!--<tr>
 								<td>
 									<label class="control-label  label-css">Unintimated Leaves </label>   
 									
 								</td>
 								<td><?php echo $this->Form->input('unintimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm unintimated_leave','readonly']); ?></td>
 								<td></td>
-							</tr>
+							</tr>-->
 							<tr>
 								<td>
 									<label class="control-label  label-css">Paid Leaves </label>   
@@ -175,7 +181,10 @@ $(document).ready(function(){
 	
 
 	
-	$('input[name=intimated_leave]').live("keyup",function(){
+	$('input[name=without_prior_approval]').live("keyup",function(){
+		countLeaves();
+	});
+	$('input[name=prior_approval]').live("keyup",function(){
 		countLeaves();
 	});
 	$('input[name=approve_leave_to]').live("blur",function(){
@@ -217,7 +226,54 @@ $(document).ready(function(){
 		}
 	}
 	countLeaves();
-	function countLeaves(){
+	function countLeaves(){ 
+		var employee_id='<?php echo $LeaveApplication->employee_id; ?>';
+		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfoEmployees']); ?>";
+        url=url+'/'+employee_id+'/'+leaveAppId; 
+		//alert(url);
+		 $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { // alert(response);
+			var res = response.split(",");
+			var paid_leave = res[0];
+			var unpaid_leave = res[1];
+			var un_initimate_leave = res[2];
+			var prior_leave = res[3];
+			var without_prior_leave = res[4];
+			var day_no = res[5];
+			var total_past_paid_leave = res[6];
+			var total_past_unpaid_leave = res[7];
+			
+			$('div#qwerty').html('ML:'+30+', PPL:'+total_past_paid_leave+', PUL:'+total_past_unpaid_leave);
+			
+			$('input[name="paid_leaves"]').val(paid_leave);
+			$('input[name="unpaid_leaves"]').val(unpaid_leave);
+			$('input[name="unintimated_leave"]').val(un_initimate_leave);
+			$('input[name="total_approved_leaves"]').val(day_no);
+			if(total_past_unpaid_leave > 0){
+				var unpaid_leave_tot = parseFloat(total_past_unpaid_leave)+parseFloat(paid_leave);
+				$('input[name="unpaid_leaves"]').val(unpaid_leave_tot);
+				$('input[name="paid_leaves"]').val(0);
+			}
+			var without_prior_approvals = $('input[name="without_prior_approval"]').val();
+			if(without_prior_approvals > 0){
+				var unpaid_leave_t =$('input[name="unpaid_leaves"]').val(); 
+				var abc = parseFloat(without_prior_approvals)+parseFloat(unpaid_leave_t);
+				//var total_unpaid = parseFloat(5.0)-parseFloat(unpaid_leave_t); 
+				//var tots = parseFloat(without_prior_approvals)+parseFloat(without_prior_leave);
+				//var abc = parseFloat(total_unpaid) + parseFloat(tots);
+				//$('input[name="without_prior_approval"]').val(tots);
+				$('input[name="unpaid_leaves"]').val(abc);
+			}
+			
+		});
+	
+	
+	
+	}
+	/* function countLeaves(){
 		
 		var w=$('input[name=approve_leave_to]').val();
 		if(w==""){
@@ -334,7 +390,7 @@ $(document).ready(function(){
 		
 		
 		
-	}
+	} */
 	
 	$('input[name="unpaid_leaves"]').live("keyup",function(){
 		countLeaves();

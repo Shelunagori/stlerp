@@ -1472,6 +1472,21 @@ class InvoiceBookingsController extends AppController
 			$invoiceBooking->due_payment=$invoiceBooking->total;
 
 			if ($this->InvoiceBookings->save($invoiceBooking)) {
+				//pr($invoiceBooking);exit;
+				/////start code for update supplier date into grn transaction date 
+					$query1 = $this->InvoiceBookings->Grns->ItemLedgers->query();
+					$query1->update()
+					->set(['processed_on' => $invoiceBooking->supplier_date])
+					->where(['source_model' => 'Grns','source_id'=>$invoiceBooking->grn_id])
+					->execute();
+
+					$query1 = $this->InvoiceBookings->Grns->query();
+					$query1->update()
+					->set(['transaction_date' => $invoiceBooking->supplier_date])
+					->where(['id'=>$invoiceBooking->grn_id])
+					->execute();
+				/////ends code for update supplier date into grn transaction date 
+				
 				$i=0;
 				foreach($invoiceBooking->invoice_booking_rows as $invoice_booking_row)
 				{
@@ -1758,7 +1773,19 @@ class InvoiceBookingsController extends AppController
 			$invoiceBooking->edited_by=$this->viewVars['s_employee_id'];
 			//pr($invoiceBooking); exit;
             if ($this->InvoiceBookings->save($invoiceBooking)) { 
-			
+				/////start code for update supplier date into grn transaction date 
+					$query1 = $this->InvoiceBookings->Grns->ItemLedgers->query();
+					$query1->update()
+					->set(['processed_on' => $invoiceBooking->supplier_date])
+					->where(['source_model' => 'Grns','source_id'=>$invoiceBooking->grn_id])
+					->execute();
+
+					$query1 = $this->InvoiceBookings->Grns->query();
+					$query1->update()
+					->set(['transaction_date' => $invoiceBooking->supplier_date])
+					->where(['id'=>$invoiceBooking->grn_id])
+					->execute();
+				/////ends code for update supplier date into grn transaction date 
 			
 				$ref_rows=@$this->request->data['ref_rows'];
 				$invoiceBookingId=$invoiceBooking->id;
