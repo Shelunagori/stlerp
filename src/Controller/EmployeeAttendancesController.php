@@ -86,7 +86,8 @@ class EmployeeAttendancesController extends AppController
 						return $q->where(['EmployeeCompanies.company_id'=>$st_company_id,'EmployeeCompanies.freeze'=>0]);
 					}
 				);
-		$employee_leave=[];
+		$employee_leave=[];$employee_leave_prior_approval=[];$employee_leave_without_prior_approval=[];$employee_leave_unintimated_leave=[];
+		
 		foreach($employees as $data){
 			$time=strtotime($From);
 			$month=date("m",$time);
@@ -131,11 +132,14 @@ class EmployeeAttendancesController extends AppController
 			$UniqueEmpIds=[];
 			foreach($employeeLeave as $data1){
 				@$employee_leave[@$data1->employee_id]+=$data1->unpaid_leaves;
+				@$employee_leave_prior_approval[@$data1->employee_id]+=$data1->prior_approval;
+				@$employee_leave_without_prior_approval[@$data1->employee_id]+=$data1->without_prior_approval;
+				@$employee_leave_unintimated_leave[@$data1->employee_id]+=$data1->unintimated_leave;
 			}
 			
 
 		}
-		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays'));
+		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays','employee_leave_prior_approval','employee_leave_without_prior_approval','employee_leave_unintimated_leave'));
 	}
 	
 	function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {

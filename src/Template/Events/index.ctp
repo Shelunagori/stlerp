@@ -51,7 +51,7 @@
 					<div class="col-md-9">
 						<div class="input-icon right">
 							<i class="fa"></i>
-							 <?php echo $this->Form->input('event_end_date',['type' => 'text','label' => false,'class' => 'form-control date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Event End Date','value'=>$ends_date]); ?>
+							 <?php echo $this->Form->input('event_end_date',['type' => 'text','label' => false,'class' => 'form-control date-picker','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Event End Date']); ?>
 						</div>
 					</div>
 				</div>

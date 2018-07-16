@@ -44,7 +44,7 @@
 		</div>
 		<hr/>
 		
-		<form method="post">
+		<form method="post" id="form_sample_3">
 			<div class="row">
 				<div class="col-md-5"></div>
 				<div class="col-md-6">
@@ -109,7 +109,7 @@
 					</div>
 				   <div class="col-md-3">
 						<div class="form-group" id="to_half">
-							<label class="control-label  label-css">.</label>  
+							<label class="control-label  label-css">&nbsp;</label>  
 							<?php 
 							
 							echo $this->Form->input('approve_full_half_to', ['label' => false,'options' => $options,'class' => 'form-control input-sm disabledbutton','value' => $LeaveApplication->to_full_half]); ?>
@@ -125,31 +125,26 @@
 						<div id="qwerty"></div>
 						<table class="table">
 							<tr>
-								<td>
+								<!--<td>
 									<label class="control-label  label-css">Intimated  Leaves </label>   
 									
-								</td>
+								</td>-->
 								<td>
 									<label class="control-label  label-css">Prior Approval </label>   
-									<?php echo $this->Form->input('prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
+									<?php echo $this->Form->input('prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm prior_approval','value'=>@$LeaveApplication->prior_approval]); ?>
 								</td>
 								<td>
 									<label class="control-label  label-css">Without Prior Approval </label>   
-									<?php echo $this->Form->input('without_prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
+									<?php echo $this->Form->input('without_prior_approval', ['type'=>'text','label' => false,'class'=>'form-control input-sm without_prior_approval','value'=>@$LeaveApplication->without_prior_approval,'max'=>5]); ?>
 								</td>
 								
 								<td>
-									
+									<label class="control-label  label-css">Unintimated Leaves </label>  
+									<?php echo $this->Form->input('unintimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm unintimated_leave','value'=>@$LeaveApplication->unintimated_leave]); ?>									
 								</td>
-							</tr>
-							<!--<tr>
-								<td>
-									<label class="control-label  label-css">Unintimated Leaves </label>   
-									
-								</td>
-								<td><?php echo $this->Form->input('unintimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm unintimated_leave','readonly']); ?></td>
 								<td></td>
-							</tr>-->
+							</tr>
+							
 							<tr>
 								<td>
 									<label class="control-label  label-css">Paid Leaves </label>   
@@ -171,7 +166,7 @@
 			
 			
 			
-			<button type="submit" class="btn blue sub">Approve</button>
+			<button type="submit" id="btnsubmit" class="btn blue sub">Approve</button>
 		</form>
 	</div>
 </div>
@@ -179,12 +174,16 @@
 <script>
 $(document).ready(function(){
 	
-
+$('input[name="without_prior_approval"]').val(0);
+$('input[name="prior_approval"]').val(0);
 	
 	$('input[name=without_prior_approval]').live("keyup",function(){
 		countLeaves();
 	});
 	$('input[name=prior_approval]').live("keyup",function(){
+		countLeaves();
+	});
+	$('input[name=unintimated_leave]').live("keyup",function(){
 		countLeaves();
 	});
 	$('input[name=approve_leave_to]').live("blur",function(){
@@ -235,7 +234,7 @@ $(document).ready(function(){
 		 $.ajax({
             url: url,
             type: 'GET',
-        }).done(function(response) { // alert(response);
+        }).done(function(response) {  //alert(response);
 			var res = response.split(",");
 			var paid_leave = res[0];
 			var unpaid_leave = res[1];
@@ -245,27 +244,156 @@ $(document).ready(function(){
 			var day_no = res[5];
 			var total_past_paid_leave = res[6];
 			var total_past_unpaid_leave = res[7];
+			var casual_leave = res[8];
+			var sick_leave = res[9];
+			var leave_type = "<?php echo $LeaveApplication->leave_type->leave_name; ?>"
 			
-			$('div#qwerty').html('ML:'+30+', PPL:'+total_past_paid_leave+', PUL:'+total_past_unpaid_leave);
+			$('div#qwerty').html('<b> PPL:</b><strong>'+total_past_paid_leave+'</strong>,<b> PUL:</b><strong>'+total_past_unpaid_leave+'</strong>,<b>CL:</b><strong>'+casual_leave+'</strong>,<b>SL:</b><strong>'+sick_leave);
 			
 			$('input[name="paid_leaves"]').val(paid_leave);
-			$('input[name="unpaid_leaves"]').val(unpaid_leave);
-			$('input[name="unintimated_leave"]').val(un_initimate_leave);
+			$('input[name="unpaid_leaves"]').val(Math.abs(unpaid_leave)); 
+			//$('input[name="unintimated_leave"]').val(un_initimate_leave);
 			$('input[name="total_approved_leaves"]').val(day_no);
-			if(total_past_unpaid_leave > 0){
-				var unpaid_leave_tot = parseFloat(total_past_unpaid_leave)+parseFloat(paid_leave);
-				$('input[name="unpaid_leaves"]').val(unpaid_leave_tot);
-				$('input[name="paid_leaves"]').val(0);
+			var tot_paid_leave = parseFloat(paid_leave)+parseFloat(total_past_paid_leave); 
+			if(total_past_paid_leave > 0){
+				 
+				if(tot_paid_leave < casual_leave || tot_paid_leave < sick_leave){ 
+					$('input[name="paid_leaves"]').val(tot_paid_leave);
+				}else if(total_past_paid_leave == casual_leave || total_past_paid_leave == sick_leave){
+					$('input[name="paid_leaves"]').val(total_past_paid_leave);
+					var unpaid_leave_tot = parseFloat(total_past_unpaid_leave)+parseFloat(unpaid_leave);
+					$('input[name="unpaid_leaves"]').val(Math.abs(unpaid_leave_tot));
+				  
+				}else{  
+					if(leave_type == "Sick Leave"){
+						var tot_unpaid = parseFloat(tot_paid_leave)-parseFloat(sick_leave);
+						$('input[name="paid_leaves"]').val(sick_leave);
+					}else{
+						var tot_unpaid = parseFloat(tot_paid_leave)-parseFloat(casual_leave);
+						$('input[name="paid_leaves"]').val(casual_leave);
+					}
+					
+					$('input[name="unpaid_leaves"]').val(Math.abs(tot_unpaid));
+				}
+			}else{
+				if(tot_paid_leave < casual_leave || tot_paid_leave < sick_leave){ 
+					
+				}
 			}
+			
+			var prior_approval = $('input[name="prior_approval"]').val();
+			if(prior_approval > 0){
+				if(prior_approval > casual_leave || prior_approval > sick_leave){ 
+					$('input[name="unpaid_leaves"]').val(Math.abs(prior_approval));
+				}else{
+				   if(leave_type == "Sick Leave"){
+					   var tot_prior = parseFloat(prior_approval)-parseFloat(sick_leave);
+					   $('input[name="paid_leaves"]').val(sick_leave);
+				   }else{
+					   var tot_prior = parseFloat(prior_approval)-parseFloat(casual_leave);
+					   $('input[name="paid_leaves"]').val(casual_leave);
+				   }	
+					
+					$('input[name="unpaid_leaves"]').val(Math.abs(tot_prior));
+					
+				}
+				
+			}
+			
 			var without_prior_approvals = $('input[name="without_prior_approval"]').val();
-			if(without_prior_approvals > 0){
+			
+			var WPA =5; var tot_prior =0;
+			if(without_prior_approvals > 0 ){   
+				if(without_prior_leave != WPA){  
+					if(total_past_paid_leave > casual_leave || total_past_paid_leave > sick_leave){ 
+						$('input[name="unpaid_leaves"]').val(without_prior_approvals);
+					}else{  
+						 if(leave_type == "Sick Leave"){
+							 if(sick_leave == paid_leave){
+								var tot_without_prior = parseFloat(without_prior_approvals)-parseFloat(sick_leave);
+
+								$('input[name="paid_leaves"]').val(sick_leave);
+								if(sick_leave == paid_leave){ 
+								var a = parseFloat(Math.abs(unpaid_leave))+parseFloat(without_prior_approvals);
+								//alert(unpaid_leave);
+								$('input[name="unpaid_leaves"]').val(Math.abs(a));
+								}else{
+								$('input[name="unpaid_leaves"]').val(Math.abs(tot_without_prior));
+								}
+							 }else{
+								 var a = parseFloat(paid_leave)+parseFloat(without_prior_approvals); 
+								
+								if(sick_leave < a){ 
+									$('input[name="paid_leaves"]').val(sick_leave);
+									var paid_leave =$('input[name="paid_leaves"]').val();
+									if(sick_leave == paid_leave){ 
+									var unpaid_leave =$('input[name="unpaid_leaves"]').val();
+									var a = parseFloat(Math.abs(paid_leave))-parseFloat(without_prior_approvals);
+									
+									$('input[name="unpaid_leaves"]').val(Math.abs(a));
+									}else{
+									var a = parseFloat(Math.abs(unpaid_leave))+parseFloat(without_prior_approvals);
+									$('input[name="unpaid_leaves"]').val(Math.abs(tot_without_prior));
+									}
+								}else{
+									$('input[name="paid_leaves"]').val(a);
+									$('input[name="unpaid_leaves"]').val(0);
+								}
+							 }
+							 
+							
+						 }else if(leave_type == "Casual Leave"){ 
+						 
+							if(casual_leave == paid_leave){ 
+								var tot_without_prior = parseFloat(without_prior_approvals)-parseFloat(casual_leave);
+
+								$('input[name="paid_leaves"]').val(casual_leave);
+								if(casual_leave == paid_leave){ 
+								var a = parseFloat(Math.abs(unpaid_leave))+parseFloat(without_prior_approvals);
+								//alert(unpaid_leave);
+								$('input[name="unpaid_leaves"]').val(Math.abs(a));
+								}else{
+								$('input[name="unpaid_leaves"]').val(Math.abs(tot_without_prior));
+								}
+							}else{ 
+								var a = parseFloat(paid_leave)+parseFloat(without_prior_approvals); 
+								
+								if(casual_leave < a){ 
+									$('input[name="paid_leaves"]').val(casual_leave);
+									var paid_leave =$('input[name="paid_leaves"]').val();
+									if(casual_leave == paid_leave){ 
+									var unpaid_leave =$('input[name="unpaid_leaves"]').val();
+									var a = parseFloat(Math.abs(paid_leave))-parseFloat(without_prior_approvals);
+									
+									$('input[name="unpaid_leaves"]').val(Math.abs(a));
+									}else{
+									var a = parseFloat(Math.abs(unpaid_leave))+parseFloat(without_prior_approvals);
+									$('input[name="unpaid_leaves"]').val(Math.abs(tot_without_prior));
+									}
+								}else{
+									$('input[name="paid_leaves"]').val(a);
+									$('input[name="unpaid_leaves"]').val(0);
+								}
+							}
+							
+						 }
+					
+						
+						
+					}
+					
+				}else{  
+					$('input[name="unpaid_leaves"]').val(Math.abs(without_prior_approvals));
+				}
+			}	
+			
+			var unintimated_leave = $('input[name="unintimated_leave"]').val(); 
+			
+			if(unintimated_leave > 0){
 				var unpaid_leave_t =$('input[name="unpaid_leaves"]').val(); 
-				var abc = parseFloat(without_prior_approvals)+parseFloat(unpaid_leave_t);
-				//var total_unpaid = parseFloat(5.0)-parseFloat(unpaid_leave_t); 
-				//var tots = parseFloat(without_prior_approvals)+parseFloat(without_prior_leave);
-				//var abc = parseFloat(total_unpaid) + parseFloat(tots);
-				//$('input[name="without_prior_approval"]').val(tots);
-				$('input[name="unpaid_leaves"]').val(abc);
+				var double_value = parseFloat(unintimated_leave)*2;
+				var abc = parseFloat(double_value)+parseFloat(unpaid_leave_t);
+				$('input[name="unpaid_leaves"]').val(Math.abs(abc));
 			}
 			
 		});
@@ -273,124 +401,74 @@ $(document).ready(function(){
 	
 	
 	}
-	/* function countLeaves(){
+	
+	var form3 = $('#form_sample_3');
+	var error3 = $('.alert-danger', form3);
+	var success3 = $('.alert-success', form3);
+	form3.validate({
+		errorElement: 'span', //default input error message container
+		errorClass: 'help-block help-block-error', // default input error message class
+		focusInvalid: true, // do not focus the last invalid input
+		rules: {
 		
-		var w=$('input[name=approve_leave_to]').val();
-		if(w==""){
-			var t=$('input[name=approve_leave_from]').val();
-			$('input[name=approve_leave_to]').val(t);
-		}
-		
-		var employee_id='<?php echo $LeaveApplication->employee_id; ?>';
-		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
-		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfo']); ?>";
-        url=url+'/'+employee_id+'/'+leaveAppId; 
-		//alert(url);
-        $.ajax({
-            url: url,
-            type: 'GET',
-        }).done(function(response) {
-			//alert(response);
-			var res = response.split("-");
-			var ML=res[0];
-			var PPL=res[1];
-			var PUL=res[2];
-			var EMPTYPE=res[3];
-			
-			$('div#qwerty').html('ML:'+ML+', PPL:'+PPL+', PUL'+PUL);
-			
-			var p=$('input[name="approve_leave_from"]').val().split('-');
-			var approve_leave_from = new Date(p[2], p[1] - 1, p[0]);
-			
-			var p=$('input[name="approve_leave_to"]').val().split('-');
-			var approve_leave_to = new Date(p[2], p[1] - 1, p[0]);
-			
-			var diff = new Date(approve_leave_to - approve_leave_from);
-			var days = diff/1000/60/60/24;
-			days=days+1;
-			
-			if(days<0){
-				var q=$('input[name="approve_leave_from"]').val();
-				$('input[name="approve_leave_to"]').val(q);
-			}
-			
-			var single_multiple=$('input[name="approve_single_multiple"]:checked').val();
-			var approve_full_half_from=$('select[name="approve_full_half_from"] option:selected').val();
-			var approve_full_half_to=$('select[name="approve_full_half_to"] option:selected').val();
-			if(single_multiple=='Single'){
-				if(approve_full_half_from!='Full Day'){
-					days=0.5;
-				}else{
-					days=1;
-				}
-			}else{
-				if(approve_full_half_from=='Second Half Day'){
-					days-=0.5;
-				}
-				if(approve_full_half_to=='First Half Day'){
-					days-=0.5;
-				}
-			}
-			
-			var T=days;
-			
-			var I=$('input[name="intimated_leave"]').val();
-			
-			if(I>T){
-				I=0;
-				$('input[name="intimated_leave"]').val(0);
-			}
-			var U=T-I;
-			
-			$('input[name="unintimated_leave"]').val(U);
-			
-			var PL=0; var UPL=0;
-			var R=5-PUL;
-			var X=R-U;
-			if(EMPTYPE == "probabtion"){ 
-				if(X>=0){
-					var Q=ML-PPL; 
-					var Z=Q-U;
-					if(Z>=0){ PL=U; }
-					if(Z<0){ PL=Q; UPL=Math.abs(Z); }alert(UPL);alert(PL);
-				}else{
-					var Q=ML-PPL;
-					var Z=Q-R;
-					if(Z>=0){ PL=R; UPL=Math.abs(X); }
-					if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
-				}
-			}else{
-				if(X>=0){
-					var Q=ML-PPL;
-					var Z=Q-U;
-					if(Z>=0){ PL=U; }
-					if(Z<0){ PL=Q; UPL=Math.abs(Z); }
-				}else{
-					var Q=ML-PPL;
-					var Z=Q-R;
-					if(Z>=0){ PL=R; UPL=Math.abs(X); }
-					if(Z<0){ PL=Q; UPL=Math.abs(Z); UPL+=Math.abs(X); }
-				}
-			}
-			
-			
-			
-			
-			
-			var B=ML-(parseFloat(PPL)+parseFloat(PL));
-			var C=B-I;
-			if(C>=0){ PL+=parseFloat(I);  }
-			if(C<0){ PL+=B; UPL+=Math.abs(C);  }
-			//alert(PL);
+		},
 
-			$('input[name="paid_leaves"]').val(PL);
-			$('input[name="unpaid_leaves"]').val(UPL);
-			$('input[name="total_approved_leaves"]').val(T);
-        });
+		messages: { // custom messages for radio buttons and checkboxes
+			
+		},
+
+		errorPlacement: function (error, element) { // render error placement for each input type
+			if (element.parent(".input-group").size() > 0) {
+				error.insertAfter(element.parent(".input-group"));
+			} else if (element.attr("data-error-container")) { 
+				error.appendTo(element.attr("data-error-container"));
+			} else if (element.parents('.radio-list').size() > 0) { 
+				error.appendTo(element.parents('.radio-list').attr("data-error-container"));
+			} else if (element.parents('.radio-inline').size() > 0) { 
+				error.appendTo(element.parents('.radio-inline').attr("data-error-container"));
+			} else if (element.parents('.checkbox-list').size() > 0) {
+				error.appendTo(element.parents('.checkbox-list').attr("data-error-container"));
+			} else if (element.parents('.checkbox-inline').size() > 0) { 
+				error.appendTo(element.parents('.checkbox-inline').attr("data-error-container"));
+			} else {
+				error.insertAfter(element); // for other inputs, just perform default behavior
+			}
+		},
+
+		invalidHandler: function (event, validator) { //display error alert on form submit   
+			//put_code_description();
+			success3.hide();
+			error3.show();
+			//$("#add_submit").removeAttr("disabled");
+			//Metronic.scrollTo(error3, -200);
+		},
+
+		highlight: function (element) { // hightlight error inputs
+		   $(element)
+				.closest('.form-group').addClass('has-error'); // set error class to the control group
+		},
+
+		unhighlight: function (element) { // revert the change done by hightlight
+			$(element)
+				.closest('.form-group').removeClass('has-error'); // set error class to the control group
+		},
+
+		success: function (label) {
+			label
+				.closest('.form-group').removeClass('has-error'); // set success class to the control group
+		},
+	
+		submitHandler: function (form) {
+			$('#btnsubmit').prop('disabled', true);
+			$('#btnsubmit').text('Submitting.....');
 		
-		
-		
-	} */
+			//put_code_description();
+			success3.show();
+			error3.hide();
+			form[0].submit();
+		}
+
+	});
 	
 	$('input[name="unpaid_leaves"]').live("keyup",function(){
 		countLeaves();
@@ -401,5 +479,8 @@ $(document).ready(function(){
 	$(".sub").mouseover(function(){
 		countLeaves();
 	});
+	
+	
+	
 });
 </script>

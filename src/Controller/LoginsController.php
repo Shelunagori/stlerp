@@ -488,6 +488,14 @@ class LoginsController extends AppController
 			
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'])->toArray();
 			
+			$SickleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'=>function ($q){
+				return $q->where(['LeaveTypes.leave_name'=>'Sick Leave']);
+			}])->order(['LeaveApplications.id'=>'DESC'])->first();
+			
+			$CasualleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'=>function ($q){
+				return $q->where(['LeaveTypes.leave_name'=>'Casual Leave']);
+			}])->order(['LeaveApplications.id'=>'DESC'])->first();
+			
 		}
 		
 //pr($PendingleaveRequests);exit;
@@ -496,7 +504,7 @@ class LoginsController extends AppController
 		$PendingTravelRequestStatus = $this->Logins->TravelRequests->find()->where(['TravelRequests.employee_id'=>$employee_id,'TravelRequests.status'=>'Pending'])->contain(['Employees','empData'])->toArray();
 		/* pr($employee_id);
 		pr($PendingTravelRequestStatus); exit; */
-	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus','monthelySaleForInvoice','monthelySaleForSO','monthelySaleForQO','PendingLoanApplications'));
+	   $this->set(compact('st_company_id','pending_quotation','pending_sales','pending_invoice','pending_po','pending_grn','employee_id','PendingleaveStatus','PendingleaveRequests','PendingTravelRequests','PendingTravelRequestStatus','monthelySaleForInvoice','monthelySaleForSO','monthelySaleForQO','PendingLoanApplications','CasualleaveRequests','SickleaveRequests'));
 		
     }
 }

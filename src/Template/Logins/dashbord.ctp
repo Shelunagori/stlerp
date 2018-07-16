@@ -179,9 +179,7 @@
 			<div class="caption">
 				<i class="fa fa-cogs"></i>Pending Leave Request
 			</div>
-			<div class="actions">
-				
-			</div>
+			<div class="actions"></div>
 		</div>
 		<div class="portlet-body">
 			<div class="table-responsive">
@@ -231,6 +229,7 @@
 					</tr>
 					<?php } ?>
 				</tbody>
+				
 				</table>
 			</div>
 		</div>
@@ -386,6 +385,20 @@
 					</tr>
 					<?php } ?>
 				</tbody>
+				<tfoot>
+					<tr>
+						<td  colspan="1" style="text-align:right;"><b>Total Sick Paid Leave :</b></td>
+						<td><?php echo $SickleaveRequests->paid_leaves; ?></td>
+						<td  colspan="2" style="text-align:right;"><b>Total Casual Paid Leave :</b></td>
+						<td><?php echo $CasualleaveRequests->paid_leaves; ?></td>
+					</tr>
+					<tr>
+						<td colspan="1" style="text-align:right;"><b>Total Sick UnPaid Leave :</b></td>
+						<td><?php echo $SickleaveRequests->unpaid_leaves; ?></td>
+						<td colspan="2" style="text-align:right;"><b>Total Casual Paid Leave :</b></td>
+						<td><?php echo $CasualleaveRequests->unpaid_leaves; ?></td>
+					</tr>
+				</tfoot>
 				</table>
 			</div>
 		</div>

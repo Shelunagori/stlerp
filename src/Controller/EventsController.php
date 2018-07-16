@@ -65,7 +65,7 @@ class EventsController extends AppController
 			$end_date=date('Y-m-d',strtotime($end_date));
 			$where['Events.event_end_date <=']=$end_date;
 		} 
-        $events = $this->paginate($this->Events->find()->where($where)->order(['Events.event_name' => 'ASC']));
+        $events = $this->paginate($this->Events->find()->where($where)->order(['Events.id' => 'DESC']));
 
         $this->set(compact('events','event'));
         $this->set('_serialize', ['events','event']);

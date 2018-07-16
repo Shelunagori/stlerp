@@ -515,10 +515,10 @@ class LeaveApplicationsController extends AppController
 			$prior_approval=$this->request->data['prior_approval'];
 			$without_prior_approval=$this->request->data['without_prior_approval'];
 			//$intimated_leave=$this->request->data['intimated_leave'];
-			//$unintimated_leave=$this->request->data['unintimated_leave'];
+			$unintimated_leave=$this->request->data['unintimated_leave'];
 			$query = $this->LeaveApplications->query();
 			$query->update()
-				->set(['leave_status' =>'approved','approve_single_multiple'=>$approve_single_multiple,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'approve_full_half_from'=>$approve_full_half_from,'approve_full_half_to'=>$approve_full_half_to,'paid_leaves'=>$paid_leaves,'unpaid_leaves'=>$unpaid_leaves,'without_prior_leave'=>$without_prior_approval,'prior_leave'=>$prior_approval])
+				->set(['leave_status' =>'approved','approve_single_multiple'=>$approve_single_multiple,'approve_leave_from'=>$approve_leave_from,'approve_leave_to'=>$approve_leave_to,'approve_full_half_from'=>$approve_full_half_from,'approve_full_half_to'=>$approve_full_half_to,'paid_leaves'=>$paid_leaves,'unpaid_leaves'=>$unpaid_leaves,'without_prior_leave'=>$without_prior_approval,'prior_leave'=>$prior_approval,'unintimated_leave'=>$unintimated_leave])
 				->where(['id' => $id])
 				->execute();
 			return $this->redirect(['controller'=>'Logins','action' => 'dashbord']);
@@ -570,6 +570,8 @@ class LeaveApplicationsController extends AppController
 		$now = new \DateTime('now');
 		$current_month = $now->format('m');
 		$employeesData = $this->LeaveApplications->Employees->get($employee_id);
+		$permanent_join_month = date('m',strtotime($employeesData->permanent_join_date));
+		$permanent_join_mid_month_date = date('d',strtotime($employeesData->permanent_join_date));
 		$permanent_join_date = strtotime($employeesData->permanent_join_date);
 		$empType='';
 		if($permanent_join_date  > $current_date){
@@ -579,44 +581,45 @@ class LeaveApplicationsController extends AppController
 			$empType= "permanent";
 		}
 		
-		/* if($empType == "probabtion"){
-			$now = new \DateTime('now');
-			$month = $now->format('m');
-		}else{
-			
-		} */
+		$last_month = date('m', strtotime(date('Y-m')." -1 month"));
 		
+		$lastMonthleaveapplicationsApproved=	$this->LeaveApplications->find()
+							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date)'=>$last_month])->contain(['LeaveTypes'])->toArray();
+
 		$leaveapplicationsApproved=	$this->LeaveApplications->find()
-							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date) >='=>$current_month])->contain(['LeaveTypes']);
-		//pr($leaveapplicationsApproved->toArray());exit;				
-		
-		
-		/* $holiday_date=[];	
-		foreach($holidays as $holiday){
-			$holiday_date=date('d-m-Y',strtotime($holiday->event_start_date));
-		} */
-		
+							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date) >='=>$current_month])->contain(['LeaveTypes'])->order(['LeaveApplications.id'=>'DESC'])->first();
+		$leaveapplications=	$this->LeaveApplications->find()
+							->where(['employee_id'=>$employee_id, 'financial_year_id'=>$st_year_id, 'leave_status'=>'Pending', 'company_id'=>$st_company_id, 'LeaveApplications.id'=>$leaveAppId])->contain(['LeaveTypes'])->first();
 		///start code for approved leave count particular employee
 		$total_paid_leave = 0;$total_unpaid_leave = 0;
 		$total_uninitimate_leave = 0;$total_prior_leave = 0;$total_withoutprior_leave = 0;
-		$total_past_paid_leave=0;$total_past_unpaid_leave=0;$total_past_uninitimate_leave=0;$total_past_prior_leave=0;$total_past_withoutprior_leave=0;
+		$total_past_paid_leave=0.00;$total_past_unpaid_leave=0.00;$total_past_uninitimate_leave=0;$total_past_prior_leave=0;$total_past_withoutprior_leave=0;$sick_leaves=0;$casual_leaves=0;$pre_from_leave_date="00-00-0000";
 		if(!empty($leaveapplicationsApproved)){ 
-			foreach($leaveapplicationsApproved as $leave){  
-				 $total_past_paid_leave += $leave->paid_leaves;
-				 $total_past_unpaid_leave += $leave->unpaid_leaves;
-				 $total_past_uninitimate_leave += $leave->unintimated_leave;
-				 $total_past_prior_leave += $leave->prior_leave;
-				 $total_past_withoutprior_leave += $leave->without_prior_leave;
+			if($leaveapplicationsApproved->leave_type->leave_name == $leaveapplications->leave_type->leave_name){
+				$pre_from_leave_date = date('d-m-Y',strtotime($leaveapplicationsApproved->from_leave_date));
+				 $total_past_paid_leave = number_format($leaveapplicationsApproved->paid_leaves,1);
+				 $total_past_unpaid_leave = $leaveapplicationsApproved->unpaid_leaves;
+				 $total_past_uninitimate_leave = $leaveapplicationsApproved->unintimated_leave;
+				 $total_past_prior_leave = $leaveapplicationsApproved->prior_leave;
+				 $total_past_withoutprior_leave = $leaveapplicationsApproved->without_prior_leave;
+			}else if($leaveapplicationsApproved->leave_type->leave_name == $leaveapplications->leave_type->leave_name){
+				$pre_from_leave_date = date('d-m-Y',strtotime($leaveapplicationsApproved->from_leave_date));
+				 $total_past_paid_leave = number_format($leaveapplicationsApproved->paid_leaves,1);
+				 $total_past_unpaid_leave = $leaveapplicationsApproved->unpaid_leaves;
+				 $total_past_uninitimate_leave = $leaveapplicationsApproved->unintimated_leave;
+				 $total_past_prior_leave = $leaveapplicationsApproved->prior_leave;
+				 $total_past_withoutprior_leave = $leaveapplicationsApproved->without_prior_leave;
 			}
+				
 		}
-		
+		//pr($total_past_paid_leave);exit;
 		///ends code for approved leave count particular employee
-		$leaveapplications=	$this->LeaveApplications->find()
-							->where(['employee_id'=>$employee_id, 'financial_year_id'=>$st_year_id, 'leave_status'=>'Pending', 'company_id'=>$st_company_id, 'LeaveApplications.id'=>$leaveAppId])->contain(['LeaveTypes'])->first();
+		
 								
 							
 				
 		$from_leave_date = date('d-m-Y',strtotime($leaveapplications->from_leave_date));
+		
 		$to_leave_date	 = date('d-m-Y',strtotime($leaveapplications->to_leave_date));	
 		$from_full_half	 = $leaveapplications->from_full_half;
 		$to_full_half 	 = $leaveapplications->to_full_half;
@@ -625,75 +628,189 @@ class LeaveApplicationsController extends AppController
 		$from_leave_month =	date('m',strtotime($leaveapplications->from_leave_date));$to_leave_month   = date('m',strtotime($leaveapplications->to_leave_date));
 
 		$holidays=	$this->LeaveApplications->Events->find()
-							->where(['is_deleted'=>0,'MONTH(event_start_date) >='=>$current_month,'event_start_date >='=>date('Y-m-d')]);	
-		///start code for pending leave particular employee
+							->where(['is_deleted'=>0,'MONTH(event_start_date) >='=>$current_month,'event_start_date >='=>date('Y-m-d')]);
+		$d=[];
+		$d=[15,16,17,18,19,20];
+		$d1=[];
+		$d1=[21,22,23,24,25,26,27,28,29,30,31];	
 		
-		if(!empty($leaveapplications)){
+		///start code for pending leave particular employee
+		if($empType == "permanent"){ 
+			if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d)){
+				$sick_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/2,1);
+			}else if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d1)){
+				$sick_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/4,1);
+			}else if(sizeof($lastMonthleaveapplicationsApproved) > 0){  
+				$sick_leaves = $leaveapplications->leave_type->maximum_leave_in_month;
+			}else{
+				$sick_leaves = $leaveapplications->leave_type->maximum_leave_in_month+$leaveapplications->leave_type->maximum_leave_in_month;
+			}
 			
-			foreach($holidays as $holiday){ 
-				$holiday_date = date('d-m-Y',strtotime($holiday->event_start_date));
-				$holiday_start_date = date('d-m-Y',strtotime($holiday->event_start_date.'-1 days'));
-				$holiday_end_date = date('d-m-Y',strtotime($holiday->event_start_date.'+1 days'));
-				///start code for sandwich method
-				if(($from_leave_date == $holiday_start_date) && ($to_leave_date == $holiday_end_date)){
-						if($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "First Half Day"){
-							$total_unpaid_leave = $total_unpaid_leave+2;
-						}else if($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "Full Day"){
-							$total_unpaid_leave = $total_unpaid_leave+3;
-						}else if(($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "First Half Day") && ($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "Full Day")){
-							$total_unpaid_leave = $total_unpaid_leave+2.5;
-						}
-					///ends code for sandwich method	
-					}else{
-						if($leaveapplications->leave_type->leave_name == "Sick Leave"){
-							$sick_leave = $leaveapplications->leave_type->maximum_leave_in_month;
-							$total_sick_leave = $sick_leave - $day_no;
-							if($total_sick_leave < 0){
-								
-								$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
-								if($total_unpaid_leave > 0){
-									$total_unpaid_leave= $total_unpaid_leave;
+			if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d)){
+				$casual_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/2,1);
+			}else if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d1)){
+				$casual_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/4,1);
+			}else if(sizeof($lastMonthleaveapplicationsApproved) > 0){ 
+				$casual_leaves = $leaveapplications->leave_type->maximum_leave_in_month;
+			}else{
+				$casual_leaves = $leaveapplications->leave_type->maximum_leave_in_month+$leaveapplications->leave_type->maximum_leave_in_month;
+			}
+		
+		
+			if(!empty($leaveapplications)){  
+				
+				foreach($holidays as $holiday){ 
+					$holiday_date = date('d-m-Y',strtotime($holiday->event_start_date));
+					$holiday_start_date = date('d-m-Y',strtotime($holiday->event_start_date.'-1 days'));
+					$holiday_end_date = date('d-m-Y',strtotime($holiday->event_start_date.'+1 days'));
+					
+					
+					///start code for sandwich method
+					if(($from_leave_date == $holiday_start_date) && ($to_leave_date == $holiday_end_date) || ($pre_from_leave_date == $holiday_start_date) && ($from_leave_date == $holiday_start_date)){  
+							if($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "First Half Day"){
+								$tot = $total_unpaid_leave+2;
+								if($total_past_paid_leave < $casual_leaves || $total_past_paid_leave < $sick_leaves){
+									if($leaveapplications->leave_type->leave_name == "Sick Leave"){
+										$total_paid_leave = $sick_leaves;
+										$total_unpaid_leave = $tot-$sick_leaves;
+									}else{
+										$total_paid_leave = $casual_leaves;
+										$total_unpaid_leave = $tot-$sick_leaves;
+									}
+									
 								}else{
-									$total_unpaid_leave =$total_unpaid_leave;
+									$total_unpaid_leave = $tot;
 								}
-							}else{
-								$total_paid_leave = $day_no;
+							}else if($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "Full Day"){ 
+								$tot_1 = $total_unpaid_leave+3;
+								if($total_past_paid_leave < $casual_leaves || $total_past_paid_leave < $sick_leaves){
+									if($leaveapplications->leave_type->leave_name == "Sick Leave"){
+										$total_paid_leave = $sick_leaves;
+										$total_unpaid_leave = $tot_1-$sick_leaves;
+									}else{
+										$total_paid_leave = $casual_leaves;
+										$total_unpaid_leave = $tot_1-$sick_leaves;
+									}
+									
+								}else{
+									$total_unpaid_leave = $tot_1;
+								}
+							}else if(($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "First Half Day") || ($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "Full Day")){ 
+								$tot_3 = $total_unpaid_leave+2.5;
+								if($total_past_paid_leave < $casual_leaves || $total_past_paid_leave < $sick_leaves){
+									if($leaveapplications->leave_type->leave_name == "Sick Leave"){
+										$total_paid_leave = $sick_leaves;
+										$total_unpaid_leave = $tot_3-$sick_leaves;
+									}else{
+										$total_paid_leave = $casual_leaves;
+										$total_unpaid_leave = $tot_3-$sick_leaves;
+									}
+									
+								}else{
+									$total_unpaid_leave = $tot_3;
+								}
 							}
-						}else if($leaveapplications->leave_type->leave_name == "Casual Leave"){
-							$casual_leave = $leaveapplications->leave_type->maximum_leave_in_month;
-							$total_casual_leave = $casual_leave-$day_no;
-							if($total_casual_leave < 0){
-								$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
-							}else{
+						///ends code for sandwich method	
+						}else{ 
+							
 								
-								$total_paid_leave = $day_no;
-							}
-						}else{
-							$lta = $leaveapplications->leave_type->maximum_leave_in_month;
-						}	
+								
+							if($leaveapplications->leave_type->leave_name == "Sick Leave"){ 
+								
+								$total_past_paid_leave= number_format($total_past_paid_leave,1);
+								//$total_sick_leave = $sick_leave - $day_no;
+								if($total_past_paid_leave >= $sick_leaves){
+									$total_unpaidLeave = $total_past_paid_leave-$sick_leaves;
+									
+									//$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
+									if($total_unpaidLeave > 0){
+										$total_unpaid_leave= $total_unpaidLeave;
+									}else{
+										$total_unpaid_leave =$total_unpaidLeave;
+									}
+									$total_paid_leave = $sick_leaves;
+								}else{
+									$total_paid_leave = $day_no;
+								}
+							}else if($leaveapplications->leave_type->leave_name == "Casual Leave"){
+								$total_past_paid_leave= number_format($total_past_paid_leave,1); 
+								
+								if($total_past_paid_leave >= $casual_leaves){ 
+									$total_unpaidLeave = $total_past_paid_leave-$casual_leaves;
+									//echo $total_unpaidLeave;exit;
+									//$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
+									if($total_unpaidLeave > 0){
+										$total_unpaid_leave= $total_unpaidLeave;
+									}else{
+										$total_unpaid_leave =$total_unpaidLeave+$day_no;
+									}
+									$total_paid_leave = $casual_leaves;
+								}else{ 
+									$total_paid_leave = $day_no;
+								}
+							}else{ 
+								$lta = $leaveapplications->leave_type->maximum_leave_in_month;
+							}	
+							
+						}
 						
 					}
 					
-				}
+			}
+		}else{ 
+			if(!empty($leaveapplications)){
 				
-		}
+				foreach($holidays as $holiday){ 
+					$holiday_date = date('d-m-Y',strtotime($holiday->event_start_date));
+					$holiday_start_date = date('d-m-Y',strtotime($holiday->event_start_date.'-1 days'));
+					$holiday_end_date = date('d-m-Y',strtotime($holiday->event_start_date.'+1 days'));
+					///start code for sandwich method
+					if(($from_leave_date == $holiday_start_date) && ($to_leave_date == $holiday_end_date) || ($pre_from_leave_date == $holiday_start_date) && ($from_leave_date == $holiday_start_date)){
+							if($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "First Half Day"){
+								$total_unpaid_leave = $total_unpaid_leave+2;
+							}else if($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "Full Day"){
+								$total_unpaid_leave = $total_unpaid_leave+3;
+							}else if(($leaveapplications->from_full_half == "Full Day" && $leaveapplications->to_full_half == "First Half Day") && ($leaveapplications->from_full_half == "Second Half Day" && $leaveapplications->to_full_half == "Full Day")){
+								$total_unpaid_leave = $total_unpaid_leave+2.5;
+							}
+						///ends code for sandwich method	
+						}else{
+							if($leaveapplications->leave_type->leave_name == "Sick Leave"){
+								$sick_leave = $leaveapplications->leave_type->maximum_leave_in_month;
+								$total_sick_leave = $sick_leave - $day_no;
+								if($total_sick_leave < 0){
+									
+									$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
+									if($total_unpaid_leave > 0){
+										$total_unpaid_leave= $total_unpaid_leave;
+									}else{
+										$total_unpaid_leave =$total_unpaid_leave;
+									}
+								}else{
+									$total_unpaid_leave = $day_no;
+								}
+							}else if($leaveapplications->leave_type->leave_name == "Casual Leave"){ 
+								$casual_leave = $leaveapplications->leave_type->maximum_leave_in_month;
+								$total_casual_leave = $casual_leave-$day_no;
+								if($total_casual_leave < 0){
+									$total_unpaid_leave=$day_no+$total_past_unpaid_leave;
+								}else{
+									
+									$total_unpaid_leave = $day_no;
+								}
+							}else{
+								$lta = $leaveapplications->leave_type->maximum_leave_in_month;
+							}	
+							
+						}
+						
+					}
+					
+			}
+		}	
 			
 		///ends code for pending leave particular employee
-		echo $total_paid_leave;
-		echo ",";
-		echo $total_unpaid_leave;
-		echo ",";
-		echo $total_uninitimate_leave;
-		echo ",";
-		echo $total_prior_leave;
-		echo ",";
-		echo $total_withoutprior_leave;
-		echo ",";
-		echo $day_no;
-		echo ",";
-		echo $total_past_paid_leave;
-		echo ",";
-		echo $total_past_unpaid_leave;
+		echo $total_paid_leave.",".$total_unpaid_leave.",".$total_uninitimate_leave.",".$total_prior_leave.",".$total_withoutprior_leave.",".$day_no.",".$total_past_paid_leave.",".$total_past_unpaid_leave.",".$casual_leaves.",".$sick_leaves;
 		exit;
 	}
 	

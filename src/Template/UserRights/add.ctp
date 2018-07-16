@@ -1001,7 +1001,7 @@ fieldset legend {
 						</div>
 				</div>
 				<div class="col-md-3">
-					<div class="titletext"><b>Events</b></div>
+					<div class="titletext"><b>Holidays</b></div>
 						<div class="checkbox-list">
 							<label class="checkbox-inline">
 								<?php 
