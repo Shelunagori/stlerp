@@ -99,7 +99,7 @@ border:none;
 						<?php 
 						$type[]=['value'=>'sick','text'=>'sick'];
 						$type[]=['value'=>'casual','text'=>'casual'];
-						echo $this->Form->input('leave_type_id', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control input-sm leave_type','options'=>@$leavetypes]); ?>
+						echo $this->Form->input('leave_type_id', ['empty'=> '---Select Leave type---','label' => false,'class'=>'form-control input-sm leave_type select2me','options'=>@$leavetypes]); ?>
 					</div>
 				</div>
 				<div class="col-md-4">
@@ -310,7 +310,10 @@ $(document).ready(function()
         });
 		alert(valuefirstone);
 	}); */
-	
+	$('input[name=single_multiple]').live("change",function(){
+		setdays();
+		
+	});
 	
 	$('input[name=single_multiple]').live("click",function(){
 		var single_multiple=$(this).val();
@@ -337,6 +340,35 @@ $(document).ready(function()
 		}
 	}
 	
+	function setdays(){
+		var leave_type = $('.leave_type option:selected').val();
+		//alert(leave_type);
+		var empId=$('.empDropDown').find('option:selected').val();
+		//alert(empId);
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
+		url=url+'/'+empId+'/'+leave_type;
+		//alert(url);
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { 
+			var single_multiple=$('input[name=single_multiple]:checked').val();
+			var last_day_this_month=$('input[name=last_day_this_month]').val();
+			var first_day_this_month=$('input[name=first_day_this_month]').val();
+			var from_leave_date=$('input[name=from_leave_date]').val();
+			var to_leave_date=$('input[name=to_leave_date]').val();
+			//alert(single_multiple);
+			if(response == "yes"){
+				$('.attache_file').show();
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ //alert();
+				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
+			}else{
+				$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
+			}
+        });
+	}
 	$('.leave_type').live("change",function(){
 		var leave_type = $('.leave_type option:selected').val();
 		//alert(leave_type);
@@ -354,13 +386,15 @@ $(document).ready(function()
 			var first_day_this_month=$('input[name=first_day_this_month]').val();
 			var from_leave_date=$('input[name=from_leave_date]').val();
 			var to_leave_date=$('input[name=to_leave_date]').val();
-			//alert(last_day_this_month);
+			//alert(single_multiple);
 			if(response == "yes"){
 				$('.attache_file').show();
-			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ alert();
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ //alert();
 				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
 			}else{
 				$('.attache_file').hide();
+					$('input[name=supporting_attached]').removeAttr('required','required');
 			}
         });
 		
@@ -380,11 +414,13 @@ $(document).ready(function()
 			if(leave_type == 2){ 
 					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
 						$('.attache_file').show();
+						$('input[name=supporting_attached]').attr('required','required');
 					}
 				}
 			}
 		}else{
 			$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
 		}
 		
 	}); 
@@ -402,11 +438,13 @@ $(document).ready(function()
 			if(leave_type == 2){ 
 					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
 						$('.attache_file').show();
+						$('input[name=supporting_attached]').attr('required','required');
 					}
 				}
 			}
 		}else{
 			$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
 		}
 		
 	}); 

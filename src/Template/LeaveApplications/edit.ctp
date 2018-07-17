@@ -120,7 +120,7 @@ border:none;
 						<?php echo $this->Form->input('leave_reason', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm','type'=>'textarea','rows'=>4]); ?>
 					</div>
 				</div>
-				<div class="col-md-6">
+				<!--<div class="col-md-6">
 					<label class="control-label  label-css">Intimated/Uninitiated</label><br/>
 					<?php echo $this->Form->radio(
 						'intimated_or_not',
@@ -129,7 +129,7 @@ border:none;
 							['value' => 'Uninitiated', 'text' => 'Uninitiated']
 						]
 					); ?>
-				</div>
+				</div>-->
 			</div>
 			<button type="submit" class="btn btn-primary" id='submitbtn' >Save</button>
 			<?php echo $this->Form->end(); ?>
@@ -277,6 +277,40 @@ $(document).ready(function()
 			$('.attache_file').hide();
 		}
 	}); */
+	$('input[name=single_multiple]').live("change",function(){ 
+		setdays();
+	});
+	
+	function setdays(){
+		var leave_type = $('.leave_type option:selected').val();
+		//alert(leave_type);
+		var empId=$('.empDropDown').find('option:selected').val();
+		//alert(empId);
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
+		url=url+'/'+empId+'/'+leave_type;
+		//alert(url);
+        $.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { 
+			var single_multiple=$('input[name=single_multiple]:checked').val();
+			var last_day_this_month=$('input[name=last_day_this_month]').val();
+			var first_day_this_month=$('input[name=first_day_this_month]').val();
+			var from_leave_date=$('input[name=from_leave_date]').val();
+			var to_leave_date=$('input[name=to_leave_date]').val();
+			//alert(response);
+			if(response == "yes"){
+				$('.attache_file').show();
+			}else if(response == "no" && single_multiple == "Multiple" || from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ //alert();
+				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
+			}else{
+				$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
+			}
+        });
+	}
+	
 	$('.leave_type').live("change",function(){
 		var leave_type = $('.leave_type option:selected').val();
 		//alert(leave_type);
@@ -297,10 +331,12 @@ $(document).ready(function()
 			//alert(last_day_this_month);
 			if(response == "yes"){
 				$('.attache_file').show();
-			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ alert();
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ 
 				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
 			}else{
 				$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
 			}
         });
 		
@@ -321,11 +357,13 @@ $(document).ready(function()
 			if(leave_type == 2){ 
 					if(from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){
 						$('.attache_file').show();
+						$('input[name=supporting_attached]').attr('required','required');
 					}
 				}
 			}
 		}else{
 			$('.attache_file').hide();
+			$('input[name=supporting_attached]').removeAttr('required','required');
 		}
 		
 	}); 

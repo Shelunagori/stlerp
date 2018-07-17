@@ -3,6 +3,9 @@
     pointer-events: none;
     //opacity: 0.4;
 }
+.table > tbody > tr > td {
+	border:none !important;
+}
 </style>
 
 <div class="portlet light bordered">
@@ -14,12 +17,14 @@
 	<div class="portlet-body">
 		<div class="row">
 			<div class="col-md-12">
-				<table width="70%">
+				<table width="70%" class="table" >
 					<tr>
 						<td width="15%"><b>Employee: </b></td>
 						<td><?php echo $LeaveApplication->employee->name; ?></td>
 						<td width="15%"><b>No. of leaves: </b></td>
 						<td><?php echo $LeaveApplication->day_no; ?></td>
+						<td width="15%"><b>Leave Type: </b></td>
+						<td><?php echo $LeaveApplication->leave_type->leave_name; ?></td>
 					</tr>
 					<tr>
 						<td width="15%"><b>Leave Dates: </b></td>
@@ -29,14 +34,15 @@
 							To <?php echo $LeaveApplication->to_leave_date->format('d-m-Y'); ?>
 							<?php if($LeaveApplication->to_full_half!='Full Day'){ echo '('.$LeaveApplication->to_full_half.')'; } ?>
 						</td>
-						<td width="15%"><b>Leave Type: </b></td>
-						<td><?php echo $LeaveApplication->leave_type->leave_name; ?></td>
-					</tr>
-					<tr>
 						<td width="15%"><b>Reason for leave: </b></td>
 						<td><?php echo $LeaveApplication->leave_reason; ?></td>
-						<td width="15%"></td>
 						<td></td>
+						<td></td>
+					</tr>
+					<tr>
+						
+						<td colspan="4"><div id="qwerty"></div></td>
+						<td colspan="2"></td>
 					</tr>
 				</table>
 			
@@ -122,7 +128,7 @@
 				<tr>
 					
 					<td align="center">
-						<div id="qwerty"></div>
+						
 						<table class="table">
 							<tr>
 								<!--<td>
@@ -248,15 +254,16 @@ $('input[name="prior_approval"]').val(0);
 			var sick_leave = res[9];
 			var leave_type = "<?php echo $LeaveApplication->leave_type->leave_name; ?>"
 			
-			$('div#qwerty').html('<b> PPL:</b><strong>'+total_past_paid_leave+'</strong>,<b> PUL:</b><strong>'+total_past_unpaid_leave+'</strong>,<b>CL:</b><strong>'+casual_leave+'</strong>,<b>SL:</b><strong>'+sick_leave);
+			$('div#qwerty').html('<td><b> Past Paid Leave:</b><strong>'+' '+total_past_paid_leave+'</strong>&nbsp;&nbsp;<b> Past Unpaid Leave:</b><strong>'+' '+total_past_unpaid_leave+'</strong>&nbsp;&nbsp;<b>CL(Casual Leave):</b><strong>'+' '+casual_leave+'</strong>&nbsp;&nbsp;<b>SL(Sick Leave):</b><strong>'+' '+sick_leave+'');
 			
 			$('input[name="paid_leaves"]').val(paid_leave);
 			$('input[name="unpaid_leaves"]').val(Math.abs(unpaid_leave)); 
 			//$('input[name="unintimated_leave"]').val(un_initimate_leave);
 			$('input[name="total_approved_leaves"]').val(day_no);
-			var tot_paid_leave = parseFloat(paid_leave)+parseFloat(total_past_paid_leave); 
+			var tot_paid_leave = parseFloat(paid_leave)+parseFloat(total_past_paid_leave);
+			
 			if(total_past_paid_leave > 0){
-				 
+				
 				if(tot_paid_leave < casual_leave || tot_paid_leave < sick_leave){ 
 					$('input[name="paid_leaves"]').val(tot_paid_leave);
 				}else if(total_past_paid_leave == casual_leave || total_past_paid_leave == sick_leave){
@@ -275,9 +282,9 @@ $('input[name="prior_approval"]').val(0);
 					
 					$('input[name="unpaid_leaves"]').val(Math.abs(tot_unpaid));
 				}
-			}else{
+			}else{ 
 				if(tot_paid_leave < casual_leave || tot_paid_leave < sick_leave){ 
-					
+					//alert(tot_paid_leave);
 				}
 			}
 			

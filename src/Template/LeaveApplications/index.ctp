@@ -9,7 +9,7 @@
 			<div class="col-md-12">
 				<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){ ?>
 					<form method="GET" >
-						<table width="80%">
+						<table width="80%" class="table table-bordered table-striped">
 							<tr>
 								<td>
 									<input type="text" name="FromDate" class="form-control input-sm date-picker" value="<?php echo @$FromDate; ?>" data-date-format="dd-mm-yyyy" placeholder="From"/>
@@ -21,8 +21,8 @@
 									<?php echo $this->Form->input('employee_id', ['empty'=>'--Select--','options' =>@$Employees,'label' => false,'class' => 'form-control input-sm select2me empDropDown employeeData', 'value'=>@$employee_id]); ?>
 								</td>
 								<td>
-									<select name="status" class="form-control input-sm " >
-										<option value="">select</option>
+									<select name="status" class="form-control input-sm select2me" >
+										<option value="">--Select--</option>
 										<option value="approved" <?php if($status=="approved"){ echo "selected='selected'"; } ?>>approved</option>
 										<option value="Pending" <?php if($status=="Pending"){ echo "selected='selected'"; } ?>>Pending</option>
 										<option value="cancle" <?php if($status=="Pending"){ echo "selected='selected'"; } ?>>Canceled</option>
@@ -82,12 +82,12 @@
 									echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $leaveApplication->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); 
 								}	?>
 								<?php if($empData->department->name=='HR & Administration' || $empData->designation->name=='Director'){
-									if($leaveApplication->leave_status=="approved"){
+									/* if($leaveApplication->leave_status=="approved"){
 										if(in_array(186,$allowed_pages)){
 											echo $this->Html->link('<i class="fa fa-edit"></i>',['action' => 'approveLeave', $leaveApplication->id],['escape'=>false,'target'=>'_blank','class'=>'btn btn-xs purple tooltips','data-original-title'=>'Edit after approve ']);
 									}
-								}	
-									if($leaveApplication->leave_status=="cancle"){
+								}	 */
+									if($leaveApplication->leave_status=="cancel"){
 										if(in_array(199,$allowed_pages)){
 											echo $this->Html->link('<i class="fa fa-undo"></i>',['action' => 'markPending', $leaveApplication->id],['escape'=>false,'class'=>'btn btn-xs purple tooltips','data-original-title'=>'Mark as pending ']);
 										}
