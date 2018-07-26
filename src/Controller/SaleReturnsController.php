@@ -1099,7 +1099,7 @@ class SaleReturnsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['SaleReturns.date_created <=']=$To;
 		}
-		$SaleReturns = $this->SaleReturns->find()->where($where)->contain(['SaleReturnRows','Customers'])->order(['SaleReturns.id' => 'DESC'])->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id,'sale_return_type'=>'Non-GST']);
+		$SaleReturns = $this->SaleReturns->find()->where($where)->contain(['SaleReturnRows','Customers'])->order(['SaleReturns.id' => 'DESC'])->where(['SaleReturns.company_id'=>$st_company_id,'sale_return_type'=>'Non-GST']);
 		//pr($invoices->toArray()); exit;
 		$this->set(compact('SaleReturns','url'));
 	}
