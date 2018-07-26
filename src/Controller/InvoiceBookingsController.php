@@ -1358,9 +1358,15 @@ class InvoiceBookingsController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['InvoiceBookings.created_on >=']=$From;
+		}else{
+			$From = date('1-m-Y');
+			$where['InvoiceBookings.created_on >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['InvoiceBookings.created_on <=']=$To;
+		}else{
+			$To= date('d-m-Y');
 			$where['InvoiceBookings.created_on <=']=$To;
 		}
 		
@@ -1383,14 +1389,20 @@ class InvoiceBookingsController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['InvoiceBookings.created_on >=']=$From;
+		}else{
+			$From = date('1-m-Y');
+			$where['InvoiceBookings.created_on >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['InvoiceBookings.created_on <=']=$To;
+		}else{
+			$To= date('d-m-Y');
+			$where['InvoiceBookings.created_on <=']=$To;
 		}
 		
 		$this->viewBuilder()->layout('index_layout');
-		$InvoiceBookings = $this->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors'])->where($where)->order(['InvoiceBookings.id' => 'DESC'])->where(['InvoiceBookings.company_id'=>$st_company_id,'gst'=>'no','InvoiceBookings.financial_year_id'=>$st_year_id]);
+		$InvoiceBookings = $this->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors'])->where($where)->order(['InvoiceBookings.id' => 'DESC'])->where(['InvoiceBookings.company_id'=>$st_company_id,'gst'=>'no']);
 		//pr($InvoiceBookings->toArray()); exit;
 		$this->set(compact('InvoiceBookings','url'));
 	}

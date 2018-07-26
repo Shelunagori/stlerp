@@ -21,7 +21,7 @@
 					<?php if(!empty($From)){ ?>
 						<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
 						<?php }else { ?>
-						<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo date('1-m-Y'); ?>"  data-date-format="dd-mm-yyyy" >
+						<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo date('01-m-Y'); ?>"  data-date-format="dd-mm-yyyy" >
 						<?php } ?>
 					</td>
 					<td width="5%">

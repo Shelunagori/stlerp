@@ -1519,15 +1519,21 @@ class PurchaseReturnsController extends AppController
 		
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
-			$where['transaction_date >=']=$From;
+			$where['PurchaseReturns.transaction_date >=']=$From;
+		}else{
+			$From = date('1-m-Y');
+			$where['PurchaseReturns.transaction_date >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['transaction_date <=']=$To;
+			$where['PurchaseReturns.transaction_date <=']=$To;
+		}else{
+			$To= date('d-m-Y');
+			$where['PurchaseReturns.transaction_date <=']=$To;
 		}
 		
 		$this->viewBuilder()->layout('');
-		$PurchaseReturns = $this->PurchaseReturns->find()->contain(['InvoiceBookings'=>['InvoiceBookingRows'],'PurchaseReturnRows','Vendors'])->order(['PurchaseReturns.id' => 'DESC'])->where(['PurchaseReturns.company_id'=>$st_company_id]);
+		$PurchaseReturns = $this->PurchaseReturns->find()->contain(['InvoiceBookings'=>['InvoiceBookingRows'],'PurchaseReturnRows','Vendors'])->order(['PurchaseReturns.id' => 'DESC'])->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.gst_type'=>'Non-Gst']);
 		//$InvoiceBookings=$this->PurchaseReturns->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors']);
 		/* foreach($PurchaseReturns->invoice_booking_rows as $invoice_booking_row ) {
 			
@@ -1550,9 +1556,15 @@ class PurchaseReturnsController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['PurchaseReturns.transaction_date >=']=$From;
+		}else{
+			$From = date('1-m-Y');
+			$where['PurchaseReturns.transaction_date >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['PurchaseReturns.transaction_date <=']=$To;
+		}else{
+			$To= date('d-m-Y');
 			$where['PurchaseReturns.transaction_date <=']=$To;
 		}
 		

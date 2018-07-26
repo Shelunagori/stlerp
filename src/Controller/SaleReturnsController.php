@@ -1065,13 +1065,18 @@ class SaleReturnsController extends AppController
 		$To=$this->request->query('To');
 		$this->set(compact('From','To'));
 		$where=[];
-		$where=[];
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['SaleReturns.date_created >=']=$From;
+		}else{
+			$From = date('1-m-Y');
 			$where['SaleReturns.date_created >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['SaleReturns.date_created <=']=$To;
+		}else{
+			$To= date('d-m-Y');
 			$where['SaleReturns.date_created <=']=$To;
 		}
 		$this->viewBuilder()->layout('');
@@ -1094,9 +1099,15 @@ class SaleReturnsController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['SaleReturns.date_created >=']=$From;
+		}else{
+			$From = date('1-m-Y');
+			$where['SaleReturns.date_created >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['SaleReturns.date_created <=']=$To;
+		}else{
+			$To= date('d-m-Y');
 			$where['SaleReturns.date_created <=']=$To;
 		}
 		$SaleReturns = $this->SaleReturns->find()->where($where)->contain(['SaleReturnRows','Customers'])->order(['SaleReturns.id' => 'DESC'])->where(['SaleReturns.company_id'=>$st_company_id,'sale_return_type'=>'Non-GST']);
