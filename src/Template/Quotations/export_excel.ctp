@@ -39,6 +39,7 @@
 	<tbody>
 		<?php $i=0; foreach ($quotations as $quotation): 
 		if($status==$quotation->status){
+			if(in_array($quotation->customer->employee_id,$allowed_emp)){
 		?>
 		<tr >
 			<td><?= h(++$i) ?></td>
@@ -50,7 +51,7 @@
 			<td><?php echo date("d-m-Y",strtotime($quotation->finalisation_date)); ?></td>
 			<td><?php echo ucwords($quotation->status); ?></td>
 		</tr>
-		<?php } endforeach; ?>
+		<?php }} endforeach; ?>
 	</tbody>
 </table>
 			

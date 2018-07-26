@@ -1434,7 +1434,7 @@ class SalesOrdersController extends AppController
 			//pr($salesOrder->id); exit;
 			if ($this->SalesOrders->save($salesOrder)) {
 				
-				$status=$this->sendEmail($salesOrder->id);
+				$this->sendEmail($salesOrder->id);
 				$status_close=$this->request->query('status');
 				$totalSalesOrderIDs=[];
 				foreach($salesOrder->sales_order_rows as $sales_order_row)
@@ -1631,7 +1631,7 @@ class SalesOrdersController extends AppController
 		//$email_to='dimpaljain892@gmail.com';
 		$cc_mail=@$salesOrder->customer->employee->company_email;
 		//$cc_mail='dimpaljain892@gmail.com';
-		
+		//exit;
 		$name='last_so'; 
 		$attachments='';
 		$attachments='Invoice_email/'.$name.'.pdf';

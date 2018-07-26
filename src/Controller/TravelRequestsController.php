@@ -239,7 +239,7 @@ class TravelRequestsController extends AppController
 			$dates=$this->date_range($travelRequest->travel_from_date, $travelRequest->travel_to_date, $step = '+1 day', $output_format = 'Y-m-d' );
 			foreach($dates  as $date){
 				
-				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date, 'travel_mode_to_date >='=>$date, 'employee_id'=>$travelRequest->employee_id,'company_id'=>$st_company_id])->count();
+				$c=$this->TravelRequests->find()->where(['travel_mode_from_date <='=>$date, 'travel_mode_to_date >='=>$date, 'employee_id'=>$travelRequest->employee_id])->count();
 				if($c>0){
 					$this->Flash->error(__('Travel request cannot be fullfilled with duplicate dates.'));
 					goto a;

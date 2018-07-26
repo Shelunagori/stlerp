@@ -62,10 +62,10 @@
 					</tr>
 				</thead>
 				<tbody><?php $sales5=0; $vat5=0; $sales14=0; $vat14=0; $sales2=0; $vat2=0; $sales0=0; ?>
-				<?php foreach ($SaleReturns as $SaleReturn): ?>
+				<?php foreach ($SaleReturns as $SaleReturn):  ?>
 					<tr>
 						<td><?= h(++$page_no) ?></td>
-						<td><?= h(($SaleReturn->sr1.'/IN-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4)) ?></td>
+						<td><?= h(($SaleReturn->sr1.'/CR-'.str_pad($SaleReturn->sr2, 3, '0', STR_PAD_LEFT).'/'.$SaleReturn->sr3.'/'.$SaleReturn->sr4)) ?></td>
 						<td><?php echo date("d-m-Y",strtotime($SaleReturn->date_created)); ?></td>
 						<td><?= h($SaleReturn->customer->customer_name) ?></td>
 						<td align="right"><?php if($SaleReturn->sale_tax_per==5.50){

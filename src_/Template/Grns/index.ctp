@@ -1,0 +1,139 @@
+<?php 
+
+	if(!empty($status)){
+		$url_excel=$status."/?".$url;
+	}else{
+		$url_excel="/?".$url;
+	}
+
+?>
+<div class="portlet light bordered">
+	<div class="portlet-title">
+		<div class="caption">
+			<i class="icon-globe font-blue-steel"></i>
+			<span class="caption-subject font-blue-steel uppercase">Goods Receipt Note</span>
+			<?php if($pull_request=="true" || $grn_pull_request=="true"){ ?>
+			: Select a GRN to Book Invoice
+			<?php } ?>
+		</div>
+		<div class="actions">
+			<div class="btn-group">
+			<?php
+			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
+			if($status=='Invoice-Booked'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
+			?>
+			<?php if($pull_request!="true" && $grn_pull_request!="true"){ ?>
+				<?= $this->Html->link(
+					'Pending',
+					'/Grns/index/Pending',
+					['class' => $class1]
+				); ?>
+				<?= $this->Html->link(
+					'Invoice-Booked',
+					'/Grns/index/Invoice-Booked',
+					['class' => $class2]
+				); ?>
+			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Grns/Export-Excel/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+			<?php } ?>
+			</div>
+			</div>
+
+	<div class="portlet-body">
+		<div class="row">
+		<div class="col-md-12">
+			<form method="GET" >
+				<table class="table table-condensed">
+					<tbody>
+						<tr>
+							<td width="31%">
+								<div class="input-group" >
+									<span class="input-group-addon">GRN-</span><input type="text" name="grn_no" class="form-control input-sm" placeholder="GRN No" value="<?php echo @$grn_no; ?>">
+								</div>
+							</td>
+							<td width="20%">
+								<input type="text" name="po_no" class="form-control input-sm" placeholder="PO No" value="<?php echo @$po_no; ?>">
+							</td>
+							<td width="20%">
+								<input type="text" name="vendor" class="form-control input-sm" placeholder="Supplier Name" value="<?php echo @$vendor; ?>">
+							</td>
+							<td width="15%">
+								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Date From" value="<?php echo @$From; ?>" data-date-format="dd-mm-yyyy" >
+							</td>
+							<td width="19%">
+								<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Date To" value="<?php echo @$To; ?>" data-date-format="dd-mm-yyyy" >
+								<input type="hidden" name="grn-pull-request" value="<?php echo $grn_pull_request;?>">
+								<input type="hidden" name="pull-request" value="<?php echo $pull_request;?>">
+							</td>
+							<td><button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+			
+				<?php $page_no=$this->Paginator->current('Grns'); $page_no=($page_no-1)*20; ?>
+				<table class="table table-bordered table-striped table-hover">
+					<thead>
+						<tr>
+							<th width="9%">Sr. No.</th>
+							<th width="19%" >GRN No.</th>
+							<th width="19%" >PO No.</th>
+							<th width="19%">Supplier</th>
+							<th width="19%" >Date Created</th>
+							<th class="actions"><?= __('Actions') ?></th>
+						</tr>
+					</thead>
+					<tbody>
+					
+						<?php foreach ($grns as $grn): 
+						  if(date("Y-m-d",strtotime($financial_year->date_to)) >= date("Y-m-d",strtotime($grn->transaction_date))){ 
+						  ?>
+						 
+						<tr>
+							<td><?= h(++$page_no) ?></td>
+							<td><?= h(($grn->grn1.'/GRN-'.str_pad($grn->grn2, 3, '0', STR_PAD_LEFT).'/'.$grn->grn3.'/'.$grn->grn4)) ?></td>
+							<td>
+							<?php if(in_array($grn->purchase_order->created_by,$allowed_emp)){ ?>
+							<?php $purchase_order_id = $EncryptingDecrypting->encryptData($grn->purchase_order->id);
+							echo $this->Html->link($grn->purchase_order->po1.'/PO-'.str_pad($grn->purchase_order->po2, 3, '0', STR_PAD_LEFT).'/'.$grn->purchase_order->po3.'/'.$grn->purchase_order->po4,[
+							'controller'=>'PurchaseOrders','action' => 'confirm',$purchase_order_id],array('target'=>'_blank')); ?>
+							<?php } ?>
+							</td>
+							<td><?= h($grn->vendor->company_name) ?></td>
+							<td><?php echo date("d-m-Y",strtotime($grn->date_created)); ?></td>
+							<td class="actions"> 
+							<?php 
+							$grn->id = $EncryptingDecrypting->encryptData($grn->id);
+							if($pull_request=="true"){
+									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Book Invoice','/InvoiceBookings/Add?grn='.$grn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}else if($grn_pull_request=="true")
+								{
+									echo $this->Html->link('<i class="fa fa-repeat"></i>  Convert Into Gst Book Invoice','/InvoiceBookings/gstInvoiceBooking?grn='.$grn->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								}
+  							else { ?>
+							<?php
+							if(in_array($grn->created_by,$allowed_emp)){
+							if(in_array(35,$allowed_pages)){ ?>
+							<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $grn->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View '));  ?>	
+							
+							 <?php } ?>
+							<?php if($status!='Invoice-Booked' and in_array(16,$allowed_pages)){ ?>
+							<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'EditNew', $grn->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));?> <?php } }?>
+							
+							
+					
+                             <?php } ?>
+							</td>
+						</tr>
+						  <?php 
+						  }
+						  endforeach; ?>
+					</tbody>
+				</table>
+					</div>
+			</div>
+		</div>
+				
+			</div>
+		</div>
+	
+	

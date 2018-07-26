@@ -481,18 +481,21 @@ class LoginsController extends AppController
 			$PendingLoanApplications = $this->Logins->LoanApplications->find()->where(['LoanApplications.status'=>'Pending','company_id'=>$st_company_id])->contain(['Employees'])->toArray();
 			//pr($PendingLoanApplications); exit;
 			
+			
+			
 		}else{
 			
 			$s_year_from_date=date('Y-m-d',strtotime($s_year_from_date));
 			$s_year_to_date=date('Y-m-d',strtotime($s_year_to_date));
-			
+			$now = new \DateTime('now');
+			$current_month = $now->format('m');
 			$PendingleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'])->toArray();
 			
-			$SickleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'=>function ($q){
+			$SickleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'MONTH(from_leave_date)'=>$current_month])->contain(['Employees','LeaveTypes'=>function ($q){
 				return $q->where(['LeaveTypes.leave_name'=>'Sick Leave']);
 			}])->order(['LeaveApplications.id'=>'DESC'])->first();
-			
-			$CasualleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'from_leave_date >='=>$s_year_from_date,'to_leave_date <='=>$s_year_to_date])->contain(['Employees','LeaveTypes'=>function ($q){
+			//pr($SickleaveRequests);exit;
+			$CasualleaveRequests = $this->Logins->LeaveApplications->find()->where(['employee_id'=>$employee_id,'MONTH(from_leave_date)'=>$current_month])->contain(['Employees','LeaveTypes'=>function ($q){
 				return $q->where(['LeaveTypes.leave_name'=>'Casual Leave']);
 			}])->order(['LeaveApplications.id'=>'DESC'])->first();
 			

@@ -32,7 +32,7 @@ class PurchaseOrdersController extends AppController
 		$pull_request=$this->request->query('pull-request');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		
+		$st_year_id = $session->read('st_year_id');
 		$st_year_id = $session->read('st_year_id');
 		$financial_year = $this->PurchaseOrders->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$financial_month_first = $this->PurchaseOrders->FinancialMonths->find()->where(['financial_year_id'=>$st_year_id,'status'=>'Open'])->first();
@@ -69,6 +69,10 @@ class PurchaseOrdersController extends AppController
 			$where['PurchaseOrders.date_created <=']=$To;
 		}
 		$where1=[];
+		if(!empty($items)){
+			$where1['Items.id']=$items;
+		}
+		
 		$purchaseOrders=[];
 		$styear=[1,3,2];
 			if(in_array($st_year_id,$styear)){ 
@@ -86,13 +90,16 @@ class PurchaseOrdersController extends AppController
 		
 		
 		if(!empty($items)){ 
+		//$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 
 				$PurchaseOrderRows = $this->PurchaseOrders->PurchaseOrderRows->find();
 				$purchaseOrders = $this->PurchaseOrders->find();
 				$purchaseOrders->select(['id','total_sales'=>$PurchaseOrderRows->func()->sum('PurchaseOrderRows.quantity')])
 				->innerJoinWith('PurchaseOrderRows')
 				->group(['PurchaseOrders.id'])
-				->matching('PurchaseOrderRows.Items', function ($q) use($items,$st_company_id) {
-											return $q->where(['Items.id' =>$items,'company_id'=>$st_company_id]);
+				->matching('PurchaseOrderRows.Items', function ($q) use($where1,$st_company_id,$st_year_id) {
+											return $q->where($where1)->contain(['ItemCompanies'=>function ($e) use($st_company_id,$st_year_id){
+												return $e->where(['ItemCompanies.company_id'=>$st_company_id]);
+											}]);
 							})
 				->contain(['Companies', 'Vendors','PurchaseOrderRows'=>['Items','GrnRows']])
 				->autoFields(true)
@@ -100,6 +107,7 @@ class PurchaseOrdersController extends AppController
 				->where($where)
 				->where($wheree)
 				->order(['PurchaseOrders.id'=>'DESC']);
+				//pr($purchaseOrders->toArray()); exit;
 		}else{	
 			if($pull_request=="true"){ 
 				$tdate=date('Y-m-d',strtotime($financial_year->date_to)); 

@@ -1086,6 +1086,7 @@ class SaleReturnsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$From=$this->request->query('From');
 		$To=$this->request->query('To');
 		$this->set(compact('From','To'));
@@ -1098,7 +1099,7 @@ class SaleReturnsController extends AppController
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['SaleReturns.date_created <=']=$To;
 		}
-		$SaleReturns = $this->SaleReturns->find()->where($where)->contain(['SaleReturnRows','Customers'])->order(['SaleReturns.id' => 'DESC'])->where(['SaleReturns.company_id'=>$st_company_id,'sale_return_type'=>'Non-GST']);
+		$SaleReturns = $this->SaleReturns->find()->where($where)->contain(['SaleReturnRows','Customers'])->order(['SaleReturns.id' => 'DESC'])->where(['SaleReturns.company_id'=>$st_company_id,'SaleReturns.financial_year_id'=>$st_year_id,'sale_return_type'=>'Non-GST']);
 		//pr($invoices->toArray()); exit;
 		$this->set(compact('SaleReturns','url'));
 	}
@@ -1152,7 +1153,7 @@ class SaleReturnsController extends AppController
 			//pr($data);
 			$saleReturn = $this->SaleReturns->patchEntity($saleReturn, $data);
 			$last_voucher_no_sr=$this->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
-			$last_voucher_no_credit_note=$this->SaleReturns->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
+			$last_voucher_no_credit_note=$this->SaleReturns->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['CreditNotes.id' => 'DESC'])->first();
 			
 			if($last_voucher_no_credit_note->voucher_no > $last_voucher_no_sr->sr2){
 				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;

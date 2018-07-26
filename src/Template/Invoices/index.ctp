@@ -93,7 +93,7 @@
 							<?php if($invoice->sales_order_id != 0){ ?>
 							<td>
 							
-							<?php if(in_array($invoice->customer->employee_id,$allowed_emp)){
+							<?php //if(in_array($invoice->customer->employee_id,$allowed_emp)){
 							$sales_order_id = $EncryptingDecrypting->encryptData($invoice->sales_order->id);	
 							if($invoice->sales_order->gst == 'yes'){
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
@@ -101,7 +101,9 @@
 							}else{
 								echo $this->Html->link( $invoice->sales_order->so1.'/SO-'.str_pad($invoice->sales_order->so2, 3, '0', STR_PAD_LEFT).'/'.$invoice->sales_order->so3.'/'.$invoice->sales_order->so4,[
 							'controller'=>'SalesOrders','action' => 'confirm',$sales_order_id],array('target'=>'_blank')); 
-							} }?>
+							} 
+							//}
+							?>
 							</td>
 							<?php }else{?>
 							<td></td><?php } ?>
@@ -123,7 +125,7 @@
 							<td align="right"><?= h($this->Money->indianNumberFormat($invoice->total_after_pnf)) ?></td>
 							<td class="actions">
 							<?php
-							if(in_array($invoice->customer->employee_id,$allowed_emp)){
+							//if(in_array($invoice->customer->employee_id,$allowed_emp)){
 								if($invoice->invoice_type=='GST'){ ?>
 									<?php 
 									if(in_array(27,$allowed_pages)){
@@ -149,7 +151,7 @@
 								<?php echo $this->Html->link('<i class="fa fa-download"></i>',['action' => 'dispatch_download', $invoice_id,],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs blue tooltips','data-original-title'=>'View Dispatch Document'));  
 								?><?php } 
 								
-								}?>
+								//}?>
 								<?php
 								if($inventory_voucher=="true" ){
 								echo $this->Html->link('<i class="fa fa-repeat"></i>  Create Inventory Voucher','/Ivs/add/'.$invoice_id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));

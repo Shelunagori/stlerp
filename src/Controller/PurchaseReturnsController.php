@@ -1541,6 +1541,7 @@ class PurchaseReturnsController extends AppController
 		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$From=$this->request->query('From');
 		$To=$this->request->query('To');
 		$this->set(compact('From','To'));
@@ -1556,7 +1557,7 @@ class PurchaseReturnsController extends AppController
 		}
 		
 		$this->viewBuilder()->layout('index_layout');
-		$PurchaseReturns = $this->PurchaseReturns->find()->contain(['InvoiceBookings'=>['InvoiceBookingRows'],'PurchaseReturnRows','Vendors'])->order(['PurchaseReturns.id' => 'DESC'])->where(['PurchaseReturns.company_id'=>$st_company_id]);
+		$PurchaseReturns = $this->PurchaseReturns->find()->contain(['InvoiceBookings'=>['InvoiceBookingRows'],'PurchaseReturnRows','Vendors'])->order(['PurchaseReturns.id' => 'DESC'])->where(['PurchaseReturns.company_id'=>$st_company_id,'PurchaseReturns.financial_year_id'=>$st_year_id,'PurchaseReturns.gst_type'=>'Non-Gst']);
 		//$InvoiceBookings=$this->PurchaseReturns->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors']);
 		/* foreach($PurchaseReturns->invoice_booking_rows as $invoice_booking_row ) {
 			

@@ -1375,6 +1375,7 @@ class InvoiceBookingsController extends AppController
 		
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$From=$this->request->query('From');
 		$To=$this->request->query('To');
 		$where=[];
@@ -1389,7 +1390,7 @@ class InvoiceBookingsController extends AppController
 		}
 		
 		$this->viewBuilder()->layout('index_layout');
-		$InvoiceBookings = $this->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors'])->where($where)->order(['InvoiceBookings.id' => 'DESC'])->where(['InvoiceBookings.company_id'=>$st_company_id,'gst'=>'no']);
+		$InvoiceBookings = $this->InvoiceBookings->find()->contain(['InvoiceBookingRows','Vendors'])->where($where)->order(['InvoiceBookings.id' => 'DESC'])->where(['InvoiceBookings.company_id'=>$st_company_id,'gst'=>'no','InvoiceBookings.financial_year_id'=>$st_year_id]);
 		//pr($InvoiceBookings->toArray()); exit;
 		$this->set(compact('InvoiceBookings','url'));
 	}

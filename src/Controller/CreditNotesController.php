@@ -137,11 +137,13 @@ class CreditNotesController extends AppController
 				}
 				
 			$last_voucher_no_sr=$this->CreditNotes->SaleReturns->find()->select(['sr2'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['sr2' => 'DESC'])->first();
-			$last_voucher_no_credit_note=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['voucher_no' => 'DESC'])->first();
 			
-			if(@$last_voucher_no_credit_note->voucher_no > @$last_voucher_no_sr->sr2){
+			$last_voucher_no_credit_note=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['CreditNotes.id' => 'DESC'])->first();
+			
+			//echo $last_voucher_no_credit_note->voucher_no;exit;
+			if(@$last_voucher_no_credit_note->voucher_no > @$last_voucher_no_sr->sr2){ 
 				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;
-			}else{
+			}else{ 
 				$last_voucher_no=$last_voucher_no_sr->sr2;
 			}
 			

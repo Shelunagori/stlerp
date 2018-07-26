@@ -69,7 +69,7 @@
 							if(sizeof($SalesOrder->sales_order_rows)>0){
 								echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Pre-Add?sales-order='.$SalesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 							}else{
-								echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Add?sales-order='.$SalesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
+								echo $this->Html->link('<i class="fa fa-repeat "></i>  Create Job Card','/JobCards/Add/'.$SalesOrder->id,array('escape'=>false,'class'=>'btn btn-xs default blue-stripe'));
 							}
 						} } ?>
 					</td>

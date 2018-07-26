@@ -173,6 +173,7 @@
 						
 						?>
 						<tr <?php if($status=='Converted-Into-GRN' && $st_year_id==$purchaseOrder->financial_year_id){ echo 'style="background-color:#f4f4f4"';   
+					
 							if(@$total_sales[@$purchaseOrder->id] == @$total_qty[@$purchaseOrder->id]){ 
 						
 						?>>
@@ -234,6 +235,9 @@
 								//pr($text); 
 						//pr(@$supplier_total_po[$purchaseOrder->vendor_id]);   ?>
 						<tr <?php if($status=='true' || $status==null){ echo 'style="background-color:#f4f4f4"';  
+							//pr($total_sales);
+						//pr($total_qty);
+						//exit;
 							if(@$total_sales[@$purchaseOrder->id] != @$total_qty[@$purchaseOrder->id]){ //exit;
 						?>>
 							<td><?= h(++$page_no) ?></td>

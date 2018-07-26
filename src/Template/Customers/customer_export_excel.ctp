@@ -58,6 +58,23 @@
 					}else{
 						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
 					}
+				}else if(@$Emp_department_id->dipartment_id == 2){
+					$ttlamt=round(@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount'],2);
+					
+					if($amountType=='Zero' && $ttlamt==0){
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Positive' && $ttlamt > 0 ){ 
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='Negative' && $ttlamt < 0 ){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else if($amountType=='All'){
+						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
+					}else{
+						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
+					}
+					
 				}
 			}
 		//	pr($amountType); exit;
@@ -150,7 +167,105 @@
 				</td>
 				
 			</tr>
-			<?php }} }?>
+			<?php }}else if($Emp_department_id->dipartment_id == 2){
+				if($ClosingBalanceLedgerWise[$LedgerAccount->id]=="Yes"){
+				if(!empty($LedgerAccount->customer)){
+			?>
+			<tr>
+				<td><?php echo ++$sr; ?></td>
+				<td style=" white-space: normal; width: 200px; ">
+				<?php if(!empty($LedgerAccount->alias)){ ?>
+				<?php echo  $this->Html->link( $LedgerAccount->name." (". $LedgerAccount->alias.")",[
+							'controller'=>'Ledgers','action' => 'AccountStatementRefrence?status=completed&ledgerid='.$LedgerAccount->id],array('target'=>'_blank')); 
+				}else{ 
+					echo $this->Html->link($LedgerAccount->name,[
+							'controller'=>'Ledgers','action' => 'AccountStatementRefrence?status=completed&ledgerid='.$LedgerAccount->id],array('target'=>'_blank'));
+					
+				}		?></td>
+				<td><?php echo $CustmerPaymentTerms[$LedgerAccount->id].' Days'; ?></td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab2'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab2'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab2'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab3'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab3'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab3'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab4'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab4'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab4'],2).'</span>';
+					} ?>
+				</td>
+				<td>
+					<?php if(@$Outstanding[$LedgerAccount->id]['Slab5'] > 0){
+						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab5'],2).'</span>';
+					}else{
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab5'],2).'</span>';
+					} ?>
+				</td>
+				
+				<td>
+				<?php 
+					echo round(@$Outstanding[$LedgerAccount->id]['OnAccount'],2); 
+					@$ColumnOnAccount+=@$Outstanding[$LedgerAccount->id]['OnAccount'];
+				?>
+				</td>
+				<td>
+				<?php $TotalOutStanding=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
+				<?php 
+				if($TotalOutStanding>0){
+					echo '<span id="outstnd" class="clrRed">'.round(@$TotalOutStanding,2).'</span>';
+				}elseif($TotalOutStanding<0){
+					echo '<span id="outstnd">'.round(@$TotalOutStanding,2).'</span>';
+				} ?>
+				<?php
+					@$ColumnOutStanding+=@$TotalOutStanding;
+				?>
+				</td>
+				<td>
+					<?php 
+					echo round(@$Outstanding[$LedgerAccount->id]['NoDue'],2);
+					@$ColumnNoDue+=@$Outstanding[$LedgerAccount->id]['NoDue'];
+					?>
+				</td>
+				<td>
+				<?php $ClosingBalance=@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount']; ?>
+				<?php if($ClosingBalance!=0){
+					echo round($ClosingBalance,2);
+				}else{
+					echo "0";
+				} ?>
+				<?php
+					@$ColumnClosingBalance+=$ClosingBalance;
+				?>
+				</td>
+				<td style="text-align:center;">
+					<?php 
+					$ClosingBalance= round($ClosingBalance,2);
+					if($ClosingBalance > 0){ ?>
+						
+						<a href="#" class="btn-primary btn-sm send_mail" title="Send Email " amt=<?php echo $ClosingBalance; ?>  ledger_id=<?php echo $LedgerAccount->id; ?>><i class="fa fa-envelope"></i></a>
+				<?php	} ?>
+				</td>
+			</tr>
+				
+				
+				<?php }}} }?>
 			</tbody>
 			<tfoot id='tf'>
 				<tr>
