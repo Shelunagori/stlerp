@@ -113,6 +113,7 @@ margin-bottom: 0;
 						<?php } ?>
 						<th>Quantity</th>
 						<th>Rate</th>
+						<th>Narration</th>
 					</thead>
 					<tbody>
 						<?php $i=1; foreach($out_item as $out_item){ ?>
@@ -143,6 +144,7 @@ margin-bottom: 0;
 							<?php }} ?>
 							<td valign="top"><?php echo $out_item->quantity ?></td>
 							<td><?= h($this->Number->format($out_item->amount,['places'=>2])) ?></td>
+							<td style="text-align:justify;"><?php echo $out_item->narration ?></td>
 						</tr>
 						<?php $i++; } ?>
 					</tbody>
