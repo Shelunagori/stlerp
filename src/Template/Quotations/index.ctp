@@ -157,14 +157,21 @@ if(!empty($status)){
 						</tr>
 					</thead>
 					<tbody>
-						<?php $total_amount=0; $i=0; foreach ($quotations as $quotation):  $i++;
+						<?php $total_amount=0; $i=0; 
+						$created_by=[];
+						foreach ($quotations as $quotation):  $i++;
 						$quotation_id = $quotation->id;
 						$quotation->id = $EncryptingDecrypting->encryptData($quotation->id);
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
 						
-						 //if(in_array($quotation->customer->employee_id,$allowed_emp)){
+						$created_by[] = $quotation->created_by;
+						//pr($created_by);
+						if(in_array($quotation->customer->employee_id,$created_by) && 
+						in_array($quotation->customer->employee_id,$allowed_sales) && 
+						in_array($quotation->customer->employee_id,$allowed_emp)&& 
+						in_array($quotation->customer->employee_id,$allowed_acc)){
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?>
@@ -274,7 +281,7 @@ if(!empty($status)){
 						</tr>
 						
 						 <?php 
-						 //}
+						 }
 						 endforeach; ?>
 					</tbody>
 					<tfoot>

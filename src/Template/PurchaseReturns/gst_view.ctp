@@ -109,15 +109,27 @@ margin-bottom: 0;
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
+						<td><b>Created Date</b></td>
+						<td width="20" align="center">:</td>
+						<td><?= h(date("d-m-Y",strtotime($purchaseReturn->created_on))) ?></td>
+						
+					</tr>
+				</table>
+			</td>
+			
+		</tr>
+		<tr>
+			<td width="50%" valign="top" align="left"></td>
+			<td width="50%" valign="top" align="right">
+				<table>
+					<tr>
 						<td><b>Purchase Account</b></td>
 						<td width="20" align="center">:</td>
 						<td><?= h($purchase_acc->name) ?></td>
 					</tr>
 				</table>
 			</td>
-			
 		</tr>
-		
 	</table>
 	
 </br>

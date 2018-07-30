@@ -127,15 +127,24 @@
 									
 									?>
 								</td>
-								<td>
+								<td colspan="2">
 									<label><?php
 									
 									echo $this->Form->input('check.'.$q, ['label' => false,'type'=>'checkbox','class'=>'rename_check','value' => @$purchase_order_rows->id]); ?></label>
 								</td>
 							</tr>
 							<tr class="tr2" row_no='<?php echo @$purchase_order_rows->id; ?>'>
-								<td colspan="3">
+								<td colspan="4">
+									
+								</td>
+								
+							</tr>
+							<tr class="tr3" row_no='<?php echo @$purchase_order_rows->id; ?>'>
+								<td colspan="5">
+								<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm descriptions','placeholder'=>'Description','style'=>['display:none'],'value' => @$purchase_order_rows->description,'readonly','required']); ?>
 									<?php //echo $this->Text->autoParagraph($purchase_order_rows->description); ?>
+									<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>"><?php echo @$purchase_order_rows->description; ?></div>
+							
 								</td>
 								
 							</tr>
@@ -258,7 +267,7 @@ $(document).ready(function() {
 
 	function update_sr_textbox(){
 	
-		var r=0;
+		var r=0;var t=1;
 		$("#main_tb tbody tr.tr1").each(function(){
 			var row_no=$(this).attr('row_no');
 			var serial_number_enable=$(this).find('td:nth-child(2) input[type="hidden"]:nth-child(2)').val();
@@ -288,10 +297,10 @@ $(document).ready(function() {
 							
 							for(i=l;i<=qty;i++){
 							
-							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required/></div>');
+							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').append('<div style="margin-bottom:6px;"><input type="text" class="sr_no" name="grn_rows['+val+'][serial_numbers]['+r+']" ids="sr_no['+i+']" id="sr_no'+r+row_no+'" required placeholder="Serial Number '+t+'"/></div>');
 							
 							$('.tr2[row_no="'+row_no+'"] td:nth-child(1)').find('input#sr_no'+r+row_no).rules('add', {required: true});
-							r++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
+							r++;t++;	//$('.tr2[row_no="'+row_no+'"]').find('input[ids="sr_no['+i+']"]').remove();
 							}
 						}
 					}
@@ -317,7 +326,20 @@ $(document).ready(function() {
     });
 	
 	
-	
+	function put_code_description(){
+		var i=0;
+			$("#main_tb tbody tr.tr").each(function(){ 
+				var row_no=$(this).attr('row_no');			
+				var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
+				
+				if(val){
+				var code=$('#main_tb tbody tr.tr3').find('div#summer'+val).code();
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').find('td:nth-child(1) textarea').val(code);
+				}
+			i++; 
+		});
+		
+	}
 	var p=0;
 	rename_rows();
 	function rename_rows(){
@@ -337,15 +359,27 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({name:'grn_rows['+val+'][purchase_order_row_id]'});
 				
 				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly');
+				var htm=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td').find('div.note-editable').html();
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').closest('td').html('');
+			
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td').find('div#summer'+row_no).summernote();
+				
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').find('td:nth-child(1) textarea.descriptions').attr({name:"grn_rows["+val+"][description]", id:"grn_rows-"+val+"-description"});
+				
 				$(this).css('background-color','#fffcda');
+				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+				
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
 			}else{
 				$(this).find('td:nth-child(1) input').attr({ name:"q"});
 				$(this).find('td:nth-child(2) input').attr({ name:"q"});
 				$(this).find('td:nth-child(3) input').attr({ name:"q", id:"q",readonly:"readonly"});
-				
+				var uncheck=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]');
+				$(uncheck).find('td:nth-child(1) textarea.descriptions').attr({ name:"q", readonly:"readonly"});
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
 			}
 		});
 	}

@@ -435,6 +435,7 @@ class PurchaseReturnsController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
 		$s_employee_id=$this->viewVars['s_employee_id'];
        
 		$purchase_return_id=$this->request->query('purchaseReturn');
@@ -547,8 +548,8 @@ class PurchaseReturnsController extends AppController
 			//pr($purchaseReturn); exit;
 			$purchaseReturn->company_id=$st_company_id;
 			$purchaseReturn->invoice_booking_id=$invoiceBooking->id;
-			$purchaseReturn->created_on= date("Y-m-d");
-			$purchaseReturn->created_by=$s_employee_id;
+			$purchaseReturn->edited_on= date("Y-m-d");
+			$purchaseReturn->edited_by=$s_employee_id;
 			$purchaseReturn->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 			$purchaseReturn->purchase_ledger_account=$invoiceBooking->purchase_ledger_account;
 			$purchaseReturn->vendor_id=$invoiceBooking->vendor_id;	
@@ -579,7 +580,7 @@ class PurchaseReturnsController extends AppController
 										'purchase_return_row_id' => $purchase_return_row->id,
 										'purchse_return_id' => $purchaseReturn->id,
 										'company_id'=>$st_company_id,
-										'transaction_date'=>$purchaseReturn->transaction_date,
+										'transaction_date'=>date("Y-m-d",strtotime($purchaseReturn->transaction_date)),
 										'parent_id'=>$serial
 										]);
 									$query->execute();  
@@ -597,7 +598,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->credit =0;
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				$ledger->voucher_source = 'Purchase Return';
 				$this->PurchaseReturns->Ledgers->save($ledger);
 				
@@ -609,7 +610,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
 				$ledger->voucher_source = 'Purchase Return';
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				$this->PurchaseReturns->Ledgers->save($ledger);
 				
 				$ledger_account_for_discount=$this->PurchaseReturns->LedgerAccounts->find()->where(['invoice_booking_other_charge_post'=>1,'name'=>'Discount','company_id'=>$st_company_id])->first();
@@ -626,7 +627,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
 				$ledger->voucher_source = 'Purchase Return';
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				if($purchaseReturn->total_other_charge != 0){
 					$this->PurchaseReturns->Ledgers->save($ledger);
 				}
@@ -642,7 +643,7 @@ class PurchaseReturnsController extends AppController
 					$ledger->voucher_id = $purchaseReturn->id;
 					$ledger->voucher_source = 'Purchase Return';
 					$ledger->company_id = $purchaseReturn->company_id;
-					$ledger->transaction_date = $purchaseReturn->supplier_date; 
+					$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date)); 
 					$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->sgst > 0){
@@ -654,7 +655,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->supplier_date;
+						$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date));
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->igst > 0){
@@ -666,7 +667,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->supplier_date;
+						$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date));
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 								
@@ -694,7 +695,7 @@ class PurchaseReturnsController extends AppController
 						$itemLedger->in_out = 'Out';
 						$itemLedger->rate = $itemLedger_data->rate;
 						$itemLedger->company_id = $purchaseReturn->company_id;
-						$itemLedger->processed_on =$purchaseReturn->transaction_date;   
+						$itemLedger->processed_on =date("Y-m-d",strtotime($purchaseReturn->transaction_date));   
 						$itemLedger->source_row_id =$purchase_return_row->id;   
 						$this->PurchaseReturns->ItemLedgers->save($itemLedger);
 				}
@@ -719,7 +720,7 @@ class PurchaseReturnsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
-							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							$ReferenceDetail->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 							
 							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 							
@@ -736,7 +737,7 @@ class PurchaseReturnsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
-						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						$ReferenceDetail->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 						if($purchaseReturn->on_account > 0){
 							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}
@@ -879,7 +880,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->credit =0;
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				$ledger->voucher_source = 'Purchase Return';
 				$this->PurchaseReturns->Ledgers->save($ledger);
 				
@@ -891,7 +892,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
 				$ledger->voucher_source = 'Purchase Return';
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				$this->PurchaseReturns->Ledgers->save($ledger);
 				
 				$ledger_account_for_discount=$this->PurchaseReturns->LedgerAccounts->find()->where(['invoice_booking_other_charge_post'=>1,'name'=>'Discount','company_id'=>$st_company_id])->first();
@@ -908,7 +909,7 @@ class PurchaseReturnsController extends AppController
 				$ledger->voucher_id = $purchaseReturn->id;
 				$ledger->company_id = $purchaseReturn->company_id;
 				$ledger->voucher_source = 'Purchase Return';
-				$ledger->transaction_date = $purchaseReturn->transaction_date;
+				$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 				if($purchaseReturn->total_other_charge != 0){
 					$this->PurchaseReturns->Ledgers->save($ledger);
 				}
@@ -924,7 +925,7 @@ class PurchaseReturnsController extends AppController
 					$ledger->voucher_id = $purchaseReturn->id;
 					$ledger->voucher_source = 'Purchase Return';
 					$ledger->company_id = $purchaseReturn->company_id;
-					$ledger->transaction_date = $purchaseReturn->transaction_date; 
+					$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date)); 
 					$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->sgst > 0){
@@ -936,7 +937,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->transaction_date;
+						$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date));
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 					if($purchase_return_row->igst > 0){
@@ -948,7 +949,7 @@ class PurchaseReturnsController extends AppController
 						$ledger->voucher_id = $purchaseReturn->id;
 						$ledger->voucher_source = 'Purchase Return';
 						$ledger->company_id = $purchaseReturn->company_id;
-						$ledger->transaction_date = $purchaseReturn->transaction_date;
+						$ledger->transaction_date = date("Y-m-d",strtotime($purchaseReturn->supplier_date));
 						$this->PurchaseReturns->Ledgers->save($ledger); 
 					}
 								
@@ -977,7 +978,7 @@ class PurchaseReturnsController extends AppController
 										'purchse_return_id' => $purchaseReturn->id,
 										'purchase_return_row_id' => $purchase_return_row->id,
 										'company_id'=>$st_company_id,
-										'transaction_date'=>$purchaseReturn->transaction_date,
+										'transaction_date'=>date("Y-m-d",strtotime($purchaseReturn->transaction_date)),
 										'parent_id'=>$serial_nos
 										]);
 									$query->execute();  	
@@ -1008,7 +1009,7 @@ class PurchaseReturnsController extends AppController
 						$itemLedger->in_out = 'Out';
 						$itemLedger->rate = $itemLedger_data->rate;
 						$itemLedger->company_id = $purchaseReturn->company_id;
-						$itemLedger->processed_on =$purchaseReturn->transaction_date;   
+						$itemLedger->processed_on =date("Y-m-d",strtotime($purchaseReturn->transaction_date));   
 						$itemLedger->source_row_id =$purchase_return_row->id;   
 						$this->PurchaseReturns->ItemLedgers->save($itemLedger);
 						$i++;
@@ -1034,7 +1035,7 @@ class PurchaseReturnsController extends AppController
 								$ReferenceDetail->debit = 0;
 							}
 							$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
-							$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+							$ReferenceDetail->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 							
 							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 							
@@ -1051,7 +1052,7 @@ class PurchaseReturnsController extends AppController
 							$ReferenceDetail->debit = 0;
 						}
 						$ReferenceDetail->purchase_return_id = $purchaseReturn->id;
-						$ReferenceDetail->transaction_date = $purchaseReturn->transaction_date;
+						$ReferenceDetail->transaction_date = date("Y-m-d",strtotime($purchaseReturn->transaction_date));
 						if($purchaseReturn->on_account > 0){
 							$this->PurchaseReturns->ReferenceDetails->save($ReferenceDetail);
 						}

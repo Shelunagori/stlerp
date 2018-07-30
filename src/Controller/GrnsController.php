@@ -499,7 +499,7 @@ class GrnsController extends AppController
 			$grn->company_id=$st_company_id;
 			$grn->financial_year_id=$st_year_id;
 			$grn->created_by=$this->viewVars['s_employee_id'];
-			
+			//pr($grn);exit;
 			if ($this->Grns->save($grn)) {
 				foreach($grn->grn_rows as $key => $grn_row)
 				{
@@ -865,8 +865,8 @@ class GrnsController extends AppController
 			$this->Grns->SerialNumbers->delete($SerialNumber);
 			$this->Flash->success(__('The Serial Number has been deleted.'));
 		}
-		
-		return $this->redirect(['action' => 'EditNew/'.$grn_id]);
+		$grn_id = $this->EncryptingDecrypting->encryptData($grn_id);
+		return $this->redirect(['action' => 'EditNew/',$grn_id]);
 	}
 	
 	public function grnData(){

@@ -2,6 +2,7 @@
 $pdf_url=$this->Url->build(['controller'=>'Invoices','action'=>'pdf']);
 $list_url=$this->Url->build(['controller'=>'Invoices','action'=>'index']);
 $Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
+$id = $EncryptingDecrypting->encryptData($id);
 ?>
 <table width="100%">
 	<tr>
@@ -62,7 +63,7 @@ $Edit_url=$this->Url->build(['controller'=>'Invoices','action'=>'Edit']);
 		<?= $this->Form->end() ?>
 		</div>
 		</td>
-		<td width="80%">
+		<td width="80%"  style="vertical-align: top;">
 			<object data="<?php echo $pdf_url.'/'.$id; ?>" type="application/pdf" width="100%" height="613px">
 			  <p>Wait a while, PDf is loading...</p>
 			</object>

@@ -2,7 +2,11 @@
 namespace App\Controller;
 
 use App\Controller\AppController;
-
+use Cake\View\Helper\NumberHelper;
+use Cake\View\Helper\HtmlHelper;
+use Cake\Utility\Text;
+use Cake\Mailer\Email;
+use Cake\View\Helper\TextHelper;
 /**
  * Challans Controller
  *
@@ -160,7 +164,7 @@ class ChallansController extends AppController
 			}
 		
 			$challan->created_by=$s_employee_id; 
-			$challan->ch3=$challan->qt3; 
+			$challan->ch3=$challan->ch3; 
 			$challan->company_id=$st_company_id;
 			$challan->created_on=date("Y-m-d",strtotime($challan->created_on));
 			$customer_id=$challan->customer_id;
@@ -188,8 +192,8 @@ class ChallansController extends AppController
 					}
 					
                 $this->Flash->success(__('The challan has been saved.'));
-
-                  return $this->redirect(['action' => 'confirm/'.$challan->id]);
+				$challan->id = $this->EncryptingDecrypting->decryptData($challan->id); 
+                  return $this->redirect(['action' => 'confirm/',$challan->id]);
             } else { 
 				
                 $this->Flash->error(__('The challan could not be saved. Please, try again.'));
@@ -253,6 +257,7 @@ class ChallansController extends AppController
 		}else{
 			$chkdate = 'Found';
 		}
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $challan = $this->Challans->get($id, [
             'contain' => ['Companies','Transporters','ChallanRows','Creator','Vendors']
         ]);
@@ -260,7 +265,7 @@ class ChallansController extends AppController
             $challan = $this->Challans->patchEntity($challan, $this->request->data);
 			$challan->company_id=$st_company_id;
 			$challan->created_by=$s_employee_id; 
-			$challan->company_id=$st_company_id;
+			//$challan->company_id=$st_company_id;
 			$challan->created_on=date("Y-m-d",strtotime($challan->created_on));
 			$customer_id=$challan->customer_id;
 			$vendor_id=$challan->vendor_id;
@@ -373,6 +378,8 @@ class ChallansController extends AppController
 	
 	public function pdf($id = null)
     {
+		$id = $this->EncryptingDecrypting->decryptData($id); 
+		
 		$this->viewBuilder()->layout('');
          $challan = $this->Challans->get($id, [
             'contain' => ['Companies','Customers','Transporters','ChallanRows','Creator','Vendors']
@@ -390,7 +397,7 @@ class ChallansController extends AppController
 		
 		$Challans = $this->paginate($this->Challans->find()->matching('ChallanRows' , function($q) use($st_company_id){
 			return $q->where(['ChallanRows.invoice'=>1]);
-		})->contain('Customers')->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Pending'])->order(['Challans.id' => 'ASC']));
+		})->contain(['Customers','Vendors'])->where(['Challans.company_id'=>$st_company_id,'challan_status'=>'Pending'])->order(['Challans.id' => 'ASC']));
 		
 		
 		$this->set(compact('Challans'));
@@ -467,7 +474,7 @@ class ChallansController extends AppController
 	public function ConvertedIntoInvoice($id = null)
     {
 		$this->viewBuilder()->layout('');
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$query2 = $this->Challans->query();
 		$query2->update()
 			->set(['challan_status' => 'Converted'])

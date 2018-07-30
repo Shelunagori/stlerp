@@ -61,20 +61,29 @@
 					</thead>
 
 					<tbody>
-            <?php foreach ($challans as $challan): ?>
+            <?php foreach ($challans as $challan): 
+			$challan->id = $EncryptingDecrypting->encryptData($challan->id); 
+			
+			?>
             <tr>
 				<?php $type=$challan->challan_for; ?>
                 <td><?= h(++$page_no) ?></td>
 				<td><?= h(($challan->ch1.'/CH-'.str_pad($challan->ch2, 3, '0', STR_PAD_LEFT).'/'.$challan->ch3.'/'.$challan->ch4)) ?></td>
                 <td><?= h($challan->challan_for) ?></td>
-				<td><?php if($challan->customer_id){ echo $challan->customer->customer_name;  }elseif($challan->vendor_id){ echo $challan->vendor->company_name; } ?></td>
+				<td><?php if($challan->customer_id){
+					if(!empty($challan->customer->alias)){
+						echo $challan->customer->customer_name.'('.$challan->customer->alias.')';
+					}else{
+						echo $challan->customer->customer_name;
+					}
+				  }elseif($challan->vendor_id){ echo $challan->vendor->company_name; } ?></td>
 				<td><?= h($challan->transporter->transporter_name) ?></td>
                 <td><?= $this->Number->format($challan->lr_no) ?></td>
                 <td><?= h($challan->reference_detail) ?></td>
                 <td><?= $this->Number->format($challan->total) ?></td>
                
 				<td class="actions">
-								<?php if(in_array(28,$allowed_pages)){  ?>
+								<?php if(in_array(29,$allowed_pages)){  ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challan->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								<?php } ?>
 								<?php if(in_array(12,$allowed_pages)){  ?>

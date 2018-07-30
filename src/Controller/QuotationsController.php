@@ -228,6 +228,22 @@ class QuotationsController extends AppController
 						return $q->where(['Departments.id' =>1]);
 					}
 				);
+		$SalesMans_QO = $this->Quotations->Employees->find()->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>1]);
+					}
+				);	
+		$allowed_sales=[];		
+		foreach($SalesMans_QO as $qo_salesman){
+			$allowed_sales[]=$qo_salesman->id;
+		}		
+		
+		$SalesMans_QO = $this->Quotations->Employees->find()->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>1]);
+					}
+				);
+//pr($allowed_sales);exit;		
 		/* $EMP_ID =[23,16,17];
 		if(in_array($s_employee_id,$EMP_ID)){
 			 $SalesMans = $this->Quotations->Employees->find('list')->matching(
@@ -242,7 +258,7 @@ class QuotationsController extends AppController
 						}
 					)->where(['Employees.id'=>$s_employee_id]);
 		}	 */	
-        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id','ItemGroups','ItemSubGroups','SalesMans','s_employee_id','EMP_ID'));
+        $this->set(compact('quotations','status','copy_request','companies','closeReasons','closed_month','close_status','Items','financial_month_first','financial_month_last','st_year_id','ItemGroups','ItemSubGroups','SalesMans','s_employee_id','EMP_ID','allowed_sales'));
         $this->set('_serialize', ['quotations']);
 		$this->set(compact('url'));
 	}

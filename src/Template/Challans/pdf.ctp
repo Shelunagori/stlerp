@@ -21,7 +21,7 @@ $html = '
     #header { position: fixed; left: 0px; top: -150px; right: 0px; height: 150px;}
     #footer { position: fixed; left: 0px; bottom: -200px; right: 0px; height: 200px;}
     #footer .page:after { content: content: counter(page); }
-	
+	 #header { position:fixed; left: 0px; top: -150px; right: 0px; height: 150px;}
 	
 	@font-face {
 		font-family: Lato;
@@ -53,23 +53,30 @@ $html = '
 	}
 	</style>
 <body>
-  <div id="header" ><br/>	
+  <div id="header" >
 		<table width="100%">
 			<tr>
-				<td width="50%">
+				<td width="50%" rowspan="2">
 				<img src='.ROOT . DS  . 'webroot' . DS  .'logos/'.$challan->company->logo.' height="80px" style="height:80px;"/>
 				</td>
-				<td align="right" width="50%" style="font-size: 12px;">
-				<span style="font-size: 16px;">'. h($challan->company->name) .'</span><br/>
-				<span>'. $this->Text->autoParagraph(h($challan->company->address)) .'</span>
-				<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/telephone.gif height="11px" style="height:11px;margin-top:5px;"/> '. h($challan->company->mobile_no).'</span> | 
-				<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/email.png height="15px" style="height:15px;margin-top:4px;"/> '. h($challan->company->email).'</span>
+				<td colspan="2" align="right">'. h($challan->company->name) .'</span>
+				
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2">
-					<div align="center" style="font-size: 16px;font-weight: bold;color: #0685a8;">'. h(strtoupper($challan->challan_type)) .' CHALLAN</div>
-					<div style="border:solid 2px #0685a8;margin-bottom:35px;margin-top: 5px;"></div>
+				<td width="30%" valign="top">
+					<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;">'. h(strtoupper($challan->challan_type)) .'CHALLAN</div>
+				</td>
+				<td align="right" width="35%" style="font-size: 12px;">
+				<span>'. $this->Text->autoParagraph(h($challan->company->address)) .'</span>
+				<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/telephone.gif height="11px" style="height:11px;margin-top:5px;"/> '. h($challan->company->mobile_no).'</span> | 
+				<span><img src='.ROOT . DS  . 'webroot' . DS  .'img/email.png height="15px" style="height:15px;margin-top:4px;"/> '. h($challan->company->email).'</span>
+				
+				</td>
+			</tr>
+			<tr>
+				<td colspan="3" >
+					<div style="border:solid 2px #0685a8;margin-top: 5px; margin-top:15px;"></div>
 				</td>
 			</tr>
 		</table>
@@ -85,8 +92,14 @@ $html.='
 		
 			<td width="50%">Challan No :  '. h(($challan->ch1." /  CH-".str_pad($challan->ch2, 3, "0", STR_PAD_LEFT)." / ".$challan->ch3." / ".$challan->ch4)) .'<br/>';
 				if($challan->customer_id){
-				$html.='<span>'. h($challan->customer->customer_name) .'</span><br/>
-				'. $this->Text->autoParagraph(h($challan->customer_address)) .'</span>';
+					if(!empty($challan->customer->alias)){ 
+						$html.='<span>'. h($challan->customer->customer_name.'('.$challan->customer->alias.')') .'</span><br/>';
+						
+					}else{
+						$html.='<span>'. h($challan->customer->customer_name) .'</span><br/>';
+					}
+				
+				$html.=$this->Text->autoParagraph(h($challan->customer_address)) .'</span>';
 				
 				}else {
 				$html.='<span>'. h($challan->vendor->company_name) .'</span><br/>
@@ -98,8 +111,8 @@ $html.='
 				<table>
 					
 					<tr>
-						<td>Date</td>
-						<td width="20" align="center">:</td>
+						<td >Date</td>
+						<td width="20" align="right">:</td>
 						<td>'. h(date("d-m-Y",strtotime($challan->created_on))) .'</td>
 					</tr>
 					<tr>
@@ -171,7 +184,7 @@ $html.='
 	</table>'; 
 		
   		
-$html .= '<div id="footer">
+$html .= '<div  >
    <table width="100%" class="divFooter">
 			<tr>
 				<td >

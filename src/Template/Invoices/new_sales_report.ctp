@@ -3,10 +3,10 @@
 	<div class="portlet-title">
 		<div class="caption">
 			<i class="icon-globe font-blue-steel"></i>
-			<span class="caption-subject font-blue-steel uppercase">GST Sales Report</span>
+			<span class="caption-subject font-blue-steel uppercase">Sales Report Segment Wise</span>
 		</div>
 		<div class="actions">
-			<?php //echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Invoices/Sales-Man-Excel-Export/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
+			<?php echo $this->Html->link( '<i class="fa fa-file-excel-o"></i> Excel', '/Invoices/NewSalesExcelExport/'.$url_excel.'',['class' =>'btn  green tooltips','target'=>'_blank','escape'=>false,'data-original-title'=>'Download as excel']); ?>
 		</div>
 		
 	

@@ -110,7 +110,7 @@ if($grn_row->item->item_companies[0]->serial_number_enable == 1) {
 ?>
 	<tr>
 		<td><?= h(++$page_no) ?></td>
-		<td><?= $grn_row->item->name; ?></td>
+		<td><?= $grn_row->item->name; ?><br/><?= $grn_row->description; ?></td>
 		<?php if($flag==1) { if($grn_row->item->item_companies[0]->serial_number_enable == 1) { ?>
 		<td><table>
 		<?php 

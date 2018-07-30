@@ -129,7 +129,8 @@
 						//pr($allowed_emp); exit;
 						$total_amount=0;
 						foreach ($salesOrders as $salesOrder):
-						
+						$created_by = $salesOrder->created_by;
+						pr($created_by);
 							$TotalSalesOrderQuantity=0;
 							$item_ids=[];
 							foreach($salesOrder->sales_order_rows as $sales_order_row){ 
@@ -137,7 +138,7 @@
 								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
 							}
 							@$salesOrder->quotation->id = $EncryptingDecrypting->encryptData(@$salesOrder->quotation->id);
-							 //if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
+				if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
@@ -337,7 +338,7 @@
 							<?php } ?> 
 								
 							 <?php } 
-							 //}
+							 }
 						endforeach; ?>
 					</tbody>
 					<tfoot>

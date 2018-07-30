@@ -43,7 +43,8 @@
 							<th>Supplier</th>
 							<th>Purchase Return No</th>
 							<th>Invoice Booking No</th>
-							<th>Date</th>
+							<th>Created Date</th>
+							<th>Transaction Date</th>
 							<th>Actions</th>
 						</tr>
 					</thead>
@@ -84,6 +85,7 @@
 								}	?>
 							</td>
 							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->created_on)); ?></td>
+							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->transaction_date)); ?></td>
 						<td class="actions">
 							<?php 
 							$purchaseReturn->id = $EncryptingDecrypting->encryptData($purchaseReturn->id);

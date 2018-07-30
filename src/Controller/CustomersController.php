@@ -1299,7 +1299,7 @@ class CustomersController extends AppController
 		$from_name=$company_data->alias;
 		$email_to=$cust_info->customer_contacts[0]->email;
 		$cc_mail=$cust_info->employee->company_email;
-		//$email_to="gopalkrishanp3@gmail.com";
+		//$email_to="dimpaljain892@gmail.com";
 		//$cc_mail="dimpaljain1699@gmail.com";
 		
 		$sub=$company_data->alias.' - Payment Reminder';

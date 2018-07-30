@@ -10,11 +10,11 @@
 		<div class="form-body">
 			<div class="row">
 				
-				<div class="col-md-2">
+				<div class="col-md-3">
 						<div class="form-group">
-							<div class="radio-list" >
-							<label class="control-label">Challan For<span class="required" aria-required="true">*</span></label>
-							<?php echo $this->Form->radio('challan_for',[['value' => 'Customer', 'text' => 'Customer','id' => 'id_radio1','checked'=>'checked']/* ,['value' => 'Vendor', 'text' => 'Vendor','id' => 'id_radio2'] */]); ?>
+							<div class="radio-inline" >
+							<label class="control-label">Challan For<span class="required" aria-required="true">*</span></label><br/>
+							<?php echo $this->Form->radio('challan_for',[['value' => 'Customer', 'text' => 'Customer','id' => 'id_radio1','checked'=>'checked'] ,['value' => 'Vendor', 'text' => 'Supplier','id' => 'id_radio2'] ]); ?>
 							</div>
 						</div>
 				</div>
@@ -61,7 +61,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-3">
+					<div class="col-md-2">
 						<div class="form-group">
 							<label class="control-label">Date</label>
 							<?php echo $this->Form->input('created_on', ['type' => 'text','label' => false,'class' => 'form-control input-sm','value' => date("d-m-Y"),'readonly']); ?>
@@ -651,21 +651,21 @@ $(document).ready(function() {
 	
 	$('#id_radio2').click(function () {
 		
-        $('#vendor_div').show('fast');
-		$('#customer_div').hide('fast');
-		$('#vendor_address_div').show('fast');
-		$('#customer_address_div').hide('fast');
-		$('#invoice_div').hide('fast');
-		$('#invoice_booking_div').show('fast');
+        $('#vendor_div').show();
+		$('#customer_div').hide();
+		$('#vendor_address_div').show();
+		$('#customer_address_div').hide();
+		$('#invoice_div').hide();
+		$('#invoice_booking_div').show();
 	});
 				 
 	$('#id_radio1').click(function () {
-        $('#vendor_div').hide('fast');
-		$('#customer_div').show('fast');    
-		$('#vendor_address_div').hide('fast');
-		$('#customer_address_div').show('fast');
-		$('#invoice_div').show('fast');
-		$('#invoice_booking_div').hide('fast');
+        $('#vendor_div').hide();
+		$('#customer_div').show();    
+		$('#vendor_address_div').hide();
+		$('#customer_address_div').show();
+		$('#invoice_div').show();
+		$('#invoice_booking_div').hide();
 	});
 	
 	$('select[name="customer_id"]').on("change",function() {

@@ -27,7 +27,8 @@
 							<th>Supplier</th>
 							<th>Purchase Return No</th>
 							<th>Invoice Booking No</th>
-							<th>Date</th>
+							<th>Created Date</th>
+							<th>Transaction Date</th>
 						</tr>
 				</thead>
 				<tbody>
@@ -51,7 +52,7 @@
 							<td>
 								<?= h($purchaseReturn->invoice_booking->ib1.'/IB-'.str_pad($purchaseReturn->invoice_booking->ib2, 3, '0', STR_PAD_LEFT).'/'.$purchaseReturn->invoice_booking->ib3.'/'.$purchaseReturn->invoice_booking->ib4);?>
 							</td>
-							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->created_on)); ?></td>
+							<td><?php echo date("d-m-Y",strtotime($purchaseReturn->created_on)); ?></td><td><?php echo date("d-m-Y",strtotime($purchaseReturn->transaction_date)); ?></td>
 						
 						</tr>
 						<?php endforeach; ?>

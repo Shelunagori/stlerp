@@ -915,6 +915,7 @@ class PurchaseOrdersController extends AppController
 	public function sendMail(){
 		$totalPo=$this->request->query('totalPo');
 		$totalPo = explode(",", $totalPo); 
+		//pr($totalPo);exit;
 		$PurchaseOrders = $this->PurchaseOrders->get($totalPo[0], [
             'contain' => ['Creator','Vendors'=>['VendorContactPersons'=>function($q){
 				return $q->where(['VendorContactPersons.default_person'=>1]);
@@ -960,7 +961,7 @@ class PurchaseOrdersController extends AppController
 		//pr($email_to);
 		//pr($cc_mail);exit; 
 		//$email_to="dimpaljain892@gmail.com";
-		//$cc_mail="gopal@phppoets.in";
+		//$cc_mail="dimpaljain1699@gmail.com";
 		//pr($email_to);exit; 
 		$email->from(['dispatch@mogragroup.com' => $from_name])
 		->to($email_to)

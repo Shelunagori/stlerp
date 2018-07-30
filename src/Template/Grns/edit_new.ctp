@@ -263,6 +263,17 @@ if($transaction_date <  $start_date ) {
 									echo $this->Form->input('q', ['type'=>'hidden','value' => @$grn_rows->id,'class'=>'hid']); ?>
 								</td>
 							</tr>
+							
+							
+							
+							<tr class="tr3" row_no='<?php echo @$grn_rows->id; ?>'>
+								<td colspan="5">
+									<?php //echo $this->Text->autoParagraph($purchase_order_rows->description); ?>
+									<div contenteditable="true" class="note-editable" id="summer<?php echo $q; ?>"><?php echo @$grn_rows->description; ?></div>
+							<?php echo $this->Form->input('q', ['label' => false,'type' => 'textarea','class' => 'form-control input-sm descriptions','placeholder'=>'Description','style'=>['display:none'],'value' => @$grn_rows->description,'readonly','required']); ?>
+								</td>
+								
+							</tr>
 							<?php  $q++; }
 							?>
 						<?php  endforeach; ?>
@@ -356,7 +367,7 @@ $(document).ready(function() {
 		},
 
 		submitHandler: function (form) {
-			
+			put_code_description();
 			success1.show();
 			error1.hide();
 			form[0].submit(); // submit the form
@@ -436,7 +447,20 @@ $(document).ready(function() {
 			
 		});
 	}
+	function put_code_description(){
+		var i=0;
+			$("#main_tb tbody tr.tr").each(function(){ 
+				var row_no=$(this).attr('row_no');			
+				var val=$(this).find('td:nth-child(4) input[type="checkbox"]:checked').val();
+				
+				if(val){
+				var code=$('#main_tb tbody tr.tr3').find('div#summer'+val).code();
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').find('td:nth-child(1) textarea').val(code);
+				}
+			i++; 
+		});
 		
+	}	
 	
 	$('.rename_check').die().live("click",function() { 
 		rename_rows();
@@ -506,15 +530,30 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(2) input.purchase_order_row_id').attr({ name:"grn_rows["+val+"][purchase_order_row_id]"});
 				$(this).find('td:nth-child(2) input.grn_row_id').attr({ name:"grn_rows["+val+"][id]"});
 				$(this).find('td:nth-child(3) input').attr({ name:"grn_rows["+val+"][quantity]", id:"grn_rows-"+val+"-quantity"}).removeAttr('readonly');
+				
+				var htm=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td').find('div.note-editable').html();
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').closest('td').html('');
+			
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"] td').find('div#summer'+row_no).summernote();
+				
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').find('td:nth-child(1) textarea.descriptions').attr({name:"grn_rows["+val+"][description]", id:"grn_rows-"+val+"-description"});
+				
 				$(this).css('background-color','#fffcda');
+				
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#fffcda');
+				
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#fffcda');
+				
+				
 			}
 			else{
 				$(this).find('td:nth-child(2) input').attr({ name:"q"});
 				$(this).find('td:nth-child(3) input').attr({ name:"q", id:"q",readonly:"readonly"});
-				
+				var uncheck=$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]');
+				$(uncheck).find('td:nth-child(1) textarea.descriptions').attr({ name:"q", readonly:"readonly"});
 				$(this).css('background-color','#FFF');
 				$('#main_tb tbody tr.tr2[row_no="'+row_no+'"]').css('background-color','#FFF');
+				$('#main_tb tbody tr.tr3[row_no="'+row_no+'"]').css('background-color','#FFF');
 			}
 		});
 		$("#main_tb tbody tr.tr2").each(function(){

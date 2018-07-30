@@ -42,7 +42,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					<div class="col-md-6">
 						<div class="form-group">
-							<label class="control-label">Sales Account. <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">Sales Account<span class="required" aria-required="true">*</span></label>
 							<div class="row">
 								<div class="col-md-12">
 									<?php echo $this->Form->input('sales_ledger_account', ['label' => false,'options' => $ledger_account_details,'class' => 'form-control input-sm select2me','required']); ?>
@@ -75,7 +75,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<div class="row">
 								<div class="col-md-12">
 									<?php echo $this->Form->input('customer_id', ['type'=>'hidden','value' => @$sales_order->customer_id]); ?>
-									<?php echo $sales_order->customer->customer_name.'('; echo $sales_order->customer->alias.')'; ?>	
+									<?php echo @$sales_order->customer->customer_name.'('; echo @$sales_order->customer->alias.')'; ?>	
 								</div>
 							</div>
 						</div>

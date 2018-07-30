@@ -30,20 +30,39 @@
 							<tr>
 								<th>S.No</th>
 								<th>Challan.No</th>
-								<th>Customer</th>
+								<th>
+								<?php if(!empty($challan->customer)){	
+									echo "Customer";
+								}else{
+									echo "Supplier";
+								}?>
+								</th>
 								<th>Actions</th>
 							</tr>
 					
 					</thead>
 
 					<tbody>
-            <?php foreach ($Challans as $challan): ?>
+            <?php foreach ($Challans as $challan):  
+			$challan->id = $EncryptingDecrypting->encryptData($challan->id); 
+			?>
             <tr>
                 <td><?= h(++$page_no) ?></td>
 				<td><?= h(($challan->ch1.'/CH-'.str_pad($challan->ch2, 3, '0', STR_PAD_LEFT).'/'.$challan->ch3.'/'.$challan->ch4)) ?></td>
-                <td><?php echo $challan->customer->customer_name; ?></td>            
+                <td><?php
+				if(!empty($challan->customer)){
+					if(!empty($challan->customer->alias)){
+						echo $challan->customer->customer_name.'('.$challan->customer->alias.')'; 
+					}else{
+						echo $challan->customer->customer_name; 
+					}
+					
+				}else{
+					echo $challan->vendor->company_name; 
+				}
+				?></td>            
 				<td class="actions">
-								<?php if(in_array(28,$allowed_pages)){  ?>
+								<?php if(in_array(29,$allowed_pages)){  ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challan->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								<?php } ?>
 								<?php if(in_array(12,$allowed_pages)){  ?>

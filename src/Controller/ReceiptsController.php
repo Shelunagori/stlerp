@@ -65,6 +65,9 @@ class ReceiptsController extends AppController
      *
      * @return \Cake\Network\Response|null
      */
+	 
+	
+	
     public function index()
     {
 		$url=$this->request->here();

@@ -71,6 +71,14 @@
                             									'class' => 'btn btn-xs btn-danger',
                             									'confirm' => __('Are you sure ?', $Login->id)
                             								]
+                            							) ?>
+														<?= $this->Form->postLink('<i class="fa fa-edit"></i> ',
+                            								['action' => 'edit', $Login->id],
+                            								[
+                            									'escape' => false,
+                            									'class' => 'btn btn-xs btn-primary',
+                            									
+                            								]
                             							) ?></td>
 					</tr>
 					<?php endforeach; ?>

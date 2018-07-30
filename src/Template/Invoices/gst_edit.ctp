@@ -174,7 +174,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</div>
 					</div>
 					<?php } ?>
-					<?php if($invoice->road_permit_required=='Yes') {?>
+					<?php if($invoice->road_permit_required=='Yes') { ?>
 					<div class="col-md-6">
 						<div class="form-group">
 							<label class="control-label">Form 49 <span class="required" aria-required="true">*</span></label>

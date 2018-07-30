@@ -35,6 +35,11 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 				}else{
 					$default_date=date('d-m-Y',strtotime($end_date));
 				}
+		if($st_company_id == 25){
+			$slected_bank=145;
+		}else{
+			$slected_bank='';
+		}	
 		?>
         <div class="row">
 			<div class="col-md-3">
@@ -53,7 +58,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Bank/Cash Account<span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('bank_cash_id', ['empty'=>'--Select-','label' => false,'class' => 'form-control input-sm select2me']); ?>
+					<?php echo $this->Form->input('bank_cash_id', ['empty'=>'--Select-','label' => false,'class' => 'form-control input-sm select2me','value'=>$slected_bank]); ?>
 				</div>
 			</div>
 			<div class="col-md-3">

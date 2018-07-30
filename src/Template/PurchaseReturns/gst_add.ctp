@@ -114,7 +114,7 @@
 						<div class="form-group">
 							<label class="control-label">Transaction Date<span class="required" aria-required="true">*</span></label><br/>
 							<?php echo $this->Form->input('transaction_date', ['type'=>'text','label' => false,'class' => 'form-control input-sm date-picker','placeholder'=>'Transaction Date','data-date-format'=>'dd-mm-yyyy','data-date-start-date' 
-										=>$start_date ,'data-date-end-date' => $end_date,'required']); ?>
+										=>$start_date ,'data-date-end-date' => $end_date,'required','value'=>date('d-m-Y')]); ?>
 						</div>
 						<span style="color: red;"><?php if($chkdate == 'Not Found'){  ?>
 							You are not in Current Financial Year

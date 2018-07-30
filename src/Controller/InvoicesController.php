@@ -1289,7 +1289,7 @@ class InvoicesController extends AppController
 		 
 		$this->viewBuilder()->layout('index_layout');
 		
-		
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$invoice = $this->Invoices->get($id, [
             'contain' => ['ReferenceDetails','SerialNumbers','InvoiceRows','SalesOrders' => ['SalesOrderRows' => ['Items'=>['SerialNumbers','ItemCompanies'=>function($q) use($st_company_id){
 									return $q->where(['ItemCompanies.company_id' => $st_company_id]);
@@ -2061,15 +2061,9 @@ class InvoicesController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['Invoices.date_created >=']=$From;
-		}else{
-			$From = date('01-m-Y');
-			$where['Invoices.date_created >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['Invoices.date_created <=']=$To;
-		}else{
-			$To=date('d-m-Y');
 			$where['Invoices.date_created <=']=$To;
 		}
 		if(!empty($salesman_id)){ 
@@ -2111,15 +2105,9 @@ class InvoicesController extends AppController
 		if(!empty($From)){
 			$From=date("Y-m-d",strtotime($this->request->query('From')));
 			$where['Invoices.date_created >=']=$From;
-		}else{
-			$From = date('01-m-Y');
-			$where['Invoices.date_created >=']=$From;
 		}
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
-			$where['Invoices.date_created <=']=$To;
-		}else{
-			$To=date('d-m-Y');
 			$where['Invoices.date_created <=']=$To;
 		}
 		if(!empty($salesman_id)){ 
@@ -2147,7 +2135,7 @@ class InvoicesController extends AppController
 					}
 				); 
 				//pr($SalesMans); exit;
-		$invoices = $this->Invoices->find()->where($where)->contain(['InvoiceRows','Customers'])->order(['Invoices.id' => 'DESC'])->where(['Invoices.company_id'=>$st_company_id,'Invoices.invoice_type'=>'Non-GST']);
+		$invoices = $this->Invoices->find()->where($where)->contain(['InvoiceRows','Customers'])->order(['Invoices.id' => 'DESC'])->where(['Invoices.company_id'=>$st_company_id,'Invoices.invoice_type'=>'Non-GST	']);
 		
 		$this->set(compact('invoices','SalesMans','url'));
 	}

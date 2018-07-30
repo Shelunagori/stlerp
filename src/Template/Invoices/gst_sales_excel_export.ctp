@@ -39,8 +39,8 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $SalesTotal=[];$SalesgstTotal=[];$gstRowTotal=[]; $gstTotal=[];$i=1;
-			foreach ($invoices as $invoice): $frigtData=[]; $frigtAmount=[];
+		<?php $SalesTotal=[];$SalesgstTotal=[];$gstRowTotal=[];  $gstTotal=[];$i=1;
+					foreach ($invoices as $invoice): $frigtData=[]; $frigtAmount=[];
 						$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
 						foreach($invoice->invoice_rows as $invoice_row)
 						{
@@ -55,61 +55,66 @@
 							//pr($frigtAmount); 
 							}
 						}
-				
-					
-			?>
-		<tr>
-			<td><?php echo $i; ?></td>
-			<td>
-				<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4; ?>
-			</td>
-			<td><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
-			<td><?php echo $invoice->customer->customer_name.'('.$invoice->customer->alias.')'?></td>
-			<?php $k=0; $AllTaxs=[];
-				foreach($invoiceGst as $Key1=>$SaleTaxeGst){ 
-						$AllTaxs[$k]=$SaleTaxeGst->id;
-						$k++;
-				}
-			?>
-			<?php foreach($AllTaxs as  $key=>$AllTax){ 
-				if(isset($gstRowTotal[$invoice->id][$AllTax]))
-				{?>
-						<td style="text-align:right;"><?php echo 
-						$this->Number->format(@$gstTotal[@$invoice->id][$AllTax]+@$frigtAmount[$AllTax],['places'=>2]); 
-						$SalesTotal[$AllTax]=@$SalesTotal[$AllTax]+$gstTotal[$invoice->id][$AllTax]+@$frigtAmount[$AllTax];
-						?></td>
-						<td style="text-align:right;"><?php echo $this->Number->format($gstRowTotal[$invoice->id][$AllTax]+@$frigtData[$AllTax],['places'=>2]); 
-						$SalesgstTotal[$AllTax]=@$SalesgstTotal[$AllTax]+$gstRowTotal[$invoice->id][$AllTax]+@$frigtData[$AllTax];
-						?></td>
-						<?php 
-				}							
-				else 
-				{
-				?>
-					<td style="text-align:right;"><?php echo "-"; ?></td>
-					<td style="text-align:right;"><?php echo "-"; ?></td>
+						
+							
+					?>
+					<tr>
+						<td><?php echo $i; ?></td>
+						<td>
+							<?php if(in_array($invoice->created_by,$allowed_emp)){  ?>
+							<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4; ?>
+							<?php } else{ ?>
+							<?php echo $invoice->in1.'/IN-'.str_pad($invoice->in2, 3, '0', STR_PAD_LEFT).'/'.$invoice->in3.'/'.$invoice->in4 ;?>
+							<?php }  ?>
+						</td>
+						<td><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
+						<td><?php echo $invoice->customer->customer_name.'('.$invoice->customer->alias.')'?></td>
+						<?php $k=0; $AllTaxs=[];
+							foreach($invoiceGst as $Key1=>$SaleTaxeGst){ 
+									$AllTaxs[$k]=$SaleTaxeGst->id;
+									$k++;
+							}
+						?>
+						<?php foreach($AllTaxs as  $key=>$AllTax){ 
+							if(isset($gstRowTotal[$invoice->id][$AllTax]))
+							{  ?>
+									<td style="text-align:right;"><?php echo 
+									$this->Number->format(@$gstTotal[@$invoice->id][$AllTax]+@$frigtAmount[$AllTax],['places'=>2]); 
+									$SalesTotal[$AllTax]=@$SalesTotal[$AllTax]+$gstTotal[$invoice->id][$AllTax]+@$frigtAmount[$AllTax];
+									?></td>
+									<td style="text-align:right;"><?php echo $this->Number->format($gstRowTotal[$invoice->id][$AllTax]+@$frigtData[$AllTax],['places'=>2]); 
+									$SalesgstTotal[$AllTax]=@$SalesgstTotal[$AllTax]+$gstRowTotal[$invoice->id][$AllTax]+@$frigtData[$AllTax];
+									?></td>
+									<?php 
+							}							
+							else 
+							{
+							?>
+								<td style="text-align:right;"><?php echo "-"; ?></td>
+								<td style="text-align:right;"><?php echo "-"; ?></td>
+							<?php 
+							} 
+							
+						}  ?>
+						
+					</tr>
+				<?php $i++; endforeach;  ?>
+				<tr>
+				<td style="text-align:right;" colspan=4><b>Total</b></td>
 				<?php 
-				} 
+					foreach($invoiceGst as $Key1=>$SaleTaxeGst){  
+						if(!empty($SalesTotal[$SaleTaxeGst->id])){
+					?>
+						<td style="text-align:right;"><b><?php echo 
+						$this->Number->format(@$SalesTotal[$SaleTaxeGst->id],['places'=>2]); ?></b></td>
+						<td style="text-align:right;"><b><?php echo 
+						$this->Number->format(@$SalesgstTotal[$SaleTaxeGst->id],['places'=>2]); ?></b></td>
+					<?php }else{ ?>
+						<td style="text-align:right;"><b>-</b></td>
+						<td style="text-align:right;"><b>-</b></td>
+					<?php }} ?>
 				
-			}  ?>
-			
-		</tr>
-		<?php $i++; endforeach;  ?>
-		<tr>
-			<td style="text-align:right;" colspan=4><b>Total</b></td>
-			<?php 
-				foreach($invoiceGst as $Key1=>$SaleTaxeGst){  
-					if(!empty($SalesTotal[$SaleTaxeGst->id])){
-				?>
-					<td style="text-align:right;"><b><?php echo 
-					$this->Number->format(@$SalesTotal[$SaleTaxeGst->id],['places'=>2]); ?></b></td>
-					<td style="text-align:right;"><b><?php echo 
-					$this->Number->format(@$SalesgstTotal[$SaleTaxeGst->id],['places'=>2]); ?></b></td>
-				<?php }else{ ?>
-					<td style="text-align:right;"><b>-</b></td>
-					<td style="text-align:right;"><b>-</b></td>
-				<?php }} ?>
-		</tr>
+				</tr>
 	</tbody>
 </table>
 <table border="1">
@@ -159,9 +164,11 @@
 					<tr>
 						<td><?php echo $j++; ?></td>
 						<td>
-						
+							<?php if(in_array($invoiceigsts->created_by,$allowed_emp)){  ?>
 								<?php echo $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4; ?>
-							
+							<?php } else { ?>
+								<?php echo $invoiceigsts->in1.'/IN-'.str_pad($invoiceigsts->in2, 3, '0', STR_PAD_LEFT).'/'.$invoiceigsts->in3.'/'.$invoiceigsts->in4; ?>
+							<?php }  ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoiceigsts->date_created)); ?></td>
 						<td><?php echo $invoiceigsts->customer->customer_name.'('.$invoiceigsts->customer->alias.')'?></td>
@@ -265,9 +272,11 @@
 					<tr>
 						<td><?php echo $i; ?></td>
 						<td>
-					
+						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
 							<?php echo $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4; ?>
-						
+						<?php }else{ ?>
+							<?php echo $invoicebooking->ib1.'/IB-'.str_pad($invoicebooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoicebooking->ib3.'/'.$invoicebooking->ib4; ?>
+						<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoicebooking->supplier_date)); ?></td>
 						<td><?php echo $invoicebooking->vendor->company_name; ?></td>
@@ -337,7 +346,7 @@
 	</thead>
 		<?php $PurchaseIgstTotal=[]; $PurchaseTotal=[]; $i=1;
 				foreach ($invoiceBookingsInterState as $invoiceBooking):   
-				$invoiceBooking_id1 = $EncryptingDecrypting->encryptData($invoice->id);
+				$invoiceBooking_id1 = $EncryptingDecrypting->encryptData(@$invoice->id);
 				?>
 				<tbody>
 					<?php $igstRowTotal=[]; $igstTotal=[];
@@ -353,9 +362,11 @@
 					<tr>
 						<td><?php echo $i++; ?></td>
 						<td>
-						
+						<?php if(in_array($invoicebooking->created_by,$allowed_emp)){  ?>
 							<?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?>
-					
+						<?php }else{ ?>
+							<?php echo $invoiceBooking->ib1.'/IB-'.str_pad($invoiceBooking->ib2, 3, '0', STR_PAD_LEFT).'/'.$invoiceBooking->ib3.'/'.$invoiceBooking->ib4; ?>
+						<?php } ?>
 						</td>
 						<td><?php echo date("d-m-Y",strtotime($invoiceBooking->supplier_date)); ?></td>
 						<td><?php echo $invoiceBooking->vendor->company_name; ?></td>
@@ -402,7 +413,6 @@
 				<?php } ?>
 				
 				</tr>
-					
 				</tbody>
 </table>
 <table border="1">
@@ -425,8 +435,9 @@
 	</thead>
 				<tbody>
 				<?php   $i=1; $TotalAmountDr=[]; $TotalAmountCr=[]; 
-				
+				$url_path="";
 				foreach($voucherLedgerDetailsGst as  $key=>$voucherLedgerDetailsGst){  
+				 $voucherLedgerDetailsGst->voucher_id= $EncryptingDecrypting->encryptData($voucherLedgerDetailsGst->voucher_id);
 				if($voucherSourceGst[$key]=="Petty Cash Payment Voucher"){
 					$voucher_no="Petty Cash Payment Voucher";
 					$url_path="/PettyCashVouchers/view/".$voucherLedgerDetailsGst->voucher_id;
@@ -445,14 +456,20 @@
 				}else if($voucherSourceGst[$key]=="Contra Voucher"){
 					$voucher_no="Contra Voucher";
 					$url_path="/ContraVouchers/view/".$voucherLedgerDetailsGst->voucher_id;
+				}else if($voucherSourceGst[$key]=="Credit Notes"){
+					$voucher_no="Credit Notes";
+					$url_path="/CreditNotes/view/".$voucherLedgerDetailsGst->voucher_id;
+				}else if($voucherSourceGst[$key]=="Debit Notes"){
+					$voucher_no="Debit Notes";
+					$url_path="/DebitNotes/view/".$voucherLedgerDetailsGst->voucher_id;
 				}
 				?>
 					<tr>
 						<td><?php echo $i++; ?></td>
 						<td>
 						
-						<?php echo $voucher_no; ?>
 						
+						<?php echo $voucher_no; ?>
 						</td>
 						<?php $k=0; $AllTax=[];
 							foreach($LedgerAccountDetails as $Key1=>$SaleTaxeGst){ 
@@ -465,12 +482,12 @@
 							foreach($AllTax as  $key=>$AllTax){  
 							if($voucherLedgerDetailsGst->ledger_account_id==$AllTax){ ?>
 								<?php if($voucherLedgerDetailsGst->debit == 0){ ?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailsGst->credit;  echo "Cr"; 
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailsGst->credit,['places'=>2]);  echo "Cr"; 
 								@$TotalAmountCr[@$AllTax]=@$TotalAmountCr[@$AllTax]+@$voucherLedgerDetailsGst->credit;
 								?>
 							</td>
 							<?php } else {?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailsGst->debit; echo "Dr";  
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailsGst->debit,['places'=>2]); echo "Dr";  
 								@$TotalAmountDr[@$AllTax]=@$TotalAmountDr[@$AllTax]+@$voucherLedgerDetailsGst->debit;
 								?>
 							</td>
@@ -487,9 +504,9 @@
 				<td style="text-align:right;" colspan=2>Total</td>
 				<?php  foreach($LedgerAccountDetails as $Key1=>$SaleTaxeGst){ ?>
 						<?php if(@$TotalAmountDr[$Key1] > @$TotalAmountCr[$Key1]) {?>
-						<td style="text-align:right;"><?php echo @$TotalAmountDr[$Key1]-@$TotalAmountCr[$Key1]; echo "Dr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalAmountDr[$Key1]-@$TotalAmountCr[$Key1],['places'=>2]); echo "Dr";?></td>
 						<?php } else if(@$TotalAmountDr[$Key1] < @$TotalAmountCr[$Key1]){ ?>
-						<td style="text-align:right;"><?php echo @$TotalAmountCr[$Key1]-@$TotalAmountDr[$Key1]; echo "Cr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalAmountCr[$Key1]-@$TotalAmountDr[$Key1],['places'=>2]); echo "Cr";?></td>
 					<?php }else{ ?>
 							<td style="text-align:right;"><?php echo "-"; ?></td>
 					<?php	}} ?>
@@ -519,8 +536,9 @@
 	</thead>
 		<tbody>
 				<?php  $i=1; $TotalIGSTAmountDr=[]; $TotalIGSTAmountCr=[]; 
-				foreach($voucherLedgerDetailIgst as  $key=>$voucherLedgerDetailIgst){  
-					if($voucherSourceIgst[$key]=="Petty Cash Payment Voucher"){
+				foreach($voucherLedgerDetailIgst as  $key=>$voucherLedgerDetailIgst){ 
+					$voucherLedgerDetailIgst->voucher_id= $EncryptingDecrypting->encryptData($voucherLedgerDetailIgst->voucher_id);				
+				if($voucherSourceIgst[$key]=="Petty Cash Payment Voucher"){
 					$voucher_no="Petty Cash Payment Voucher";
 					$url_path="/PettyCashVouchers/view/".$voucherLedgerDetailIgst->voucher_id;
 				}else if($voucherSourceIgst[$key]=="Journal Voucher"){
@@ -538,6 +556,12 @@
 				}else if($voucherSourceIgst[$key]=="Contra Voucher"){
 					$voucher_no="Contra Voucher";
 					$url_path="/ContraVouchers/view/".$voucherLedgerDetailIgst->voucher_id;
+				}else if($voucherSourceIgst[$key]=="Credit Notes"){
+					$voucher_no="Credit Notes";
+					$url_path="/CreditNotes/view/".$voucherLedgerDetailIgst->voucher_id;
+				}else if($voucherSourceIgst[$key]=="Debit Notes"){
+					$voucher_no="Debit Notes";
+					$url_path="/DebitNotes/view/".$voucherLedgerDetailIgst->voucher_id;
 				}
 				?>
 					<tr>
@@ -553,12 +577,12 @@
 							foreach($AllTax as  $key=>$AllTax){  
 							if($voucherLedgerDetailIgst->ledger_account_id==$AllTax){ ?>
 								<?php if($voucherLedgerDetailIgst->debit == 0){ ?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailIgst->credit; echo "Cr";
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailIgst->credit,['places'=>2]); echo "Cr";
 								@$TotalIGSTAmountCr[@$AllTax]=@$TotalIGSTAmountCr[@$AllTax]+@$voucherLedgerDetailIgst->credit;
 								?>
 							</td>
 							<?php } else {?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailIgst->debit; echo "Dr"; 
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailIgst->debit,['places'=>2]); echo "Dr"; 
 								@$TotalIGSTAmountDr[@$AllTax]=@$TotalIGSTAmountDr[@$AllTax]+@$voucherLedgerDetailIgst->debit;
 								?>
 							</td>
@@ -575,9 +599,9 @@
 				<td style="text-align:right;" colspan=2>Total</td>
 				<?php  foreach($LedgerAccountDetailIgst as $Key1=>$SaleTaxeGst){ ?>
 					<?php if(@$TotalIGSTAmountDr[$Key1] > @$TotalIGSTAmountCr[$Key1]) {?>
-						<td style="text-align:right;"><?php echo @$TotalIGSTAmountDr[$Key1]-@$TotalIGSTAmountCr[$Key1]; echo "Dr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalIGSTAmountDr[$Key1]-@$TotalIGSTAmountCr[$Key1],['places'=>2]); echo "Dr";?></td>
 						<?php } else if(@$TotalIGSTAmountDr[$Key1] < @$TotalIGSTAmountCr[$Key1]) { ?>
-						<td style="text-align:right;"><?php echo @$TotalIGSTAmountCr[$Key1]-@$TotalIGSTAmountDr[$Key1]; echo "Cr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalIGSTAmountCr[$Key1]-@$TotalIGSTAmountDr[$Key1],['places'=>2]); echo "Cr";?></td>
 					<?php }else { ?>
 							<td style="text-align:right;"><?php echo "-"; ?></td>
 					<?php	}} ?>

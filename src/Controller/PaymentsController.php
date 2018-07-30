@@ -487,7 +487,7 @@ class PaymentsController extends AppController
 						
 						//$email_to="gopalkrishanp3@gmail.com";
 						//$cc_mail="gopal@phppoets.in";
-						$member_name="Gopal";
+						//$member_name="Gopal";
 						$from_name=$company_data->alias;
 						$sub="Payment advice - Shilpa Udr";
 						//pr($email_to);
@@ -589,7 +589,7 @@ class PaymentsController extends AppController
 		}else{
 			$ReceivedFroms_selected='no';
 		}
-        $this->set(compact('payment', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last'));
+        $this->set(compact('payment', 'bankCashes', 'receivedFroms', 'financial_year', 'BankCashes_selected', 'ReceivedFroms_selected','chkdate','financial_month_first','financial_month_last','st_company_id'));
         $this->set('_serialize', ['payment']);
     }
 

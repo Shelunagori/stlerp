@@ -168,6 +168,23 @@ class AppController extends Controller
 				}
 			}
 			
+			$sales_man_acc= $this->Employees->find()->contain('Departments')->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>2]);
+					}
+				);
+			$allowed_acc=[];$allowed_sales=[];		
+					$emp_acc= $this->Employees->find()->contain('Departments');
+					foreach($emp_acc as $data1){ 
+						if($data1->department->id == "1"){
+							$allowed_sales[]=$data1->id; 
+						}else{
+							$allowed_acc[]=$data1->id; 
+						}
+					}
+				
+			//pr($allowed_sales);exit;
+	
 		/* 	if($employees_data){
 				$children = $this->EmployeeHierarchies
 				->find('children', ['for' =>$employees_data->id])
@@ -189,7 +206,7 @@ class AppController extends Controller
 
 
 			//pr($allowed_emp); exit;
-			$this->set(compact('allowed_pages','st_company_id','allowed_emp','st_year_id'));
+			$this->set(compact('allowed_pages','st_company_id','allowed_emp','st_year_id','allowed_acc','allowed_sales'));
 		}
 
 		$this->loadModel('Pages');

@@ -384,7 +384,7 @@
 				</thead>
 				<?php $PurchaseIgstTotal=[]; $PurchaseTotal=[]; $i=1;
 				foreach ($invoiceBookingsInterState as $invoiceBooking):   
-				$invoiceBooking_id1 = $EncryptingDecrypting->encryptData($invoice->id);
+				$invoiceBooking_id1 = $EncryptingDecrypting->encryptData(@$invoice->id);
 				?>
 				<tbody>
 					<?php $igstRowTotal=[]; $igstTotal=[];
@@ -474,8 +474,9 @@
 				</thead>
 				<tbody>
 				<?php   $i=1; $TotalAmountDr=[]; $TotalAmountCr=[]; 
-				
+				$url_path="";
 				foreach($voucherLedgerDetailsGst as  $key=>$voucherLedgerDetailsGst){  
+				 $voucherLedgerDetailsGst->voucher_id= $EncryptingDecrypting->encryptData($voucherLedgerDetailsGst->voucher_id);
 				if($voucherSourceGst[$key]=="Petty Cash Payment Voucher"){
 					$voucher_no="Petty Cash Payment Voucher";
 					$url_path="/PettyCashVouchers/view/".$voucherLedgerDetailsGst->voucher_id;
@@ -494,14 +495,20 @@
 				}else if($voucherSourceGst[$key]=="Contra Voucher"){
 					$voucher_no="Contra Voucher";
 					$url_path="/ContraVouchers/view/".$voucherLedgerDetailsGst->voucher_id;
+				}else if($voucherSourceGst[$key]=="Credit Notes"){
+					$voucher_no="Credit Notes";
+					$url_path="/CreditNotes/view/".$voucherLedgerDetailsGst->voucher_id;
+				}else if($voucherSourceGst[$key]=="Debit Notes"){
+					$voucher_no="Debit Notes";
+					$url_path="/DebitNotes/view/".$voucherLedgerDetailsGst->voucher_id;
 				}
 				?>
 					<tr>
 						<td><?php echo $i++; ?></td>
 						<td>
 						
-						<?php echo $voucher_no; ?>
 						
+						<?php echo $this->Html->link( $voucher_no,$url_path,array('target'=>'_blank')); ?>
 						</td>
 						<?php $k=0; $AllTax=[];
 							foreach($LedgerAccountDetails as $Key1=>$SaleTaxeGst){ 
@@ -514,12 +521,12 @@
 							foreach($AllTax as  $key=>$AllTax){  
 							if($voucherLedgerDetailsGst->ledger_account_id==$AllTax){ ?>
 								<?php if($voucherLedgerDetailsGst->debit == 0){ ?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailsGst->credit;  echo "Cr"; 
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailsGst->credit,['places'=>2]);  echo "Cr"; 
 								@$TotalAmountCr[@$AllTax]=@$TotalAmountCr[@$AllTax]+@$voucherLedgerDetailsGst->credit;
 								?>
 							</td>
 							<?php } else {?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailsGst->debit; echo "Dr";  
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailsGst->debit,['places'=>2]); echo "Dr";  
 								@$TotalAmountDr[@$AllTax]=@$TotalAmountDr[@$AllTax]+@$voucherLedgerDetailsGst->debit;
 								?>
 							</td>
@@ -536,9 +543,9 @@
 				<td style="text-align:right;" colspan=2>Total</td>
 				<?php  foreach($LedgerAccountDetails as $Key1=>$SaleTaxeGst){ ?>
 						<?php if(@$TotalAmountDr[$Key1] > @$TotalAmountCr[$Key1]) {?>
-						<td style="text-align:right;"><?php echo @$TotalAmountDr[$Key1]-@$TotalAmountCr[$Key1]; echo "Dr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalAmountDr[$Key1]-@$TotalAmountCr[$Key1],['places'=>2]); echo "Dr";?></td>
 						<?php } else if(@$TotalAmountDr[$Key1] < @$TotalAmountCr[$Key1]){ ?>
-						<td style="text-align:right;"><?php echo @$TotalAmountCr[$Key1]-@$TotalAmountDr[$Key1]; echo "Cr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalAmountCr[$Key1]-@$TotalAmountDr[$Key1],['places'=>2]); echo "Cr";?></td>
 					<?php }else{ ?>
 							<td style="text-align:right;"><?php echo "-"; ?></td>
 					<?php	}} ?>
@@ -568,8 +575,9 @@
 				
 				<tbody>
 				<?php  $i=1; $TotalIGSTAmountDr=[]; $TotalIGSTAmountCr=[]; 
-				foreach($voucherLedgerDetailIgst as  $key=>$voucherLedgerDetailIgst){  
-					if($voucherSourceIgst[$key]=="Petty Cash Payment Voucher"){
+				foreach($voucherLedgerDetailIgst as  $key=>$voucherLedgerDetailIgst){ 
+					$voucherLedgerDetailIgst->voucher_id= $EncryptingDecrypting->encryptData($voucherLedgerDetailIgst->voucher_id);				
+				if($voucherSourceIgst[$key]=="Petty Cash Payment Voucher"){
 					$voucher_no="Petty Cash Payment Voucher";
 					$url_path="/PettyCashVouchers/view/".$voucherLedgerDetailIgst->voucher_id;
 				}else if($voucherSourceIgst[$key]=="Journal Voucher"){
@@ -587,11 +595,17 @@
 				}else if($voucherSourceIgst[$key]=="Contra Voucher"){
 					$voucher_no="Contra Voucher";
 					$url_path="/ContraVouchers/view/".$voucherLedgerDetailIgst->voucher_id;
+				}else if($voucherSourceIgst[$key]=="Credit Notes"){
+					$voucher_no="Credit Notes";
+					$url_path="/CreditNotes/view/".$voucherLedgerDetailIgst->voucher_id;
+				}else if($voucherSourceIgst[$key]=="Debit Notes"){
+					$voucher_no="Debit Notes";
+					$url_path="/DebitNotes/view/".$voucherLedgerDetailIgst->voucher_id;
 				}
 				?>
 					<tr>
 						<td><?php echo $i++; ?></td>
-						<td><?php echo $voucher_no; ?></td>
+						<td><?php echo $this->Html->link( $voucher_no,$url_path,array('target'=>'_blank')); ?></td>
 						<?php $k=0; $AllTax=[];
 							foreach($LedgerAccountDetailIgst as $Key1=>$SaleTaxeGst){ 
 									$AllTax[$k]=$Key1;
@@ -602,12 +616,12 @@
 							foreach($AllTax as  $key=>$AllTax){  
 							if($voucherLedgerDetailIgst->ledger_account_id==$AllTax){ ?>
 								<?php if($voucherLedgerDetailIgst->debit == 0){ ?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailIgst->credit; echo "Cr";
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailIgst->credit,['places'=>2]); echo "Cr";
 								@$TotalIGSTAmountCr[@$AllTax]=@$TotalIGSTAmountCr[@$AllTax]+@$voucherLedgerDetailIgst->credit;
 								?>
 							</td>
 							<?php } else {?>
-							<td style="text-align:right;"><?php echo $voucherLedgerDetailIgst->debit; echo "Dr"; 
+							<td style="text-align:right;"><?php echo $this->Number->format($voucherLedgerDetailIgst->debit,['places'=>2]); echo "Dr"; 
 								@$TotalIGSTAmountDr[@$AllTax]=@$TotalIGSTAmountDr[@$AllTax]+@$voucherLedgerDetailIgst->debit;
 								?>
 							</td>
@@ -624,9 +638,9 @@
 				<td style="text-align:right;" colspan=2>Total</td>
 				<?php  foreach($LedgerAccountDetailIgst as $Key1=>$SaleTaxeGst){ ?>
 					<?php if(@$TotalIGSTAmountDr[$Key1] > @$TotalIGSTAmountCr[$Key1]) {?>
-						<td style="text-align:right;"><?php echo @$TotalIGSTAmountDr[$Key1]-@$TotalIGSTAmountCr[$Key1]; echo "Dr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalIGSTAmountDr[$Key1]-@$TotalIGSTAmountCr[$Key1],['places'=>2]); echo "Dr";?></td>
 						<?php } else if(@$TotalIGSTAmountDr[$Key1] < @$TotalIGSTAmountCr[$Key1]) { ?>
-						<td style="text-align:right;"><?php echo @$TotalIGSTAmountCr[$Key1]-@$TotalIGSTAmountDr[$Key1]; echo "Cr";?></td>
+						<td style="text-align:right;"><?php echo $this->Number->format(@$TotalIGSTAmountCr[$Key1]-@$TotalIGSTAmountDr[$Key1],['places'=>2]); echo "Cr";?></td>
 					<?php }else { ?>
 							<td style="text-align:right;"><?php echo "-"; ?></td>
 					<?php	}} ?>

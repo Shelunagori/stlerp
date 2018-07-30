@@ -5,6 +5,11 @@
 if($BankCashes_selected=="no"){
 	echo 'Select Ledger Accounts for Cash/Bank.';
 	goto last;
+}
+if($st_company_id == 25){
+	$slected_bank=146;
+}else{
+	$slected_bank='';
 } ?>
 <style>
 table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table > thead > tr > td, table > tbody > tr > td, table > tfoot > tr > td{
@@ -64,7 +69,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 			<div class="col-md-3">
 				<div class="form-group">
 					<label class="control-label">Bank/Cash Account<span class="required" aria-required="true">*</span></label>
-					<?php echo $this->Form->input('bank_cash_id', ['empty'=>'--Select-','label' => false,'class' => 'form-control input-sm select2me']); ?>
+					<?php echo $this->Form->input('bank_cash_id', ['empty'=>'--Select-','label' => false,'class' => 'form-control input-sm select2me','value'=>$slected_bank]); ?>
 				</div>
 			</div>
 			<div class="col-md-3">

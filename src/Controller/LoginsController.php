@@ -171,6 +171,12 @@ class LoginsController extends AppController
 		
 	}
 	
+	public function edit($login_id = null){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+	}
+	
 	function otpCodeConfirm($employee_id=null,$login_id=null)
 	{
 		$this->viewBuilder()->layout('');
