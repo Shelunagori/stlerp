@@ -64,7 +64,7 @@ p { margin-top : 0px;  }
 		</tr>
 		
 		<tr>
-			<td>In case of any further clarification you may write back to us or call your salesperson <?php echo $salesOrder->creator->name; ?> at <?php echo $salesOrder->creator->mobile; ?>.<?php echo "<br/>"; ?>
+			<td>In case of any further clarification you may write back to us or call your salesperson <?php echo $salesOrder->customer->employee->name; ?> at <?php echo $salesOrder->customer->employee->mobile; ?>.<?php echo "<br/>"; ?>
 			</td>
 		</tr>
 		

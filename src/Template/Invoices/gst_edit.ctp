@@ -40,7 +40,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 					
 					<div class="col-md-6">
 						<div class="form-group">
-							<label class="control-label">Sales Account. <span class="required" aria-required="true">*</span></label>
+							<label class="control-label">Sales Account<span class="required" aria-required="true">*</span></label>
 							<div class="row">
 								<div class="col-md-12">
 									<?php echo $this->Form->input('sales_ledger_account', ['label' => false,'options' => $ledger_account_details,'class' => 'form-control input-sm select2me','required']); ?>
@@ -146,7 +146,8 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							<label class="control-label">Customer PO NO  </label>
 							<div class="row">
 								<div class="col-md-12">
-									<?php echo $invoice->customer_po_no; ?>
+									<?php echo $invoice->sales_order->customer_po_no; ?>
+									<?php echo $this->Form->input('customer_po_no', ['type'=>'hidden','label' => false,'class' => 'form-control input-sm','placeholder'=>'Delivery Description','value'=>$invoice->sales_order->customer_po_no]); ?>
 								</div>
 							</div><br/>
 							<label class="control-label">PO DATE</label>
@@ -174,7 +175,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</div>
 					</div>
 					<?php } ?>
-					<?php if($invoice->road_permit_required=='Yes') { ?>
+					<?php if($invoice->road_permit_required=='Yes') {?>
 					<div class="col-md-6">
 						<div class="form-group">
 							<label class="control-label">Form 49 <span class="required" aria-required="true">*</span></label>

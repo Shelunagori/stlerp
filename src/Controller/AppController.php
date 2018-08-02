@@ -168,23 +168,6 @@ class AppController extends Controller
 				}
 			}
 			
-			$sales_man_acc= $this->Employees->find()->contain('Departments')->matching(
-					'Departments', function ($q) use($st_company_id) {
-						return $q->where(['Departments.id' =>2]);
-					}
-				);
-			$allowed_acc=[];$allowed_sales=[];		
-					$emp_acc= $this->Employees->find()->contain('Departments');
-					foreach($emp_acc as $data1){ 
-						if($data1->department->id == "1"){
-							$allowed_sales[]=$data1->id; 
-						}else{
-							$allowed_acc[]=$data1->id; 
-						}
-					}
-				
-			//pr($allowed_sales);exit;
-	
 		/* 	if($employees_data){
 				$children = $this->EmployeeHierarchies
 				->find('children', ['for' =>$employees_data->id])
@@ -206,7 +189,7 @@ class AppController extends Controller
 
 
 			//pr($allowed_emp); exit;
-			$this->set(compact('allowed_pages','st_company_id','allowed_emp','st_year_id','allowed_acc','allowed_sales'));
+			$this->set(compact('allowed_pages','st_company_id','allowed_emp','st_year_id'));
 		}
 
 		$this->loadModel('Pages');
@@ -360,9 +343,7 @@ class AppController extends Controller
 	public function stockValuationWithDate($date=null){ 
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
-		//$date=date('Y-m-d');
-		//pr($date);exit;
-		//$date=$this->request->query('date');
+		
 		$date=date("Y-m-d",strtotime($date));
 	
 		$this->loadModel('ItemLedgers');
@@ -372,13 +353,13 @@ class AppController extends Controller
 		$stockNew=[];
 		$stock=[];  $sumValue=0; $itemSerialRate=[]; $itemSerialQuantity=[];
 		foreach($Items as $Item){
-			if(@$Item->item_companies[0]->serial_number_enable==0){
+			if(@$Item->item_companies[0]->serial_number_enable==0){ 
 				if(strtotime($date)==strtotime('2017-04-01')){
 					$StockLedgers=$this->ItemLedgers->find()
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
-				}else{
-					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+				}else{ 
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
 				}
 				
 				foreach($StockLedgers as $StockLedger){
