@@ -130,6 +130,7 @@ class EmployeeAttendancesController extends AppController
 			
 			$employeeLeave = $this->EmployeeAttendances->LeaveApplications->find()->where(['employee_id'=>$data->id,'leave_status'=>'approved','approve_leave_from >='=>date('Y-m-d',strtotime($From)), 'approve_leave_to <='=>date('Y-m-d',strtotime($to_date))]);
 			$UniqueEmpIds=[];
+			
 			foreach($employeeLeave as $data1){
 				@$employee_leave[@$data1->employee_id]+=$data1->unpaid_leaves;
 				@$employee_leave_prior_approval[@$data1->employee_id]+=$data1->prior_approval;
@@ -137,7 +138,7 @@ class EmployeeAttendancesController extends AppController
 				@$employee_leave_unintimated_leave[@$data1->employee_id]+=$data1->unintimated_leave;
 			}
 			
-
+//pr($employee_leave);exit;
 		}
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays','employee_leave_prior_approval','employee_leave_without_prior_approval','employee_leave_unintimated_leave'));
 	}
@@ -204,6 +205,7 @@ class EmployeeAttendancesController extends AppController
 			$year=date("Y",$time);
 			//pr($month); exit;
 			$total_day=cal_days_in_month(CAL_GREGORIAN,$month,$year);
+			//pr($employeeAttendance->employee_attendances);exit;
 			foreach($employeeAttendance->employee_attendances as $data){
 				$employeeAtten = $this->EmployeeAttendances->newEntity();
 				$employeeAtten->employee_id = $data['employee_id'];

@@ -103,7 +103,8 @@
 				?>
 			</td>
 			<td align="right">
-				<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((@$dr_amt-$cr_amt)-$total_row-$loan_amt),'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
+				<?php $abc = round((@$dr_amt-$cr_amt)); ?>
+				<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((($abc)-$loan_amt)-$total_row),'loan'=>@$loan_amount[@$data->id],'other'=>@$other_amount[@$data->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
 			</td>
 			<?php $total+=round((@$dr_amt-$cr_amt)-$total_row-$loan_amt); ?>
 		</tr>
@@ -169,6 +170,8 @@ $(document).ready(function() {
 		}
 		totalColumn();
 	});
+	
+	
 	$('.save').on("click",function() {
 		$("#main_table tbody#main_tbody1 tr.tr1").each(function(){ var counter=0; 
 				$(this).find('td').each(function(){ counter++;
@@ -184,8 +187,19 @@ $(document).ready(function() {
 	$('.other_amount1').on("blur",function() {
 		var ths=$(this);
 		var net_amount=$(this).closest('tr').find('.net_amount').attr('net');
+		var loan_amount=$(this).closest('tr').find('.net_amount').attr('loan');
+		if(isNaN(loan_amount)){ 
+			loan_amount =0;
+		}
+		if(isNaN(net_amount)){ 
+			net_amount =0;
+		}
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
-		var amount_after_other=round(net_amount-other_amt);
+		if(isNaN(other_amt)){ 
+			other_amt =0;
+		}
+		var amount_after_other= round(net_amount-loan_amount);
+		amount_after_other = round(amount_after_other-other_amt);
 		var net_amount=$(this).closest('tr').find('.net_amount').val(amount_after_other);
 		totalColumn();
 	});

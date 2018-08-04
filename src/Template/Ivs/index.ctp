@@ -61,7 +61,7 @@
 						<?php  $i=0; foreach ($ivs as $iv):
 						$iv->id = $EncryptingDecrypting->encryptData($iv->id);
 						$iv->invoice->id = $EncryptingDecrypting->encryptData($iv->invoice->id);
-						if(in_array($iv->created_by,$allowed_emp)){
+						//if(in_array($iv->created_by,$allowed_emp)){
 						$i++;?>
 						<tr>
 							<td><?= h(++$page_no) ?></td>
@@ -93,7 +93,9 @@
 							</td>
 							<?php  ?>
 						</tr>
-						<?php } endforeach; ?>
+						<?php
+						//}
+						endforeach; ?>
 					</tbody>
 				</table>
 				
