@@ -91,7 +91,7 @@ class EmployeeSalariesController extends AppController
 		$loan_amount=[];
 		$loan_app=[];
 		$other_amount=[];
-		$EmployeeAtten=[];
+		$EmployeeAtten=[];$total_loan_amt=[];
 		foreach($employees as $dt){
 			$From=date('Y-m-d',strtotime($From)); 
 			$EmployeeSalary = $this->EmployeeSalaries->find()->where(['employee_id'=>$dt->id,'effective_date_from <='=>$From])->contain(['EmployeeSalaryRows'])->order(['EmployeeSalaries.id'=>'DESC'])
@@ -113,18 +113,22 @@ class EmployeeSalariesController extends AppController
 			
 			foreach($LoanApplications as $LoanApplication){
 				$repayment=0;
+					
 				if($LoanApplication->loan_installments){
 					foreach($LoanApplication->loan_installments as $loan_installment){
 						$repayment+=$loan_installment->amount;
+						$total_loan_amt[$dt->id]=$repayment;
 					}
 				}
 				
 				if($LoanApplication->approve_amount_of_loan>$repayment){
 					$loan_amount[$dt->id]=$LoanApplication->instalment_amount; 
 					$loan_app[$dt->id]=$LoanApplication->id;
+					
 					break;
 				}
 			}
+			
 			
 				
 				
@@ -195,7 +199,7 @@ class EmployeeSalariesController extends AppController
 		$EmployeeSalaryAddition = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'addition', 'company_id'=>$st_company_id]); 
 		$EmployeeSalaryDeduction = $this->EmployeeSalaries->EmployeeSalaryRows->EmployeeSalaryDivisions->find()->where(['salary_type'=>'deduction', 'company_id'=>$st_company_id]); 
 		
-		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','loan_app','other_amount','EmployeeAtten','bankCashes'));
+		$this->set(compact('employees', 'employeeSalary', 'employeeSalaryDivisions','employeeDetails','financial_year','basic_sallary','emp_month_sallary','EmployeeSalaryAddition','EmployeeSalaryDeduction','emp_sallary_division','loan_amount','loan_app','other_amount','EmployeeAtten','bankCashes','total_loan_amt'));
 
 	}
 	

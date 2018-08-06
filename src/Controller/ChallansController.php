@@ -184,7 +184,7 @@ class ChallansController extends AppController
 							$itemLedger->rate = $challan_row->rate;
 							$itemLedger->company_id = $st_company_id;
 							$itemLedger->processed_on = date("Y-m-d");
-							$itemLedger->challan_type = $challan->challan_type;
+							$itemLedger->challan_type = $challan_row->challan_type;
 							$itemLedger->source_row_id = $challan_row->id;
 							
 							$this->Challans->ItemLedgers->save($itemLedger);

@@ -50,7 +50,7 @@
 	</thead>
 	<tbody id="main_tbody1">
 		<?php $total=0; $r=5; $l=1; $i=1;   
-		
+		$loan_amt=0;
 		$totalNetSalary=0; $TotalAddition=[]; $TotalDeduction=[]; $TotalLoanAmount=0; $TotalOthers=0;
 		foreach($employees as $data){ $total_row=0; $dr_amt=0; $cr_amt=0; ?>
 		<tr class="tr1">
@@ -93,13 +93,14 @@
 				echo $this->Form->input('loan_app['.$data->id.']', ['style'=>'text-align:right;','class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$data->id]]); 
 				$loan_amt=round(@$loan_amount[@$data->id]);
 				$TotalLoanAmount+=$loan_amt;
+				
 				?>
 				<a href="#" class="hold" style="float:right;">Hold</a>
 			</td>
 			<td align="right">
 				<?php  $total_row=@$other_amount[@$data->id]; ?>
-				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); 
-				$TotalOthers+=$other_amount[@$data->id];
+				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]+@$total_loan_amt[@$data->id]]); 
+				$TotalOthers+=$other_amount[@$data->id]+@$total_loan_amt[@$data->id];
 				?>
 			</td>
 			<td align="right">

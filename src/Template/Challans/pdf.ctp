@@ -12,7 +12,7 @@ $dompdf = new Dompdf();
 
 
 
-
+pr($challan->challan_type);exit;
 $html = '
 <html>
 <head>
