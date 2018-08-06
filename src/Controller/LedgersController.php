@@ -1152,11 +1152,13 @@ class LedgersController extends AppController
 		} 
 }  
 		//pr($groupForPrint); exit;
-		$ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
+		/* $ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
 		$itemOpeningBalance=0;
 		foreach($ItemLedgers as $ItemLedger){ 
 			$itemOpeningBalance+=$ItemLedger->quantity*$ItemLedger->rate;
-		}
+		} */
+		
+		$itemOpeningBalance= $this->StockValuationWithDate($from_date);
 		//pr($itemOpeningBalance);  exit;
 		if(empty($from_date) || empty($to_date))
 		{ 
