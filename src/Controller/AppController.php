@@ -359,7 +359,7 @@ class AppController extends Controller
 					->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date, 'ItemLedgers.source_model'=>'Items'])
 					->order(['ItemLedgers.processed_on'=>'ASC']);
 				}else{ 
-					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <='=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
+					$StockLedgers=$this->ItemLedgers->find()->where(['ItemLedgers.item_id'=>$Item->id,'ItemLedgers.company_id'=>$st_company_id,'ItemLedgers.processed_on <'=>$date])->order(['ItemLedgers.processed_on'=>'ASC']);
 				}
 				
 				foreach($StockLedgers as $StockLedger){
