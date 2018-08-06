@@ -98,7 +98,7 @@
 				<a href="#" class="hold" style="float:right;">Hold</a>
 			</td>
 			<td align="right">
-				<?php  $total_row=@$other_amount[@$data->id]; ?>
+				<?php  $total_row=@$other_amount[@$data->id]+@$total_loan_amt[@$data->id]; ?>
 				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]+@$total_loan_amt[@$data->id]]); 
 				$TotalOthers+=$other_amount[@$data->id]+@$total_loan_amt[@$data->id];
 				?>
@@ -196,6 +196,7 @@ $(document).ready(function() {
 			net_amount =0;
 		}
 		var other_amt=$(this).closest('tr').find('.other_amount1').val();
+		
 		if(isNaN(other_amt)){ 
 			other_amt =0;
 		}
