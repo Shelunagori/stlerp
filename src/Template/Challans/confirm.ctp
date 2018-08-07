@@ -9,7 +9,9 @@ $id = $EncryptingDecrypting->encryptData($id);
 		<td valign="top" style="background: #FFF;">
 		<div class="list-group">
 			<a href="<?php echo $list_url; ?>" class="list-group-item"><i class="fa fa-chevron-left"></i> Back to Challan </a>
+			<?php if(in_array(12,$allowed_pages)){  ?>
 			<a href="<?php echo $Edit_url.'/'.$id; ?>" class="list-group-item"><i class="fa fa-edit"></i> Edit </a>
+			<?php }  ?>
 			<a href="#" class="list-group-item" onclick="window.close()"><i class="fa fa-times"></i> Close </a>
 		</div>
 		<div style="padding:5px;overflow: auto;">

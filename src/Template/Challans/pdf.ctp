@@ -113,7 +113,7 @@ $html = '
 			</tr>
 			<tr>
 				<td width="30%" valign="top"> 
-				<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;"> CHALLAN</div>
+				<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;text-align:center;"> CHALLAN</div>
 				</td>
 				<td align="right" width="35%" style="font-size: 12px; ">
 				<span >'. $this->Text->autoParagraph(h($challan->company->address)) .'</span>
@@ -227,6 +227,7 @@ $html.='
 			<tr>
 				<th width="5%">S No</th>
 				<th>Item Description</th>
+				<th width="8%">Type</th>
 				<th width="8%">Quantity</th>
 				<th width="10%">Rate</th>
 				<th width="10%">Amount</th>
@@ -239,13 +240,14 @@ $sr=0; $h="-"; $total_taxable_value=0; foreach ($challan->challan_rows as  $chal
 // pr($challanRows);
 $html.='
 	<tr>
-		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center" >'. h($sr) .'</td>
-		<td style="padding-top:8px;padding-bottom:5px;line-height:20px " valign="top">
-		<span>'.$challanRows->item->name;
+		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center" class="topdata">'. h($sr) .'</td>
+		<td class="topdata" style="padding-top:8px;padding-bottom:5px;line-height:20px " valign="top">
+		<span class="topdata">'.$challanRows->item->name;
 		
 		$html.='		
 		<div style="height:'.$challanRows->height.'"></div></span>
 		<span>'.$challanRows->description .'<div style="height:'.$challanRows->height.'"></div></span></td>
+		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($challanRows->challan_type) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;" valign="top" align="center">'. h($challanRows->quantity) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($challanRows->rate) .'</td>
 		<td style="padding-top:8px;padding-bottom:5px;" align="right" valign="top">'. $this->Money->indianNumberFormat($challanRows->amount) .'</td>';
@@ -254,7 +256,10 @@ $html.='
 
 	</tr>';
 }
-	$html.='</tbody>';
+	$html.='<tr>
+							<td colspan="5" style="text-align:right"><b>Total<b></td>
+							<td style="text-align:right;" valign="">'. $this->Money->indianNumberFormat($challan->total) .'</td>
+						</tr></tbody>';
 $html.='</table>';
 	
 $grand_total=explode('.',$challan->total);
@@ -273,39 +278,46 @@ $html.='
 	<table width="100%" class="table_rows ">
 		<tr>
 			<td valign="top" width="18%">Amount in words</td>
-			<td  valign="top"> '. h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text).'</td>
+			<td  valign="top" class="topdata"> '. h(ucwords($this->NumberWords->convert_number_to_words($rupees))) .'  Rupees ' .h($paisa_text).'</td>
 		</tr>
 		<tr>
-			<td valign="top" width="18%">Additional Note</td>
+			<td valign="top" width="18%">Documents</td>
 			<td  valign="top" class="topdata">'. $this->Text->autoParagraph($challan->documents).'</td>
-
+		</tr>
+		<tr>
+			<td valign="top" width="18%">Reference Detail</td>
+			<td  valign="top" class="topdata">'. $this->Text->autoParagraph($challan->reference_detail).'</td>
 		</tr>
 		
 		<tr>
-				<td colspan="2" >
+				<td colspan="2">
 					<table width="100%" class="table2" >
-						<tr>
+						<tr width="50%">
 							<td  >
-								
 								<table>
 									<tr>
-										<td >GST</td>
-										<td >: '. h($challan->company->gst_no) .'</td>
+										<td style="line-height:20px" >&nbsp;</td>
+									</tr>
+								</table>
+								<table>
+									<tr>
+										<td >&nbsp;</td>
+										<td >&nbsp;</td>
 									</tr>
 									<tr width="30">
-										<td >PAN</td>
-										<td >: '. h($challan->company->pan_no) .'</td>
+										<td >&nbsp;</td>
+										<td >&nbsp;</td>
 									</tr>
 									<tr>
-										<td >CIN</td>
-										<td >: '. h($challan->company->cin_no) .'</td>
+										<td ></td>
+										<td ></td>
 									</tr>
 								</table>
 							</td>
-							<td align="right" >
+							<td align="right" style="    width: 20%;">
 								<div align="center">
 									<span>For <b>'. h($challan->company->name) .'</b></span><br/>
-									<img src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.$challan->creator->signature.' height="50px" style="height:50px;"/>
+									<img  src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.$challan->creator->signature.' height="50px" style="height:50px; "/>
 									<br/>
 									<span><b>Authorised Signatory</b></span><br/>
 									<span>'. h($challan->creator->name) .'</span><br/>
