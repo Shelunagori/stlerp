@@ -106,7 +106,7 @@ class EmployeeSalariesController extends AppController
 			
 			$LoanInstallments = $this->EmployeeSalaries->LoanApplications->LoanInstallments->find();
 			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()
-								->where(['employee_id'=>$dt->id,'installment_start_month <= '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
+								->where(['employee_id'=>$dt->id,'installment_start_month < '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
 								->contain(['LoanInstallments']);
 			
 			
@@ -162,8 +162,9 @@ class EmployeeSalariesController extends AppController
 				if($SalaryExist){
 					$other_amount[@$dt->id]=round(@$SalaryExist->other_amount,2);
 				}else{
-					
-					$other_amount[@$dt->id]=round((@$dr-@$cr),2);
+					$x=@$total_loan_amt[@$dt->id];
+					$y=round(@$dr-@$cr);
+					$other_amount[@$dt->id]=round((@$y+@$x),2);
 				}
 		
 		}   
@@ -384,7 +385,7 @@ class EmployeeSalariesController extends AppController
 				}
 			}
 			
-			$this->EmployeeSalaries->LoanInstallments->deleteAll(['month' => $month, 'year' => $year]);
+			$this->EmployeeSalaries->LoanInstallments->deleteAll(['month' => $month, 'year' => $year,'loan_application_id'=>$loan_app[$dt->id]]);
 			if(@$loan_amount2[$dt->id]>0){
 				$LoanInstallment = $this->EmployeeSalaries->LoanInstallments->newEntity();
 				$LoanInstallment->loan_application_id=$loan_app[$dt->id];
@@ -782,6 +783,7 @@ class EmployeeSalariesController extends AppController
 					}
 				)
 			->group(['Employees.id'])->toArray();
+			   //pr($Employees); exit;
 			$this->set(compact('Employees'));
 		}
 		$this->set(compact('st_company_id'));

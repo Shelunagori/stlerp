@@ -299,7 +299,7 @@ class ChallansController extends AppController
 							$itemLedger->rate = $challan_row->rate;
 							$itemLedger->company_id = $st_company_id;
 							$itemLedger->processed_on = date("Y-m-d");
-							$itemLedger->challan_type = $challan->challan_type;
+							$itemLedger->challan_type = $challan_row->challan_type;
 							$itemLedger->source_row_id = $challan_row->id;
 							
 							$this->Challans->ItemLedgers->save($itemLedger);
@@ -382,7 +382,7 @@ class ChallansController extends AppController
 		
 		$this->viewBuilder()->layout('');
          $challan = $this->Challans->get($id, [
-            'contain' => ['Companies','Customers','Transporters','ChallanRows','Creator','Vendors']
+            'contain' => ['Companies','Customers','Transporters','ChallanRows'=>['Items'],'Creator','Vendors']
 			]);
 
         $this->set('challan', $challan);
@@ -468,8 +468,36 @@ class ChallansController extends AppController
 	public function confirm($id = null)
     {
 		$this->viewBuilder()->layout('pdf_layout');
-		
-        $this->set('id', $id);
+		$id = $this->EncryptingDecrypting->decryptData($id);
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+		$challans = $this->Challans->get($id, [
+             'contain' => ['Companies','Customers','Transporters','ChallanRows','Creator','Vendors']
+			]);
+		if ($this->request->is(['patch', 'post', 'put'])) {
+			
+			if(!empty($this->request->data['challan_rows'])){ 
+				foreach($this->request->data['challan_rows'] as $invoice_row_id=>$value){
+					$challanRows=$this->Challans->ChallanRows->get($invoice_row_id);
+					$challanRows->height=$value["height"];
+					$this->Challans->ChallanRows->save($challanRows);
+				}
+			}
+			
+			if(!empty($this->request->data['pdf_font_size'])){
+				$pdf_font_size=$this->request->data['pdf_font_size'];
+				$query = $this->Challans->query();
+					$query->update()
+						->set(['pdf_font_size' => $pdf_font_size])
+						->where(['id' => $id])
+						->execute();
+			}
+			
+			$id = $this->EncryptingDecrypting->encryptData($id);
+			return $this->redirect(['action' => 'confirm',$id]);
+		}	
+        $this->set(compact('challans','id'));
     }
 	public function ConvertedIntoInvoice($id = null)
     {

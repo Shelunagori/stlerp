@@ -37,11 +37,13 @@
 						$division[$Employee->id][$salarie->employee_salary_division_id]=$salarie->amount;
 						
 					}
-					$Loan[$Employee->id]=$salarie->loan_amount;
+					if(@$salarie->loan_amount > 0){
+						$Loan[$Employee->id]=$salarie->loan_amount;
+					}
 					@$Others[$Employee->id]=@$Others[$Employee->id]+$salarie->other_amount;
 				}
 			}
-			//pr($allDivisions);
+			//pr($Loan);
 			//pr($salary_type);
 			
 			?>
