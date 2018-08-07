@@ -35,7 +35,7 @@ class SerialNumbersTable extends Table
 
         $this->table('serial_numbers');
         $this->displayField('name');
-
+		  $this->primaryKey('id');
         $this->belongsTo('Grns', [
             'foreignKey' => 'grn_id',
             'joinType' => 'INNER'

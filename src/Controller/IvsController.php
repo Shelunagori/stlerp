@@ -362,7 +362,7 @@ class IvsController extends AppController
 			
 			$iv->created_by=$s_employee_id;
 			$iv->financial_year_id=$st_year_id;
-			
+		
         //pr($iv); exit;
 			if ($this->Ivs->save($iv)) {
 				
@@ -486,14 +486,14 @@ class IvsController extends AppController
 	$this->viewBuilder()->layout('');
 			$session = $this->request->session();
 			$st_company_id = $session->read('st_company_id');
-			
+			$sr_no_out_id=(int)$sr_no_out_id; 
 			$ItemData=$this->Ivs->ItemLedgers->SerialNumbers->get($sr_no_out_id);
 			$Items = $this->Ivs->ItemLedgers->Items->get($ItemData->item_id, [
 				'contain' => ['ItemCompanies'=>function($q) use($st_company_id){
 					return $q->where(['company_id'=>$st_company_id]);
 				}]
 			]);
-			
+				
 			$to_date = date('Y-m-d');
 			$unit_rate=0;
 	
