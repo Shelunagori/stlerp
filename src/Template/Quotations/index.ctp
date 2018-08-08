@@ -216,7 +216,7 @@ if(!empty($status)){
 								<?php
 								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id)
 								 { ?>
-								<div class="btn-group dropup" >
+								<div class="btn-group dropup">
 									<button type="button" class="btn btn-xs blue dropdown-toggle" data-toggle="dropdown"><i class="fa fa-pencil-square-o"></i></button>
 									<ul class="dropdown-menu" role="menu" style=" margin-left: -82px; ">
 										<li>
