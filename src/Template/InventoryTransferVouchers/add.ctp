@@ -140,9 +140,7 @@
 							<th >Item</th>
 							<th >Quantity</th>
 							<th >Serial Number</th>
-							<th >Rate</th>
-							<th></th>
-							<th></th>
+							
 						</tr>
 					</thead>
 					<tbody id="maintbody_1"></tbody>
@@ -363,7 +361,7 @@ $(document).ready(function() {
 			
 			$(this).find('td:nth-child(2) input.status').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][status]", id:"inventory_transfer_voucher_rows-"+j+"-status", row:j});
 		
-			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
+			
 			j++; 
 	   });
 	}	
@@ -541,10 +539,8 @@ $(document).ready(function() {
 				<?php echo $this->Form->input('q', ['type' => 'hidden','label' => false,'class' => 'form-control input-sm status','placeholder' => 'Quantity','value'=>'In']); ?>
 			</td>
 			<td style="width: 200px;"><div class="sr_container"></div></td>
-			<td style="width: 300px;">
-				<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
-			</td>
-			<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'><i class="fa fa-plus"></i></a><a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a></td>
+			
+			<td></td>
 		</tr>
 	</tbody>
 </table>

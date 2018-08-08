@@ -408,6 +408,8 @@ class InventoryTransferVouchersController extends AppController
 			$inventoryTransferVoucher->created_by=$s_employee_id;
 			$inventoryTransferVoucher->financial_year_id=$st_year_id;
 			$inventoryTransferVoucher->file_no = $inventoryTransferVoucher->so3;
+			
+			
 
 	        //pr($inventoryTransferVoucher);exit;
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) {
@@ -416,9 +418,10 @@ class InventoryTransferVouchersController extends AppController
 				{
 					$inventory_transfer_voucher_rows[$key]['row_id'] = $inventory_transfer_voucher_row->id;
 				}
-				
+				$avg_cost_data=0;
 			    foreach($inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_data)
 				{ 
+				
 				if($inventory_transfer_voucher_row_data['status'] == 'Out')
 				{
 					$serial_data=0;
@@ -470,12 +473,13 @@ class InventoryTransferVouchersController extends AppController
 										])
 					    ->execute();
 						
-						$avg_cost_data = $unit_rate*$inventory_transfer_voucher_row_data['quantity'];
+						$avg_cost_data1= $unit_rate*$inventory_transfer_voucher_row_data['quantity'];
+						$avg_cost_data += $unit_rate*$inventory_transfer_voucher_row_data['quantity'];
 						
 						
 						$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
 						$query21->update()
-							->set(['amount' => $avg_cost_data])
+							->set(['amount' => $unit_rate])
 							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'item_id' => $inventory_transfer_voucher_row_data['item_id'],'status' => 'Out'])
 							->execute();
 							
@@ -508,7 +512,7 @@ class InventoryTransferVouchersController extends AppController
 							  ->values([
 											'item_id' => $inventory_transfer_voucher_row_data['item_id'],
 											'quantity' => $inventory_transfer_voucher_row_data['quantity'],
-											'rate' =>$inventory_transfer_voucher_row_data['amount'],
+											'rate' =>@$avg_cost_data/@$inventory_transfer_voucher_row_data['quantity'],
 											'source_model' => 'Inventory Transfer Voucher',
 											'processed_on' => date("Y-m-d",strtotime($inventoryTransferVoucher->transaction_date)),
 											'in_out'=>'In',
@@ -517,11 +521,17 @@ class InventoryTransferVouchersController extends AppController
 											'source_row_id'=>$inventory_transfer_voucher_row_data['row_id']
 										])
 					    ->execute();
+					$query21 = $this->InventoryTransferVouchers->InventoryTransferVoucherRows->query();
+						$query21->update()
+							->set(['amount' => $avg_cost_data/$inventory_transfer_voucher_row_data['quantity']])
+							->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'status' => 'In'])
+							->execute();
 			} 
 			
 					
 				}
-			//pr($inventory_transfer_voucher_rows); exit;
+			//pr($inventory_transfer_voucher_rows); 
+			
 			}	
 			$this->Flash->success(__('The inventory transfer voucher has been saved.'));
 
