@@ -117,12 +117,12 @@ class JobCardsController extends AppController
 							return $q->where(['Customers.id' =>$customer_id]);
 						}
 				);
-			}else{ 
+			}else{  
 				$jobCards = $this->JobCards->find()->contain(['SalesOrders'=>['Customers'],'JobCardRows'=>['Items']])
-				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.financial_year_id'=>$st_year_id,'JobCards.status IN'=>['Closed','Pending']])->order(['JobCards.jc2' => 'DESC']);
+				->where($where1)->where($wheree)->where(['JobCards.company_id'=>$st_company_id,'JobCards.status IN'=>['Closed','Pending'],'JobCards.financial_year_id'=>$st_year_id])->order(['JobCards.jc2' => 'DESC']);
 			}
 		} 
-		
+		//pr($jobCards->toArray());exit;
 		$SalesOrderQty=[];
 		$InvoiceQty=[];
 		$InventoryVoucherQty=[];
@@ -166,6 +166,22 @@ class JobCardsController extends AppController
         $this->set('_serialize', ['jobCards']);
     }
 
+	public function CloseJobCards($ids=null,$jobcardreason=null){
+		$id = $this->EncryptingDecrypting->decryptData($ids);
+		$jobcards = $this->JobCards->get($id);
+		//$quotation_reason=$this->Quotations->QuotationCloseReasons->get($reason);
+		$jobcards->reason=$jobcardreason;
+		$jobcards->status='Closed';
+		$jobcards->closing_date=date("Y-m-d");
+		//pr($id);exit;
+		 if ($this->JobCards->save($jobcards)) {
+            echo 'The jobcards has been closed.';
+        } else {
+            echo 'The jobcards could not be closed. Please, try again.';
+        }
+		exit;
+		//return $this->redirect(['action' => 'index']);
+	}
 	
 	public function exportExcel($status=null){
 		$this->viewBuilder()->layout('');

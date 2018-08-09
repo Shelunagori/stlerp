@@ -7,7 +7,7 @@
 	}
 	
 	$jobCardStatus=$status;
-	
+
 ?>
 <div class="portlet light bordered">
 <div class="portlet-title">
@@ -106,6 +106,7 @@
 			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
 				if($so != $in || $so != $iv || $in != $iv ){
 					$jobCard->id = $EncryptingDecrypting->encryptData($jobCard->id);
+					$jobCard_id = $jobCard->id;
 			?>
 				<tr>
 					<td><?= h(++$page_no) ?></td>
@@ -134,8 +135,12 @@
 					{ 
 					echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $jobCard->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
 				<?php } }  ?>
+				<?php if(in_array(34,$allowed_pages)){ ?>
+					<?php
+						echo $this->Html->link('<i class="fa fa-minus-circle"></i> ',['action' => '#'],array('escape'=>false,'class'=>'btn btn-xs red tooltips close_btn','data-original-title'=>'Close','role'=>'button','jobcard_id'=>$jobCard_id));
 
-				
+					?>
+				<?php } ?>
 					<!-- // if(in_array(34,$allowed_pages)) { 
 
 					 //if($status==null or $status=='Pending'){ 
@@ -199,5 +204,63 @@
 
 </div>
 </div>
+<?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
+<?php echo $this->Html->css('/drag_drop/jquery-ui.css'); ?>
+<?php echo $this->Html->script('/drag_drop/jquery-1.12.4.js'); ?>
+<?php echo $this->Html->script('/drag_drop/jquery-ui.js'); ?>
+<script>
+$(document).ready(function() {
+	$('.close_btn').die().live("click",function() {
+		var jobcard_id=$(this).attr('jobcard_id');
+		var addr=$(this).text();
+		$("#myModal2").show();
+		$("#close_popup_btn").attr('jobcard_id',jobcard_id);
+    });
+	
+	$('#close_popup_btn').die().live("click",function() {
+		var jobcard_id=$(this).attr('jobcard_id');
+		var jobcardreason=$('.jobcardreason').val();
+		
+		if((jobcard_id) && (jobcardreason)){
+			var url="<?php echo $this->Url->build(['controller'=>'JobCards','action'=>'CloseJobCards']); 
+			?>";
+			url=url+'/'+jobcard_id+'/'+jobcardreason,
+			
+			$.ajax({
+				url: url,
+			}).done(function(response) {
+				
+				location.reload();
+			});
+			
+		}else{
+			alert("Please Select Atleast one reason For Close Quotaion");		
+		}		
+    });
+	
+	$('.closebtn2').on("click",function() { 
+		$("#myModal2").hide();
+    });
+	
+	});
+</script>	
+<div id="myModal2" class="modal fade in" tabindex="-1" role="dialog" aria-labelledby="myModalLabel1" aria-hidden="false" style="display: none; padding-right: 12px;"><div class="modal-backdrop fade in" ></div>
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-body" id="result_ajax">
+			<h4>Closing Reason</h4>
+				<div class="row">
+					<div class="col-md-12">
+						<textarea cols="30" rows="5" name="reason" class="form-control jobcardreason"></textarea>
+					</div>
+				</div>
+				
+			</div>
+			<div class="modal-footer">
+				<button class="btn default closebtn2">Close</button>
+				<button class="btn red close_rsn" id="close_popup_btn">Close JobCards</button>
+			</div>
+		</div>
+	</div>
  
  

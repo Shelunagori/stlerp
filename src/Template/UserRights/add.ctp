@@ -105,11 +105,11 @@ fieldset legend {
 							if(in_array(24,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
 							echo $this->Form->input('user_rights.24.page_id', ['label' => 'View','class' => '','type'=>'checkbox','value'=>24,$checked_status]); ?>
 						</label>
-						<!--<label class="checkbox-inline">
+						<label class="checkbox-inline">
 							<?php 
 							if(in_array(34,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
 							echo $this->Form->input('user_rights.34.page_id', ['label' => 'Close','class' => '','type'=>'checkbox','value'=>34,$checked_status]); ?>
-						</label>-->
+						</label>
 						
 					</div>
 					</fieldset>
