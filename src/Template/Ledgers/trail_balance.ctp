@@ -59,7 +59,7 @@ $url_excel="/?".$url;
 						</tr>
 					</thead>
 					<tbody>
-							<?php $i=1; $totalDr=0; $totalCr=0; foreach($ClosingBalanceForPrint as $key=>$data){  ?>
+							<?php $op_dr_total=0; $op_cr_total=0;$tr_dr_total=0; $tr_cr_total=0;$cl_dr_total=0; $cl_cr_total=0; $i=1; $totalDr=0; $totalCr=0; foreach($ClosingBalanceForPrint as $key=>$data){  ?>
 							<tr>		
 								<td>
 									<a href="#" role='button' status='close' class="group_name" group_id='<?php  echo $key; ?>' style='color:black;'>
@@ -67,20 +67,26 @@ $url_excel="/?".$url;
 									</a>
 								</td>
 								<?php if($OpeningBalanceForPrint[$key]['balance'] > 0){ ?>
-								<td><?php echo $OpeningBalanceForPrint[$key]['balance'];
+								<td><?php 
+								echo $OpeningBalanceForPrint[$key]['balance'];
+								$op_dr_total += $OpeningBalanceForPrint[$key]['balance'];
 										?></td>
 								<td><?php echo "-" ?></td>
 								<?php }else{ ?>
 								<td><?php echo "-"; ?></td>
-								<td><?php echo abs($OpeningBalanceForPrint[$key]['balance']);  ?></td>
+								<td><?php echo abs($OpeningBalanceForPrint[$key]['balance']); 
+									$op_cr_total += $OpeningBalanceForPrint[$key]['balance'];
+								?></td>
 								<?php } ?>
 
 
 								
 								<td><?php echo abs($TransactionDr[$key]['balance']);
+										$tr_dr_total += $TransactionDr[$key]['balance'];
 										?></td>
 								
 								<td><?php echo abs($TransactionCr[$key]['balance']);
+										$tr_cr_total += $TransactionDr[$key]['balance'];
 									  ?></td>
 								
 								
@@ -88,21 +94,35 @@ $url_excel="/?".$url;
 
 								<?php if($data['balance'] > 0){ ?>
 								<td><?php echo $data['balance'];
-									@$totalDr=@$totalDr+$data['balance'];	?></td>
+									@$totalDr=@$totalDr+$data['balance'];	
+									$cl_dr_total += $data['balance'];
+									?></td>
 								<td><?php echo "-" ?></td>
 								<?php }else{ ?>
 								<td><?php echo "-"; ?></td>
 								<td><?php echo abs($data['balance']);  
+										$cl_cr_total += $data['balance'];
 									@$totalCr=@$totalCr+abs($data['balance']);  ?></td>
 								<?php } ?>
 								
 							</tr>
 							<?php } ?>
 							<tr>
-								<td colspan="5">Opening Stocks</td>
+								<td >Opening Stocks</td>
 								<td  scope="col" align="left"><?php echo round($itemOpeningBalance,2); ?></td>
-								<td></td>
+								<td colspan="5"></td>
 							</tr>
+							<tr>
+								<td colspan="1">Row total</td>
+								<td  scope="col" align="left"><?php echo round($op_dr_total+@$itemOpeningBalance,2); ?></td>
+								<td  scope="col" align="left"><?php echo round(abs($op_cr_total),2); ?></td>
+								<td  scope="col" align="left"><?php echo round($tr_dr_total,2); ?></td>
+								<td  scope="col" align="left"><?php echo round($tr_cr_total,2); ?></td>
+								<td  scope="col" align="left"><?php echo round($cl_dr_total,2); ?></td>
+								<td  scope="col" align="left"><?php echo round($cl_cr_total,2); ?></td>
+								
+							</tr>
+							
 							<tr style="color:red;">
 								<td colspan="5">Diff. In Opening Balance</td>
 								<?php if($differenceInOpeningBalance > 0){ ?>
@@ -219,7 +239,7 @@ $(document).ready(function() {
 		   var to_date = $('.to_date').val();
 		   var url="<?php echo $this->Url->build(['controller'=>'Ledgers','action'=>'ledgerAccountDataTb']); ?>";
 		   url=url+'/'+second_grp_id +'/'+from_date+'/'+to_date,
-			
+		//	alert(url);
 			$.ajax({
 				url: url,
 			}).done(function(response) {
