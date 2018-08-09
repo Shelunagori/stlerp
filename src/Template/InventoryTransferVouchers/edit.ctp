@@ -170,9 +170,11 @@ if($transaction_date <  $start_date ) {
 					</thead>
 					<tbody id="maintbody_1">
 							<tr>
-								<td><a class="btn btn-xs btn-default addrow_1" href="#" role='button'>Add row</a></td>
+								<td class="add_in_row" value=""><a class="btn btn-xs btn-default addrow_1" href="#" role='button'>Add row</a></td>
 							</tr>
-						<?php $options1= [];	foreach($inventoryTransferVouchersins->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ 
+						<?php 
+						//pr(sizeof($inventoryTransferVouchersins->inventory_transfer_voucher_rows));
+						$options1= [];	foreach($inventoryTransferVouchersins->inventory_transfer_voucher_rows as $inventory_transfer_voucher_row_in){ 
 									?>
 							<tr class="main">
 								<td  width="25%">
@@ -201,7 +203,7 @@ if($transaction_date <  $start_date ) {
 										
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1;  $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+									$i=1; $k=0;  $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ 
@@ -227,20 +229,22 @@ if($transaction_date <  $start_date ) {
 									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'style'=>'width: 79px;','value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
 								</td>
 								<td>
-								<?php if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
-								<?= $this->Html->link('<i class="fa fa-trash"></i> ',
-														['action' => 'DeleteRow', $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
-														[
-															'escape' => false,
-															'class' => 'btn btn-xs red',
-															'confirm' => __('Are you sure, you want to delete {0}?', $inventory_transfer_voucher_row_in->item->name)
-														]
-													) ?>
-								<?php } ?>
-								</td>
-							</tr>
+								<?php 
+								
+									if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
+									<?= $this->Html->link('<i class="fa fa-trash"></i> ',
+															['action' => 'DeleteRow', $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
+															[
+																'escape' => false,
+																'class' => 'btn btn-xs red',
+																'confirm' => __('Are you sure, you want to delete {0}?', $inventory_transfer_voucher_row_in->item->name)
+															]
+														) ?>
+									<?php }?>
+									</td>
+								</tr>
 							
-						<?php }?>
+								<?php  }?>
 							
 						</tbody>
 					</table>
@@ -361,6 +365,8 @@ $(document).ready(function() {
 	
 	//add_row_in();
 	//add_row_out();
+	
+	
 
 	$('.addrow_1').die().live("click",function() { 
 		add_row_in();
@@ -391,6 +397,7 @@ $(document).ready(function() {
 				var del=$(this).closest("tr");
 				$(del).remove();
 				rename_rows_in();
+				cheak_row();
 			}
 		} 
 	});
@@ -399,8 +406,10 @@ $(document).ready(function() {
 		var tr2=$("#sampletable_1 tbody tr").clone();
 		$("#main_table_1 tbody#maintbody_1").append(tr2);
 		rename_rows_in();
+		cheak_row();
 		
 	}
+	
 	
 	function add_row_out(){
 		var tr2=$("#sampletable tbody tr").clone();
@@ -410,6 +419,22 @@ $(document).ready(function() {
 	}
 	rename_rows_out();
 	rename_rows_in();
+	cheak_row();
+	
+	function cheak_row(){
+		
+		var j=0;
+		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
+			j++;
+		});
+		if(j >= 1){
+			$('.add_in_row').css("display", "none");
+		}else{
+			$('.add_in_row').css("display", "");
+		}
+		alert(j); 
+	}
+	
 	
 	$('.select_item_in').die().live("change",function() {
 		rename_rows_in();
@@ -526,6 +551,7 @@ $(document).ready(function() {
 			j++; 
 	   });
 	}	
+	//pr(sizeof($inventoryTransferVouchersins->inventory_transfer_voucher_rows));
 	
 	$('.select_item_out').die().live("change",function() {
 		var t=$(this);
