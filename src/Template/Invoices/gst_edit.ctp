@@ -49,14 +49,14 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 						</div>
 					</div>
 					<div class="col-md-4">
-					<?php //if($invoice->e_way_bill_no){ ?>
+					<?php if($invoice->e_way_bill_no){ ?>
 							<label class="control-label">E-Way Bill No</label>
 							<div class="row">
 								<div class="col-md-12">
 									<?php echo $this->Form->input('e_way_bill_no', ['type' => 'text','label' => false,'class' => 'form-control input-sm','placeholder'=>'E-Way Bill No']); ?>
 								</div>
 							</div>
-							<?php //} ?>
+							<?php } ?>
 					</div>
 					<div class="col-md-2">
 						<div class="form-group">
