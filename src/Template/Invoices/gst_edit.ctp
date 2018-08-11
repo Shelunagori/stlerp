@@ -306,7 +306,7 @@ table > thead > tr > th, table > tbody > tr > th, table > tfoot > tr > th, table
 							</td>
 							<td>
 								<?php  
-								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity row_textbox','placeholder' => 'Quantity','value' => @$current_invoice_rows[$sales_order_row->id],'max'=>@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id],'min'=>@$sr_qty[$in_row_id]]); 
+								echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm quantity row_textbox','placeholder' => 'Quantity','id'=>'quantity','value' => @$current_invoice_rows[$sales_order_row->id],'max'=>@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id],'min'=>@$sr_qty[$in_row_id]]); 
 								?>
 								<span>Max: <?= h(@$sales_order_qty[$sales_order_row->id]-@$existing_invoice_rows[$sales_order_row->id]+@$current_invoice_rows[$sales_order_row->id]) ?></span>
 							</td>
@@ -779,7 +779,7 @@ $(document).ready(function() {
 		rename_rows(); calculate_total();
     });
 	
-	$('#add_submit').on("mouseover", function () {
+	$('#add_submit').die().on("mouseover", function () {
 		do_ref_total();	
 		put_code_description();
 	});
@@ -949,7 +949,7 @@ $(document).ready(function() {
 			});
 		}
 	
-	$('#update_credit_limit').on("click",function() {
+	$('#update_credit_limit').die().on("click",function() {
 		var customer_id=$('input[name="customer_id"]').val();
 		$("#update_credit_limit_wait").html('Loading...');
 		var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'CreditLimit']); ?>";
@@ -1182,7 +1182,7 @@ $(document).ready(function() {
 	}
 	
 	
-	$('.addrefrow').live("click",function() {
+	$('.addrefrow').die().live("click",function() {
 		add_ref_row();
 	});
 	
@@ -1192,7 +1192,7 @@ $(document).ready(function() {
 		rename_ref_rows();
 	}
 	
-	$('.ref_type').live("change",function() {
+	$('.ref_type').die().live("change",function() {
 		var current_obj=$(this);
 		
 		var ref_type=$(this).find('option:selected').val();

@@ -698,7 +698,7 @@ $(document).ready(function() {
 		rename_rows(); calculate_total();
     });
 	
-	$('#add_submit').on("mouseover", function () { //alert()
+	$('#add_submit').die().on("mouseover", function () { //alert()
 		put_code_description();
     });
 	
@@ -876,7 +876,7 @@ $(document).ready(function() {
 			
 	<?php } ?>
 	
-	$('#update_credit_limit').on("click",function() {
+	$('#update_credit_limit').die().on("click",function() {
 		var customer_id=$('input[name="customer_id"]').val();
 		$("#update_credit_limit_wait").html('Loading...');
 		var url="<?php echo $this->Url->build(['controller'=>'Customers','action'=>'CreditLimit']); ?>";
@@ -1093,7 +1093,7 @@ $(document).ready(function() {
 	}
 	
 	
-	$('.addrefrow').live("click",function() {
+	$('.addrefrow').die().live("click",function() {
 		add_ref_row();
 	});
 	
@@ -1130,12 +1130,12 @@ $(document).ready(function() {
 		} */
 	}
 	
-	$('.deleterefrow').live("click",function() {
+	$('.deleterefrow').die().live("click",function() {
 		$(this).closest("tr").remove();
 		do_ref_total();
 	});
 	
-	$('.ref_type').live("change",function() {
+	$('.ref_type').die().live("change",function() {
 		var current_obj=$(this);
 		
 		var ref_type=$(this).find('option:selected').val();
@@ -1157,17 +1157,17 @@ $(document).ready(function() {
 		}
 	});
 	
-	$('.ref_list').live("change",function() {
+	$('.ref_list').die().live("change",function() {
 		var current_obj=$(this);
 		var due_amount=$(this).find('option:selected').attr('amt');
 		$(this).closest('tr').find('td:eq(2) input').val(round(due_amount,2));
 		do_ref_total();
 	});
-	$('.cr_dr_amount').live("change",function() {
+	$('.cr_dr_amount').die().live("change",function() {
 		do_ref_total();
 	});
 	
-	$('.ref_amount_textbox').live("keyup",function() {
+	$('.ref_amount_textbox').die().live("keyup",function() {
 		do_ref_total();
 	});
 	

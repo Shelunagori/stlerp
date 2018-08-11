@@ -6192,6 +6192,13 @@ class InvoicesController extends AppController
 		$this->set(compact('Invoices','url'));
 	}
 	
+	
+	public function invoiceReceivableReport(){
+		$Invoices =$this->Invoices->find();
+		pr($Invoices->toArray());exit;
+		$this->set(compact('Invoices','url'));
+	}
+	
 	/* public function InvoiceList()
 		{
 			$session = $this->request->session();
