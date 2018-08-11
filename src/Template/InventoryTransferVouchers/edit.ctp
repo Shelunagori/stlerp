@@ -163,9 +163,7 @@ if($transaction_date <  $start_date ) {
 							<th>Item</th>
 							<th >Qty</th>
 							<th>Serial Number</th>
-							<th >Rate</th>
-							<th></th>
-							<th></th>
+							
 						</tr>
 					</thead>
 					<tbody id="maintbody_1">
@@ -203,11 +201,12 @@ if($transaction_date <  $start_date ) {
 										
 									<?php 
 									//pr($inventory_transfer_voucher_row_in); exit;
-									$i=1; $k=0;  $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
+									$i=0; $k=0;  $p=0; foreach($inventory_transfer_voucher_row_in->item->serial_numbers as $item_serial_number){
 										
 										if($item_serial_number->itv_row_id == $inventory_transfer_voucher_row_in->id 
 										&& $item_serial_number->status=='In'){ 
-											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]); ?>
+											echo $this->Form->input('q', ['label' => false,'type'=>'text','style'=>'width: 120px;','value' => $item_serial_number->name]);
+											echo $this->Form->input('inventory_transfer_voucher_rows[in][0][sr_no]['.$i.']', ['label' => false,'type'=>'hidden','style'=>'width: 120px;','value' => $item_serial_number->name,'class' =>'sr_no']); ?>
 											
 											<?php
 										if(@$parentSerialNo[$item_serial_number->id]!=$item_serial_number->id){ $p++; ?>
@@ -225,13 +224,19 @@ if($transaction_date <  $start_date ) {
 									</div>
 									
 								</td>
-								<td width="20%">
-									<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'style'=>'width: 79px;','value'=>$inventory_transfer_voucher_row_in->amount,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
-								</td>
+								
 								<td>
 								<?php 
-								
-									if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1 || $inventory_transfer_voucher_row_in->quantity==$p){ ?>
+									if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable==1 &&$inventory_transfer_voucher_row_in->quantity==$k){ ?>
+									<?= $this->Html->link('<i class="fa fa-trash"></i> ',
+															['action' => 'DeleteRow', $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
+															[
+																'escape' => false,
+																'class' => 'btn btn-xs red',
+																'confirm' => __('Are you sure, you want to delete {0}?', $inventory_transfer_voucher_row_in->item->name)
+															]
+														) ?>	
+								<?php	}else if($inventory_transfer_voucher_row_in->item->item_companies[0]->serial_number_enable != 1){  ?>
 									<?= $this->Html->link('<i class="fa fa-trash"></i> ',
 															['action' => 'DeleteRow', $inventory_transfer_voucher_row_in->id,$inventory_transfer_voucher_row_in->inventory_transfer_voucher_id,$inventory_transfer_voucher_row_in->item_id], 
 															[
@@ -432,7 +437,7 @@ $(document).ready(function() {
 		}else{
 			$('.add_in_row').css("display", "");
 		}
-		alert(j); 
+		
 	}
 	
 	
@@ -475,14 +480,20 @@ $(document).ready(function() {
 	
 	
 	function sr_nos(tr_obj,serial_number_enable,old_qty){  
-		//var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable');  
+		//var serial_number_enable=tr_obj.find('td:nth-child(1) select option:selected').attr('serial_number_enable'); 
+	
 		if(serial_number_enable==1){
 			var OriginalQty=tr_obj.find('td:nth-child(2) input').val();  
-			Quantity = OriginalQty.split('.'); qty=Quantity[0];
+			Quantity = OriginalQty.split('.'); qty=Quantity[0]; 
 			var row_no=tr_obj.attr('row_no');
 			tr_obj.find('td:nth-child(3) div.sr_container').html('');
+			var p=parseInt(old_qty);
+			var q=(p+1);
+			//var p=old_qty;
 			for(var w=1; w<=qty-old_qty; w++){ 
-				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+w+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+w+'" required="required" placeholder="serial number '+w+'" class="sr_no" style=" width: 120px;" />');
+				tr_obj.find('td:nth-child(3) div.sr_container').append('<input type="text" name="inventory_transfer_voucher_rows[in]['+row_no+'][sr_no]['+p+']" id="inventory_transfer_voucher_rows-in-'+row_no+'-sr_no-'+p+'" required="required" placeholder="serial number '+q+'" class="sr_no" style=" width: 120px;" />');
+				p++;
+				q++;
 			}
 			rename_input();
 		}else{
@@ -546,7 +557,7 @@ $(document).ready(function() {
 			
 			$(this).find('td:nth-child(2) input.itvrowid1').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][id]", id:"inventory_transfer_voucher_rows-"+j+"-id"});
 			
-			$(this).find('td:nth-child(4) input').attr({name:"inventory_transfer_voucher_rows[in]["+j+"][amount]", id:"inventory_transfer_voucher_rows-"+j+"-amount"}).rules("add", "required");
+			
 			
 			j++; 
 	   });
@@ -557,7 +568,7 @@ $(document).ready(function() {
 		var t=$(this);
 		var row_no=t.closest('tr').attr('row_no');
 		var select_item_id=$(this).find('option:selected').val();
-		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumber']); ?>";
+		var url1="<?php echo $this->Url->build(['controller'=>'InventoryTransferVouchers','action'=>'ItemSerialNumber1']); ?>";
 		url1=url1+'/'+select_item_id,
 		$.ajax({
 			url: url1,

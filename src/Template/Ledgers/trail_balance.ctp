@@ -107,19 +107,24 @@ $url_excel="/?".$url;
 								
 							</tr>
 							<?php } ?>
+							<?php  
+								
+							?>
 							<tr>
 								<td >Opening Stocks</td>
+								<td  scope="col" align="left"><?php  echo round($itemOpeningBalance,2); ?></td>
+								<td colspan="3"></td>
 								<td  scope="col" align="left"><?php echo round($itemOpeningBalance,2); ?></td>
-								<td colspan="5"></td>
+								<td ></td>
 							</tr>
 							<tr>
 								<td colspan="1">Row total</td>
 								<td  scope="col" align="left"><?php echo round($op_dr_total+@$itemOpeningBalance,2); ?></td>
 								<td  scope="col" align="left"><?php echo round(abs($op_cr_total),2); ?></td>
 								<td  scope="col" align="left"><?php echo round($tr_dr_total,2); ?></td>
-								<td  scope="col" align="left"><?php echo round($tr_cr_total,2); ?></td>
-								<td  scope="col" align="left"><?php echo round($cl_dr_total,2); ?></td>
-								<td  scope="col" align="left"><?php echo round($cl_cr_total,2); ?></td>
+								<td  scope="col" align="left"><?php echo round(abs($tr_cr_total),2); ?></td>
+								<td  scope="col" align="left"><?php echo round($cl_dr_total+@$itemOpeningBalance,2); ?></td>
+								<td  scope="col" align="left"><?php echo round(abs($cl_cr_total),2); ?></td>
 								
 							</tr>
 							
