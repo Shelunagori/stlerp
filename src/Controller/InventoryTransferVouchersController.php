@@ -583,7 +583,7 @@ class InventoryTransferVouchersController extends AppController
 			
 			//pr($SerialNumbers->toArray());exit;
 			$flag=1;
-		} pr($SerialNumbers->toArray());exit;
+		} 
 		$this->set(compact('SerialNumbers','flag','select_item_id','selectedSerialNumbers'));
     }
 	public function ItemSerialNumber1($select_item_id = null)
@@ -739,7 +739,7 @@ class InventoryTransferVouchersController extends AppController
 			
 			
 			if ($this->InventoryTransferVouchers->save($inventoryTransferVoucher)) { 
-				
+				//pr($inventoryTransferVoucher); exit;
 				$this->InventoryTransferVouchers->ItemLedgers->deleteAll(['source_id'=>$inventoryTransferVoucher->id,'source_model'=>'Inventory Transfer Voucher','company_id'=>$st_company_id]);
 				$this->InventoryTransferVouchers->Items->SerialNumbers->deleteAll(['itv_id'=>$inventoryTransferVoucher->id,'company_id'=>$st_company_id,'SerialNumbers.status'=>'Out']);
 				//pr($inventoryTransferVoucher->inventory_transfer_voucher_rows); exit;
@@ -841,7 +841,9 @@ class InventoryTransferVouchersController extends AppController
 										->execute();
 								}		
 							}
-							$query= $this->InventoryTransferVouchers->ItemLedgers->query();
+							
+						}
+						$query= $this->InventoryTransferVouchers->ItemLedgers->query();
 								$query->insert(['item_id','quantity' ,'rate', 'in_out','source_model','company_id','processed_on','source_id','source_row_id'])
 									  ->values([
 													'item_id' => $inventoryTransferVoucher_data1->item_id,
@@ -861,11 +863,10 @@ class InventoryTransferVouchersController extends AppController
 									->where(['inventory_transfer_voucher_id'=>$inventoryTransferVoucher->id,'status' => 'In'])
 									->execute();
 							
-						}
 					}
 				}
 				
-				exit;
+				
 				$this->Flash->success(__('The inventory transfer voucher has been saved.'));
 				return $this->redirect(['action' => 'index']);
             } else {
@@ -1733,8 +1734,12 @@ class InventoryTransferVouchersController extends AppController
 		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->deleteAll(['id'=>$row_id]); 
 		$this->InventoryTransferVouchers->Items->SerialNumbers->deleteAll(['itv_id'=>$id,'company_id'=>$st_company_id,'SerialNumbers.status'=>'In','SerialNumbers.item_id'=>$item_id]); 
 		$ItemLedger=$this->InventoryTransferVouchers->InventoryTransferVoucherRows->Items->ItemLedgers->deleteAll(['source_id'=>$id,'item_id'=>$item_id,'in_out'=>'In','source_model'=>'Inventory Transfer Voucher']);
+		
 		$id = $this->EncryptingDecrypting->encryptData($id);
-		return $this->redirect(['action' => 'edit/'.$id]);
+		//pr($id); exit;
+		return $this->redirect(['action' => 'edit',$id]);
+		//return $this->redirect(['action' => 'edit/'.$id]);
+		//return $this->redirect(['action' => 'edit.'.$id]);
 	}
 	public function itvData(){
 	$this->viewBuilder()->layout('');
