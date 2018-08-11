@@ -15,7 +15,7 @@
 			: Select a Sales-Order to convert into Invoice
 			<?php }elseif($gst=="true"){ ?>
 			: Select a Sales-Order to convert into Tax Invoice
-			<?php }  elseif($copy_request=="copy"){?>
+			<?php }  elseif($copy_request=="copy"){ ?>
 			: Select a Sales-Order to Copy <?php }
 			  elseif($gst_copy_request=="copy"){ ?>
 			: Select a Sales-Order to Copy
@@ -130,7 +130,7 @@
 						$total_amount=0;
 						foreach ($salesOrders as $salesOrder):
 						$created_by = $salesOrder->created_by;
-						pr($created_by);
+						//pr($created_by);
 							$TotalSalesOrderQuantity=0;
 							$item_ids=[];
 							foreach($salesOrder->sales_order_rows as $sales_order_row){ 

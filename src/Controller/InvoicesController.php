@@ -2230,7 +2230,7 @@ class InvoicesController extends AppController
 			$invoice->invoice_type='GST';
 			$invoice->total_after_pnf=$invoice->total_taxable_value;
 			$invoice->sales_ledger_account=$invoice->sales_ledger_account;
-			
+			$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
 			/* if($invoice->payment_mode=='New_ref'){
 			$invoice->due_payment=$invoice->grand_total;
 			}else{
@@ -2644,6 +2644,7 @@ class InvoicesController extends AppController
 			//pr($invoice->total_taxable_value); exit;
 			$invoice->total_after_pnf=$invoice->total_taxable_value;
 			$invoice->sales_ledger_account=$invoice->sales_ledger_account;
+			$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
 			//$invoice->edited_on =$edited_on; 
 			//$invoice->edited_by=$edited_by;
 			$invoice->edited_on = date("Y-m-d"); 
