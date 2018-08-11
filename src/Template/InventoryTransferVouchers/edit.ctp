@@ -432,10 +432,13 @@ $(document).ready(function() {
 		$("#main_table_1 tbody#maintbody_1 tr.main").each(function(){
 			j++;
 		});
-		if(j >= 1){
+		if(j >= 1){ 
 			$('.add_in_row').css("display", "none");
 		}else{
-			$('.add_in_row').css("display", "");
+			$('.add_in_row').css("display", "none");
+			var tr2=$("#sampletable_1 tbody tr").clone();
+			$("#main_table_1 tbody#maintbody_1").append(tr2);
+			rename_rows_in();
 		}
 		
 	}
@@ -724,9 +727,9 @@ $(document).ready(function() {
 				<?php echo $this->Form->input('q', ['type' => 'text','label' => false,'class' => 'form-control input-sm qty_bx_in','old_qty'=>0,'placeholder' => 'Quantity']); ?>
 			</td>
 			<td width="20%" ><div class="offset sr_container"></div></td>
-			<td width="20%">
+			<!--<td width="20%">
 				<?php echo $this->Form->input('amount', ['type' => 'text','label' => false,'class' => 'form-control input-sm ','placeholder' => 'Rate']); ?>
-			</td>
+			</td>-->
 			<td width="20%"><a class="btn btn-xs btn-default deleterow_1" href="#" role='button'><i class="fa fa-times"></i></a></td>
 		</tr>
 	</tbody>

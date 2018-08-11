@@ -1657,7 +1657,7 @@ class SalesOrdersController extends AppController
 			} catch (Exception $e) {
 					echo 'Exception : ',  $e->getMessage(), "\n";
 				}	
-			$email->send();
+			//$email->send();
 		}	
 		return;
 	}
