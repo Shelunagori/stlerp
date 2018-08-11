@@ -6194,7 +6194,7 @@ class InvoicesController extends AppController
 	
 	
 	public function invoiceReceivableReport(){
-		$Invoices =$this->Invoices->find();
+		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails']);
 		pr($Invoices->toArray());exit;
 		$this->set(compact('Invoices','url'));
 	}
