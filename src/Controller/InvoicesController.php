@@ -6194,9 +6194,23 @@ class InvoicesController extends AppController
 	
 	
 	public function invoiceReceivableReport(){
-		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails']);
-		pr($Invoices->toArray());exit;
-		$this->set(compact('Invoices','url'));
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$this->viewBuilder()->layout('index_layout');
+		$st_year_id = $session->read('st_year_id');
+		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails','Customers'])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id]);
+		//pr($Invoices->toArray());exit;
+		$Receiptdatas=[];
+		$Receiptdatas=[];
+		foreach($Invoices as $invoice){ 
+			foreach($invoice->reference_details as $reference_detail){
+				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0]);
+				$Receiptdatas[$invoice->id]=$References->toArray();
+				
+			}
+		}
+		
+		$this->set(compact('Invoices','url','Receiptdatas'));
 	}
 	
 	/* public function InvoiceList()

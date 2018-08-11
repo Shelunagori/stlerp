@@ -91,6 +91,7 @@ class ReferenceDetailsTable extends Table
             'joinType' => 'INNER'
         ]);
 		$this->belongsTo('PettyCashVouchers');
+		$this->belongsTo('Receipts');
     }
 
     /**
