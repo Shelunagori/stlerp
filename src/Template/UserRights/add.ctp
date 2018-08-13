@@ -602,6 +602,16 @@ fieldset legend {
 						</div>
 				</div>
 				<div class="col-md-3">
+					<div class="titletext"><b>Invoice Receivable Report</b></div>
+						<div class="checkbox-list">
+							<label class="checkbox-inline">
+								<?php 
+								if(in_array(222,$page_ids)){ $checked_status='checked'; }else{ $checked_status=''; }
+								echo $this->Form->input('user_rights.222.page_id', ['label' => 'View','class' => '','type'=>'checkbox','value'=>222,$checked_status]); ?>
+							</label>
+						</div>
+				</div>
+				<div class="col-md-3">
 					<div class="titletext"><b>Material Indent Report</b></div>
 						<div class="checkbox-list">
 							<label class="checkbox-inline">

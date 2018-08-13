@@ -6198,8 +6198,33 @@ class InvoicesController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		$this->viewBuilder()->layout('index_layout');
 		$st_year_id = $session->read('st_year_id');
-		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails','Customers'])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id]);
-		//pr($Invoices->toArray());exit;
+		
+		
+		$cust_name  = $this->request->query('cust_name');
+		$From  = $this->request->query('From');
+		$To  = $this->request->query('To');
+		$reciept  = $this->request->query('reciept');
+		
+		$where=[];
+		if(!empty($cust_name)){
+			$where['Customers.customer_name LIKE']='%'.$cust_name.'%';
+		}
+		
+		if(!empty($From)){
+			$From=date("Y-m-d",strtotime($this->request->query('From')));
+			$where['Invoices.date_created >=']=$From;
+		}
+		
+		if(!empty($To)){
+			$To=date("Y-m-d",strtotime($this->request->query('To')));
+			$where['Invoices.date_created <=']=$To;
+		}
+		
+		
+		
+		
+		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails','Customers'])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->where($where)->order(['Invoices.date_created'=>'DESC']);
+		
 		$Receiptdatas=[];
 		$Receiptdatas=[];
 		foreach($Invoices as $invoice){ 
@@ -6210,7 +6235,7 @@ class InvoicesController extends AppController
 			}
 		}
 		
-		$this->set(compact('Invoices','url','Receiptdatas'));
+		$this->set(compact('Invoices','url','Receiptdatas','cust_name','From','To','reciept'));
 	}
 	
 	/* public function InvoiceList()
