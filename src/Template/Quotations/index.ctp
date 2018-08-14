@@ -163,8 +163,8 @@ if(!empty($status)){
 						if($quotation->status=='Converted Into Sales Order'){ $tr_color='#f4f4f4'; }
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
-						
-						 //if(in_array($quotation->customer->employee_id,$allowed_emp)){
+						//pr($allowed_acc);
+						 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || $quotation->created_by == $s_employee_id || $quotation->employee_id == $s_employee_id){
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?>
@@ -204,17 +204,19 @@ if(!empty($status)){
 							<?php if($status=='Converted into Sales Order' && in_array(21,$allowed_pages)){?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); 
 							} ?>
-							<?php //if(in_array($quotation->customer->employee_id,$allowed_emp)){ ?>
+							<?php //if(in_array($quotation->customer->employee_id,$allowed_emp)){ 
+								
+							?>
 							
-							<?php if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date && date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  { ?>
-								<?php if($quotation->status=='Pending' and $gst_pull_request!="true" and in_array(2,$allowed_pages) and $pull_request!="true" && $copy_request!="copy"){ ?>
+							<?php if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date && date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  {  ?>
+								<?php if($quotation->status=='Pending' and $gst_pull_request!="true"  and $pull_request!="true" && $copy_request!="copy"){ ?>
 								<?php if(in_array(21,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								
 							<?php } ?>	
 							<a href="#" class="btn btn-xs blue tooltips  select_term_condition" qwerty="<?php echo $quotation_id; ?>" data-original-title="Pending Item"><i class="fa fa-eye"></i></a>
 								<?php
-								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id)
+								 if(!in_array(date("m-Y",strtotime($quotation->created_on)),$closed_month) && $st_year_id==$quotation->financial_year_id and in_array(2,$allowed_pages))
 								 { ?>
 								<div class="btn-group dropup">
 									<button type="button" class="btn btn-xs blue dropdown-toggle" data-toggle="dropdown"><i class="fa fa-pencil-square-o"></i></button>
@@ -274,7 +276,7 @@ if(!empty($status)){
 						</tr>
 						
 						 <?php 
-						 //}
+						 }
 						 endforeach; ?>
 					</tbody>
 					<tfoot>
