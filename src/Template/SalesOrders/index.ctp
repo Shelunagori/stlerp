@@ -138,7 +138,7 @@
 								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
 							}
 							@$salesOrder->quotation->id = $EncryptingDecrypting->encryptData(@$salesOrder->quotation->id);
-				if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
+				 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || ($quotation->created_by == $s_employee_id) || ($quotation->employee_id == $s_employee_id)){
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   

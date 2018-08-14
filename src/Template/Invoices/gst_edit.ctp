@@ -919,6 +919,7 @@ $(document).ready(function() {
 				$(this).find('td:nth-child(1) input.invoiceid').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(1) input.hiddenid').attr({ name:"q", readonly:"readonly"});
 				$(this).find('td:nth-child(2) input.item_ids').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
+				$(this).find("td:nth-child(2) input.customer_item_code").attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(3) input.quantity').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(4) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
 				$(this).find('td:nth-child(5) input').attr({ name:"q", readonly:"readonly"}).rules( "remove", "required" );
