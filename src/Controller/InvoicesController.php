@@ -2230,8 +2230,8 @@ class InvoicesController extends AppController
 			$invoice->invoice_type='GST';
 			$invoice->total_after_pnf=$invoice->total_taxable_value;
 			$invoice->sales_ledger_account=$invoice->sales_ledger_account;
-			if(!empty($invoice->e_way_bill_no)){
-				$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
+			if(!empty(@$this->request->data['e_way_bill_no'])){
+				$invoice->e_way_bill_no=@$this->request->data['e_way_bill_no'];
 			}
 			
 			/* if($invoice->payment_mode=='New_ref'){
