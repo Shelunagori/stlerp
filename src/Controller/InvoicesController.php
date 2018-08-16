@@ -2230,7 +2230,10 @@ class InvoicesController extends AppController
 			$invoice->invoice_type='GST';
 			$invoice->total_after_pnf=$invoice->total_taxable_value;
 			$invoice->sales_ledger_account=$invoice->sales_ledger_account;
-			$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
+			if(!empty($invoice->e_way_bill_no)){
+				$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
+			}
+			
 			/* if($invoice->payment_mode=='New_ref'){
 			$invoice->due_payment=$invoice->grand_total;
 			}else{
@@ -2644,13 +2647,16 @@ class InvoicesController extends AppController
 			//pr($invoice->total_taxable_value); exit;
 			$invoice->total_after_pnf=$invoice->total_taxable_value;
 			$invoice->sales_ledger_account=$invoice->sales_ledger_account;
-			$invoice->e_way_bill_no=$this->request->data['e_way_bill_no'];
+			if(!empty(@$this->request->data['e_way_bill_no'])){
+				$invoice->e_way_bill_no=@$this->request->data['e_way_bill_no'];
+			}
+			
 			//$invoice->edited_on =$edited_on; 
 			//$invoice->edited_by=$edited_by;
 			$invoice->edited_on = date("Y-m-d"); 
 			$invoice->edited_by=$this->viewVars['s_employee_id'];
 			
-			
+			//pr($invoice);exit;
 			if ($this->Invoices->save($invoice)) {
 				
 				
@@ -2987,7 +2993,7 @@ class InvoicesController extends AppController
                 $this->Flash->success(__('The invoice has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
-            } else {  //pr($invoice); exit;
+            } else {  pr($invoice); exit;
                 $this->Flash->error(__('The invoice could not be saved. Please, try again.'));
             }
         }
