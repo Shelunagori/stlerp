@@ -279,12 +279,19 @@ if(!empty($status)){
 						 }
 						 endforeach; ?>
 					</tbody>
+					
 					<tfoot>
 						<tr>
 							<td colspan="6" style="text-align:right"><b>Total</b></td>
 							<td style="text-align:right"><b><?php echo $this->Money->indianNumberFormat($total_amount);?></b></td>
 							<td style="text-align:right"><b></b></td>
 							<td style="text-align:right"><b></b></td>
+							<?php 
+								if($status == "Closed"){ ?>
+								<td></td>
+								<td></td>
+							<?php	}
+							?>		
 						</tr>
 					</tfoot>
 				</table>

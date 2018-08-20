@@ -39,7 +39,7 @@
 	<tbody>
 		<?php $i=0; foreach ($quotations as $quotation): 
 		if($status==$quotation->status){
-			if(in_array($quotation->customer->employee_id,$allowed_emp)){
+			 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || $quotation->created_by == $s_employee_id || $quotation->employee_id == $s_employee_id){
 		?>
 		<tr >
 			<td><?= h(++$i) ?></td>
