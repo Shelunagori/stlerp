@@ -135,6 +135,7 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
     }
 	
+	
 	public function SalesReturnIndex($status=null){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
@@ -6237,7 +6238,6 @@ class InvoicesController extends AppController
 			foreach($invoice->reference_details as $reference_detail){
 				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0]);
 				$Receiptdatas[$invoice->id]=$References->toArray();
-				
 			}
 		}
 		
