@@ -135,7 +135,6 @@ class InvoicesController extends AppController
 		$this->set(compact('url'));
     }
 	
-	
 	public function SalesReturnIndex($status=null){
 		$this->viewBuilder()->layout('index_layout');
 		$url=$this->request->here();
@@ -3416,7 +3415,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3441,7 +3440,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3543,7 +3542,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3568,7 +3567,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3659,7 +3658,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" ||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes")
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3684,7 +3683,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3783,7 +3782,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3808,7 +3807,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3905,7 +3904,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -3930,7 +3929,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4036,7 +4035,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" ||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes")
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4061,7 +4060,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4142,7 +4141,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4169,7 +4168,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{   
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ //pr($voucherLedgerData);
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4318,7 +4317,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4343,7 +4342,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4445,7 +4444,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4470,7 +4469,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4561,7 +4560,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" ||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes")
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4586,7 +4585,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4685,7 +4684,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4710,7 +4709,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4807,7 +4806,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4832,7 +4831,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4938,7 +4937,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -4963,7 +4962,7 @@ class InvoicesController extends AppController
 					$voucherLedgerDatas = $this->Invoices->Ledgers->find()->where($where3)->where(['Ledgers.ledger_account_id'=>$LedgerAccount['id'],'Ledgers.company_id'=>$st_company_id])->contain(['LedgerAccounts'])->toArray();
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{ 
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -5044,7 +5043,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher"||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes" )
 							{ 
 								$voucherLedgerDetailIgst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceIgst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -5071,7 +5070,7 @@ class InvoicesController extends AppController
 					
 						foreach($voucherLedgerDatas as $voucherLedgerData)
 						{   
-							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" )
+							if($voucherLedgerData->voucher_source=="Payment Voucher" ||$voucherLedgerData->voucher_source=="Contra Voucher" ||$voucherLedgerData->voucher_source=="Journal Voucher" ||$voucherLedgerData->voucher_source=="Non Print Payment Voucher" ||$voucherLedgerData->voucher_source=="Petty Cash Payment Voucher" ||$voucherLedgerData->voucher_source=="Receipt Voucher" ||$voucherLedgerData->voucher_source=="Credit Notes" ||$voucherLedgerData->voucher_source=="Debit Notes")
 							{ //pr($voucherLedgerData);
 								$voucherLedgerDetailsGst[$voucherLedgerData->id]=$voucherLedgerData;
 								$voucherSourceGst[$voucherLedgerData->id]=$voucherLedgerData->voucher_source;
@@ -6238,6 +6237,7 @@ class InvoicesController extends AppController
 			foreach($invoice->reference_details as $reference_detail){
 				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0]);
 				$Receiptdatas[$invoice->id]=$References->toArray();
+				
 			}
 		}
 		
