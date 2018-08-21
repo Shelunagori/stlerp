@@ -42,7 +42,7 @@
 	<?php 
 			$ClosingBalanceLedgerWise=[];
 			foreach($LedgerAccounts as $LedgerAccount){
-				if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+				if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp) || in_array(@$LedgerAccount->customer->employee_id,$allowed_acc) || ($LedgerAccount->customer->employee_id == $s_employee_id)){
 					$ttlamt=round(@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount'],2);
 					
 					if($amountType=='Zero' && $ttlamt==0){
@@ -58,30 +58,13 @@
 					}else{
 						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
 					}
-				}else if(@$Emp_department_id->dipartment_id == 2){
-					$ttlamt=round(@$Outstanding[$LedgerAccount->id]['Slab1']+@$Outstanding[$LedgerAccount->id]['Slab2']+@$Outstanding[$LedgerAccount->id]['Slab3']+@$Outstanding[$LedgerAccount->id]['Slab4']+@$Outstanding[$LedgerAccount->id]['Slab5']+@$Outstanding[$LedgerAccount->id]['NoDue']+@$Outstanding[$LedgerAccount->id]['OnAccount'],2);
-					
-					if($amountType=='Zero' && $ttlamt==0){
-						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
-					}else if($amountType=='Positive' && $ttlamt > 0 ){ 
-						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
-					}else if($amountType=='Negative' && $ttlamt < 0 ){
-						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
-						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
-					}else if($amountType=='All'){
-						//$ClosingBalanceLedgerWise[$LedgerAccount->id]= $ttlamt;
-						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "Yes";
-					}else{
-						$ClosingBalanceLedgerWise[$LedgerAccount->id]= "No";
-					}
-					
 				}
 			}
 		//	pr($amountType); exit;
 			$sr=0; $ClosingBalance=0; 
 			$ColumnOnAccount=0; $ColumnOutStanding=0; $ColumnNoDue=0; $ColumnClosingBalance=0;
 			foreach($LedgerAccounts as $LedgerAccount){ 
-			if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp)){
+			if(in_array(@$LedgerAccount->customer->employee_id,@$allowed_emp) || in_array(@$LedgerAccount->customer->employee_id,$allowed_acc) || ($LedgerAccount->customer->employee_id == $s_employee_id)){
 				if($ClosingBalanceLedgerWise[$LedgerAccount->id]=="Yes"){
 			?>
 			<tr>

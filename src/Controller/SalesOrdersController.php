@@ -58,6 +58,7 @@ class SalesOrdersController extends AppController
 		$gst=$this->request->query('gst');
 		$Actionstatus=$this->request->query('Actionstatus');
 		$s_employee_id = $this->viewVars['s_employee_id'];
+		$allowed_acc = $this->viewVars['allowed_acc'];
 
 		$this->set(compact('sales_order_no','customer','po_no','product','From','To','file','pull_request','items','gst'));
 		/* if(!empty($company_alise)){
@@ -115,7 +116,7 @@ class SalesOrdersController extends AppController
             'contain' => ['Customers']
         ];
 		//
-		//pr($where1);exit;
+		//pr($salesman_name);exit;
 		$styear=[1,3,2];
 			if(in_array($st_year_id,$styear)){ 
 				if(!empty($items) && empty($Actionstatus) || !empty($item_group) || !empty($item_subgroup)){ 
@@ -315,13 +316,44 @@ class SalesOrdersController extends AppController
 		
 	
 		$Items = $this->SalesOrders->SalesOrderRows->Items->find('list')->order(['Items.name' => 'ASC']);
-        $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
+        /* $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
 					'Departments', function ($q) use($items,$st_company_id) {
 						return $q->where(['Departments.id' =>1]);
 					}
+				); */
+		$salesOrders = $salesOrders->contain(['Employees'=>function($q) use($st_company_id){
+			return $q->matching(
+					'Employees.Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>3]);
+					}
 				);
-		/* $EMP_ID =[23,16,17];
-		if(in_array($s_employee_id,$EMP_ID)){
+		}]);		
+		
+	
+		$created_by=[];		
+		foreach($salesOrders as $salesOrder){
+			if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
+				$created_by[] = $salesOrder->created_by;
+			}
+		}		
+		
+		 $SalesMansEmps = $this->SalesOrders->Employees->find()->matching(
+						'Departments', function ($q) use($st_company_id) {
+							return $q->where(['Departments.id' =>3]);
+						}
+					);
+						
+		$smemps=[];			
+		foreach($SalesMansEmps as $smemp){ 
+			if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
+				$smemps[] = $smemp->id;
+			}
+		}
+		//pr($created_by);exit;
+		$EMP_ID =[23,16,17];
+		//pr($created_by);exit;
+		//pr($smemps);
+		/*  if((in_array($s_employee_id,$EMP_ID) || in_array($s_employee_id,$allowed_acc)) || in_array($smemps,$created_by)){
 			 $SalesMans = $this->SalesOrders->Employees->find('list')->matching(
 						'Departments', function ($q) use($st_company_id) {
 							return $q->where(['Departments.id' =>1]);
@@ -333,10 +365,18 @@ class SalesOrdersController extends AppController
 							return $q->where(['Departments.id' =>1]);
 						}
 					)->where(['Employees.id'=>$s_employee_id]);
-		}		 */	
+		} */	
+		
+		
+		$SalesMans = $this->SalesOrders->Employees->find('list')->matching(
+						'Departments', function ($q) use($st_company_id) {
+							return $q->where(['Departments.id' =>1]);
+						}
+					);
+	
 		$ItemGroups = $this->SalesOrders->SalesOrderRows->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
 		$ItemSubGroups = $this->SalesOrders->SalesOrderRows->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);		
-	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty','Actionstatus','st_year_id','ItemGroups','ItemSubGroups','item_subgroup','item_group','item_category'));
+	 $this->set(compact('salesOrders','status','copy_request','gst_copy_request','job_card','SalesOrderRows','Items','gst','SalesMans','salesman_name','total_sales','total_qty','Actionstatus','st_year_id','ItemGroups','ItemSubGroups','item_subgroup','item_group','item_category','created_by'));
 		 $this->set('_serialize', ['salesOrders']);
 		$this->set(compact('url'));
 		

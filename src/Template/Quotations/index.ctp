@@ -164,7 +164,7 @@ if(!empty($status)){
 						if($quotation->status=='Pending'){ $tr_color='#FFF'; }
 						if($quotation->status=='Closed'){ $tr_color='#FFF'; }
 						//pr($allowed_acc);
-						 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || $quotation->created_by == $s_employee_id || $quotation->employee_id == $s_employee_id){
+						 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || $quotation->created_by == $s_employee_id || $quotation->employee_id == $s_employee_id || $gst_pull_request=='true'){
 						?>
 						<tr>
 							<td><?= h(++$page_no) ?>

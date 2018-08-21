@@ -35,7 +35,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($salesOrders as $salesOrder){ 
-						if(in_array($salesOrder->customer->employee_id,$allowed_emp)){
+						 if((in_array($salesOrder->customer->employee_id,$allowed_emp) || in_array($salesOrder->customer->employee_id,$allowed_acc)) || ($salesOrder->created_by == $s_employee_id) || ($salesOrder->employee_id == $s_employee_id)){
 						if($status=='Converted Into Invoice' ){
 							if(@$total_sales[@$salesOrder->id] == @$total_qty[@$salesOrder->id] && $st_year_id==@$salesOrder->financial_year_id){ 
 							

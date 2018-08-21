@@ -84,7 +84,12 @@
 						if($invoice->status=='Pending'){ $tr_color='#FFF'; }
 						if($invoice->status=='Cancel'){ $tr_color='#FFF'; }
 						?>
-						<?php if(sizeof($invoice->invoice_rows) > 0){ ?>
+						<?php 
+						 if((in_array($invoice->customer->employee_id,$allowed_emp) || in_array($invoice->customer->employee_id,$allowed_acc)) || ($invoice->created_by == $s_employee_id) || ($invoice->employee_id == $s_employee_id) || $inventory_voucher == 'true'){
+						
+						
+						
+						if(sizeof($invoice->invoice_rows) > 0){ ?>
 						<tr>
 							<td><?php echo ++$i; ?></td>
 							<td>
@@ -163,7 +168,7 @@
 								
 							</td>
 						</tr>
-							<?php }  endforeach; ?>
+						 <?php }}  endforeach; ?>
 					</tbody>
 				</table>
 				</div>

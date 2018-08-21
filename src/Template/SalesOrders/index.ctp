@@ -30,7 +30,7 @@
 			if($status==null or $status=='Pending'){ $class1='btn btn-primary'; }else{ $class1='btn btn-default'; }
 			if($status=='Converted Into Invoice'){ $class2='btn btn-primary'; }else{ $class2='btn btn-default'; }
 			?>
-						<?php if($Actionstatus=="IndexPage"){ ?>
+			<?php if($Actionstatus=="IndexPage"){ ?>
 				<?= $this->Html->link(
 					'Pending',
 					'/Sales-Orders/index/Pending',
@@ -72,13 +72,9 @@
 							<td width="15%">
 								<input type="text" name="po_no" class="form-control input-sm" placeholder="PO No." value="<?php echo @$po_no; ?>">
 							</td>
-							<?php
-							$EMP_ID =[23,16,17];
-							if(in_array($s_employee_id,$EMP_ID)){ ?>
-								<td width="15%"><?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman) ]); ?></td>
-							<?php }else{ ?>
-								<td width="15%"><?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$s_employee_id) ]); ?></td>
-							<?php } ?>
+							
+								 <td width="15%"><?php echo $this->Form->input('salesman_name', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$s_employee_id) ]); ?></td>
+							
 							
 						</tr>
 					</tbody>
@@ -114,7 +110,7 @@
 					<thead>
 						<tr>
 							<th width="5%" >S. No.</th>
-							<th width="15%" >Sales Order No</th>
+							<th width="15%">Sales Order No</th>
 							<th width="15%" >Quotation No</th>
 							<th width="15%">Customer</th>
 							<th width="10%">PO No.</th>
@@ -138,7 +134,7 @@
 								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
 							}
 							@$salesOrder->quotation->id = $EncryptingDecrypting->encryptData(@$salesOrder->quotation->id);
-				 if((in_array($quotation->customer->employee_id,$allowed_emp) || in_array($quotation->customer->employee_id,$allowed_acc)) || ($quotation->created_by == $s_employee_id) || ($quotation->employee_id == $s_employee_id)){
+				 if((in_array($salesOrder->customer->employee_id,$allowed_emp) || in_array($salesOrder->customer->employee_id,$allowed_acc)) || ($salesOrder->created_by == $s_employee_id) || ($salesOrder->employee_id == $s_employee_id) || $gst == 'true'){
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
@@ -149,8 +145,15 @@
 							<td><?= h(($salesOrder->so1.'/SO-'.str_pad($salesOrder->so2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->so3.'/'.$salesOrder->so4)) ?></td>
 							<?php if($salesOrder->quotation_id != 0){ ?>
 							<td>
-							<?php echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
-							'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank')); ?>
+							<?php 
+								if(in_array(21,$allowed_pages)){
+									echo $this->Html->link($salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
+									'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank'));
+								}else{
+									echo $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4;
+								}
+							
+							 ?>
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
 							<td><?= h($salesOrder->customer_po_no); ?></td>
@@ -197,8 +200,13 @@
 							<?php //if(in_array($salesOrder->customer->employee_id,$allowed_emp)){  
 							//$quotation_id = $EncryptingDecrypting->encryptData($salesOrder->quotation->id);
 							?>
-							<?php echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
-							'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank')); ?>
+							<?php 
+								if(in_array(21,$allowed_pages)){
+									echo $this->Html->link( $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4,[
+									'controller'=>'Quotations','action' => 'confirm', $salesOrder->quotation->id],array('target'=>'_blank')); 
+								}else{
+									echo $salesOrder->quotation->qt1.'/QT-'.str_pad($salesOrder->quotation->qt2, 3, '0', STR_PAD_LEFT).'/'.$salesOrder->quotation->qt3.'/'.$salesOrder->quotation->qt4;
+								}	?>
 							<?php //} ?>
 							</td><?php }else{ ?><td>-</td><?php } ?>
 							<td><?php echo $salesOrder->customer->customer_name.'('.$salesOrder->customer->alias.')' ?></td>
