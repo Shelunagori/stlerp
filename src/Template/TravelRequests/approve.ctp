@@ -59,13 +59,14 @@
     </div>
 	<form method="post">
 		<label class="control-label  label-css">Advance Amount</label>
-		<?php echo $this->Form->input('advance_amt', ['label' => false, 'type'=>'text','placeholder'=>'0.00','style'=> 'text-align:  right;', 'required', 'value'=>$travelRequest->advance_amt]); ?><br/>
+		<?php echo $this->Form->input('advance_amt', ['label' => false, 'type'=>'text','placeholder'=>'0.00','style'=> 'text-align:  right;',  'value'=>$travelRequest->advance_amt]); ?><br/>
 		
 		<label class="control-label  label-css">Transaction Date</label>
-		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text', 'required', 'value'=>$travelRequest->trans_date==null?'':$travelRequest->trans_date->format('d-m-Y')]); ?><br/>
+		<?php echo $this->Form->input('trans_date', ['label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'date-picker','data-date-format'=>'dd-mm-yyyy', 'type'=>'text', 'value'=>$travelRequest->trans_date==null?'':$travelRequest->trans_date->format('d-m-Y')]); ?><br/>
 		
 		<label class="control-label  label-css">Bank</label><br/>
 		<select name="bank_id">
+			<option value="">Select</option>
 			<?php foreach($bankCashes as $bank_id=>$bankName){
 				if($bank_id == "145"){
 					echo '<option value="'.$bank_id.'" selected>'.$bankName.'</option>';
