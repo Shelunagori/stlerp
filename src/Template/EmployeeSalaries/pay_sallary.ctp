@@ -140,7 +140,11 @@
 <input type="text" name="trans_date" class="date-picker" data-date-format='dd-mm-yyyy' value="<?php echo date('d-m-Y'); ?>" data-date-format="d-m-Y" >
 <select name="bank_id">
 	<?php foreach($bankCashes->toArray() as $bank_id=>$bank_name){
-		echo '<option value="'.$bank_id.'">'.$bank_name.'</option>';
+		if($bank_id == "145"){
+			echo '<option value="'.$bank_id.'" selected>'.$bank_name.'</option>';
+		}else{
+			echo '<option value="'.$bank_id.'">'.$bank_name.'</option>';
+		}
 	} ?>
 </select>
 <button type="submit" class="btn blue genertSlry">GENERATE SALARY</button>

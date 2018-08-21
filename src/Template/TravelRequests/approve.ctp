@@ -67,7 +67,11 @@
 		<label class="control-label  label-css">Bank</label><br/>
 		<select name="bank_id">
 			<?php foreach($bankCashes as $bank_id=>$bankName){
-				echo '<option value="'.$bank_id.'">'.$bankName.'</option>';
+				if($bank_id == "145"){
+					echo '<option value="'.$bank_id.'" selected>'.$bankName.'</option>';
+				}else{
+					echo '<option value="'.$bank_id.'">'.$bankName.'</option>';
+				}
 			}?>
 		</select>
 	<button type="submit" class="btn blue">Approve</button>

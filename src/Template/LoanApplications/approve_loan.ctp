@@ -121,7 +121,11 @@
 					<label class="control-label  label-css">Bank</label><br/>
 					<select name="bank_id" class="form-control input-sm">
 						<?php foreach($bankCashes as $bankId=>$bankName){
-							echo '<option value="'.$bankId.'">'.$bankName.'</option>';
+							if($bankId == "145"){
+								echo '<option value="'.$bankId.'" selected>'.$bankName.'</option>';
+							}else{
+								echo '<option value="'.$bankId.'">'.$bankName.'</option>';
+							}
 						} ?>
 					</select>
 				</div>
