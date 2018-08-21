@@ -35,7 +35,7 @@
 					</thead>
 					<tbody>
 						<?php $i=0; foreach ($invoices as $invoice):
-						if(in_array($invoice->created_by,$allowed_emp)){
+						if((in_array($invoice->customer->employee_id,$allowed_emp) || in_array($invoice->customer->employee_id,$allowed_acc)) || ($invoice->created_by == $s_employee_id) || ($invoice->employee_id == $s_employee_id) || $inventory_voucher == 'true'){
 						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
