@@ -35,7 +35,9 @@
 					<tbody>
 						<?php 
 						$i=0;
-						foreach ($salesOrders as $salesOrder): ?>
+						foreach ($salesOrders as $salesOrder): 
+						$salesOrder->id = $EncryptingDecrypting->encryptData($salesOrder->id);	
+						?>
 						<tr>
 							<td><?= h(++$i) ?></td>
 							<td>
