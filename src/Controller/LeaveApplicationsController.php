@@ -597,16 +597,29 @@ class LeaveApplicationsController extends AppController
 			$empType= "permanent";
 		}
 		
-		$last_month = date('m', strtotime(date('Y-m')." -1 month"));
-		
+		//$last_months = date('m', strtotime(date('Y-m')." -1 month"));
+		$last_month = "04";
+		$tot_month = $current_month-$last_month;
 		$lastMonthleaveapplicationsApproved=	$this->LeaveApplications->find()
-							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date)'=>$last_month])->contain(['LeaveTypes'])->toArray();
-
+							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date) >='=>$last_month])->contain(['LeaveTypes'])->toArray();
+		
+		
 		$leaveapplicationsApproved=	$this->LeaveApplications->find()
 							->where(['employee_id'=>$employee_id, 'leave_status'=>'approved', 'financial_year_id'=>$st_year_id, 'company_id'=>$st_company_id, 'LeaveApplications.id !='=>$leaveAppId,'MONTH(from_leave_date) >='=>$current_month])->contain(['LeaveTypes'])->order(['LeaveApplications.id'=>'DESC'])->first();
+							
 		$leaveapplications=	$this->LeaveApplications->find()
 							->where(['employee_id'=>$employee_id, 'financial_year_id'=>$st_year_id, 'leave_status IN'=>['Pending','approved'], 'company_id'=>$st_company_id, 'LeaveApplications.id'=>$leaveAppId])->contain(['LeaveTypes'])->first();
 		///start code for approved leave count particular employee
+		
+		$day_nos_cl=0;$day_nos_sl=0;
+		foreach($lastMonthleaveapplicationsApproved as $lastMonthleaveapplications_Approved){
+			if($lastMonthleaveapplications_Approved->leave_type_id == "1"){
+				$day_nos_cl = $day_nos_cl+$lastMonthleaveapplications_Approved->day_no;
+			}else if($lastMonthleaveapplications_Approved->leave_type_id == "2"){
+				$day_nos_sl = $day_nos_sl+$lastMonthleaveapplications_Approved->day_no;
+			}
+		}
+		
 		$total_paid_leave = 0;$total_unpaid_leave = 0;
 		$total_uninitimate_leave = 0;$total_prior_leave = 0;$total_withoutprior_leave = 0;
 		$total_past_paid_leave=0.00;$total_past_unpaid_leave=0.00;$total_past_uninitimate_leave=0;$total_past_prior_leave=0;$total_past_withoutprior_leave=0;$sick_leaves=0;$casual_leaves=0;$pre_from_leave_date="00-00-0000";
@@ -641,7 +654,8 @@ class LeaveApplicationsController extends AppController
 		$to_full_half 	 = @$leaveapplications->to_full_half;
 		$day_no 		 = @$leaveapplications->day_no;
 
-		$from_leave_month =	date('m',strtotime(@$leaveapplications->from_leave_date));$to_leave_month   = date('m',strtotime(@$leaveapplications->to_leave_date));
+		$from_leave_month =	date('m',strtotime(@$leaveapplications->from_leave_date));
+		$to_leave_month   = date('m',strtotime(@$leaveapplications->to_leave_date));
 
 		$holidays=	$this->LeaveApplications->Events->find()
 							->where(['is_deleted'=>0,'MONTH(event_start_date) >='=>$current_month,'event_start_date >='=>date('Y-m-d')]);
@@ -657,9 +671,17 @@ class LeaveApplicationsController extends AppController
 			}else if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d1)){
 				$sick_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/4,1);
 			}else if(sizeof($lastMonthleaveapplicationsApproved) > 0){  
-				$sick_leaves = @$leaveapplications->leave_type->maximum_leave_in_month;
+			
+				///start code for carry forward leave SL
+				$tot_max_leave = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
+				if($tot_max_leave > $day_nos_sl){
+					$sick_leaves = abs(@$day_nos_sl-$tot_max_leave);
+				}else{
+					$sick_leaves = @$leaveapplications->leave_type->maximum_leave_in_month;
+				}
+				///ends code for carry forward leave SL
 			}else{
-				$sick_leaves = @$leaveapplications->leave_type->maximum_leave_in_month+$leaveapplications->leave_type->maximum_leave_in_month;
+				$sick_leaves = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
 			}
 			
 			if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d)){
@@ -667,9 +689,16 @@ class LeaveApplicationsController extends AppController
 			}else if($permanent_join_month == $current_month && in_array($permanent_join_mid_month_date,$d1)){
 				$casual_leaves = number_format($leaveapplications->leave_type->maximum_leave_in_month/4,1);
 			}else if(sizeof($lastMonthleaveapplicationsApproved) > 0){ 
-				$casual_leaves = @$leaveapplications->leave_type->maximum_leave_in_month;
+				///start code for carry forward leave CL
+				$tot_max_leave_cl = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
+				if($tot_max_leave_cl > $day_nos_cl){
+					$casual_leaves = abs(@$day_nos_cl-$tot_max_leave_cl);
+				}else{
+					$casual_leaves = @$leaveapplications->leave_type->maximum_leave_in_month;
+				}
+				///ends code for carry forward leave CL
 			}else{
-				$casual_leaves = @$leaveapplications->leave_type->maximum_leave_in_month+$leaveapplications->leave_type->maximum_leave_in_month;
+				$casual_leaves = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
 			}
 		
 		
@@ -728,9 +757,6 @@ class LeaveApplicationsController extends AppController
 							}
 						///ends code for sandwich method	
 						}else{ 
-							
-								
-								
 							if($leaveapplications->leave_type->leave_name == "Sick Leave"){ 
 								
 								$total_past_paid_leave= number_format($total_past_paid_leave,1);

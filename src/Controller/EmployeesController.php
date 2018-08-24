@@ -353,12 +353,30 @@ class EmployeesController extends AppController
 
             }
         }
-        $employe_data = $this->Employees->get($employee_id);
-        $this->set(compact('employe_data', 'Companies', 'customer_Company', 'Company_array', 'employee_id', 'Company_array1','Company_array2'));
+        $employe_data = $this->Employees->get($employee_id,
+							['contain'=>'EmployeeCompanies']
+		);
+		$emp_data=[];$emp_effective_date=[];
+			foreach($employe_data->employee_companies as $data){
+				
+				$emp_data[$data['company_id']]=$data['freeze'];
+				$emp_effective_date[$data['company_id']]=$data['effective_date'];
+			}
+		
+		//pr($emp_data);exit;
+        $this->set(compact('employe_data', 'Companies', 'customer_Company', 'Company_array', 'employee_id', 'Company_array1','Company_array2','emp_data','emp_effective_date'));
 
     }
 
 
+    public function updateffectivedate($employee_id = null,$effective_date = null,$company_id = null){
+		$query_update = $this->Employees->EmployeeCompanies->query();
+							$query_update->update()
+								->set(['effective_date'=>date('Y-m-d',strtotime($effective_date))])
+								->where(['company_id' => $company_id,'employee_id'=>$employee_id])
+								->execute();
+		exit;
+	}
     public function CheckCompany($company_id = null, $employee_id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -437,9 +455,13 @@ class EmployeesController extends AppController
 	public function EmployeeFreeze($company_id=null,$employee_id=null,$freeze=null)
 	{
 		$query2 = $this->Employees->EmployeeCompanies->query();
-		$query2->update()
-			->set(['freeze' => $freeze])
-			->where(['employee_id' => $employee_id,'company_id'=>$company_id])
+				$query2->update();
+		if($freeze == 0){
+			$query2->set(['freeze' => $freeze,'effective_date'=>'0000-00-00']);
+		}else{
+			$query2->set(['freeze' => $freeze]);
+		}
+			$query2->where(['employee_id' => $employee_id,'company_id'=>$company_id])
 			->execute();
 
 		return $this->redirect(['action' => 'EditCompany/'.$employee_id]);

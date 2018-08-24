@@ -1777,4 +1777,45 @@ class InventoryTransferVouchersController extends AppController
 	<?php
 	exit;
 	}
+	
+	
+	public function getInventoryTranferVouchers(){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+		$inventorytransfervouchers=$this->InventoryTransferVouchers->find()
+			->select(['total_rows'=>$this->InventoryTransferVouchers->find()->func()->count('InventoryTransferVoucherRows.id'),'InventoryTransferVoucherRows.status'])
+			->InnerJoinWith('InventoryTransferVoucherRows',function($q){
+				return $q->where(['InventoryTransferVoucherRows.status'=>'In']);
+			})
+			->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id,'InventoryTransferVouchers.in_out'=>'in_out'])
+			->group(['InventoryTransferVouchers.id'])
+			->autoFields(true)
+			->having(['total_rows >' => 1])
+			->contain(['InventoryTransferVoucherRows'=>function($q){
+				return $q->where(['InventoryTransferVoucherRows.status'=>'In']);
+			}])
+			->toArray();
+			
+			?>
+		<table border="1">
+		<tr>
+			<th>ID</th>
+			<th>No</th>
+			<th>Transaction Date</th>
+		</tr>	
+		<?php foreach($inventorytransfervouchers as $InventoryTransferVoucher){
+			
+		?>
+		<tr>
+			<td><?php echo $InventoryTransferVoucher->id; ?></td>
+			<td><?= h('#'.$InventoryTransferVoucher->voucher_no) ?></td>
+			<td><?php echo date('d-m-Y',strtotime($InventoryTransferVoucher->transaction_date)); ?></td>
+			
+		</tr>
+		<?php } ?>
+	</table>
+	<?php
+	exit;
+	}
 }

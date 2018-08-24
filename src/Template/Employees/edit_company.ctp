@@ -15,20 +15,23 @@
 						<th>Company Name</th>
 						<th width="10%">Action</th>
 						<th width="10%">Freeze</th>
-						
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
 				<?php $i=0; foreach ($Company_array as $key=>$Company_array){ $i++;
+			
 				$c_namrr=$Company_array1[$key];
 				$bill_to_bill=@$Company_array2[$key];
+				
 				?>
-					<tr>
+					<tr row_no="<?php echo $key; ?>" class="main_tr">
 						<td><?= h($i) ?></td>
-						<td><?php echo $c_namrr; ?></td>
+						<td><?php echo $c_namrr; ?>
+						<input type="hidden" class="emp_id" value="<?php echo $employee_id; ?>"></td>
 						<td class="actions">
 						 	<?php if($Company_array =='Yes') { ?>
-							 <?= $this->Form->postLink('Added ',
+							 <?= $this->Form->postLink('Added',
 								['action' => 'CheckCompany', $key,$employee_id],
 								[
 									'escape' => false,
@@ -37,7 +40,7 @@
 								]
 							) ?>
 							<?php  } else { ?>
-							<?= $this->Form->postLink('Removed ',
+							<?= $this->Form->postLink('Removed',
 								['action' => 'AddCompany', $key,$employee_id],
 								[
 									'escape' => false,
@@ -49,8 +52,8 @@
 						</td>
 						<td class="actions">
 						 	<?php if($bill_to_bill =='No' && $Company_array=='Yes') { ?>
-							 <?= $this->Form->postLink('Unfreezed ',
-								['action' => 'EmployeeFreeze', $key,$employee_id,$bill_to_bill="1"],
+							 <?= $this->Form->postLink('Unfreezed',
+								['action' => 'EmployeeFreeze',$key,$employee_id,$bill_to_bill="1"],
 								[
 									'escape' => false,
 									'class'=>' blue tooltips','data-original-title'=>'Click To Freeze'
@@ -58,16 +61,29 @@
 								]
 							) ?>
 							<?php  } else if($Company_array=='Yes')  { ?>
-							<?= $this->Form->postLink(' Freezed ',
-								['action' => 'EmployeeFreeze', $key,$employee_id,$bill_to_bill="0"],
+							<?= $this->Form->postLink('Freezed',
+								['action' => 'EmployeeFreeze',$key,$employee_id,$bill_to_bill="0"],
 								[
 									'escape' => false,
-									'class'=>' blue tooltips','data-original-title'=>'Click To Unfreeze'
+									'class'=>' blue tooltips freeze_key','data-original-title'=>'Click To Unfreeze'
 									
 								]
 							) ?>
 							<?php }  ?>
 						</td>
+						<?php if($emp_data[$key] == 1){ ?>
+						<td >
+							<?php 
+								if(date('d-m-Y',strtotime($emp_effective_date[$key])) == "01-01-1970"){
+									echo $this->Form->input('effective_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker effective_date','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Effective Date']);
+								}else{
+									echo $this->Form->input('effective_date', ['type' => 'text','label' => false,'class' => 'form-control input-sm date-picker effective_date','data-date-format' => 'dd-mm-yyyy','placeholder' => 'Effective Date','value'=>@date('d-m-Y',strtotime($emp_effective_date[$key]))]);
+								}
+								 
+							
+							?>
+						</td>
+						<?php } ?>
 					</tr>
 				<?php  } ?>
 				</tbody>
@@ -82,6 +98,24 @@
 <?php echo $this->Html->script('/assets/global/plugins/jquery.min.js'); ?>
 <script>
 $(document).ready(function() {
+	$('.effective_date').live("change",function() {
+		var sel=$(this).closest('tr.main_tr');
+		var effective_date =sel.find('input.effective_date').val();
+		var company_id =sel.attr('row_no');
+		var emp_id =$('.emp_id').val();
+		
+		var url="<?php echo $this->Url->build(['controller'=>'Employees','action'=>'updateffectivedate']); ?>";
+		url=url+'/'+emp_id+'/'+effective_date+'/'+company_id;
+		
+			$.ajax({
+				url: url,
+				type: 'GET',
+			}).done(function(response) {
+				
+				//alert("Save Minimum Stock");
+			});
+	});
+	
 	
 });
 </script>
