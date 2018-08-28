@@ -64,7 +64,7 @@
 				<?php echo $this->Form->input('employee_attendances.'.$i.'.employee_id', ['type' => 'hidden','placeholder'=>'','class'=>'form-control input-sm','value'=>$data->id]); ?>
 			</td>
 			<td>
-				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'style'=>'width:50px;','class'=>'form-control input-sm','type'=>'text','readonly','value'=>round(@$EmployeeAtten[@$data->id])]); ?>
+				<?php echo $this->Form->input('amount_of_loan', ['label' => false,'style'=>'width:50px;','class'=>'form-control input-sm','type'=>'text','readonly','value'=>@$EmployeeAtten[@$data->id]]); ?>
 				
 			</td>
 			<td>
