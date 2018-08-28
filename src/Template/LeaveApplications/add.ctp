@@ -143,7 +143,7 @@ border:none;
 				<div class="col-md-3">
 					<div class="form-group" >
 						<label class="control-label  label-css">Date of Leave Required (To)</label>   
-						<?php echo $this->Form->input('to_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
+						<?php echo $this->Form->input('to_leave_date', ['type'=>'text','label' => false,'placeholder'=>'dd-mm-yyyy','class'=>'form-control input-sm date-picker to_leave_date','data-date-format'=>'dd-mm-yyyy','data-date-start-date'=>$start_date ,'data-date-end-date' => $end_date]); ?>
 					</div>
 				</div>
 			   <div class="col-md-2">
@@ -310,6 +310,7 @@ $(document).ready(function()
         });
 		alert(valuefirstone);
 	}); */
+	
 	$('input[name=single_multiple]').live("change",function(){
 		setdays();
 		
@@ -357,7 +358,7 @@ $(document).ready(function()
 			var first_day_this_month=$('input[name=first_day_this_month]').val();
 			var from_leave_date=$('input[name=from_leave_date]').val();
 			var to_leave_date=$('input[name=to_leave_date]').val();
-			//alert(single_multiple);
+			//alert(response);
 			if(response == "yes"){
 				$('.attache_file').show();
 			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ //alert();
@@ -369,6 +370,38 @@ $(document).ready(function()
 			}
         });
 	}
+	$('.to_leave_date').live("change",function(){
+		
+		var leave_type = $('.leave_type option:selected').val();
+		var empId=$('.empDropDown').find('option:selected').val();
+		var single_multiple=$('input[name=single_multiple]:checked').val();
+		var last_day_this_month=$('input[name=last_day_this_month]').val();
+		var first_day_this_month=$('input[name=first_day_this_month]').val();
+		var from_leave_date=$('input[name=from_leave_date]').val();
+		var to_leave_date=$('input[name=to_leave_date]').val();
+		var to_full_half=$('.to_full_half option:selected').val();
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'getsickleaveData']); ?>";
+		url=url+'/'+empId+'/'+leave_type;
+		$.ajax({
+            url: url,
+            type: 'GET',
+        }).done(function(response) { 
+			if(response == "yes"){
+				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
+			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month && to_full_half == "Full Day"){
+				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
+			}else{
+				$('.attache_file').hide();
+				$('input[name=supporting_attached]').removeAttr('required','required');
+			}
+		
+		}); 
+		
+	});
+	
+	
 	$('.leave_type').live("change",function(){
 		var leave_type = $('.leave_type option:selected').val();
 		//alert(leave_type);
@@ -389,6 +422,7 @@ $(document).ready(function()
 			//alert(single_multiple);
 			if(response == "yes"){
 				$('.attache_file').show();
+				$('input[name=supporting_attached]').attr('required','required');
 			}else if(response == "no" && single_multiple == "Multiple" && from_leave_date >= first_day_this_month && to_leave_date <= last_day_this_month){ //alert();
 				$('.attache_file').show();
 				$('input[name=supporting_attached]').attr('required','required');

@@ -136,11 +136,12 @@ class EmployeeAttendancesController extends AppController
 				@$employee_leave_prior_approval[@$data1->employee_id]+=$data1->prior_approval;
 				@$employee_leave_without_prior_approval[@$data1->employee_id]+=$data1->without_prior_approval;
 				@$employee_leave_unintimated_leave[@$data1->employee_id]+=$data1->unintimated_leave;
+				@$employee_leave_intimated_leave[@$data1->employee_id]+=$data1->intimated_leave;
 			}
 			
 //pr($employee_leave);exit;
 		}
-		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays','employee_leave_prior_approval','employee_leave_without_prior_approval','employee_leave_unintimated_leave'));
+		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day', 'adjstDays','employee_leave_prior_approval','employee_leave_without_prior_approval','employee_leave_unintimated_leave','employee_leave_intimated_leave'));
 	}
 	
 	function date_range($first, $last, $step = '+1 day', $output_format = 'd/m/Y' ) {
@@ -218,6 +219,7 @@ class EmployeeAttendancesController extends AppController
 				$employeeAtten->total_month_day = $total_day;
 				$employeeAtten->no_of_leave = $total_day-$data['present_day'];
 				$employeeAtten->company_id = $st_company_id;
+				//pr($employeeAtten);
 				$this->EmployeeAttendances->save($employeeAtten);
 			}
 				$this->Flash->success(__('The employee attendance has been saved.'));

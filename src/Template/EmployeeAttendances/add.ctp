@@ -110,8 +110,8 @@ $(document).ready(function()
 	});
 	
 	$('.adjst').live('keyup',function(){ 
-		var one=parseFloat($(this).closest('tr').find('td:nth-child(6) input.attn').val());
-		var two=parseFloat($(this).closest('tr').find('td:nth-child(7) input.adjst').val());
+		var one=parseFloat($(this).closest('tr').find('td:nth-child(7) input.attn').val());
+		var two=parseFloat($(this).closest('tr').find('td:nth-child(8) input.adjst').val());
 		
 		if(isNaN(two)){ 
 			two=0;
@@ -121,9 +121,9 @@ $(document).ready(function()
 		}
 		var tot = one+two;
 		if(isNaN(tot)){ 
-			$(this).closest('tr').find('td:nth-child(8) input.amount').val(0);
+			$(this).closest('tr').find('td:nth-child(9) input.amount').val(0);
 		}else{
-			$(this).closest('tr').find('td:nth-child(8) input.amount').val(tot);
+			$(this).closest('tr').find('td:nth-child(9) input.amount').val(tot);
 		}
 	});
 	
