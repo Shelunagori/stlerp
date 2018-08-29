@@ -889,7 +889,14 @@ $this->set(compact('EmployeeAtten1','emp_sallary_division1','other_amount1'));
 				)
 			->group(['Employees.id'])->toArray();
 			   //pr($Employees); exit;
-			$this->set(compact('Employees'));
+			   $EmployeeAtten=[];
+			$EmployeeAttendances = $this->EmployeeSalaries->EmployeeAttendances->find()->where(['month'=>$month_year[0],'financial_year_id'=>$financial_year->id]);  
+			foreach($EmployeeAttendances as $employeeattendance){
+				$EmployeeAtten[$employeeattendance->employee_id]=@$employeeattendance->present_day;   
+			}
+			
+			 
+			$this->set(compact('Employees','EmployeeAtten'));
 		}
 		$this->set(compact('st_company_id'));
 	}

@@ -186,6 +186,7 @@ class EmployeeAttendancesController extends AppController
 		//pr($employees->toArray()); exit;
 		$this->set(compact('employeeAttendance', 'financialYears', 'employees','employee_leave','total_day'));
 	}
+	
     public function add()
     {
 		$this->viewBuilder()->layout('index_layout');

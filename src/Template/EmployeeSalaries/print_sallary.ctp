@@ -52,6 +52,7 @@
 			<table class="table table-condensed table-bordered table-hover" id="qwerty">
 				<tr>
 					<th>Employee Name</th>
+					<th>Atten.</th>
 					<?php foreach($allDivisions as $DivisionId=>$DivisionName){
 						echo '<th>'.$DivisionName.'</th>';
 					} ?>
@@ -63,6 +64,7 @@
 				foreach($Employees as $Employee){ ?>
 				<tr>
 					<td><?php echo $Employee->name; ?></td>
+					<td><?php echo @$EmployeeAtten[@$Employee->id]; ?></td>
 					<?php $total_add=0; $total_ded=0;  
 					$colspan=0;
 					foreach($allDivisions as $DivisionId=>$DivisionName){
