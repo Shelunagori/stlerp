@@ -104,7 +104,7 @@ $html = '
 				</td>
 			</tr>
 			<tr>
-				<td width="35%" rowspan="2" valign="bottom">
+				<td width="25%" rowspan="2" valign="bottom">
 				<img src='.ROOT . DS  . 'webroot' . DS  .'logos/'.$challan->company->logo.' height="80px" />
 				</td>
 				<td colspan="2" align="right">
@@ -112,8 +112,8 @@ $html = '
 				</td>
 			</tr>
 			<tr>
-				<td width="30%" valign="top"> 
-				<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;text-align:center;"> CHALLAN</div>
+				<td width="50%" valign="top"> 
+				<div align="center" style="font-size: 28px;font-weight: bold;color: #0685a8;text-align:center;">CHALLAN</div>
 				</td>
 				<td align="right" width="35%" style="font-size: 12px; ">
 				<span >'. $this->Text->autoParagraph(h($challan->company->address)) .'</span>
