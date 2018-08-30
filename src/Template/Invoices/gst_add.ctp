@@ -731,23 +731,23 @@ $(document).ready(function() {
 	
 	$("select.sgst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
-	})
+	});
 	
 	$("select.igst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
-	})
+	});
 	
 	$("select.fright_cgst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 	$("select.fright_sgst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 	$("select.fright_igst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 
 	$('.fright_amount').die().live("keyup",function() {
