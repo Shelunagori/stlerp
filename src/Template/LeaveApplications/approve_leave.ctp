@@ -395,7 +395,7 @@ $('input[name="prior_approval"]').val(0);
 		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfoEmployees']); ?>";
         url=url+'/'+employee_id+'/'+leaveAppId; 
-		alert(url);
+		//alert(url);
 		 $.ajax({
             url: url,
             type: 'GET',

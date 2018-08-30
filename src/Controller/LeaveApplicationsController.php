@@ -727,9 +727,10 @@ class LeaveApplicationsController extends AppController
 			
 				///start code for carry forward leave SL
 				$tot_max_leave = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
-				if($tot_max_leave > $day_nos_sl){
+				
+				if($tot_max_leave < $day_nos_sl){ 
 					$sick_leaves = abs(@$day_nos_sl-$tot_max_leave);
-				}else if($tot_max_leave_cl == $day_nos_sl){
+				}else if($tot_max_leave == $day_nos_sl){
 					$sick_leaves = 0;
 				}else{
 					$sick_leaves = @$leaveapplications->leave_type->maximum_leave_in_month;
@@ -747,7 +748,7 @@ class LeaveApplicationsController extends AppController
 				///start code for carry forward leave CL
 				$tot_max_leave_cl = @$leaveapplications->leave_type->maximum_leave_in_month*$tot_month;
 				
-				if($tot_max_leave_cl > $day_nos_cl){
+				if($tot_max_leave_cl < $day_nos_cl){
 					$casual_leaves = abs(@$day_nos_cl-$tot_max_leave_cl);
 				}else if($tot_max_leave_cl == $day_nos_cl){
 					$casual_leaves = 0;
