@@ -789,30 +789,54 @@ $(document).ready(function() {
 		rename_rows(); calculate_total();
     });
 	
-	$("select.cgst_percentage").die().live("change",function(){ 
+	/* $("select.cgst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
-	})
+	}); */
+	
+	$("select.cgst_percentage").die().live("change",function(){
+		
+			var select_value = $(this).closest('tr').find('td:nth-child(11) select option:selected').attr('percentage');
+			
+			
+			var sgst_options = $(this).closest('tr').find('td:nth-child(13) select.sgst_percentage option');
+			
+			$(sgst_options).each(function() {
+				var $thisOption = $(this);
+				$thisOption.attr("disabled", false);
+				var valueToCompare = select_value;
+				if($thisOption.attr('percentage') == valueToCompare) { 
+					$thisOption.prop("selected", true);
+					$thisOption.attr("disabled", false);
+				}else{ 
+					$thisOption.attr("disabled", "disabled");
+				}
+			});
+			
+			
+			
+		rename_rows(); calculate_total();
+	});
 	
 	$("select.sgst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
-	})
+	});
 	
 	$("select.igst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
-	})
+	});
 	
 
 	$("select.fright_cgst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 	$("select.fright_sgst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 	$("select.fright_igst_percent").die().live("change",function(){ 
 		calculate_fright_amount_total(); calculate_total();
-	})
+	});
 	
 
 	$('.fright_amount').die().live("keyup",function() {

@@ -727,7 +727,7 @@ $(document).ready(function() {
 			
 			
 		rename_rows(); calculate_total();
-	})
+	});
 	
 	$("select.sgst_percentage").die().live("change",function(){ 
 		rename_rows(); calculate_total();
