@@ -85,6 +85,8 @@ class LoginsController extends AppController
 	//	$this->set(compact('st_company_id'));
 	}
 	
+	
+	
 	public function checkFySession()
 	{
 		$this->viewBuilder()->layout('');
@@ -169,6 +171,42 @@ class LoginsController extends AppController
 			return $this->redirect(['controller'=>'Logins', 'action' => 'generateOtp',$login->employee_id,$login->id]);
 		} */
 		
+	}
+	
+	public function changePassword(){
+		$this->viewBuilder()->layout('login_layout');
+		$login = $this->Logins->newEntity();
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$employee_id=$this->viewVars['s_employee_id'];
+		 if ($this->request->is(['patch', 'post', 'put'])) {
+            $login = $this->Logins->patchEntity($login, $this->request->data);
+			$emp_id=$login->employee_id;
+			$EmployeeIdExist = $this->Logins->exists(['employee_id' => $emp_id]);
+		
+			if(!$EmployeeIdExist)
+				{
+					$login->employee_id = $employee_id;
+					$query = $this->Logins->query();
+					$query->update()
+					->set(['password' => $this->request->data['password']])
+					->where(['employee_id' => $employee_id]);
+					
+					if ($query->execute()) {
+						$this->Flash->success(__('Login has been saved.'));
+						return $this->redirect(['controller'=>'Logins', 'action' => 'index']);
+					} else {
+						$this->Flash->error(__('The Login could not be saved. Please, try again.'));
+					}
+				}
+			else{
+				$this->Flash->error(__('This user have already login.'));
+				}
+        }
+		
+		
+		//$login=$this->Logins->get($st_login_id);
+		$this->set(compact('st_login_id','Employee','login'));
 	}
 	
 	public function edit($login_id = null){
