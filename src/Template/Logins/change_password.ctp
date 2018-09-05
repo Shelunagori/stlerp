@@ -4,9 +4,6 @@ $this->Form->templates([
 ]);
 ?>
 <style>
-.error{
-	color:#aa4e4e !important;
-}
 
 </style>
 <!-- BEGIN LOGIN FORM -->

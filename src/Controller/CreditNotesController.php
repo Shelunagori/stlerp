@@ -140,6 +140,9 @@ class CreditNotesController extends AppController
 			
 			$last_voucher_no_credit_note=$this->CreditNotes->find()->select(['voucher_no'])->where(['company_id' => $st_company_id,'financial_year_id'=>$st_year_id])->order(['CreditNotes.id' => 'DESC'])->first();
 			
+			/* pr($last_voucher_no_credit_note->voucher_no);
+			pr($last_voucher_no_sr->sr2);
+			exit; */
 			//echo $last_voucher_no_credit_note->voucher_no;exit;
 			if(@$last_voucher_no_credit_note->voucher_no > @$last_voucher_no_sr->sr2){ 
 				$last_voucher_no=$last_voucher_no_credit_note->voucher_no;
@@ -179,7 +182,7 @@ class CreditNotesController extends AppController
 				$voucher_no1=1;
 			}
 			
-			$creditNote->voucher_no=$voucher_no1;
+			$creditNote->voucher_no=$voucher_no;
 			//pr($creditNote);exit;
            if ($this->CreditNotes->save($creditNote)) {
 				if($creditNote->cr_dr=="Dr"){
@@ -523,10 +526,10 @@ class CreditNotesController extends AppController
 	
         if ($this->request->is(['patch', 'post', 'put'])) {
 					$creditNote = $this->CreditNotes->patchEntity($creditNote, $this->request->data);
-					$creditNote->created_on=date("Y-m-d");
-					$creditNote->transaction_date=date("Y-m-d");
+					$creditNote->edited_on=date("Y-m-d");
+					$creditNote->transaction_date=date('Y-m-d',strtotime($this->request->data['transaction_date']));
 					$creditNote->company_id=$st_company_id;
-					$creditNote->created_by=$s_employee_id;
+					$creditNote->edited_by=$s_employee_id;
 					
 			//pr($creditNote); exit;
            if ($this->CreditNotes->save($creditNote)) {
@@ -540,7 +543,7 @@ class CreditNotesController extends AppController
 				$ledger->voucher_id = $creditNote->id;
 				$ledger->voucher_source = 'Credit Notes';
 				$ledger->company_id = $st_company_id; 
-				$ledger->transaction_date = $creditNote->transaction_date;
+				$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 				$this->CreditNotes->Ledgers->save($ledger); 
 				if(!empty($creditNote->ref_rows)){
 						foreach($creditNote->ref_rows as $ref_row){ 
@@ -552,7 +555,7 @@ class CreditNotesController extends AppController
 						$ReferenceDetail->debit = $ref_row['ref_amount'];
 						$ReferenceDetail->credit = 0;
 						$ReferenceDetail->credit_note_id = $creditNote->id;
-						$ReferenceDetail->transaction_date = $creditNote->transaction_date;
+						$ReferenceDetail->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 						$this->CreditNotes->ReferenceDetails->save($ReferenceDetail); 
 					}
 				}
@@ -566,7 +569,7 @@ class CreditNotesController extends AppController
 					$ledger->voucher_id = $creditNote->id;
 					$ledger->voucher_source = 'Credit Notes';
 					$ledger->company_id = $st_company_id; 
-					$ledger->transaction_date = $creditNote->transaction_date;
+					$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 					$this->CreditNotes->Ledgers->save($ledger); 
 					
 					if($credit_notes_row->cgst_amount > 0){
@@ -579,7 +582,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 					
@@ -592,7 +595,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 					
@@ -605,7 +608,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 				}
@@ -617,7 +620,7 @@ class CreditNotesController extends AppController
 				$ledger->voucher_id = $creditNote->id;
 				$ledger->voucher_source = 'Credit Notes';
 				$ledger->company_id = $st_company_id; 
-				$ledger->transaction_date = $creditNote->transaction_date;
+				$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 				$this->CreditNotes->Ledgers->save($ledger); 
 				
 				foreach($creditNote->ref_rows as $ref_row){ 
@@ -629,7 +632,7 @@ class CreditNotesController extends AppController
 					$ReferenceDetail->credit = $ref_row['ref_amount'];
 					$ReferenceDetail->debit = 0;
 					$ReferenceDetail->credit_note_id = $creditNote->id;
-					$ReferenceDetail->transaction_date = $creditNote->transaction_date;
+					$ReferenceDetail->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 					$this->CreditNotes->ReferenceDetails->save($ReferenceDetail); 
 				}
 
@@ -641,7 +644,7 @@ class CreditNotesController extends AppController
 					$ledger->voucher_id = $creditNote->id;
 					$ledger->voucher_source = 'Credit Notes';
 					$ledger->company_id = $st_company_id; 
-					$ledger->transaction_date = $creditNote->transaction_date;
+					$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date));
 					$this->CreditNotes->Ledgers->save($ledger); 
 					
 					if($credit_notes_row->cgst_amount > 0){
@@ -654,7 +657,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 					
@@ -667,7 +670,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 					
@@ -680,7 +683,7 @@ class CreditNotesController extends AppController
 						$ledger->voucher_id = $creditNote->id;
 						$ledger->voucher_source = 'Credit Notes';
 						$ledger->company_id = $st_company_id; 
-						$ledger->transaction_date = $creditNote->transaction_date; 
+						$ledger->transaction_date = date('Y-m-d',strtotime($creditNote->transaction_date)); 
 						$this->CreditNotes->Ledgers->save($ledger); 
 					}
 					

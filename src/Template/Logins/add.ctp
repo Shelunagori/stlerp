@@ -72,14 +72,8 @@
                             									'confirm' => __('Are you sure ?', $Login->id)
                             								]
                             							) ?>
-														<?= $this->Form->postLink('<i class="fa fa-edit"></i> ',
-                            								['action' => 'edit', $Login->id],
-                            								[
-                            									'escape' => false,
-                            									'class' => 'btn btn-xs btn-primary',
-                            									
-                            								]
-                            							) ?></td>
+														<?= $this->Html->link('<i class="fa fa-edit"></i>', ['controller'=>'Logins','action' => 'edit', $Login->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')) ?>
+														</td>
 					</tr>
 					<?php endforeach; ?>
 				</tbody>

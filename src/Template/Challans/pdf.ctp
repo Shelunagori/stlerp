@@ -162,24 +162,10 @@ $html = '
 								$html.='</b></span><br/>';
 								if($challan->customer_id){
 									$html.= $this->Text->autoParagraph(h($challan->customer_address));
-									if(!empty($challan->customer->gst_no))
-									{
-										$html.='<span>GST  : '. h($challan->customer->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
-									}
-									if(!empty($challan->customer->pan_no))
-									{
-										$html.='<span> PAN : '. h($challan->customer->pan_no) . '</span><br/>';
-									}
+									
 								}else{
 									$html.= $this->Text->autoParagraph(h($challan->vendor_address));
-									if(!empty($challan->vendor->gst_no))
-									{
-										$html.='<span>GST  : '. h($challan->vendor->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
-									}
-									if(!empty($challan->vendor->pan_no))
-									{
-										$html.='<span> PAN : '. h($challan->vendor->pan_no) . '</span><br/>';
-									}
+									
 								}
 								
                                 
@@ -294,27 +280,58 @@ $html.='
 					<table width="100%" class="table2" >
 						<tr width="50%">
 							<td  >
+								
+								<table>
+									<tr>
+										<td >GST</td>
+										<td >: ';
+										if($challan->customer_id){
+									
+									if(!empty($challan->customer->gst_no))
+									{
+										$html.='<span>'. h($challan->customer->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
+									}
+									
+								}else{
+									
+									if(!empty($challan->vendor->gst_no))
+									{
+										$html.='<span>'. h($challan->vendor->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
+									}
+									
+								}
+									$html.='</td>
+									</tr>
+									<tr width="30">
+										<td >PAN</td>
+										<td >: ';
+										if($challan->customer_id){
+									
+									if(!empty($challan->customer->pan_no))
+									{
+										$html.='<span> PAN : '. h($challan->customer->pan_no) . '</span><br/>';
+									}
+								}else{
+									
+									if(!empty($challan->vendor->pan_no))
+									{
+										$html.='<span> PAN : '. h($challan->vendor->pan_no) . '</span><br/>';
+									}
+								}
+									$html.='</td>
+									</tr>
+									<tr>
+										<td >CIN</td>
+										<td >: '. h($challan->company->cin_no) .'</td>
+									</tr>
+								</table>
 								<table>
 									<tr>
 										<td style="line-height:20px" >&nbsp;</td>
 									</tr>
 								</table>
-								<table>
-									<tr>
-										<td >&nbsp;</td>
-										<td >&nbsp;</td>
-									</tr>
-									<tr width="30">
-										<td >&nbsp;</td>
-										<td >&nbsp;</td>
-									</tr>
-									<tr>
-										<td ></td>
-										<td ></td>
-									</tr>
-								</table>
 							</td>
-							<td align="right" style="    width: 20%;">
+							<td align="right" style="width: 30%;">
 								<div align="center">
 									<span>For <b>'. h($challan->company->name) .'</b></span><br/>
 									<img  src='.ROOT . DS  . 'webroot' . DS  .'signatures/'.$challan->creator->signature.' height="50px" style="height:50px; "/>

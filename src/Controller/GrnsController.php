@@ -45,7 +45,7 @@ class GrnsController extends AppController
 		if(!empty($po_no)){
 			$findpo = $this->Grns->PurchaseOrders->find()->where(['PurchaseOrders.po2'=>$po_no])->first();
 			//pr($findpo->id); exit;
-			$where1['Grns.purchase_order_id']=@$findpo->id;
+			$where1['PurchaseOrders.po2']=@$po_no;
 		}
 		
 		if(!empty($vendor)){
@@ -66,6 +66,8 @@ class GrnsController extends AppController
 				$wheree=[];
 			}
 		$where=[];
+		
+		//pr($where1);exit;
 		if($status==null or $status=='Pending'){
 			$where['status']='Pending';
 		}elseif($status=='Invoice-Booked'){

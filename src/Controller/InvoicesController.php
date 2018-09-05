@@ -127,6 +127,8 @@ class InvoicesController extends AppController
 		} else{ 
 			$invoices =$this->Invoices->find()->contain(['Customers','SalesOrders','SendEmails','InvoiceRows'=>['Items']])->where($where)->where($wheree)->where(['Invoices.company_id'=>$st_company_id,'Invoices.financial_year_id'=>$st_year_id])->order(['Invoices.in2' => 'DESC']);
 		} 
+		
+		
 		//pr($invoices->toArray());exit;
 		$Items = $this->Invoices->InvoiceRows->Items->find('list')->order(['Items.name' => 'ASC']);
 		$this->set(compact('invoices','status','inventory_voucher','sales_return','InvoiceRows','Items','url','current_rows'));
@@ -6207,9 +6209,11 @@ class InvoicesController extends AppController
 		
 		
 		$cust_name  = $this->request->query('cust_name');
+		$salesman  = $this->request->query('salesman');
 		$From  = $this->request->query('From');
 		$To  = $this->request->query('To');
 		$reciept  = $this->request->query('reciept');
+		$overdue_filter  = $this->request->query('overdue_filter');
 		
 		$where=[];
 		if(!empty($cust_name)){
@@ -6224,6 +6228,14 @@ class InvoicesController extends AppController
 		if(!empty($To)){
 			$To=date("Y-m-d",strtotime($this->request->query('To')));
 			$where['Invoices.date_created <=']=$To;
+		}
+		
+		if(!empty($salesman)){
+			$where['Customers.employee_id']=$salesman;
+		}
+		
+		if(!empty($overdue_filter)){
+			$where['Customers.employee_id']=$overdue_filter;
 		}
 		
 		
@@ -6241,7 +6253,13 @@ class InvoicesController extends AppController
 			}
 		}
 		
-		$this->set(compact('Invoices','url','Receiptdatas','cust_name','From','To','reciept'));
+		$SalesMans = $this->Invoices->Employees->find('list')->matching(
+					'Departments', function ($q) use($st_company_id) {
+						return $q->where(['Departments.id' =>1]);
+					}
+				);
+		
+		$this->set(compact('Invoices','url','Receiptdatas','cust_name','From','To','reciept','SalesMans','salesman'));
 	}
 	
 	/* public function InvoiceList()
@@ -6383,7 +6401,7 @@ class InvoicesController extends AppController
 				if($otherData){
 						$message_web3.= '
 						<tr>
-							<td style="text-align:justify !important; font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'. h(($otherData)) .'</td>
+							<td colspan="2" style="text-align:justify !important; font-family:Palatino Linotype; font-size:' . h(($invoice->pdf_font_size)) .';"><br/>'. h(($otherData)) .'</td>
 						</tr>
 					'; 
 					$message_web.=$message_web3;

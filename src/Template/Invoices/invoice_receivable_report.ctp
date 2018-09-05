@@ -18,12 +18,32 @@
 							<input type="text" name="cust_name" class="form-control input-sm" placeholder="Customer Name" value="<?php echo @$cust_name; ?>" >
 						</td>
 						<td width="20%">
-							<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
+							<?php echo $this->Form->input('salesman', ['empty'=>'--SalesMans--','options' => $SalesMans,'label' => false,'class' => 'form-control input-sm select2me','placeholder'=>'SalesMan Name','value'=> h(@$salesman) ]); ?>
 						</td>
 						<td width="20%">
-							<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Transaction To" value="<?php echo @$To; ?>"  data-date-format="dd-mm-yyyy" >
+							<?php if(!empty($From)){ ?>
+								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo date('d-m-Y',strtotime($From)); ?>"  data-date-format="dd-mm-yyyy" >
+							<?php }else{ ?>
+								<input type="text" name="From" class="form-control input-sm date-picker" placeholder="Transaction From" value="<?php echo @$From; ?>"  data-date-format="dd-mm-yyyy" >
+							<?php } ?>
+							
 						</td>
-						
+						<td width="20%">
+						<?php if(!empty($To)){ ?>
+							<input type="text" name="To" class="form-control input-sm date-picker" placeholder="Transaction To" value="<?php echo date('d-m-Y',strtotime(@$To)); ?>"  data-date-format="dd-mm-yyyy" >
+						<?php }else{ ?>	
+							<input type="text" name="TO" class="form-control input-sm date-picker" placeholder="Transaction TO" value="<?php echo @$TO; ?>"  data-date-format="dd-mm-yyyy" >
+						<?php } ?>
+						</td>
+						<!--<td>
+							<select class="form-control input-sm select2me" name="overdue_filter">
+								<option value="">Overdue</option>
+								<option value="15">1-30</option>
+								<option value="">31-45</option>
+								<option value="">46-60</option>
+								<option value="">61-75</option>
+							</select>
+						</td>-->
 						<td>
 							<button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i> Filter</button>
 						</td>
@@ -45,6 +65,8 @@
 						<th style="text-align:center;">Invoice No</th>
 						<th style="text-align:center;">Invoice Date</th>
 						<th style="text-align:center;">Payment Terms</th>
+						<th style="text-align:center;">Overdue Days</th>
+						<th style="text-align:right;">Amount</th>
 						<th style="text-align:center;">Reciept No</th>
 						<th style="text-align:center;">Reciept Date</th>
 					</tr>
@@ -79,6 +101,8 @@
 						?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo $invoice->customer->payment_terms ?>Days</td>
+						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>">-</td>
+						<td  style="text-align:right;" rowspan="<?php echo $refSize; ?>"><?php echo $this->Number->format($invoice->total,['places'=>2]); ?></td>
 						<?php 
 							$jk=0;
 								foreach($Receiptdatas[$invoice->id] as $data){
@@ -90,6 +114,7 @@
 									}
 									$jk++;
 									?>
+									
 									<td style="text-align:center;">
 									<?php 
 									$reciept_id = $EncryptingDecrypting->encryptData($data->receipt->id);
@@ -127,6 +152,21 @@
 									</td>
 									<td  style="text-align:center;"><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 									<td  style="text-align:center;"><?php echo $invoice->customer->payment_terms ?> Days</td> 
+									<td  style="text-align:center;">
+									<?php
+										$due_date=date('Y-m-d', strtotime(@$invoice->date_created. ' +'. $invoice->customer->payment_terms .'days'));
+										$t_date = strtotime(date("d-m-Y"));
+										$due_dates = strtotime(date("d-m-Y",strtotime($due_date)));
+										if($due_dates < $t_date){
+											$due_day=date("d-m-Y")-date("d-m-Y",strtotime($due_date)); ?>
+											<span style="color:red;"> <?php echo $due_day.' '.'Days';?></span>
+										<?php }else{
+											echo "-";
+										}
+										
+									?>
+									</td> 
+									<td  style="text-align:right;"><?php echo $this->Number->format($invoice->total,['places'=>2]); ?></td> 
 									<td  style="text-align:center;">-</td> 
 									<td  style="text-align:center;">-</td> 
 								   <?php }?>

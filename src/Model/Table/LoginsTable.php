@@ -37,9 +37,9 @@ class LoginsTable extends Table
             ->integer('id')
             ->allowEmpty('id', 'create');
 
-       /*  $validator
+        $validator
             ->requirePresence('username', 'create')
-            ->notEmpty('username'); */
+            ->notEmpty('username');
 		
 		$validator->add(
 				'username', 

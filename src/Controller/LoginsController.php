@@ -211,8 +211,37 @@ class LoginsController extends AppController
 	
 	public function edit($login_id = null){
 		$this->viewBuilder()->layout('index_layout');
+
+		$login = $this->Logins->get($login_id);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
+		$employee_id=$this->viewVars['s_employee_id'];
+		 if ($this->request->is(['patch', 'post', 'put'])) {
+            $login = $this->Logins->patchEntity($login, $this->request->data);
+			$emp_id=$login->employee_id;
+			$EmployeeIdExist = $this->Logins->exists(['employee_id' => $emp_id]);
+		
+			if($EmployeeIdExist)
+				{
+					if ($this->Logins->save($login)) {
+						$this->Flash->success(__('Login has been saved.'));
+						return $this->redirect(['controller'=>'Logins', 'action' => 'add']);
+					} else {
+						$this->Flash->error(__('The Login could not be saved. Please, try again.'));
+					}
+				}
+			else{
+				$this->Flash->error(__('This user have already login.'));
+				}
+        }
+		
+		
+		//$login=$this->Logins->get($st_login_id);
+		$this->set(compact('st_login_id','Employee','login'));
+	}
+	
+	public function checkNameExists($user_id=null){
+		$login = $this->Logins->get($login_id);
 	}
 	
 	function otpCodeConfirm($employee_id=null,$login_id=null)
