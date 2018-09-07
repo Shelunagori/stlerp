@@ -71,7 +71,7 @@
 							) ?>
 							<?php }  ?>
 						</td>
-						<?php if($emp_data[$key] == 1){ ?>
+						<?php if(@$emp_data[$key] == 1){ ?>
 						<td >
 							<?php 
 								if(date('d-m-Y',strtotime($emp_effective_date[$key])) == "01-01-1970"){

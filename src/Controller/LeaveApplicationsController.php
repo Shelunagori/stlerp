@@ -852,9 +852,12 @@ class LeaveApplicationsController extends AppController
 						}else{ 
 							if($leaveapplications->leave_type->leave_name == "Sick Leave"){
 
-								if($per_month_leave > $no_of_day_approve){
+								if($no_of_day_approve > $per_month_leave){
 										$total_unpaid_leave =  $day_no;
 										$total_paid_leave=0;
+									}else{
+										$total_unpaid_leave =  0;
+										$total_paid_leave=$day_no;
 									}	
 								
 								/* $total_past_paid_leave= number_format($total_past_paid_leave,1);
@@ -882,9 +885,12 @@ class LeaveApplicationsController extends AppController
 								} */
 							}else if($leaveapplications->leave_type->leave_name == "Casual Leave"){
 									
-									if($per_month_leave > $no_of_day_approve){
+									if($no_of_day_approve > $per_month_leave){ 
 										$total_unpaid_leave =  $day_no;
 										$total_paid_leave=0;
+									}else{
+										$total_unpaid_leave =  0;
+										$total_paid_leave=$day_no;
 									}
 
 								/* $total_past_paid_leave= number_format($total_past_paid_leave,1); 

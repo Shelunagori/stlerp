@@ -100,9 +100,9 @@
 				<a href="#" class="hold" style="float:right;">Hold</a>
 			</td>
 			<td align="right">
-				<?php  $total_row=@$other_amount[@$data->id]+@$total_loan_amt[@$data->id]; ?>
-				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]+@$total_loan_amt[@$data->id]]); 
-				$TotalOthers+=$other_amount[@$data->id]+@$total_loan_amt[@$data->id];
+				<?php  $total_row=@$other_amount[@$data->id];?>
+				<?php echo $this->Form->input('other_amount['.$data->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount[@$data->id]]); 
+				$TotalOthers+=$other_amount[@$data->id];
 				?>
 			</td>
 			<td align="right">
@@ -155,23 +155,24 @@
 						</td>
 					<?php }  ?>
 					<td align="right">
-						<?php echo $this->Form->input('loan_amount['.$datas1->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm loanAm','type'=>'text','readonly','value'=>round(@$loan_amount[@$datas1->id])]); 
+						<?php echo $this->Form->input('loan_amount['.$datas1->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm loanAm','type'=>'text','readonly','value'=>round(@$loan_amount1[@$datas1->id])]); 
 						echo $this->Form->input('loan_app['.$datas1->id.']', ['style'=>'text-align:right;','class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$datas1->id]]); 
-						$loan_amt=round(@$loan_amount[@$datas1->id]);
+						$loan_amt=round(@$loan_amount1[@$datas1->id]);
 						$TotalLoanAmount+=$loan_amt;
 						
 						?>
 						<a href="#" class="hold" style="float:right;">Hold</a>
 					</td>
 					<td align="right">
-						<?php  $total_row=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]; ?>
-						<?php echo $this->Form->input('other_amount['.$datas1->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]]); 
-						@$TotalOthers+=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id];
+						<?php  //$total_row=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]; ?>
+						<?php  $total_row=@$other_amount1[@$datas1->id]; ?>
+						<?php echo $this->Form->input('other_amount['.$datas1->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount1[@$datas1->id]]); 
+						@$TotalOthers+=@$other_amount1[@$datas1->id];
 						?>
 					</td>
 					<td align="right">
 						<?php $abc = round((@$dr_amt-$cr_amt)); ?>
-						<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((($abc)-$loan_amt)-$total_row),'loan'=>@$loan_amount[@$datas1->id],'other'=>@$other_amount1[@$datas1->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
+						<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((($abc)-$loan_amt)-$total_row),'loan'=>@$loan_amount1[@$datas1->id],'other'=>@$other_amount1[@$datas1->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
 					</td>
 					<?php $total+=round((@$dr_amt-$cr_amt)-$total_row-$loan_amt); ?>
 				</tr>
@@ -213,23 +214,24 @@
 						</td>
 					<?php }  ?>
 					<td align="right">
-						<?php echo $this->Form->input('loan_amount['.$datas1->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm loanAm','type'=>'text','readonly','value'=>round(@$loan_amount[@$datas1->id])]); 
+						<?php echo $this->Form->input('loan_amount['.$datas1->id.']', ['label' => false,'placeholder'=>'','class'=>'form-control input-sm loanAm','type'=>'text','readonly','value'=>round(@$loan_amount1[@$datas1->id])]); 
 						echo $this->Form->input('loan_app['.$datas1->id.']', ['style'=>'text-align:right;','class'=>'form-control input-sm','type'=>'hidden','value'=>@$loan_app[@$datas1->id]]); 
-						$loan_amt=round(@$loan_amount[@$datas1->id]);
+						$loan_amt=round(@$loan_amount1+[@$datas1->id]);
 						$TotalLoanAmount+=$loan_amt;
 						
 						?>
 						<a href="#" class="hold" style="float:right;">Hold</a>
 					</td>
 					<td align="right">
-						<?php  $total_row=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]; ?>
-						<?php echo $this->Form->input('other_amount['.$datas1->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]]); 
-						@$TotalOthers+=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id];
+						<?php // $total_row=@$other_amount1[@$datas1->id]+@$total_loan_amt[@$datas1->id]; ?>
+						<?php  $total_row=@$other_amount1[@$datas1->id]; ?>
+						<?php echo $this->Form->input('other_amount['.$datas1->id.']', ['style'=>'text-align:right;width:80px;','label' => false,'placeholder'=>'','class'=>'form-control input-sm other_amount1','type'=>'text','value'=>@$other_amount1[@$datas1->id]]); 
+						@$TotalOthers+=@$other_amount1[@$datas1->id];
 						?>
 					</td>
 					<td align="right">
 						<?php $abc = round((@$dr_amt-$cr_amt)); ?>
-						<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((($abc)-$loan_amt)-$total_row),'loan'=>@$loan_amount[@$datas1->id],'other'=>@$other_amount1[@$datas1->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
+						<?php echo $this->Form->input('net_amount', ['style'=>'text-align:right;','label' => false,'placeholder'=>'','class'=>'form-control input-sm net_amount','type'=>'text','value'=>round((($abc)-$loan_amt)-$total_row),'loan'=>@$loan_amount1[@$datas1->id],'other'=>@$other_amount1[@$datas1->id],'net'=>(@$dr_amt-$cr_amt),'readonly']); ?>
 					</td>
 					<?php $total+=round((@$dr_amt-$cr_amt)-$total_row-$loan_amt); ?>
 				</tr>
