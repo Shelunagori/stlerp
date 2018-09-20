@@ -985,6 +985,7 @@ class QuotationsController extends AppController
 	
 	public function close($id = null,$reason=null)
     {
+		//$id = $this->EncryptingDecrypting->decryptData($id);
         $quotation = $this->Quotations->get($id);
 		$quotation_reason=$this->Quotations->QuotationCloseReasons->get($reason);
 		$quotation->reason=$quotation_reason->reason;
@@ -1000,6 +1001,7 @@ class QuotationsController extends AppController
 	
 	public function revision($id = null)
     {
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$quotation = $this->Quotations->get($id);
 		$quot_id = $quotation->quotation_id;
 		$revision = $quotation->revision;
@@ -1009,6 +1011,7 @@ class QuotationsController extends AppController
 	
 	public function reopen($id = null)
     {
+		$id = $this->EncryptingDecrypting->decryptData($id);
         $quotation = $this->Quotations->get($id);
 		$quotation->reason='';
 		$quotation->status='Pending';

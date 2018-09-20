@@ -44,13 +44,13 @@
 			<div style="overflow:auto;" class="hide_at_print">
 				<?php $url= $this->Url->build(['controller'=>'Salaries','action'=>'sendPaySlip']); ?>
 				<form method="post" action="<?php echo $url; ?>" id="f<?php echo $Employee->id; ?>" target="_blank">
-					<input type="hidden" name="email" value="abhilashlohar01@gmail.com" />
+					<input type="hidden" name="email" value="<?php echo $Employee->company_email; ?>" />
 					<textarea name="qwerty" id="t<?php echo $Employee->id; ?>" style="display:none;"></textarea>
 					<button type="button" id="<?php echo $Employee->id; ?>" class="btnsb btn btn-sm btn-primary" style="float: left;">Send by mail</button>
 				</form>
 				<?php $url= $this->Url->build(['controller'=>'Salaries','action'=>'printPaySlip']); ?>
 				<form method="post" action="<?php echo $url; ?>" id="f2<?php echo $Employee->id; ?>" target="_blank">
-					<input type="hidden" name="email" value="abhilashlohar01@gmail.com" />
+					<input type="hidden" name="email" value="<?php echo $Employee->company_email; ?>" />
 					<textarea name="qwerty" id="t2<?php echo $Employee->id; ?>" style="display:none;"></textarea>
 					<button type="button" id="<?php echo $Employee->id; ?>" class="btnprint btn btn-sm btn-info" style="float: left;">Print</button>
 				</form>

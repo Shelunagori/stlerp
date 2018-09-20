@@ -166,6 +166,19 @@ $html = '
 								}else{
 									$html.= $this->Text->autoParagraph(h($challan->vendor_address));
 									
+									
+									if(!empty($challan->vendor->gst_no))
+									{
+										$html.='<span> GST No-'. h($challan->vendor->gst_no).  '</span><br/>';
+									}
+									
+									
+									
+									if(!empty($challan->vendor->pan_no))
+									{
+										$html.='<span> PAN : '. h($challan->vendor->pan_no) . '</span><br/>';
+									}
+								
 								}
 								
                                 
@@ -282,42 +295,40 @@ $html.='
 							<td  >
 								
 								<table>
-									<tr>
+									<tr>';
+									if($challan->customer_id){
+									$html.='
 										<td >GST</td>
 										<td >: ';
-										if($challan->customer_id){
+									}else{
+										$html.='<td></td>
+										<td >';
+									}	
+									
+									if($challan->customer_id){
 									
 									if(!empty($challan->customer->gst_no))
 									{
 										$html.='<span>'. h($challan->customer->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
 									}
 									
-								}else{
-									
-									if(!empty($challan->vendor->gst_no))
-									{
-										$html.='<span>'. h($challan->vendor->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
-									}
-									
 								}
 									$html.='</td>
 									</tr>
-									<tr width="30">
-										<td >PAN</td>
+									<tr width="30">';
+									if($challan->customer_id){
+										$html.='<td >PAN</td>
 										<td >: ';
-										if($challan->customer_id){
+									}else{
+										$html.='<td></td>
+										<td>';
+									}	
 									
 									if(!empty($challan->customer->pan_no))
 									{
-										$html.='<span> PAN : '. h($challan->customer->pan_no) . '</span><br/>';
+										$html.='<span>'. h($challan->customer->pan_no) . '</span><br/>';
 									}
-								}else{
-									
-									if(!empty($challan->vendor->pan_no))
-									{
-										$html.='<span> PAN : '. h($challan->vendor->pan_no) . '</span><br/>';
-									}
-								}
+								
 									$html.='</td>
 									</tr>
 									<tr>

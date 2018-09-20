@@ -22,7 +22,7 @@ class ChallanReturnVouchersController extends AppController
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $this->paginate = [
-            'contain' => ['Companies', 'Challans'=>['Customers']]
+            'contain' => ['Companies', 'Challans'=>['Customers', 'Companies','Vendors']]
         ];
         $challanReturnVouchers = $this->paginate($this->ChallanReturnVouchers);
 
@@ -61,6 +61,7 @@ class ChallanReturnVouchersController extends AppController
 		/*$challan= $this->ChallanReturnVouchers->Challans->get($id,[
 		'contain' =>['Customers', 'Companies',  'Transporters','Vendors','ChallanRows'=>['Items','ChallanReturnVoucherRows']]]);*/
 		
+		$id = $this->EncryptingDecrypting->decryptData($id); 
 		$challan = $this->ChallanReturnVouchers->Challans->get($id, [
             'contain' => (['ChallanReturnVouchers'=>['ChallanReturnVoucherRows' => function($q) {
 				return $q->select(['challan_return_voucher_id','challan_row_id','item_id','total_qty' => $q->func()->sum('ChallanReturnVoucherRows.quantity')])->group('ChallanReturnVoucherRows.challan_row_id');

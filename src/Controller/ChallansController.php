@@ -441,7 +441,7 @@ class ChallansController extends AppController
 		$st_company_id = $session->read('st_company_id');
 		
 		
-		$Challans = $this->paginate($this->Challans->find()->contain(['Customers','ChallanRows' => function($q) {
+		$Challans = $this->paginate($this->Challans->find()->contain(['Customers', 'Companies',  'Transporters','Vendors','ChallanRows' => function($q) {
 				return $q->where(['ChallanRows.challan_type'=>'Returnable']);
 			}])->order(['Challans.id' => 'ASC']));
 			

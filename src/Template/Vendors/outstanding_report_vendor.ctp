@@ -105,7 +105,7 @@ table td, table th{
 					<?php if(@$Outstanding[$LedgerAccount->id]['Slab1'] > 0){
 						echo '<span class="clrRed">'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
 					}else{
-						echo '<span>'.@$Outstanding[$LedgerAccount->id]['Slab1'].'</span>';
+						echo '<span>'.round(@$Outstanding[$LedgerAccount->id]['Slab1'],2).'</span>';
 					} ?>
 				</td>
 				<td>

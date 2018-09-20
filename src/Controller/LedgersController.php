@@ -1206,7 +1206,7 @@ class LedgersController extends AppController
 			$transaction_from_date= date('Y-m-d', strtotime($from));
 			
 			$fromYear=date('Y', strtotime($transaction_from_date));
-			$transaction_from_date_limit=$fromYear.'-4-1';
+			$transaction_from_date_limit=$fromYear.'-04-01';
 			
 			$transaction_to_date= date('Y-m-d', strtotime($To));
 			$this->set(compact('from','To','transaction_from_date','transaction_to_date'));

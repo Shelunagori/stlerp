@@ -22,7 +22,7 @@
 								<th>Voucher.No</th>
 								<th>Customer Name</th>
 								
-								<th class="actions"><?= __('Actions') ?></th>
+								<!--<th class="actions"><?= __('Actions') ?></th>-->
 							</tr>
 					
 					</thead>
@@ -34,17 +34,28 @@
                 <td><?= h(++$page_no) ?></td>
 				<td><?= h('#'.str_pad($challanReturnVouchers->voucher_no, 4, '0', STR_PAD_LEFT)) ?></td>
                 
-				<td><?php  echo $challanReturnVouchers->challan->customer->customer_name; ?></td>
+				<td>
+				<?php if($challanReturnVouchers->challan->customer_id){
+					if(!empty($challanReturnVouchers->challan->customer->alias)){
+						echo $challanReturnVouchers->challan->customer->customer_name.'('.$challanReturnVouchers->challan->customer->alias.')';
+					}else{
+						echo $challanReturnVouchers->challan->customer->customer_name;
+					}
+				  }elseif($challanReturnVouchers->challan->vendor_id){ 
+				  echo $challanReturnVouchers->challan->vendor->company_name; 
+				  } ?>
+				
+				</td>
 			
                
-				<td class="actions">
+				<!--<td class="actions">
 								<?php if(in_array(28,$allowed_pages)){  ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challanReturnVouchers->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 								<?php } ?>
 								<?php if(in_array(12,$allowed_pages)){  ?>
 								<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $challanReturnVouchers->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
 								<?php } ?>
-				</td>
+				</td>-->
             </tr>
             <?php endforeach; ?>
         </tbody>
