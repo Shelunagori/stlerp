@@ -26,7 +26,7 @@ class CreditNotesController extends AppController
             'contain' => []
         ];
         
-		$creditNotes = $this->paginate($this->CreditNotes->find()->where(['CreditNotes.company_id'=>$st_company_id,'CreditNotes.cancle_status'=>'No'])->contain(['FinancialYears'])->order(['voucher_no'=>'DESC']));
+		$creditNotes = $this->paginate($this->CreditNotes->find()->where(['CreditNotes.company_id'=>$st_company_id,'CreditNotes.cancle_status'=>'No'])->contain(['FinancialYears'])->order(['CreditNotes.id'=>'DESC']));
         
 		//pr($creditNotes->toArray());exit;
 		

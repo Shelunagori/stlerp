@@ -252,4 +252,19 @@ class FilenamesController extends AppController
 			}])->where($where);
 		$this->set(compact('files'));
 	}
+	
+	public function listFilenameCust($id = null,$rqstfrom = null){
+		$this->viewBuilder()->layout('');
+		if(empty($id)){ exit; }
+		if($rqstfrom=='so'){ $where=['customer_id' => $id,'file1' => 'BE']; }
+		elseif($rqstfrom=='in'){ $where=['customer_id' => $id,'file1' => 'BE']; }
+		else{ $where=['customer_id' => $id]; }
+		$files = $this->Filenames->find('list', ['valueField' => function ($row) {
+				return $row['file1'] . '-' . $row['file2'];
+			},
+			'keyField' => function ($row) {
+				return $row['file1'] . '-' . $row['file2'];
+			}])->where($where);
+		$this->set(compact('files'));
+	}
 }

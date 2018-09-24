@@ -102,10 +102,10 @@
 			$so=@$SalesOrderQty[@$jobCard->sales_order_id];
 			$in=@$InvoiceQty[@$jobCard->sales_order_id];
 			$iv=@$InventoryVoucherQty[@$jobCard->sales_order_id];
-			
+			$jobCard->id = $EncryptingDecrypting->encryptData($jobCard->id);
 			if(($jobCardStatus==null || $jobCardStatus=='Pending')){ 
 				if($so != $in || $so != $iv || $in != $iv ){
-					$jobCard->id = $EncryptingDecrypting->encryptData($jobCard->id);
+					
 					$jobCard_id = $jobCard->id;
 			?>
 				<tr>

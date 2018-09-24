@@ -1,6 +1,6 @@
 <?php 
 
-	$/* date= date("d-m-Y"); 
+	$date= date("d-m-Y"); 
 	$time=date('h:i:a',time());
 
 	$filename="Trial_Balance".$date.'_'.$time;
@@ -11,7 +11,7 @@
 	header ("Pragma: no-cache");
 	header ("Content-type: application/vnd.ms-excel");
 	header ("Content-Disposition: attachment; filename=".$filename.".xls");
-	header ("Content-Description: Generated Report" );   */ 
+	header ("Content-Description: Generated Report" );    
 
 ?>	
 
@@ -45,7 +45,7 @@
 											<tbody>
 											<?php foreach($data as $dt){ ?>
 												<tr>
-													<td valign="top">
+													<td>
 														<?php echo @$dt['name']; ?>
 													</td>
 													<?php if($dt['balance'] > 0){ ?>

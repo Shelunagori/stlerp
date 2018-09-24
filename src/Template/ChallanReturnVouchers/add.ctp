@@ -31,7 +31,13 @@
 							<label class="control-label">Customer Name</label>
 							<br/>
 							
-							<?php echo @$challan->customer->customer_name; ?>
+							<?php if($challan->customer_id){
+					if(!empty($challan->customer->alias)){
+						echo $challan->customer->customer_name.'('.$challan->customer->alias.')';
+					}else{
+						echo $challan->customer->customer_name;
+					}
+				  }elseif($challan->vendor_id){ echo $challan->vendor->company_name; } ?>
 						</div>
 					</div>
 					

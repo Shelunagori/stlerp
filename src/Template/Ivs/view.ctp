@@ -213,12 +213,12 @@ margin-bottom: 0;
 
 <table width="96%">
 	<tr>
-	    <td align="left">
+	    <td align="left" width="75%">
 			<table  class="divFooter" >
 				<tr>
 					<td valign="top" align="left" width="10%"><b>Narration</b></td>
 					<td  width="2%" align="center">:</td>
-					<td>
+					<td style="text-align:justify;">
 					<?= h($iv->narration) ?>
 					</td>
 				</tr>
@@ -227,7 +227,7 @@ margin-bottom: 0;
 		<td align="right">
 		<table >
 			<tr>
-			    <td align="center">
+			    <td align="center" width="20%">
 				<span style="font-size:14px;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($iv->company->name)?><br/></span>
 				<?php 
 				 echo $this->Html->Image('/signatures/'.$iv->creator->signature,['height'=>'50px','style'=>'height:50px;']); 

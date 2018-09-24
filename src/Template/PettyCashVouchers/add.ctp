@@ -322,8 +322,8 @@ $(document).ready(function() {
 		var row_id=0;
 		$(sel).find("table.ref_table tbody tr").each(function(){
 			
+			//row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
 			row_id=$(this).closest('tr.main_tr').find('td:eq(0) .row_id').val();
-			
 			$(this).find("td:nth-child(1) select").attr({name:"petty_cash_voucher_rows["+row_id+"][ref_rows]["+i+"][ref_type]", id:"ref_rows-"+row_id+"-"+i+"-ref_type"}).rules("add", "required");
 			var is_select=$(this).find("td:nth-child(2) select").length;
 			var is_input=$(this).find("td:nth-child(2) input").length;
@@ -342,7 +342,8 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input")
+		.attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account_dr_cr").attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc_dr_cr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		///var a=$(this).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").val();	

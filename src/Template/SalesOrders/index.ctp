@@ -134,7 +134,8 @@
 								$item_ids[$sales_order_row->item_id]=$sales_order_row->item_id;
 							}
 							@$salesOrder->quotation->id = $EncryptingDecrypting->encryptData(@$salesOrder->quotation->id);
-				 if((in_array($salesOrder->customer->employee_id,$allowed_emp) || in_array($salesOrder->customer->employee_id,$allowed_acc)) || ($salesOrder->created_by == $s_employee_id) || ($salesOrder->employee_id == $s_employee_id) || $gst == 'true'){
+							
+				 //if((in_array($salesOrder->customer->employee_id,$allowed_emp) || in_array($salesOrder->customer->employee_id,$allowed_acc)) || ($salesOrder->created_by == $s_employee_id) || ($salesOrder->employee_id == $s_employee_id) || $gst == 'true'){
 						?>
 						
 						<tr <?php if($status=='Converted Into Invoice'){  echo 'style="background-color:#f4f4f4"';   
@@ -346,7 +347,7 @@
 							<?php } ?> 
 								
 							 <?php } 
-							 }
+							 //}
 						endforeach; ?>
 					</tbody>
 					<tfoot>

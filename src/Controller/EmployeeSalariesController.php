@@ -21,6 +21,7 @@ class EmployeeSalariesController extends AppController
      *
      * @return \Cake\Network\Response|null
      */
+	 
     public function index()
     {
 		$this->viewBuilder()->layout('index_layout');
@@ -125,7 +126,7 @@ class EmployeeSalariesController extends AppController
 			
 			$LoanInstallments = $this->EmployeeSalaries->LoanApplications->LoanInstallments->find();
 			$LoanApplications = $this->EmployeeSalaries->LoanApplications->find()
-								->where(['employee_id'=>$dt->id,'installment_start_month < '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
+								->where(['employee_id'=>$dt->id,'installment_start_month <= '=>$month,'installment_start_year >= '=>$year,'status'=>'approved'])
 								->contain(['LoanInstallments']);
 			
 			
@@ -181,13 +182,13 @@ class EmployeeSalariesController extends AppController
 				if($SalaryExist){
 					$other_amount[@$dt->id]=round(@$SalaryExist->other_amount,2);
 				}else{
+					
 					$x=@$total_loan_amt[@$dt->id];
 					$y=round(@$dr-@$cr);
-					$other_amount[@$dt->id]=round((@$y+@$x),2);
+					$other_amount[@$dt->id]=round((@$y+@$x),2);  
 				}
 		
-		}   
-//pr($other_amount); exit;
+		}  
 
 
 		$emp_sallary_division1=[];
@@ -226,7 +227,7 @@ class EmployeeSalariesController extends AppController
 				}
 				
 				if($LoanApplication->approve_amount_of_loan>$repayment){
-					$loan_amount[$dt->id]=$LoanApplication->instalment_amount; 
+					$loan_amount1[$dt->id]=$LoanApplication->instalment_amount; 
 					$loan_app[$dt->id]=$LoanApplication->id;
 					
 					break;
@@ -272,9 +273,9 @@ class EmployeeSalariesController extends AppController
 				}
 		
 		}  
-
 		
-$this->set(compact('EmployeeAtten1','emp_sallary_division1','other_amount1'));
+		
+$this->set(compact('EmployeeAtten1','emp_sallary_division1','other_amount1','loan_amount1'));
 
 			$vr=$this->EmployeeSalaries->Nppayments->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Non Print Payment Voucher','sub_entity'=>'Cash/Bank'])->first();
 			

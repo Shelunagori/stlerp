@@ -38,23 +38,31 @@
 
 					<tbody>
             <?php foreach ($Challans as $challan): 
+			 
 					if(sizeof($challan->challan_rows) > 0){ 
 						if($challanReturnQty[$challan->id] >= $challanQty[$challan->id]){
+							 $challan_id = $EncryptingDecrypting->encryptData($challan->id);
 				?>
 							<tr>
 								<td><?= h(++$page_no) ?></td>
 								<td><?= h(($challan->ch1.'/CH-'.str_pad($challan->ch2, 3, '0', STR_PAD_LEFT).'/'.$challan->ch3.'/'.$challan->ch4)) ?></td>
-								<td><?php echo $challan->customer->customer_name; ?></td>          
+								<td><?php if($challan->customer_id){
+					if(!empty($challan->customer->alias)){
+						echo $challan->customer->customer_name.'('.$challan->customer->alias.')';
+					}else{
+						echo $challan->customer->customer_name;
+					}
+				  }elseif($challan->vendor_id){ echo $challan->vendor->company_name; } ?></td>          
 								<td class="actions">
 												<?php if(in_array(28,$allowed_pages)){  ?>
-												<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challan->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
+												<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $challan_id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>
 												<?php } ?>
 												<?php if(in_array(12,$allowed_pages)){  ?>
-												<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $challan->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
+												<?php echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $challan_id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit')); ?>
 												<?php } ?>
 												<?= $this->Html->link(
 													'Create Voucher',
-													['controller'=>'ChallanReturnVouchers','action' => '/Add', $challan->id], 
+													['controller'=>'ChallanReturnVouchers','action' => '/Add', $challan_id], 
 													['class' => 'btn btn-xs green tooltips']
 												); ?>
 												
