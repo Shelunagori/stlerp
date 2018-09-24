@@ -659,7 +659,7 @@ $(document).ready(function() {
 		});
 		
 		$("#ch3_div").html('Loading...');
-		var url="<?php echo $this->Url->build(['controller'=>'Filenames','action'=>'listFilename']); ?>";
+		var url="<?php echo $this->Url->build(['controller'=>'Filenames','action'=>'listFilenameCust']); ?>";
 		url=url+'/'+customer_id,
 		$.ajax({
 			url: url,

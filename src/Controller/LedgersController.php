@@ -942,10 +942,11 @@ class LedgersController extends AppController
 		$this->set(compact('from_date','to_date', 'groupForPrint', 'closingValue', 'openingValue','url','st_year_id'));
 	}
 	
-	public function excelTb (){ 
+	
+	public function testTb (){ 
 		$this->viewBuilder()->layout('');
 		$url=$this->request->here();
-		$url=parse_url($url,PHP_URL_QUERY);
+		//$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
         $st_year_id = $session->read('st_year_id');
@@ -961,41 +962,31 @@ class LedgersController extends AppController
 		$AccountCategories=$this->Ledgers->LedgerAccounts->AccountSecondSubgroups->AccountFirstSubgroups->AccountGroups->AccountCategories->find()
 		->where(['AccountCategories.id In'=>[1,2,3,4]])
 		->contain(['AccountGroups.AccountFirstSubgroups.AccountSecondSubgroups.LedgerAccounts']);
-		
+		//
 		$TransactionDr=[]; $TransactionCr=[]; $OpeningBalanceForPrint=[]; $ClosingBalanceForPrint=[];
+		$group_name=[];
 		foreach($AccountCategories as $AccountCategory){
 			foreach($AccountCategory->account_groups as $account_group){
+				@$group_name[$account_group->id]=@$account_group->name;
 				foreach($account_group->account_first_subgroups as $account_first_subgroup){
 					foreach($account_first_subgroup->account_second_subgroups as $account_second_subgroup){
 						foreach($account_second_subgroup->ledger_accounts as $ledger_account){
 							$query=$this->Ledgers->find();
 							$query->select(['ledger_account_id','totalDebit' => $query->func()->sum('Ledgers.debit'),'totalCredit' => $query->func()->sum('Ledgers.credit')])
 							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); //pr($query->first());
-							@$ClosingBalanceForPrint[$account_group->id]['name']=@$account_group->name;
-							@$ClosingBalanceForPrint[$account_group->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
-							
-							// pr($ClosingBalanceForPrint);exit;
-							$query2=$this->Ledgers->find();
-							$query2->select(['ledger_account_id','totalDebit' => $query2->func()->sum('Ledgers.debit'),'totalCredit' => $query2->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date >'=>$from_date, 'Ledgers.transaction_date <='=>$to_date,'Ledgers.company_id'=>$st_company_id])->first(); 
-
-							@$TransactionDr[@$account_group->id]['balance']+=@$query2->first()->totalDebit;
-							@$TransactionCr[@$account_group->id]['balance']+=@$query2->first()->totalCredit;
-
-							$query1=$this->Ledgers->find();
-							$query1->select(['ledger_account_id','totalDebit' => $query1->func()->sum('Ledgers.debit'),'totalCredit' => $query1->func()->sum('Ledgers.credit')])
-							->where(['Ledgers.ledger_account_id'=>$ledger_account->id, 'Ledgers.transaction_date <='=>$from_date,'Ledgers.company_id'=>$st_company_id])->first();
-							$OpeningBalanceForPrint[$account_group->id]['name']=@$account_group->name;
-							@$OpeningBalanceForPrint[$account_group->id]['balance']+=@$query1->first()->totalDebit-@$query1->first()->totalCredit;
-							/* pr($TransactionDr);
-							pr($TransactionCr);
-								exit; */
+							@$temp=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							if($temp !== 0){
+								//@$ClosingBalanceForPrint[$account_group->id]['group_name']=@$account_group->name;
+								@$ClosingBalanceForPrint[$account_group->id][$ledger_account->id]['name']=@$ledger_account->name;
+								@$ClosingBalanceForPrint[$account_group->id][$ledger_account->id]['balance']+=@$query->first()->totalDebit-@$query->first()->totalCredit;
+							}
 						}
 					}
 				}
 			}
 		} 
 	}
+	//	pr($group_name); exit;
 		//pr($OpeningBalanceForPrint); exit;
 		$ItemLedgers = $this->Ledgers->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
 		$itemOpeningBalance=0;
@@ -1008,7 +999,7 @@ class LedgersController extends AppController
 			@$to_date   = date("Y-m-d",strtotime($financial_year->date_to));
 		} 
 		$differenceInOpeningBalance= $this->differenceInOpeningBalance();
-		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance','groupForPrint','ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint'));
+		$this->set(compact('url','TrialBalances','financial_year','OpeningBalanceDebit','OpeningBalanceCredit','TransactionsDebit','TransactionsCredit','LedgerAccounts','from_date','to_date','itemOpeningBalance','differenceInOpeningBalance','groupForPrint','ClosingBalanceForPrint','TransactionDr','TransactionCr','OpeningBalanceForPrint','group_name'));
 	}
 	
 	public function TrailBalance (){
@@ -1469,6 +1460,56 @@ class LedgersController extends AppController
 					->not($between->between('reconciliation_date', $transaction_from_date, $transaction_to_date, 'date'));
 				})->order('transaction_date','ASC'); 
 				//pr($Ledgers->toArray()); exit;
+				
+				
+				$url_link=[];
+			foreach($Bank_Ledgers as $ledger){
+				if($ledger->voucher_source=="Journal Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Payment Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id,
+						['contain'=>['PaymentRows']]
+					);
+				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($ledger->voucher_id);
+					//pr($url_link[$ledger->id]); exit;
+				}else if($ledger->voucher_source=="Contra Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Receipt Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
+				}else if($ledger->voucher_source=="Invoice"){  
+					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					if($inq->sale_tax_id==0){
+						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					}else{
+						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					}
+				}else if($ledger->voucher_source=="Invoice Booking"){
+					$ib=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					if($ib->cst_vat=='vat'){
+						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					}else{
+						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					}
+				}else if($ledger->voucher_source=="Non Print Payment Voucher"){ 
+						
+					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Debit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Credit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Purchase Return"){
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Sale Return"){
+					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
+				}
+			}
 		}	
 		
 		
@@ -1546,6 +1587,58 @@ class LedgersController extends AppController
 					return $exp->between('transaction_date', $transaction_from_date, $transaction_to_date, 'date');
 				})->order('transaction_date','ASC');
 				//pr($Bank_Ledgers->toArray()); exit;
+				
+				
+			$url_link=[];
+			foreach($Bank_Ledgers as $ledger){
+				if($ledger->voucher_source=="Journal Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->JournalVouchers->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Payment Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->Payments->get($ledger->voucher_id,
+						['contain'=>['PaymentRows']]
+					);
+				}else if($ledger->voucher_source=="Petty Cash Payment Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->PettyCashVouchers->get($ledger->voucher_id);
+					//pr($url_link[$ledger->id]); exit;
+				}else if($ledger->voucher_source=="Contra Voucher"){
+					$url_link[$ledger->id]=$this->Ledgers->ContraVouchers->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Receipt Voucher"){
+				$url_link[$ledger->id]=$this->Ledgers->Receipts->get($ledger->voucher_id); 
+				}else if($ledger->voucher_source=="Invoice"){  
+					$inq=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					if($inq->sale_tax_id==0){
+						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					}else{
+						$url_link[$ledger->id]=$this->Ledgers->Invoices->get($ledger->voucher_id);
+					}
+				}else if($ledger->voucher_source=="Invoice Booking"){
+					$ib=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					if($ib->cst_vat=='vat'){
+						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					}else{
+						$url_link[$ledger->id]=$this->Ledgers->InvoiceBookings->get($ledger->voucher_id);
+					}
+				}else if($ledger->voucher_source=="Non Print Payment Voucher"){ 
+						
+					$url_link[$ledger->id]=$this->Ledgers->Nppayments->get($ledger->voucher_id);
+				}else if($ledger->voucher_source=="Debit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->DebitNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Credit Notes"){
+					$url_link[$ledger->id]=$this->Ledgers->CreditNotes->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Purchase Return"){
+					$url_link[$ledger->id]=$this->Ledgers->PurchaseReturns->get($ledger->voucher_id,[
+						'contain'=>['FinancialYears']
+					]);
+				}else if($ledger->voucher_source=="Sale Return"){
+					$url_link[$ledger->id]=$this->Ledgers->SaleReturns->get($ledger->voucher_id);
+				}
+			}	
+				
+				
 		}
 
 		$vr=$this->Ledgers->VouchersReferences->find()->where(['company_id'=>$st_company_id,'module'=>'Bank Reconciliation Add','sub_entity'=>'Bank'])->first();
@@ -1580,7 +1673,7 @@ class LedgersController extends AppController
 		{
 		$bank_ledger_data=$this->Ledgers->LedgerAccounts->get($ledger_account_id);
 		}
-		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','To','financial_year','from'));
+		$this->set(compact('bankReconciliationAdd','banks','Bank_Ledgers','ledger_account_id','bank_ledger_data','To','financial_year','from','url_link'));
 	}
 	public function findDate($ledger_account_id=null){ 
 	

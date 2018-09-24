@@ -150,11 +150,9 @@ $html = '
 							<td width="50%" valign="top" text-align="right">
 								<span><b>';
 								if($challan->customer_id){
-									if(!empty($challan->customer->alias)){ 
-										$html.= h($challan->customer->customer_name.'('.$challan->customer->alias.')');
-									}else{
+									
 										$html.= h($challan->customer->customer_name);
-									}
+									
 								}else {
 									$html.= h($challan->vendor->company_name) ;
 								}
@@ -162,14 +160,22 @@ $html = '
 								$html.='</b></span><br/>';
 								if($challan->customer_id){
 									$html.= $this->Text->autoParagraph(h($challan->customer_address));
+									if(!empty($challan->customer->gst_no))
+									{
+										$html.='<span> GST No : '. h($challan->customer->gst_no).  '</span><br/>';
+									}
 									
+									if(!empty($challan->customer->pan_no))
+									{
+										$html.='<span> PAN : '. h($challan->customer->pan_no) . '</span><br/>';
+									}
 								}else{
 									$html.= $this->Text->autoParagraph(h($challan->vendor_address));
 									
 									
 									if(!empty($challan->vendor->gst_no))
 									{
-										$html.='<span> GST No-'. h($challan->vendor->gst_no).  '</span><br/>';
+										$html.='<span> GST No : '. h($challan->vendor->gst_no).  '</span><br/>';
 									}
 									
 									
@@ -295,38 +301,25 @@ $html.='
 							<td  >
 								
 								<table>
-									<tr>';
-									if($challan->customer_id){
-									$html.='
-										<td >GST</td>
+								<tr>';
+									$html.='<td >GST No</td>
 										<td >: ';
-									}else{
-										$html.='<td></td>
-										<td >';
-									}	
 									
-									if($challan->customer_id){
-									
-									if(!empty($challan->customer->gst_no))
+									if(!empty($challan->company->gst_no))
 									{
-										$html.='<span>'. h($challan->customer->gst_no).  '</span>&nbsp;&nbsp;&nbsp;';
+										$html.='<span>'. h($challan->company->gst_no) . '</span><br/>';
 									}
-									
-								}
+								
 									$html.='</td>
-									</tr>
+								</tr>
 									<tr width="30">';
-									if($challan->customer_id){
+									
 										$html.='<td >PAN</td>
 										<td >: ';
-									}else{
-										$html.='<td></td>
-										<td>';
-									}	
 									
-									if(!empty($challan->customer->pan_no))
+									if(!empty($challan->company->pan_no))
 									{
-										$html.='<span>'. h($challan->customer->pan_no) . '</span><br/>';
+										$html.='<span>'. h($challan->company->pan_no) . '</span><br/>';
 									}
 								
 									$html.='</td>

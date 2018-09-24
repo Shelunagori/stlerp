@@ -296,7 +296,7 @@ class PettyCashVouchersController extends AppController
 			$grnIds=[];$invoiceIds=[];
 			foreach( $this->request->data['petty_cash_voucher_rows'] as $key =>  $pr)
 			{
-				$grnstring="";$invoiceString="";
+				/* $grnstring="";$invoiceString="";
 				if(!empty($pr['grn_ids']))
 				{
 					foreach( $pr['grn_ids'] as  $dr)
@@ -310,6 +310,33 @@ class PettyCashVouchersController extends AppController
 					foreach( $pr['invoice_ids'] as  $dr)
 					{
 							$invoiceString .=$dr.',';
+					}
+					$invoiceIds[$key] =$invoiceString;
+				} */
+				if(!empty(@$pr['grn_ids']))
+				{
+					$pr['grn_ids'] = array_filter(@$pr['grn_ids']);
+					$grnstring="";
+					foreach( $pr['grn_ids'] as  $dr)
+					{
+						foreach($dr as $aSelected){ 
+							$grnstring.=$aSelected.',';
+						}
+						
+					}
+					
+					$grnIds[$key] =$grnstring;
+				}
+				if(!empty($pr['invoice_ids']))
+				{
+					$pr['invoice_ids'] = array_filter($pr['invoice_ids']);
+					$invoiceString="";
+					foreach( $pr['invoice_ids'] as  $dr)
+					{
+						foreach($dr as $bSelected){ 
+							$invoiceString.=$bSelected.',';
+						}
+						//$invoiceString .=$dr.',';
 					}
 					$invoiceIds[$key] =$invoiceString;
 				}
@@ -579,24 +606,34 @@ class PettyCashVouchersController extends AppController
         
         if ($this->request->is(['patch', 'post', 'put'])) {
 			$grnIds=[];$invoiceIds=[];
+			
 			foreach( $this->request->data['petty_cash_voucher_rows'] as $key =>  $pr)
 			{ 
-				$grnstring="";$invoiceString="";
-				if(!empty($pr['grn_ids']))
+				
+				if(!empty(@$pr['grn_ids']))
 				{
-					$pr['grn_ids'] = array_filter($pr['grn_ids']);
+					$pr['grn_ids'] = array_filter(@$pr['grn_ids']);
+					$grnstring="";
 					foreach( $pr['grn_ids'] as  $dr)
 					{
-						$grnstring .=$dr.',';
+						foreach($dr as $aSelected){ 
+							$grnstring.=$aSelected.',';
+						}
+						
 					}
+					
 					$grnIds[$key] =$grnstring;
 				}
 				if(!empty($pr['invoice_ids']))
 				{
 					$pr['invoice_ids'] = array_filter($pr['invoice_ids']);
+					$invoiceString="";
 					foreach( $pr['invoice_ids'] as  $dr)
 					{
-							$invoiceString .=$dr.',';
+						foreach($dr as $bSelected){ 
+							$invoiceString.=$bSelected.',';
+						}
+						//$invoiceString .=$dr.',';
 					}
 					$invoiceIds[$key] =$invoiceString;
 				}

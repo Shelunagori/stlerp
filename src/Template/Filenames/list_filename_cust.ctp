@@ -1,0 +1,1 @@
+<?php echo $this->Form->input('ch3', ['options' => $files,'label' => false,'class' => 'form-control input-sm file_no','required','id'=>'file_no']); ?>

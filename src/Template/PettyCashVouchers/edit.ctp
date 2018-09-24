@@ -270,7 +270,7 @@ $(document).ready(function() {
 		} else {
 			//elems.addClass('error');
 		}
-	}, jQuery.format("Reference number should unique for one party."))
+	}, jQuery.format("Reference number should unique for one party."));
 
 
 	var form3 = $('#form_sample_3');
@@ -340,7 +340,7 @@ $(document).ready(function() {
 			$('#submitbtn').text('Submitting.....');
 			success3.show();
 			error3.hide();
-			form[0].submit(); // submit the form
+			form3[0].submit(); // submit the form
 		}
 
 	});
@@ -379,7 +379,8 @@ $(document).ready(function() {
 					$(this).find("td:eq(0) .row_id").val(i);
 			//var serial_l=$('#main_table tbody#main_tbody tr.main_tr td:eq(0) select').length; 
 			
-				var thela_type = $(this).find("td:nth-child(1) select.received_from option:selected").attr('thelatype'); 
+				//var thela_type = $(this).find("td:nth-child(1) select.received_from option:selected").attr('thelatype'); 
+				var thela_type = $(this).find("td:eq(0) input.check").val(); 
 				if(thela_type)
 				{
 					if(thela_type=='grn')
@@ -410,7 +411,7 @@ $(document).ready(function() {
                     });
             $(this).find("td:eq(1) select").attr({name:"petty_cash_voucher_rows["+i+"][cr_dr]", id:"quotation_rows-"+i+"-cr_dr"});
             $(this).find("td:nth-child(4) textarea").attr({name:"petty_cash_voucher_rows["+i+"][narration]", id:"quotation_rows-"+i+"-narration"}).rules("add", "required");
-			
+			$(this).find("td:eq(0) select.received_from").attr('auto_inc',i)
             i++;
         });
     }
@@ -454,7 +455,7 @@ $(document).ready(function() {
 			i++;
 		});
 		
-		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_account").attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
+		$(sel).find("table.ref_table tfoot tr:nth-child(1) td:nth-child(3) input").attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		
 		$(sel).find("table.ref_table tfoot tr:nth-child(1) .on_acc_cr_dr").attr({name:"petty_cash_voucher_rows["+row_id+"][on_acc_cr_dr]", id:"ref_rows-"+row_id+"-"+i+"-ref_cr_dr"}).rules("add", "required");
 		

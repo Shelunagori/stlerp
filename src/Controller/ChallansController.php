@@ -164,7 +164,7 @@ class ChallansController extends AppController
 			}
 		
 			$challan->created_by=$s_employee_id; 
-			$challan->ch3=$challan->ch3; 
+			$challan->ch3=@$challan->ch3; 
 			$challan->company_id=$st_company_id;
 			$challan->created_on=date("Y-m-d",strtotime($challan->created_on));
 			$customer_id=$challan->customer_id;
@@ -192,7 +192,7 @@ class ChallansController extends AppController
 					}
 					
                 $this->Flash->success(__('The challan has been saved.'));
-				$challan->id = $this->EncryptingDecrypting->decryptData($challan->id); 
+				$challan->id = $this->EncryptingDecrypting->encryptData($challan->id); 
                   return $this->redirect(['action' => 'confirm/',$challan->id]);
             } else { 
 				
