@@ -797,7 +797,29 @@ $(document).ready(function() {
 			calculate_total();
 		});
 		
+		$("select.cgst_percent").die().live("change",function(){
 		
+			var select_value = $(this).closest('tr').find('td:nth-child(11) select option:selected').attr('percentage');
+			
+			
+			var sgst_options = $(this).closest('tr').find('td:nth-child(13) select.sgst_percent option');
+			
+			$(sgst_options).each(function() {
+				var $thisOption = $(this);
+				$thisOption.attr("disabled", false);
+				var valueToCompare = select_value;
+				if($thisOption.attr('percentage') == valueToCompare) { 
+					$thisOption.prop("selected", true);
+					$thisOption.attr("disabled", false);
+				}else{ 
+					$thisOption.attr("disabled", "disabled");
+				}
+			});
+			
+			
+			
+		rename_rows(); calculate_total();
+	});	
 	$('.common_cgst_per').live("change",function() {
 	var common_cgst=$(this).find('option:selected').val();
 	$('.cgst_percent').val(common_cgst);

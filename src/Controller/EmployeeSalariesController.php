@@ -54,6 +54,18 @@ class EmployeeSalariesController extends AppController
         $this->set('_serialize', ['employeeSalary']);
     }
 
+	public function historyofSalary($employee_id=null){
+		$this->viewBuilder()->layout('index_layout');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+
+		$historyOfSalary = $this->EmployeeSalaries->find()->contain(['Employees'=>['EmployeeCompanies'=>function($q) use($st_company_id){
+								return $q->where(['EmployeeCompanies.company_id'=>$st_company_id,'freeze'=>0]);
+							}]])->where(['EmployeeSalaries.employee_id'=>$employee_id]);
+
+		//pr($historyOfSalary->toArray());exit;
+		 $this->set(compact('historyOfSalary'));
+	}
     /**
      * Add method
      *

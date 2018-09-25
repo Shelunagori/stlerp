@@ -330,6 +330,8 @@ class EmployeesController extends AppController
         return $this->redirect(['action' => 'index']);
     }
 
+	
+
     public function EditCompany($employee_id = null)
     {
         $this->viewBuilder()->layout('index_layout');

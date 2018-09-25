@@ -240,8 +240,17 @@ class LoginsController extends AppController
 		$this->set(compact('st_login_id','Employee','login'));
 	}
 	
-	public function checkNameExists($user_id=null){
-		$login = $this->Logins->get($login_id);
+	public function checkNameExists($user_id=null,$username = null){
+		$username = $this->request->query('username');;
+		$loginExits = $this->Logins->exists(['Logins.id'=>$user_id,'Logins.username'=>$username]);
+		$loginUsernameExits = $this->Logins->exists(['Logins.id !='=>$user_id,'Logins.username'=>$username]);
+
+		$succes=0;
+		if(!$loginUsernameExits || $loginExits){
+			$succes = 1;
+		}
+			
+		echo  json_encode(['success'=>$succes]);exit;
 	}
 	
 	function otpCodeConfirm($employee_id=null,$login_id=null)

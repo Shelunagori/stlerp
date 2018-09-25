@@ -26,11 +26,9 @@
 				<label class="control-label">Username</label>
 				<br/>
 				<div class="row">
-					<div class="col-md-10">
-						<?php echo $this->Form->input('username1', ['type'=>'text','label'=>false,'class' => 'form-control username','placeholder'=>'Username','id'=>'username','value'=>$login->username,'readonly']); ?>
-					</div>
-					<div class="col-md-2">
-						<span toggle="#username" class="btn btn-primary fa fa-eye toggle-password"></span>
+					<div class="col-md-12">
+						<?php echo $this->Form->input('username', ['type'=>'text','label'=>false,'class' => 'form-control username','placeholder'=>'Username','id'=>'username']); ?>
+						<label for="username" id="errorUsername" class="error"></label>
 					</div>
 				</div>
 					
@@ -77,10 +75,12 @@
 <script>
 $(document).ready(function() {
 	var url_check_name = $('.url_check_name').val();
+	var username = $('#username').val();
+	//alert(url_check_name);
 	$('#form_sample_3').validate({
 		rules: {
 		"username": {
-			required: true
+			required: true,
 		},
 		"password": {
 			required: true
@@ -92,10 +92,12 @@ $(document).ready(function() {
 	},
 	messages: {
 		"username": {
-			required: "Please enter username"
+			required: "Please enter username",
+			remote :"username already in use"
 		},
 		"password": {
-			required: "Please enter current password."
+			required: "Please enter current password.",
+			
 		},
 		"con_password": {
 			required: "Please enter confirm password.",
@@ -106,11 +108,21 @@ $(document).ready(function() {
 	submitHandler: function (form) {
 		//$("#loader-1").show();
 		form[0].submit(); 
+
+
+
+
 	}
 		
 	});
+	
+	
+	  
+	
+	
+	
 	////
-	$('.toggle-password').click(function() {
+	/*$('.toggle-password').click(function() {
 
 		$(this).toggleClass('fa-eye-slash');
 		var input = $($(this).attr('toggle'));
@@ -121,7 +133,7 @@ $(document).ready(function() {
 			input.attr('readonly', true);
 		}
 
-	});
+	});*/
 });
 
 </script>
