@@ -802,7 +802,7 @@ $this->set(compact('EmployeeAtten1','emp_sallary_division1','other_amount1','loa
             $employeeSalary = $this->EmployeeSalaries->patchEntity($employeeSalary, $this->request->data);
 			$employeeSalary->effective_date_from=$effective_date_from;
 			$employeeSalary->effective_date_to=$effective_date_to;
-			$employeeSalary->created_on=$s_employee_id;
+			$employeeSalary->created_on=date('Y-m-d');
 			$employeeSalary->amount=$employeeSalary->amount;
 			if ($this->EmployeeSalaries->save($employeeSalary)) { 
                 $this->Flash->success(__('The employee salary has been saved.'));

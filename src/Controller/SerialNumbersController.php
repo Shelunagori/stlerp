@@ -153,13 +153,13 @@ class SerialNumbersController extends AppController
 			if($outExist > 0){
 				$values[]=$serialnumber->id;
 			}
-			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'invoice_row_id != '=>$in_row_id]);
-			
-			if($inExist == 0){
+			$inExist = $this->SerialNumbers->exists(['SerialNumbers.parent_id' => $serialnumber->id,'invoice_row_id NOT IN '=>[$in_row_id]]);
+			//pr($inExist);
+			if($inExist == 0){ 
 				$options[]=['text' =>$serialnumber->name, 'value' => $serialnumber->id];
 			}
 		} 
-		//pr($in_row_id);
+		
         $this->set(compact('options', 'values'));
         $this->set('_serialize', ['serialNumbers']);
 	}	

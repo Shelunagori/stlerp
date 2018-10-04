@@ -70,6 +70,12 @@ class LedgerAccountsTable extends Table
             'joinType' => 'LEFT'
         ]);
 		
+		$this->belongsTo('Employees', [
+			'className' => 'Employees',
+            'foreignKey' => 'source_id',
+            'joinType' => 'LEFT'
+        ]);
+		
 		$this->belongsTo('AccountCategories');
 		$this->belongsTo('Grns');
 		$this->belongsTo('Invoices');

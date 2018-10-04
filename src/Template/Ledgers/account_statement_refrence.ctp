@@ -14,7 +14,7 @@
 			<tbody>
 				<tr>
 					<td width="15%">
-						<?php echo $this->Form->input('ledgerid', ['empty'=>'--Select--','options' => $ledger,'empty' => "--Select Ledger Account--",'label' => false,'class' => 'form-control input-sm input-medium  select2me','required','value'=>@$ledger_account_id]); ?>
+						<?php echo $this->Form->input('ledgerid', ['empty'=>'--Select--','options' => $options,'empty' => "--Select Ledger Account--",'label' => false,'class' => 'form-control input-sm input-medium  select2me','required','value'=>@$ledger_account_id]); ?>
 						<?php echo $this->Form->input('status', ['type'=>'hidden','value'=>'Pending']); ?>
 					</td>
 					<td width="75%">

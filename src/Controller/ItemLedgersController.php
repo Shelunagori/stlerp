@@ -1423,7 +1423,7 @@ class ItemLedgersController extends AppController
 		$company_name[]=$this->request->query('company_name');
 		$stock=$this->request->query('stock');
 		$stockstatus=$this->request->query('stockstatus');
-		//pr($company_name); exit;
+		
 		$where=[];
 		$whereItem=[];
 		
@@ -1431,7 +1431,7 @@ class ItemLedgersController extends AppController
 		$this->set(compact('item_category','item_group','item_sub_group','item_name','company_name','stock'));
 		if(!empty($item_name)){ 
 			$where['Item_id']=$item_name;
-			$whereItem['id']=$item_name;
+			$whereItem['Items.id']=$item_name;
 		}
 		
 		if(!empty($item_category)){
@@ -1717,11 +1717,12 @@ class ItemLedgersController extends AppController
 		
 		$material_report=[];
 		$ledger_item=[];
-		$Items_data =$this->ItemLedgers->Items->find();
+		/* $Items_data =$this->ItemLedgers->Items->find();
 		foreach($Items_data as $d){
 			$material_report[$d->id]=array('item_name'=>$d->name,'item_id'=>$d->id,'Current_Stock'=>'0','minimum_stock'=>'0');
 		}
-		
+		 */
+		//
 		//asort($ItemLedgers);
 		foreach ($ItemLedgers as $itemLedger){ 
 			$ledger_item[]=$itemLedger->item->id;
@@ -1753,7 +1754,7 @@ class ItemLedgersController extends AppController
 				$ItemDatas[$Item->id]=$Item->name;
 			}
 		}
-		
+		//pr($material_report);exit;
 		//pr($material_report);  pr($ItemDatas); exit;
 		$ItemCategories = $this->ItemLedgers->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
 		$ItemGroups = $this->ItemLedgers->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);

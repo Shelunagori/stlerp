@@ -69,10 +69,11 @@
 						<th style="text-align:right;">Amount</th>
 						<th style="text-align:center;">Reciept No</th>
 						<th style="text-align:center;">Reciept Date</th>
+						<th style="text-align:center;">Reciept Amount</th>
 					</tr>
 				</thead>
 				<tbody><?php  ?>
-				<?php $i=1; $refSize=0; foreach ($Invoices as $invoice):
+				<?php $i=1; $refSize=0; $dataArray=[]; foreach ($Invoices as $invoice):
 				
 				$refSize=(sizeof($Receiptdatas[$invoice->id])); 
 				$invoice_id = $EncryptingDecrypting->encryptData($invoice->id);
@@ -106,6 +107,7 @@
 						<?php 
 							$jk=0;
 								foreach($Receiptdatas[$invoice->id] as $data){
+									$dataArray[$invoice->id] = $recieptArray[$data->id];
 									if($jk > 0)
 									{
 										?>
@@ -126,7 +128,8 @@
 									?>
 									</td>
 									<td  style="text-align:center;"><?php echo date("d-m-Y",strtotime($data->receipt->transaction_date)); ?></td>
-									
+									<?php $dr = $data->debit; $cr = $data->credit; ?>
+									<td style="text-align:right;"><?php if($dr > 0){ echo $dr; }else if($cr > 0){ echo $cr;} ?></td>
 									</tr>
 								 <?php } ?>
 								   <?php } else{?>
@@ -154,7 +157,7 @@
 									<td  style="text-align:center;"><?php echo $invoice->customer->payment_terms ?> Days</td> 
 									<td  style="text-align:center;">
 									<?php
-										$due_date=date('Y-m-d', strtotime(@$invoice->date_created. ' +'. $invoice->customer->payment_terms .'days'));
+										$due_date=date('Y-m-d', strtotime(@$invoice->date_created)); 
 										$t_date = strtotime(date("d-m-Y"));
 										$due_dates = strtotime(date("d-m-Y",strtotime($due_date)));
 										if($due_dates < $t_date){
@@ -167,6 +170,7 @@
 									?>
 									</td> 
 									<td  style="text-align:right;"><?php echo $this->Number->format($invoice->total,['places'=>2]); ?></td> 
+									<td  style="text-align:center;">-</td> 
 									<td  style="text-align:center;">-</td> 
 									<td  style="text-align:center;">-</td> 
 								   <?php }?>

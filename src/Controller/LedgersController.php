@@ -612,6 +612,8 @@ class LedgersController extends AppController
 		$ledger_account_id=$this->request->query('ledgerid');
 		$financial_year = $this->Ledgers->FinancialYears->find()->where(['id'=>$st_year_id])->first();
 		$SessionCheckDate = $this->FinancialYears->get($st_year_id);
+		$s_employee_id=$this->viewVars['s_employee_id'];
+		$allowed_acc=$this->viewVars['allowed_acc'];
 		$from = date("Y-m-d",strtotime($SessionCheckDate->date_from));   
 		$To = date("Y-m-d"); 
 		$this->set(compact('ledger_account_id'));
@@ -759,9 +761,9 @@ class LedgersController extends AppController
 		//pr($on_cr); exit;
 
 	
-	
+	$ledgers=$this->Ledgers->LedgerAccounts->find()->contain(['Customers','Employees'])->where(['company_id'=>$st_company_id]);
 	//	pr($ReferenceBalances); exit;
-		$ledger=$this->Ledgers->LedgerAccounts->find('list',
+		/* $ledger=$this->Ledgers->LedgerAccounts->find('all',
 			['keyField' => function ($row) {
 				return $row['id'];
 			},
@@ -772,11 +774,12 @@ class LedgersController extends AppController
 					return $row['name'];
 				}
 				
-			}])->where(['company_id'=>$st_company_id]);
+			}])->where(['company_id'=>$st_company_id])->contain(['Customers']); */
 			//pr($ledger); exit;
 			
 		}else{
-			$ledger=$this->Ledgers->LedgerAccounts->find('list',
+			$ledgers=$this->Ledgers->LedgerAccounts->find()->contain(['Customers','Employees'])->where(['company_id'=>$st_company_id]);
+			/* $ledger=$this->Ledgers->LedgerAccounts->find('all',
 			['keyField' => function ($row) {
 				return $row['id'];
 			},
@@ -787,10 +790,46 @@ class LedgersController extends AppController
 					return $row['name'];
 				}
 				
-			}])->where(['company_id'=>$st_company_id]);
+			}])->where(['company_id'=>$st_company_id])->contain(['Customers']); */
 		}
 		
-		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data','DueReferenceBalances','Voucher_data','refInvoiceNo','refInvoiceBookingNo'));
+		$options = [];
+		$emp_id=[];
+		$emp_id =[23,16,17];
+		if(in_array($s_employee_id,$emp_id) || in_array($s_employee_id,$allowed_acc)){
+			foreach($ledgers as $ledgerEntry){
+				if(!empty($ledgerEntry->alias)){
+					$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name. ' (' . $ledgerEntry->alias . ')'];
+				}else{
+					$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name];
+				}
+			}
+		}else{
+			foreach($ledgers as $ledgerEntry){ 
+				if($ledgerEntry->source_model == "Customers"){ 
+					if(@$ledgerEntry->customer->employee_id == @$s_employee_id){
+						if(!empty($ledgerEntry->alias)){
+							$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name. ' (' . $ledgerEntry->alias . ')'];
+						}else{
+							$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name];
+						}
+					}
+				}else if($ledgerEntry->source_model == "Employees"){  
+					if(@$ledgerEntry->employee->id == @$s_employee_id){
+						if(!empty($ledgerEntry->alias)){
+							$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name. ' (' . $ledgerEntry->alias . ')'];
+						}else{
+							$options[] = ['value'=>$ledgerEntry->id,'text'=>$ledgerEntry->name];
+						}
+					}
+				}
+			}
+		}
+		//pr($options);exit;
+		
+		
+		//pr($ledger->toArray());exit;
+		$this->set(compact('Ledgers','ledger','financial_year','ReferenceBalances','Ledger_Account_data','ref_amt','ledger_amt','url','customer_data','on_dr','on_cr','Invoice_data','DueReferenceBalances','Voucher_data','refInvoiceNo','refInvoiceBookingNo','options'));
 	}
 	
 	public function excelExportAccountRef(){

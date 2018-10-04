@@ -6241,15 +6241,18 @@ class InvoicesController extends AppController
 		
 		
 		
-		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails','Customers'])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->where($where)->order(['Invoices.date_created'=>'DESC']);
+		$Invoices =$this->Invoices->find()->contain(['ReferenceDetails'=>['Receipts'],'Customers'])->where(['company_id'=>$st_company_id,'financial_year_id'=>$st_year_id])->where($where)->order(['Invoices.date_created'=>'DESC']);
 		
-		$Receiptdatas=[];
-		$Receiptdatas=[];
+		$Receiptdatas=[];$recieptArray=[];
 		foreach($Invoices as $invoice){ 
-			foreach($invoice->reference_details as $reference_detail){
-				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0]);
-				$Receiptdatas[$invoice->id]=$References->toArray();
+			foreach($invoice->reference_details as $reference_detail){ 
+				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0])->order(['ReferenceDetails.transaction_date'=>'DESC']);
+				foreach($References as $refData){
+					
+					$recieptArray[$refData->receipt_id]= $refData->receipt->transaction_date;
+				}
 				
+				$Receiptdatas[$invoice->id]=$References->toArray();
 			}
 		}
 		
@@ -6259,7 +6262,7 @@ class InvoicesController extends AppController
 					}
 				);
 		
-		$this->set(compact('Invoices','url','Receiptdatas','cust_name','From','To','reciept','SalesMans','salesman'));
+		$this->set(compact('Invoices','url','Receiptdatas','cust_name','From','To','reciept','recieptArray','SalesMans','salesman'));
 	}
 	
 	/* public function InvoiceList()
