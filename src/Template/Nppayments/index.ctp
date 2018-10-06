@@ -61,10 +61,11 @@
                             <td class="actions">
 							<?php 
 							//if(in_array($nppayment->created_by,$allowed_emp)){  
+							
 								if(in_array(173,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'view', $nppayment->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View ')); ?>
 								<?php }
-								if(in_array(172,$allowed_pages)){ echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $nppayment->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>
+								if(in_array(172,$allowed_pages) && empty($nppayment->salary_month)){ echo $this->Html->link('<i class="fa fa-pencil-square-o"></i>',['action' => 'edit', $nppayment->id],array('escape'=>false,'class'=>'btn btn-xs blue tooltips','data-original-title'=>'Edit'));  ?>
 							<?php } ?>
                             </td>
                         </tr>
