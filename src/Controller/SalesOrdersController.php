@@ -1667,7 +1667,9 @@ class SalesOrdersController extends AppController
 		$x=$this->pdfDownload($id);
 		$email = new Email('default');
 		$email->transport('gmail');
-		$email_to=$salesOrder->dispatch_email;
+		$email_to1=$salesOrder->dispatch_email;
+		$email_to2=$salesOrder->dispatch_email2;
+		$email_to3=$salesOrder->dispatch_email3;
 		//$email_to='dimpaljain892@gmail.com';
 		$cc_mail=@$salesOrder->customer->employee->company_email;
 		//$cc_mail='dimpaljain892@gmail.com';
@@ -1675,7 +1677,7 @@ class SalesOrdersController extends AppController
 		$name='last_so'; 
 		$attachments='';
 		$attachments='Invoice_email/'.$name.'.pdf';
-		
+		$email_tos=[$email_to1,$email_to2,$email_to3];
 		//pr($email_to);
 		//pr($cc_mail); exit;
 		//$email_to="gopalkrishanp3@gmail.com";
@@ -1683,6 +1685,7 @@ class SalesOrdersController extends AppController
 		//$member_name="Gopal";
 		$from_name=$company_data->alias;
 		$sub="Purchase order acknowledgement";
+	foreach($email_tos as $email_to){ 
 		if(!empty($email_to)){		
 			try { 
 				$email->from(['dispatch@mogragroup.com' => $from_name])
@@ -1692,13 +1695,14 @@ class SalesOrdersController extends AppController
 				->subject($sub)
 				->template('send_sales_order')
 				->emailFormat('html')
-				->viewVars(['salesOrder'=>$salesOrder])
+				->viewVars(['salesOrder'=>$salesOrder,'email_to'=>$email_to])
 				->attachments($attachments); // pr($salesOrder); exit;
 			} catch (Exception $e) {
 					echo 'Exception : ',  $e->getMessage(), "\n";
 				}	
-			//$email->send();
+			$email->send();
 		}	
+	}
 		return;
 	}
 	

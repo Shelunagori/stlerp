@@ -927,7 +927,7 @@ class PurchaseOrdersController extends AppController
 		
 		$email = new Email('default');
 		$email->transport('gmail');
-		$email_to=$PurchaseOrders->vendor->vendor_contact_persons[0]->email;
+		$email_to=$PurchaseOrders->vendor->account_email;
 		$cc_mail=$PurchaseOrders->creator->company_email;
 		
 		//$email_to="dimpaljain892@gmail.com";

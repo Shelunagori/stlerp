@@ -50,7 +50,7 @@ p { margin-top : 0px;  }
 				3.      Your documents will be sent by courier through <?php echo $salesOrder->courier->transporter_name; ?> <?php echo "<br/>"; ?>
 				4.      Your freight term is <?php echo $salesOrder->delivery_description; ?>.<?php echo "<br/>"; ?>
 				5.      Payment term is within  <?php echo $salesOrder->customer->payment_terms; ?> days.<?php echo "<br/>"; ?>
-				6.      Dispatch intimation will be sent to <?php echo $salesOrder->dispatch_name; ?> at <?php echo $salesOrder->dispatch_email; ?> . <?php echo "<br/>"; ?>
+				6.      Dispatch intimation will be sent to <?php echo $salesOrder->dispatch_name; ?> at <?php echo $email_to; ?> . <?php echo "<br/>"; ?>
 				7.      Your expected delivery date is <?php echo date("d-m-Y",strtotime($salesOrder->expected_delivery_date)); ?> <?php echo "<br/>"; ?>
 				</td>
 		</tr>

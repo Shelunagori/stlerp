@@ -1273,6 +1273,7 @@ class CustomersController extends AppController
 		$amount=$this->request->query('amount');
 		$CompanyBanks=$this->Customers->CompanyBanks->find()->where(['company_id'=>$st_company_id,'default_bank'=>1])->first();
 		$customerData=$this->Customers->LedgerAccounts->get($id);
+		$SaleOrdersData=$this->Customers->SaleOrders->find()->where(['SaleOrders.customer_id'=>$customerData->source_id]);
 		$s_employee_id=$this->viewVars['s_employee_id'];
 		$empData=$this->Customers->Employees->get($s_employee_id,[
 		'contain'=> ['Designations']]);

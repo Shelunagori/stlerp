@@ -85,7 +85,7 @@
 						if($invoice->status=='Cancel'){ $tr_color='#FFF'; }
 						?>
 						<?php 
-						 if((in_array($invoice->customer->employee_id,$allowed_emp) || in_array($invoice->customer->employee_id,$allowed_acc)) || ($invoice->created_by == $s_employee_id) || ($invoice->employee_id == $s_employee_id) || $inventory_voucher == 'true'){
+						 if((in_array($invoice->customer->employee_id,$allowed_emp) || in_array($s_employee_id,$allowed_acc)) || ($invoice->created_by == $s_employee_id) || ($invoice->customer->employee_id == $s_employee_id) || $inventory_voucher == 'true'){
 						
 						
 						
@@ -168,7 +168,9 @@
 								
 							</td>
 						</tr>
-						 <?php }}  endforeach; ?>
+						 <?php }
+						 }
+						 endforeach; ?>
 					</tbody>
 				</table>
 				</div>
