@@ -57,20 +57,20 @@ $url_excel="/?".$url;
 										
 									</td>
 									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
-										<td align="right">
+										<td class="first" align="right">
 										<?php if($groupForPrintRow['balance']!=0){
 											echo abs($groupForPrintRow['balance']); 
 											$LeftTotal+=abs($groupForPrintRow['balance']); 
 										} ?>
 									</td>
 									<?php }else{ ?>
-									<td align="right">
+									<td class="first" align="right">
 										<?php if($groupForPrintRow['balance']!=0){
 											echo abs($groupForPrintRow['balance']); 
 											$LeftTotal+=abs($groupForPrintRow['balance']); 
 										} ?>
 									</td>
-									<td></td>
+									<td class="first"></td>
 									<?php } ?>
 								</tr>
 								<?php } ?>
@@ -127,7 +127,7 @@ $url_excel="/?".$url;
 										
 									</td>
 									<?php if($st_year_id==1 || $st_year_id==2 ||$st_year_id==3){ ?>
-									<td align="right">
+									<td class="first" align="right">
 										<?php if($groupForPrintRow['balance']!=0){
 														
 											echo abs($groupForPrintRow['balance']);
@@ -135,14 +135,14 @@ $url_excel="/?".$url;
 										} ?>
 									</td>
 									<?php }else{ ?>
-									<td align="right">
+									<td class="first" align="right">
 										<?php if($groupForPrintRow['balance']!=0){
 														
 											echo abs($groupForPrintRow['balance']);
 											$RightTotal+=abs($groupForPrintRow['balance']);
 										} ?>
 									</td>
-									<td></td>
+									<td class="first"></td>
 									<?php } ?>
 								</tr>
 								<?php } ?>
@@ -213,7 +213,7 @@ $(document).ready(function() {
 	$(".group_name").die().live('click',function(e){
 	   var current_obj=$(this);
 	   var group_id=$(this).attr('group_id');
-	  
+	  current_obj.closest('tr').find('.first').toggle();
 	  if(current_obj.attr('status') == 'open')
 	   {
 			$('tr.row_for_'+group_id+'').remove();
@@ -244,7 +244,7 @@ $(document).ready(function() {
 	$(".first_grp_name").die().live('click',function(e){ 
 	   var current_obj=$(this);
 	   var first_grp_id=$(this).attr('first_grp_id');
-	  
+	  current_obj.closest('tr').find('.second').toggle();
 	  if(current_obj.attr('status') == 'open')
 	   {
 			$('tr.row_for_'+first_grp_id+'').remove();
@@ -273,7 +273,7 @@ $(document).ready(function() {
 	$(".second_grp_name").die().live('click',function(e){ 
 	   var current_obj=$(this);
 	   var second_grp_id=$(this).attr('second_grp_id');
-	  
+	  current_obj.closest('tr').find('.third').toggle();
 	  if(current_obj.attr('status') == 'open')
 	   {
 			$('tr.row_for_'+second_grp_id+'').remove();

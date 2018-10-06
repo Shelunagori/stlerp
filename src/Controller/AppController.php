@@ -382,7 +382,7 @@ class AppController extends Controller
 		 $st_year_id = $session->read('st_year_id');
 		 $yrid=[];
 		 $yrid = [1,2,3];
-		if(in_array($st_year_id,$yrid)){
+		if($date=="2017-04-01"){
 			$ItemLedgers = $this->ItemLedgers->find()->where(['ItemLedgers.source_model'=>'Items','ItemLedgers.company_id'=>$st_company_id]);
 			$total_amt=0;
 			foreach($ItemLedgers as $ItemLedger){ 

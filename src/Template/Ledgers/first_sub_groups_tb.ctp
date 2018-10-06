@@ -9,32 +9,32 @@
 				
 			</td>
 				<?php if($OpeningBalanceForPrint[$key]['balance'] > 0){ ?>
-								<td width="13%"><?php echo $OpeningBalanceForPrint[$key]['balance'];
+								<td class="second" width="13%"><?php echo $OpeningBalanceForPrint[$key]['balance'];
 										?></td>
-								<td  width="13%"><?php echo "-" ?></td>
+								<td class="second" width="13%"><?php echo "-" ?></td>
 								<?php }else{ ?>
-								<td  width="13%"><?php echo "-"; ?></td>
-								<td  width="13%"><?php echo abs($OpeningBalanceForPrint[$key]['balance']);  ?></td>
+								<td class="second" width="13%"><?php echo "-"; ?></td>
+								<td class="second" width="13%"><?php echo abs($OpeningBalanceForPrint[$key]['balance']);  ?></td>
 								<?php } ?>
 
 
 								
-								<td width="13%"><?php echo abs($TransactionDr[$key]['balance']);
+								<td class="second" width="13%"><?php echo abs($TransactionDr[$key]['balance']);
 										?></td>
 								
-								<td width="13%"><?php echo abs($TransactionCr[$key]['balance']);
+								<td class="second" width="13%"><?php echo abs($TransactionCr[$key]['balance']);
 									  ?></td>
 								
 								
 
 
 								<?php if($data['balance'] > 0){ ?>
-								<td width="13%"><?php echo $data['balance'];
+								<td class="second" width="13%"><?php echo $data['balance'];
 									@$totalDr=@$totalDr+$data['balance'];	?></td>
-								<td width="13%"><?php echo "-" ?></td>
+								<td class="second" width="13%"><?php echo "-" ?></td>
 								<?php }else{ ?>
-								<td width="13%"><?php echo "-"; ?></td>
-								<td width="13%"><?php echo abs($data['balance']);  
+								<td class="second" width="13%"><?php echo "-"; ?></td>
+								<td class="second" width="13%"><?php echo abs($data['balance']);  
 									@$totalCr=@$totalCr+abs($data['balance']);  ?></td>
 								<?php } ?>
 							
