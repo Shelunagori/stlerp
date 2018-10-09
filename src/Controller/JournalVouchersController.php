@@ -168,7 +168,7 @@ class JournalVouchersController extends AppController
 		$this->viewBuilder()->layout('index_layout');
 		$id = $this->EncryptingDecrypting->decryptData($id);
         $journalVoucher = $this->JournalVouchers->get($id, [
-            'contain' => ['Companies','FinancialYears'=>['Companies'],'JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator']
+            'contain' => ['Companies','FinancialYears'=>['Companies'],'JournalVoucherRows'=>['ReceivedFroms','ReferenceDetails'],'Companies','Creator','Editor']
         ]);
 		
 		$journalVoucher_row_data=[];

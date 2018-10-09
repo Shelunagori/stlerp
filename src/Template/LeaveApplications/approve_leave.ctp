@@ -22,7 +22,9 @@
 						<td width="15%"><b>Employee: </b></td>
 						<td><?php echo $LeaveApplication->employee->name; ?></td>
 						<td width="15%"><b>No. of leaves: </b></td>
-						<td><?php echo $LeaveApplication->day_no; ?></td>
+						<td><?php echo $LeaveApplication->day_no; ?>
+						<input type="hidden" class="day_nos" value="<?php echo $LeaveApplication->day_no; ?>">
+						</td>
 						<td width="15%"><b>Leave Type: </b></td>
 						<td><?php 
 							if($per_month_leave < $no_of_day_approval){
@@ -53,8 +55,8 @@
 					</tr>
 					<tr>
 						
-						<td colspan="4"><div id="qwerty"></div></td>
-						<td colspan="2"></td>
+						<td  colspan="3"><div id="qwerty"></div></td>
+						
 					</tr>
 				</table>
 			
@@ -189,7 +191,7 @@
 								</td>
 								<td style="display:none;" class="addclass">
 									<label class="control-label  label-css">Intimated Leaves </label>   
-									<?php echo $this->Form->input('intimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave]); ?>
+									<?php echo $this->Form->input('intimated_leave', ['type'=>'text','label' => false,'class'=>'form-control input-sm intimated_leave','value'=>@$LeaveApplication->intimated_leave,'readonly']); ?>
 								</td>
 								<td>
 									<label class="control-label  label-css">Unintimated Leaves </label>  
@@ -233,10 +235,11 @@
 <script>
 $(document).ready(function(){
 	
+var day_nos = $('.day_nos').val();	 
 $('input[name="without_prior_approval"]').val(0);
 $('input[name="prior_approval"]').val(0);
 	
-	$('input[name=without_prior_approval]').live("keyup",function(){
+	/* $('input[name=without_prior_approval]').live("keyup",function(){
 		countLeaves();
 	});
 	$('input[name=prior_approval]').live("keyup",function(){
@@ -247,7 +250,7 @@ $('input[name="prior_approval"]').val(0);
 	});
 	$('input[name=approve_leave_to]').live("blur",function(){
 		countLeaves();
-	});
+	}); */
 	
 	
 	var leave_type = "<?php if($per_month_leave < $no_of_day_approval){ echo "Casual Leave"; }else{ echo $LeaveApplication->leave_type->leave_name; } ?>";
@@ -265,94 +268,40 @@ $('input[name="prior_approval"]').val(0);
 		$('.radioforCL').hide();
 	}
 	
-	$('input[name=leave_types]').live("click",function(){
+	$('input[name=leave_types]').live("change",function(){ 
+		countLeaves();
+	});
+	 $('input[name=leave_types1]').live("click",function(){
 		var  leave_types = $(this).val();
 		if(leave_types == "prior_approval"){
-			$('.prior_approval').removeAttr('readonly','readonly');
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.unintimated_leave').attr('readonly','readonly');
-			$('.unintimated_leave').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.unpaid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
-		}else if(leave_types == "without_prior_approval"){ alert();
-			$('.without_prior_approval').removeAttr('readonly','readonly');
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.unintimated_leave').attr('readonly','readonly');
-			$('.unintimated_leave').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.paid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
+			
+			$('.paid_leaves').removeAttr('readonly');
+			$('.unpaid_leaves').removeAttr('readonly');
+			$('.total_approved_leaves').removeAttr('readonly');
+			
+		}else if(leave_types == "without_prior_approval"){
+			
+			$('.paid_leaves').removeAttr('readonly');
+			$('.unpaid_leaves').removeAttr('readonly');
+			$('.total_approved_leaves').removeAttr('readonly');
+			
 		}else if(leave_types == "unintimated_leave"){
-			$('.unintimated_leave').removeAttr('readonly','readonly');
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-		}else if(leave_types == "intimated_leave"){
-			$('.intimated_leave').removeAttr('readonly','readonly');
-			$('.unintimated_leave').attr('readonly','readonly');
-			$('.unintimated_leave').val(0);
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.unpaid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
-		}else if(leave_types == "unintimated_leaves"){
-			$('.unintimated_leave').removeAttr('readonly','readonly');
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.paid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
+			
+			$('.paid_leaves').removeAttr('readonly');
+			$('.unpaid_leaves').removeAttr('readonly');
+			$('.total_approved_leaves').removeAttr('readonly');
+
 		}
+	}); 
+	
+	$('input[name=leave_types1]').live("change",function(){ 
+		countLeaves();
 	});
 	
-	$('input[name=leave_types1]').live("click",function(){
+	/* $('input[name=leave_types1]').live("click",function(){
 		var  leave_types = $(this).val();
-		if(leave_types == "prior_approval"){
-			$('.prior_approval').removeAttr('readonly','readonly');
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.unintimated_leave').attr('readonly','readonly');
-			$('.unintimated_leave').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.unpaid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
-		}else if(leave_types == "without_prior_approval"){ 
-			$('.without_prior_approval').removeAttr('readonly','readonly');
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.unintimated_leave').attr('readonly','readonly');
-			$('.unintimated_leave').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.paid_leaves').val(0);
-			$('.unpaid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
-		}else if(leave_types == "unintimated_leave"){
-			$('.unintimated_leave').removeAttr('readonly','readonly');
-			$('.prior_approval').attr('readonly','readonly');
-			$('.prior_approval').val(0);
-			$('.without_prior_approval').attr('readonly','readonly');
-			$('.without_prior_approval').val(0);
-			$('.intimated_leave').attr('readonly','readonly');
-			$('.intimated_leave').val(0);
-			$('.paid_leaves').val(0);
-			$('.total_approved_leaves').val(0);
-		}
-	});
+		
+	}); */
 	
 	$('input[name=approve_single_multiple]').live("click",function(){
 		var single_multiple=$(this).val();
@@ -389,8 +338,87 @@ $('input[name="prior_approval"]').val(0);
 		}
 	}
 	
-	countLeaves();
+	countLeaves(); 
 	function countLeaves(){ 
+		var  leave_types = $('input[name=leave_types]:checked').val();
+		var day_no=0;
+		var employee_id='<?php echo $LeaveApplication->employee_id; ?>';
+		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
+		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfoEmployees']); ?>";
+        url=url+'/'+employee_id+'/'+leaveAppId;  
+		 $.ajax({
+            url: url,
+            type: 'GET',
+		    dataType : 'json',
+		}).done(function(response) { 
+			var paid_leave = JSON.parse(response.total_paid_leave);
+			var unpaid_leave = JSON.parse(response.total_unpaid_leave);
+			var un_initimate_leave = JSON.parse(response.total_uninitimate_leave);
+			var prior_leave = JSON.parse(response.total_prior_leave);
+			var without_prior_leave = JSON.parse(response.total_withoutprior_leave);
+			day_no =  JSON.parse(response.day_no);
+			var total_past_paid_leave =  JSON.parse(response.total_past_paid_leave);
+			var total_past_unpaid_leave =  JSON.parse(response.total_past_unpaid_leave);
+			var casual_leave =  JSON.parse(response.casual_leaves);
+			var sick_leave =  JSON.parse(response.sick_leaves);
+			var past_casual_leave =  JSON.parse(response.past_casual_leave);
+			var past_sick_leave =  JSON.parse(response.past_sick_leave);
+			var past_withoutprior_leave =  JSON.parse(response.total_past_withoutprior_leave);
+			var past_intimated_leave =  JSON.parse(response.total_past_intimated_leave);
+			var total_current_unpaid_leave =  JSON.parse(response.total_current_unpaid_leave);
+			var total_current_paid_leave =  JSON.parse(response.total_current_paid_leave);
+			var leave_type = "<?php echo $LeaveApplication->leave_type->leave_name; ?>";
+			
+			/****start code here for show past paid leave*****/
+				$('div#qwerty').html('<table class="table table-bordered" border="1"><tr><td>Total Past-Paid Leave</td><td>'+total_past_paid_leave+'</td><td>Total Past-UnPaid Leave</td><td>'+total_past_unpaid_leave+'</td></tr><tr><td>Total Current-Paid Leave</td><td>'+total_current_paid_leave+'</td><td>Total Current-UnPaid Leave</td><td>'+total_current_unpaid_leave+'</td></tr><tr><td>Casual Leave</td><td>'+casual_leave+'</td><td>Sick Leave</td><td>'+sick_leave+'</td></tr></table>');
+			/****ends code here for show past paid leave****/
+			var intimated_leave =0; var unintimated_leave=0;
+			if(leave_types == "intimated_leave"){ 
+				 $('input[name="intimated_leave"]').val(day_no); 
+				 intimated_leave = $('input[name="intimated_leave"]').val(); 
+				 $('input[name="unintimated_leave"]').val(0);
+				 unintimated_leave = $('input[name="unintimated_leave"]').val();
+			}else if(leave_types == "unintimated_leaves"){ 
+				$('input[name="intimated_leave"]').val(0);
+				intimated_leave =  $('input[name="intimated_leave"]').val();
+				$('input[name="unintimated_leave"]').val(day_no);
+				unintimated_leave =$('input[name="unintimated_leave"]').val();
+			}
+			
+			/**start sick leave calculation**/
+			var SL =15; 
+			if(intimated_leave > 0){
+				if(leave_type == "Sick Leave"){
+					if(intimated_leave > SL){	
+						$('input[name="unpaid_leaves"]').val(intimated_leave);
+						$('input[name="total_approved_leaves"]').val(intimated_leave);
+						$('input[name="paid_leaves"]').val(0);
+					}else{
+						$('input[name="paid_leaves"]').val(intimated_leave);
+						$('input[name="unpaid_leaves"]').val(0);
+						$('input[name="total_approved_leaves"]').val(intimated_leave);
+					}	
+				}
+			}
+			
+			if(unintimated_leave > 0){
+				//var double_value = parseFloat(unintimated_leave)*2;
+				$('input[name="paid_leaves"]').val(0);
+				$('input[name="unpaid_leaves"]').val(unintimated_leave);
+				$('input[name="total_approved_leaves"]').val(unintimated_leave);
+			}
+			/**ends sick leave calculation**/
+		
+			/**starts casual leave calculation**/
+			
+			/**ends casual leave calculation**/
+		});
+		
+		
+		
+		
+	}
+	function countLeaves1(){ 
 		var employee_id='<?php echo $LeaveApplication->employee_id; ?>';
 		var leaveAppId='<?php echo $LeaveApplication->id; ?>';
 		var url="<?php echo $this->Url->build(['controller'=>'LeaveApplications','action'=>'leaveInfoEmployees']); ?>";
@@ -420,6 +448,7 @@ $('input[name="prior_approval"]').val(0);
 			
 			$('input[name="paid_leaves"]').val(paid_leave);
 			$('input[name="unpaid_leaves"]').val(unpaid_leave);
+			
 			
 			var total_approve = parseFloat(paid_leave)+parseFloat(unpaid_leave);
 			

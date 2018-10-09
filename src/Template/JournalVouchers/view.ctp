@@ -198,6 +198,11 @@ margin-bottom: 0;
 						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
 						</br>
 						<span style="font-size:14px;"><?= h($journalVoucher->creator->name) ?></span><br/>
+						<?php if(!empty($journalVoucher->editor)){ ?>
+						<span style="font-size: 14px;font-weight: bold;">Edited By</span>
+						</br>
+						<span style="font-size:14px;"><?= h($journalVoucher->editor->name) ?></span><br/>
+						<?php } ?>
 						</td>
 					</tr>
 				</table>

@@ -24,7 +24,7 @@ class ChallanReturnVouchersController extends AppController
         $this->paginate = [
             'contain' => ['Companies', 'Challans'=>['Customers', 'Companies','Vendors']]
         ];
-        $challanReturnVouchers = $this->paginate($this->ChallanReturnVouchers);
+        $challanReturnVouchers = $this->paginate($this->ChallanReturnVouchers->find()->where(['ChallanReturnVouchers.company_id'=>$st_company_id]));
 
         $this->set(compact('challanReturnVouchers'));
         $this->set('_serialize', ['challanReturnVouchers']);

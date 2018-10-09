@@ -182,7 +182,7 @@
 			</td>
 			<td><?php if($in_out_type=='In'){ echo $itemLedger->quantity; } else { echo '-'; } ?></td>
 			<td><?php echo $status; ?></td>
-			<td align="right"><?php echo $this->Money->indianNumberFormat($rate); ?></td>
+			<td align="right"><?php echo $this->Number->format($rate,['places'=>2]); ?></td>
 		</tr>
 		<?php endforeach; ?>
 	</tbody>
