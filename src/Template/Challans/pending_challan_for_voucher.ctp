@@ -40,6 +40,7 @@
             <?php foreach ($Challans as $challan): 
 					if(sizeof($challan->challan_rows) > 0){ 
 						if(@$challanReturnQty[@$challan->id] < @$challanQty[@$challan->id]){
+							$challan->id = $EncryptingDecrypting->encryptData($challan->id);
 				?>
 							<tr>
 								<td><?= h(++$page_no) ?></td>

@@ -412,11 +412,12 @@ class ChallansController extends AppController
 		
 		$Challans = $this->paginate($this->Challans->find()->contain(['Customers','ChallanRows' => function($q) {
 				return $q->where(['ChallanRows.challan_type'=>'Returnable']);
-			}])->order(['Challans.id' => 'ASC']));
+			}])->order(['Challans.id' => 'ASC'])->where(['Challans.company_id'=>$st_company_id]));
 			
 		$ChallanReturnVouchers = $this->Challans->ChallanReturnVouchers->find()->contain(['ChallanReturnVoucherRows' => function($q) {
 				return $q->select(['challan_return_voucher_id','challan_row_id','item_id','total_qty' => $q->func()->sum('ChallanReturnVoucherRows.quantity')])->group('ChallanReturnVoucherRows.challan_row_id');
-			}]);
+			}])->where(['ChallanReturnVouchers.company_id'=>$st_company_id]);
+			
 		$challanQty=[];
 		foreach($Challans as $Challan){ //pr($Challan); exit;
 			foreach($Challan->challan_rows as $challan_row){
@@ -443,11 +444,11 @@ class ChallansController extends AppController
 		
 		$Challans = $this->paginate($this->Challans->find()->contain(['Customers', 'Companies',  'Transporters','Vendors','ChallanRows' => function($q) {
 				return $q->where(['ChallanRows.challan_type'=>'Returnable']);
-			}])->order(['Challans.id' => 'ASC']));
+			}])->order(['Challans.id' => 'ASC'])->where(['Challans.company_id'=>$st_company_id]));
 			
 		$ChallanReturnVouchers = $this->Challans->ChallanReturnVouchers->find()->contain(['ChallanReturnVoucherRows' => function($q) {
 				return $q->select(['challan_return_voucher_id','challan_row_id','item_id','total_qty' => $q->func()->sum('ChallanReturnVoucherRows.quantity')])->group('ChallanReturnVoucherRows.challan_row_id');
-			}]);
+			}])->where(['ChallanReturnVouchers.company_id'=>$st_company_id]);
 		$challanQty=[];
 		foreach($Challans as $Challan){ //pr($Challan); exit;
 			foreach($Challan->challan_rows as $challan_row){

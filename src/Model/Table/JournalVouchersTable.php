@@ -67,6 +67,13 @@ class JournalVouchersTable extends Table
 			'foreignKey' => 'created_by',
 			'propertyName' => 'creator',
 		]);
+		
+		$this->belongsTo('Editor', [
+			'className' => 'Employees',
+			'foreignKey' => 'edited_by',
+			'propertyName' => 'editor',
+		]);
+		
 		$this->belongsTo('ReceivedFroms', [
 			'className' => 'LedgerAccounts',
             'foreignKey' => 'received_from_id',

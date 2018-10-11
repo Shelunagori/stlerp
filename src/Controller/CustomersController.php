@@ -1281,13 +1281,7 @@ class CustomersController extends AppController
 		]);
 		//pr($CompanyBanks); exit;
 		$to_date=date('Y-m-d');
-		$message_web=$this->findInvoice($id,$to_date);
-		$DueReferenceBalances=$message_web[0];
-		$ReferenceBalances=$message_web[1];
-		$refInvoiceNo=$message_web[2];
-		$Invoice_data=$message_web[3];
-		$Voucher_data=$message_web[4];
-		$invoicePO=$message_web[5];
+		
 	
 		//pr($DueReferenceBalances); exit;
 		$customerAdd=$cust_info->customer_address[0]->address;
@@ -1297,31 +1291,46 @@ class CustomersController extends AppController
 		$email->transport('gmail');
 		$company_data=$this->Customers->Companies->get($st_company_id);
 		$from_name=$company_data->alias;
-		$email_to=$cust_info->customer_contacts[0]->email;
+		//$email_to=$cust_info->customer_contacts[0]->email;
 		$cc_mail=$cust_info->employee->company_email;
 		//$email_to="dimpaljain892@gmail.com";
 		//$cc_mail="dimpaljain1699@gmail.com";
 		
 		$sub=$company_data->alias.' - Payment Reminder';
 		//$member_name="Gopal";
-		 	$email->from(['dispatch@mogragroup.com' => $from_name])
-					->to($email_to)
+		foreach($cust_info->customer_contacts as $emails){
+			$message_web=$this->findInvoice($id,$to_date,$emails->email);
+			$DueReferenceBalances=$message_web[0];
+			$ReferenceBalances=$message_web[1];
+			$refInvoiceNo=$message_web[2];
+			$Invoice_data=$message_web[3];
+			$Voucher_data=$message_web[4];
+			$invoicePO=$message_web[5];
+			foreach($ReferenceBalances as $key=>$ReferenceBalance){  
+				if(sizeof(@$Invoice_data[$refInvoiceNo[$key]]['sales_order']) > 0){ 
+					$email->from(['dispatch@mogragroup.com' => $from_name])
+					->to($emails->email)
 					->cc($cc_mail)
 					->replyTo('dispatch@mogragroup.com')
 					->subject($sub)
 					->template('send_payment_reminder')
 					->emailFormat('html')
 					->viewVars(['ReferenceBalances'=>$ReferenceBalances,'DueReferenceBalances'=>$DueReferenceBalances,'company'=>$company_data->name,'address'=>$customerAdd,'customer_data'=>$cust_info,'refInvoiceNo'=>$refInvoiceNo,'Voucher_data'=>$Voucher_data,'invoicePO'=>$invoicePO,'Invoice_data'=>$Invoice_data,'customerSalesManNames'=>$customerSalesManNames,'customerSalesManMobile'=>$customerSalesManMobile,'CompanyBanks'=>$CompanyBanks]);
-					$email->send();
-		
+					//$email->send();
+					
+				}	
+			}		
+		}
+		 	
+		exit;
 	}
 	
-	public function findInvoice($id = null,$to_date = null){
+	public function findInvoice($id = null,$to_date = null,$email=null){
 		$query = $this->Customers->Ledgers->ReferenceDetails->find()->where(['ReferenceDetails.transaction_date <='=>$to_date]);
 		$query->where(['ReferenceDetails.ledger_account_id'=>$id])
 		->autoFields(true);
 		$referenceDetails=$query->order(['transaction_date' => 'ASC']);
-		
+		//$email = "dimpaljain892@gmail.com";
 		$DueReferenceBalances=[];
 		$refInvoiceNo=[];
 		$refInvoiceBookingNo=[];
@@ -1333,7 +1342,16 @@ class CustomersController extends AppController
 		foreach($referenceDetails as $referenceDetail){
 			if($referenceDetail->debit > 0){ 
 				if($referenceDetail->invoice_id > 0){
-					$Invoice_data[$referenceDetail->invoice_id] = $this->Customers->Ledgers->Invoices->get($referenceDetail->invoice_id);
+					/* $Invoice_data[$referenceDetail->invoice_id] = $this->Customers->Ledgers->Invoices->get($referenceDetail->invoice_id,['contain'=>['SalesOrders'=>function($q) use($email){
+						return $q->where(['dispatch_email'=>$email])->orWhere(['dispatch_email2'=>$email])->orWhere(['dispatch_email3'=>$email]);
+					}]]); */
+					 $Invoice_datas = $this->Customers->Ledgers->Invoices->find()->where(['Invoices.id'=>$referenceDetail->invoice_id])->contain(['SalesOrders'=>function($q) use($email){
+						return $q->where(['dispatch_email'=>$email])->orWhere(['dispatch_email2'=>$email])->orWhere(['dispatch_email3'=>$email]);
+					}]); 
+					$Invoice_data=[];
+					foreach($Invoice_datas as $Invoice_dataa){
+						$Invoice_data[$Invoice_dataa->id] = $Invoice_dataa;
+					}
 					$refInvoiceNo[$referenceDetail->reference_no]=$referenceDetail->invoice_id;
 					$Invoice_data1 = $this->Customers->Ledgers->Invoices->get($referenceDetail->invoice_id);
 					$Voucher_data[$referenceDetail->reference_no] = @$Invoice_data1->in1.'/IN-'.str_pad(@$Invoice_data1->in2, 3, '0', STR_PAD_LEFT).'/'.@$Invoice_data1->in3.'/'.@$Invoice_data1->in4;
@@ -1380,6 +1398,7 @@ class CustomersController extends AppController
 				
 			}
 		}
+		///pr($Invoice_data);exit;
 		$a=[];
 		$a[]=$DueReferenceBalances;
 		$a[]=$ReferenceBalances; 

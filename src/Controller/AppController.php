@@ -175,6 +175,7 @@ class AppController extends Controller
 				); */
 				
 			$sales_man_acc= $this->Employees->get($login_emp->employee_id,['contain' => 'Departments']);	
+			//$sales_man_acc= $this->Employees->find()->conatin(['Departments'])->where(['Employees.department_id'=>2]);	
 			//pr();exit;	
 			//$allowed_sales=[];	
 			//$allowed_sales[]=$login_emp->employee_id;	
@@ -186,10 +187,15 @@ class AppController extends Controller
 						}
 					} */
 			$allowed_acc=[];	
+			/* $empDatas=[];
+			foreach($sales_man_acc as $data1){ 
+				$empDatas[$data1->id]=$data1->id; 
+			} */
 			
 			$employees_info= $this->Employees->find();
-				foreach($employees_info as $data1){
-					if($sales_man_acc->department->id == "2"){
+			
+				foreach($employees_info as $data1){ 
+					if($sales_man_acc->dipartment_id == "2"){
 						$allowed_acc[]=$data1->id; 
 					}		
 					

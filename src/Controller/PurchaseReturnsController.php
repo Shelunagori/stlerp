@@ -1103,10 +1103,27 @@ class PurchaseReturnsController extends AppController
 			$purchase_acc=$this->PurchaseReturns->LedgerAccounts->get($purchaseReturn->purchase_ledger_account);
 		}
 		
+		
+		$cgst_per=[];
+		$sgst_per=[];
+		$igst_per=[];
+		
+		foreach($purchaseReturn->purchase_return_rows as $purchase_return_row){
+			if($purchase_return_row->cgst_per > 0){
+				$cgst_per[$purchase_return_row->id]=$this->PurchaseReturns->SaleTaxes->get(@$purchase_return_row->cgst_per);
+			}
+			if($purchase_return_row->sgst_per > 0){
+				$sgst_per[$purchase_return_row->id]=$this->PurchaseReturns->SaleTaxes->get(@$purchase_return_row->sgst_per);
+			}
+			if($purchase_return_row->igst_per > 0){
+				$igst_per[$purchase_return_row->id]=$this->PurchaseReturns->SaleTaxes->get(@$purchase_return_row->igst_per);
+			}
+		}
+		
 		$v_LedgerAccount=$this->PurchaseReturns->LedgerAccounts->find()->where(['company_id'=>$st_company_id,'source_model'=>'Vendors','source_id'=>$purchaseReturn->vendor_id])->first();
 		$ReferenceDetails=$this->PurchaseReturns->ReferenceDetails->find()->where(['ledger_account_id'=>$v_LedgerAccount->id,'purchase_return_id'=>$purchaseReturn->id]);
 		
-		$this->set(compact('purchaseReturn','purchase_acc','v_LedgerAccount','ReferenceDetails'));
+		$this->set(compact('purchaseReturn','purchase_acc','v_LedgerAccount','ReferenceDetails','cgst_per','sgst_per','igst_per'));
 		
 	}
 	

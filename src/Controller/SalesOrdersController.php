@@ -1103,6 +1103,7 @@ class SalesOrdersController extends AppController
     public function edit($id = null)
     {
 		$this->viewBuilder()->layout('index_layout');
+		$id = $this->EncryptingDecrypting->decryptData($id);
 		$so = $this->SalesOrders->get($id); //pr($salesOrder->quotation_id);exit;
 		if($so->quotation_id > 0){ 
         $salesOrder = $this->SalesOrders->get($id, [

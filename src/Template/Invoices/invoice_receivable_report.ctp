@@ -102,6 +102,7 @@
 						?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo $invoice->customer->payment_terms ?>Days</td>
+<<<<<<< HEAD
 						<?php 
 							$RTD=date('Y-m-d',strtotime(($Receiptdatas[$invoice->id][0]->transaction_date)));
 							$CD=date('Y-m-d',strtotime(($invoice->date_created)));
@@ -118,6 +119,33 @@
 						
 						<td  style="text-align:right;" rowspan="<?php echo $refSize; ?>"><?php echo $this->Number->format($invoice->grand_total,['places'=>2]); ?></td>
 						<?php 
+=======
+						<?php
+										
+										$due_date=date('Y-m-d', strtotime(@$invoice->date_created. ' +'. $invoice->customer->payment_terms .'days'));
+										
+										$RTD=date('Y-m-d',strtotime($Receiptdatas[$invoice->id][0]->transaction_date));
+										$datediff = strtotime($RTD) - strtotime($due_date);
+											$Diff=floor($datediff / (60 * 60 * 24));
+											//$due_day=strtotime($due_date)-strtotime($RTD);
+											//$due_day = date('d-m-Y',strtotime($due_day.'days'));
+											?>
+						<?php 
+							/* $RTD=date('Y-m-d',strtotime(($Receiptdatas[$invoice->id][0]->transaction_date)));
+							$CD=date('Y-m-d',strtotime(($invoice->date_created)));
+							//pr($CD);
+							//pr($RTD); exit;
+							$datediff = strtotime($RTD) - strtotime($invoice->date_created);
+							$Diff=floor($datediff / (60 * 60 * 24));  */
+						?>
+						<?php if($Diff > 0){ ?>
+							<td  style="text-align:center; color:red;" rowspan="<?php echo $refSize; ?>"><?php echo $Diff; ?> Days</td>
+						<?php }else{ ?>
+							<td style="text-align:center;">0 Days</td>
+						<?php } ?>	
+						<td  style="text-align:right;" rowspan="<?php echo $refSize; ?>"><?php echo $this->Number->format($invoice->grand_total,['places'=>2]); ?></td>
+						<?php 
+>>>>>>> origin/master
 							$jk=0; 
 								
 								

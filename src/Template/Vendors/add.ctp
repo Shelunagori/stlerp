@@ -152,7 +152,32 @@
 					</div>
 				</div>
 				
-				
+				<div class="row">
+					<div class="col-md-4">
+						<div class="form-group">
+						<label class="control-label">Payment Remainder From<span class="required" aria-required="true">*</span></label>
+							<div class="radio-list">
+								<div class="radio-inline" data-error-container="#pay_remainder_email_error">
+								<?php echo $this->Form->radio(
+									'pay_remainder_email',
+									[
+										['value' => 'Sales', 'text' => 'Sales'],
+										['value' => 'Account', 'text' => 'Account','checked'],
+									]
+								); ?>
+								</div>
+                                <div id="pay_remainder_email_error"></div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+							<label class="control-label">Payment Remainder Email<span class="required" aria-required="true">*</span></label>
+							<?php echo $this->Form->input('sales_email', ['label' => false,'class' => 'form-control input-sm sales_email','placeholder'=>'Sales Email','style'=>'display:none']); ?>
+							<?php echo $this->Form->input('account_email', ['label' => false,'class' => 'form-control input-sm account_email','placeholder'=>'Account Email','style'=>'display:none']); ?>
+						</div>
+					</div>
+				</div>	
 				<h4 style="font-size:13px'">Contact Persons</h4>
 				<table class="table table-condensed tableitm" id="main_tb">
 					<thead>
@@ -340,7 +365,21 @@ $(document).ready(function() {
 	});
 });
 	
-	
+	$('.account_email').show();
+$('input[name="pay_remainder_email"]').die().live("change",function() {
+	if(pay_remainder_email == "Account"){
+		$('.sales_email').hide();
+		$('.sales_email').val('');
+		$('.account_email').show();
+		$('.account_email').attr('required','required');
+	}else if(pay_remainder_email == "Sales"){
+		$('.account_email').hide();
+		$('.account_email').val('');
+		$('.sales_email').show();
+		$('.sales_email').attr('required','required');
+	}
+});
+
 $('select[name="account_group_id"]').die().live("change",function() {
 
 	$('#account_first_subgroup_div').html('Loading...');

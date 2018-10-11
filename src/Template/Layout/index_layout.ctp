@@ -257,10 +257,7 @@ select
 					<i class="fa fa-angle-down"></i>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-default">
-						<li>
-							<?php 
-							echo $this->Html->link('<i class="fa fa-random"></i> Change Password','/Logins/Change-Password',array('escape'=>false)); ?>
-						</li>
+						
 						<li>
 							<?php 
 							echo $this->Html->link('<i class="fa fa-random"></i> Switch Company','/Logins/Switch-Company',array('escape'=>false)); ?>
@@ -836,7 +833,12 @@ select
 						?>
 						<li><?php 
 						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Invoice Receivable Report',array('controller'=>'Invoices','action'=>'invoiceReceivableReport'),array('escape'=>false)); ?></li>
-						<?php } ?>
+						<?php }
+						if(in_array(223,$allowed_pages)){
+						?>
+						<li><?php 
+						echo $this->Html->link('<i class="fa fa-puzzle-piece"></i> Gross Profit Report',array('controller'=>'Invoices','action'=>'invoiceGrossProfit'),array('escape'=>false)); ?></li>
+						<?php }						?>
 						<?php if(in_array(39,$allowed_pages)){?>
 						<li><?php echo $this->Html->link('<i class="fa fa-truck"></i> Material Indent Report','/Item-Ledgers/material-indent-report?stockstatus=Positive&company_name='.$st_company_id,array('escape'=>false)); ?></li>
 						<?php } ?>

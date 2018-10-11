@@ -191,7 +191,7 @@ $html = '
 								
 								
 							$html.=' </td>
-							<td style="white-space:nowrap;"  width="25%" valign="top">
+							<td style="white-space:nowrap;"  width="35%" valign="top">
 								<table width="100%">
 									<tr>
 										<td valign="top" style="vertical-align: top;" >Challan No.</td>
@@ -209,9 +209,9 @@ $html = '
 										<td valign="top" style="vertical-align: top;" >'. h($challan->lr_no) .'</td>
 									</tr>
 									<tr>
-										<td valign="top" style="vertical-align: top;">Carrier</td>
-										<td valign="top">:</td>
-										<td valign="top">'. h($challan->transporter->transporter_name) .'</td>
+										<td valign="top" width="10%" style="vertical-align: top;">Carrier</td>
+										<td valign="top" width="5%">:</td>
+										<td valign="top" width="50%" >'. h($challan->transporter->transporter_name).'</td>
 									</tr>
 								
 								</table>

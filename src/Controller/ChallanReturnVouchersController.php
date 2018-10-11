@@ -24,7 +24,7 @@ class ChallanReturnVouchersController extends AppController
         $this->paginate = [
             'contain' => ['Companies', 'Challans'=>['Customers', 'Companies','Vendors']]
         ];
-        $challanReturnVouchers = $this->paginate($this->ChallanReturnVouchers);
+        $challanReturnVouchers = $this->paginate($this->ChallanReturnVouchers->find()->where(['ChallanReturnVouchers.company_id'=>$st_company_id]));
 
         $this->set(compact('challanReturnVouchers'));
         $this->set('_serialize', ['challanReturnVouchers']);
@@ -96,14 +96,14 @@ class ChallanReturnVouchersController extends AppController
             }
 			//pr($challanReturnVoucher->voucher_no); exit;
 			//pr(date("Y-m-d")); exit;
-			$challanReturnVoucher->voucher_no=1;
+			$challanReturnVoucher->voucher_no=$challanReturnVoucher->voucher_no;
 			$challanReturnVoucher->created_on=date("Y-m-d");
 			$challanReturnVoucher->created_by=$s_employee_id;
 			$challanReturnVoucher->company_id=$st_company_id;
 			$challanReturnVoucher->challan_id=$id;
 			$challanReturnVoucher->transaction_date=date("Y-m-d");
 			//pr($challanReturnVoucher); exit;
-            if ($this->ChallanReturnVouchers->save($challanReturnVoucher)) { pr($challanReturnVoucher); exit;
+            if ($this->ChallanReturnVouchers->save($challanReturnVoucher)) { //pr($challanReturnVoucher); exit;
                 $this->Flash->success(__('The challan return voucher has been saved.'));
 
                 return $this->redirect(['action' => 'index']);
