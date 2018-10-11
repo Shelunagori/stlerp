@@ -119,7 +119,15 @@ margin-bottom: 0;
 			
 		</tr>
 		<tr>
-			<td width="50%" valign="top" align="left"></td>
+			<td width="50%" valign="top" align="left">
+				<table>
+					<tr>
+						<td><b> GST No</b></td>
+						<td width="20" align="center">:</td>
+						<td><?= h($purchaseReturn->vendor->gst_no) ?></td>
+					</tr>
+				</table>
+			</td>
 			<td width="50%" valign="top" align="right">
 				<table>
 					<tr>
@@ -128,6 +136,20 @@ margin-bottom: 0;
 						<td><?= h($purchase_acc->name) ?></td>
 					</tr>
 				</table>
+			</td>
+		</tr>
+		<tr>
+			<td width="50%" valign="top" align="left">
+				<table>
+					<tr>
+						<td><b> Address</b></td>
+						<td width="20" align="center">:</td>
+						<td><?= h($purchaseReturn->vendor->address) ?></td>
+					</tr>
+				</table>
+			</td>
+			<td width="50%" valign="top" align="right">
+				
 			</td>
 		</tr>
 	</table>
@@ -176,7 +198,7 @@ margin-bottom: 0;
 	foreach ($purchaseReturn->purchase_return_rows as $purchase_return_row): ?>
 		<tr>
 			<td>&nbsp;<?= h(++$page_no) ?></td>
-			<td ><?= $purchase_return_row->item->name; ?></td>
+			<td ><b><?= $purchase_return_row->item->name; ?></b><br/><br/><?php echo $purchase_return_row->description ?></td>
 			<td align="center" width="6%"><?= $purchase_return_row->quantity; ?></td>
 			<td align="right"><?=  number_format($purchase_return_row->unit_rate_from_po, 2, '.', '');?></td>
 			<td align="right"><?= number_format($purchase_return_row->quantity*$purchase_return_row->unit_rate_from_po, 2, '.', '');?></td>
@@ -286,9 +308,28 @@ margin-bottom: 0;
 	<tr>
 		<td style="vertical-align: top !important;">
 			<table width="100%">
+				<?php if(!empty($purchaseReturn->company->gst_no)){ ?>
+					<tr>
+						<td><b>GST No. :</b>&nbsp;&nbsp;<?php echo $purchaseReturn->company->gst_no;?></td>
+					</tr>
+				<?php } ?>	
+				<?php if(!empty($purchaseReturn->company->pan_no)){ ?>
+				<tr>
+					<td><b>PAN No. :</b>&nbsp;&nbsp;<?php echo $purchaseReturn->company->pan_no;?></td>
+				</tr>
+				<?php } ?>	
+				<?php if(!empty($purchaseReturn->company->cin_no)){ ?>
+				<tr>
+					<td><b>CIN No. :</b>&nbsp;&nbsp;<?php echo $purchaseReturn->company->cin_no;?></td>
+				</tr>
+				<?php } ?>
+			</table>
+			<table width="100%">
+				<?php if(!empty($purchaseReturn->narration)){ ?>
 			    <tr>
 					<td><b>Narration :</b>&nbsp;&nbsp;<?php echo $purchaseReturn->narration;?></td>
 				</tr>
+				<?php } ?>
 			</table>
 			<table width="100%">
 			    <tr>
@@ -296,9 +337,9 @@ margin-bottom: 0;
 				</tr>
 				<?php foreach($ReferenceDetails as $ReferenceDetail){ ?>
 				<tr>
-				    <td width="22%"></td>
-				    <td width="18%">Ref No - <?php echo $ReferenceDetail->reference_no; ?></td>
-				    <td width="5%"align="left">:</td>
+				    <td width="10%">Ref No - </td>
+				    <td width="35%"><?php echo $ReferenceDetail->reference_no; ?></td>
+				    <td width="5%">:</td>
 					<td align="left" style="padding-left:10px;"><?php echo $ReferenceDetail->debit; ?> Cr</td>
 				</tr>
 				<?php } ?>

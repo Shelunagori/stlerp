@@ -186,23 +186,35 @@ margin-bottom: 0;
 	<div style="border:solid 1px ;"></div>
 	<table width="100%" class="divFooter">
 		<tr>
-			<td></td>
+			<td>
+				
+			</td>		
+			</td>
 			<td align="right">
 				<table>
 					<tr>
-						<td align="center">
-						<span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($journalVoucher->company->name)?><br/></span>
+						<td colspan="2"><span style="font-size:14px;font-weight: bold;">For</span> <span style="font-size: 14px;font-weight: bold;"><?= h($journalVoucher->company->name)?><br/></span></td>
+					</tr>
+					<tr>
+						<td align="center" width="50%">
+						<span style="font-size:14px;font-weight: bold;"><br/></span>
 						<?php 
 						 echo $this->Html->Image('/signatures/'.$journalVoucher->creator->signature,['height'=>'50px','style'=>'height:50px;']); 
 						 ?></br>
 						<span style="font-size: 14px;font-weight: bold;">Prepared By</span>
 						</br>
 						<span style="font-size:14px;"><?= h($journalVoucher->creator->name) ?></span><br/>
-						<?php if(!empty($journalVoucher->editor)){ ?>
-						<span style="font-size: 14px;font-weight: bold;">Edited By</span>
-						</br>
-						<span style="font-size:14px;"><?= h($journalVoucher->editor->name) ?></span><br/>
-						<?php } ?>
+						
+						</td>
+						<td align="center" width="50%">
+							<span style="font-size: 14px;font-weight: bold;"><br/></span>
+							<?php 
+								echo $this->Html->Image('/signatures/'.$journalVoucher->editor->signature,['height'=>'50px','style'=>'height:50px;']); 
+							?>
+							<br/>
+							<span style="font-size: 14px;font-weight: bold;">Edited By</span>
+							<br/>
+							<span style="font-size:14px;"><?= h($journalVoucher->editor->name) ?></span>
 						</td>
 					</tr>
 				</table>

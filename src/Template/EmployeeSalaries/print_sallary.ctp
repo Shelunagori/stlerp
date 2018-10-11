@@ -72,17 +72,17 @@
 						
 						echo '<td align="right">'.round(@$division[$Employee->id][$DivisionId]).'</td>';
 						 if(@$salary_type[$Employee->id][$DivisionId]=="addition"){
-							@$total_add+=round(@$division[$Employee->id][$DivisionId]);
+							@$total_add+=round(@$division[$Employee->id][$DivisionId],2);
 						}else  if(@$salary_type[$Employee->id][$DivisionId]=="deduction"){
-							@$total_ded+=round(@$division[$Employee->id][$DivisionId]);
+							@$total_ded+=round(@$division[$Employee->id][$DivisionId],2);
 						}
-						@$Totalcolumn[$DivisionId]=@$Totalcolumn[$DivisionId]+round(@$division[$Employee->id][$DivisionId]);
+						@$Totalcolumn[$DivisionId]=@$Totalcolumn[$DivisionId]+round(@$division[$Employee->id][$DivisionId],2);
 					} ?>
 					<td align="right"><?php echo @$Loan[$Employee->id]; $total_loan+=@$Loan[$Employee->id];?></td>
 					<td align="right"><?php echo @$Others[$Employee->id]; $total_other+=@$Others[$Employee->id];?></td>
 					<?php $p=@$total_add-@$total_ded-@$Loan[$Employee->id];
 						$q=$p-@$Others[$Employee->id]; 
-						$grand_total+=round($q);
+						$grand_total+=round($q,2);
 					?>
 					<td align="right"><?php echo round(@$q); ?></td>
 				</tr>

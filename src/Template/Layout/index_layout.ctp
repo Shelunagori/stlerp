@@ -257,10 +257,7 @@ select
 					<i class="fa fa-angle-down"></i>
 					</a>
 					<ul class="dropdown-menu dropdown-menu-default">
-						<li>
-							<?php 
-							echo $this->Html->link('<i class="fa fa-random"></i> Change Password','/Logins/Change-Password',array('escape'=>false)); ?>
-						</li>
+						
 						<li>
 							<?php 
 							echo $this->Html->link('<i class="fa fa-random"></i> Switch Company','/Logins/Switch-Company',array('escape'=>false)); ?>

@@ -208,7 +208,7 @@ if(!empty($status)){
 								
 							?>
 							
-							<?php if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date && date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  {  ?>
+							<?php  if(date("d-m-Y",strtotime($quotation->created_on)) >= $start_date || date("d-m-Y",strtotime($quotation->created_on)) <= $end_date)  {  ?>
 								<?php if($quotation->status=='Pending' and $gst_pull_request!="true"  and $pull_request!="true" && $copy_request!="copy"){ ?>
 								<?php if(in_array(21,$allowed_pages)){ ?>
 								<?php echo $this->Html->link('<i class="fa fa-search"></i>',['action' => 'confirm', $quotation->id],array('escape'=>false,'target'=>'_blank','class'=>'btn btn-xs yellow tooltips','data-original-title'=>'View as PDF')); ?>

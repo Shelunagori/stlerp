@@ -6202,11 +6202,51 @@ class InvoicesController extends AppController
 	}
 	
 	public function invoiceGrossProfit(){
+		$url=$this->request->here();
+		$url=parse_url($url,PHP_URL_QUERY);
 		$session = $this->request->session();
 		$st_company_id = $session->read('st_company_id');
 		$this->viewBuilder()->layout('index_layout');
 		$st_year_id = $session->read('st_year_id');
-		 $Invoices =$this->Invoices->find()->contain(['InvoiceRows'])->where(['Invoices.profit_status'=>'No'])->order(['Invoices.id'=>'ASC']);
+		
+		$salesman = $this->request->query('salesman');
+		$customer = $this->request->query('customer');
+		$item_name = $this->request->query('item_name');
+		$item_category = $this->request->query('item_category');
+		$item_group_id = $this->request->query('item_group_id');
+		$item_sub_group_id = $this->request->query('item_sub_group_id');
+		$this->set(compact('salesman','customer','item_name','item_category','item_group_id','item_sub_group_id','url'));
+		$where=[];$whereRow=[];
+		if(!empty($salesman)){
+			$where['Invoices.employee_id']=$salesman;
+		}
+		
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
+		
+		if(!empty($item_name)){
+			$whereRow['Items.id']=$item_name;
+		}
+		
+		if(!empty($item_category)){
+			$whereRow['Items.item_category_id']=$item_category;
+		}
+		
+		if(!empty($item_group_id)){
+			$whereRow['Items.item_group_id ']=$item_group;
+		}
+		
+		if(!empty($item_sub_group_id)){
+			$whereRow['Items.item_sub_group_id ']=$item_sub_group;
+		}
+		
+		 $Invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) use($whereRow)
+		{
+			return $q->where($whereRow);
+			
+			
+		}]])->where(['Invoices.profit_status'=>'No'])->where($where)->order(['Invoices.id'=>'ASC']);
 		foreach($Invoices as $Invoice){ 
 			foreach($Invoice->invoice_rows as $invoice_row){ 
 				$srDatas=[];
@@ -6251,12 +6291,137 @@ class InvoicesController extends AppController
 				->where(['profit_status' =>"Yes"])
 				->execute(); */
 			//$GrossProfitReports=$this->Invoices->GrossProfitReports->find()->where(['GrossProfitReports.financial_year_id'=>$st_year_id])->contain(['Invoices'=>['InvoiceRows'=>['Items']]]);
-		$Invoices=$this->Invoices->find()->contain(['GrossProfitReports'=>['InvoiceRows'=>['Items']]])->where(['Invoices.financial_year_id'=>$st_year_id]);
+		$Invoices=$this->Invoices->find()->contain(['Customers','SalesOrders','GrossProfitReports'=>['InvoiceRows'=>['Items'=>function ($q) use($whereRow)
+		{
+			return $q->where($whereRow);
 			
+			
+		}]]])->where(['Invoices.financial_year_id'=>$st_year_id])->where($where);
+		
+		//pr($Invoices->toArray());exit;
+		$SalesMans = $this->Invoices->Employees->find('list')->matching(
+				'Departments', function ($q) use($st_company_id) {
+					return $q->where(['Departments.id' =>1]);
+				}
+			);
+			
+		$ItemCategories = $this->Invoices->Items->ItemCategories->find('list')->order(['ItemCategories.name' => 'ASC']);
+		if(!empty($item_category)){
+			$ItemGroups = $this->Invoices->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC'])->where(['item_category_id'=>$item_category]);
+		}else{
+			$ItemGroups = $this->Invoices->Items->ItemGroups->find('list')->order(['ItemGroups.name' => 'ASC']);
+		}	
+		if(!empty($item_group)){
+			$ItemSubGroups = $this->Invoices->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC'])->where(['item_group_id'=>$item_group]);	
+		}else{
+			$ItemSubGroups = $this->Invoices->Items->ItemSubGroups->find('list')->order(['ItemSubGroups.name' => 'ASC']);
+		}
+		$Items = $this->Invoices->Items->find('list')->order(['Items.name' => 'ASC']);
 		//pr($Invoices->toArray()); exit;
-		$this->set(compact('Invoices'));
+		$this->set(compact('Invoices','SalesMans','Customer','ItemCategories','ItemGroups','ItemSubGroups','Items'));
 		
 	}
+	
+	public function profitExport(){
+		$this->viewBuilder()->layout('');
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$st_year_id = $session->read('st_year_id');
+		$salesman = $this->request->query('salesman');
+		$customer = $this->request->query('customer');
+		$item_name = $this->request->query('item_name');
+		$item_category = $this->request->query('item_category');
+		$item_group_id = $this->request->query('item_group_id');
+		$item_sub_group_id = $this->request->query('item_sub_group_id');
+		$this->set(compact('salesman','customer','item_name','item_category','item_group_id','item_sub_group_id','url'));
+		$where=[];$whereRow=[];
+		if(!empty($salesman)){
+			$where['Invoices.employee_id']=$salesman;
+		}
+		
+		if(!empty($customer)){
+			$where['Customers.customer_name LIKE']='%'.$customer.'%';
+		}
+		
+		if(!empty($item_name)){
+			$whereRow['Items.id']=$item_name;
+		}
+		
+		if(!empty($item_category)){
+			$whereRow['Items.item_category_id']=$item_category;
+		}
+		
+		if(!empty($item_group_id)){
+			$whereRow['Items.item_group_id ']=$item_group;
+		}
+		
+		if(!empty($item_sub_group_id)){
+			$whereRow['Items.item_sub_group_id ']=$item_sub_group;
+		}
+		
+		 $Invoices = $this->Invoices->find()->contain(['Customers','SalesOrders','InvoiceRows'=>['Items'=>function ($q) use($whereRow)
+		{
+			return $q->where($whereRow);
+			
+			
+		}]])->where(['Invoices.profit_status'=>'No'])->where($where)->order(['Invoices.id'=>'ASC']);
+		foreach($Invoices as $Invoice){ 
+			foreach($Invoice->invoice_rows as $invoice_row){ 
+				$srDatas=[];
+				if($invoice_row->serial_number){
+					$ItemSerialNumber=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['invoice_row_id'=>$invoice_row->id]);
+					$Totrate=0;
+					foreach($ItemSerialNumber as $sr){
+						$unit_rate = $this->weightedAvgCostSerialNo(@$sr->parent_id);
+						$Totrate+=$unit_rate;
+					}
+					$GrossProfitReportData = $this->Invoices->GrossProfitReports->newEntity();
+					$GrossProfitReportData->invoice_id =$Invoice->id;
+					$GrossProfitReportData->invoice_row_id =$invoice_row->id;
+					$GrossProfitReportData->financial_year_id=$Invoice->financial_year_id;
+					$GrossProfitReportData->taxable_value=$invoice_row->taxable_value;
+					$GrossProfitReportData->inventory_ledger_cost=$Totrate;
+					$GrossProfitReportData->sales_price=$invoice_row->rate; //pr($GrossProfitReportData); exit;
+					$this->Invoices->GrossProfitReports->save($GrossProfitReportData);
+					
+				}else{
+					$unit_rate = $this->weightedAvgCostIvs(@$invoice_row->item_id,$Invoice->date_created);
+					$GrossProfitReportData = $this->Invoices->GrossProfitReports->newEntity();
+					$GrossProfitReportData->invoice_id =$Invoice->id;
+					$GrossProfitReportData->invoice_row_id =$invoice_row->id;
+					$GrossProfitReportData->financial_year_id=$Invoice->financial_year_id;
+					$GrossProfitReportData->taxable_value=$invoice_row->taxable_value;
+					$GrossProfitReportData->inventory_ledger_cost=$unit_rate;
+					$GrossProfitReportData->sales_price=$invoice_row->rate; //pr($GrossProfitReportData); exit;
+					$this->Invoices->GrossProfitReports->save($GrossProfitReportData);
+					
+				}
+			}
+			$query = $this->Invoices->query();
+			$query->update()
+				->set(['profit_status' =>"Yes"])
+				->where(['id' => $Invoice->id])
+				->execute();
+		} 
+		/* $query = $this->Invoices->query();
+			$query->update()
+				->set(['profit_status' =>"No"])
+				->where(['profit_status' =>"Yes"])
+				->execute(); */
+			//$GrossProfitReports=$this->Invoices->GrossProfitReports->find()->where(['GrossProfitReports.financial_year_id'=>$st_year_id])->contain(['Invoices'=>['InvoiceRows'=>['Items']]]);
+		$Invoices=$this->Invoices->find()->contain(['Customers','SalesOrders','GrossProfitReports'=>['InvoiceRows'=>['Items'=>function ($q) use($whereRow)
+		{
+			return $q->where($whereRow);
+			
+			
+		}]]])->where(['Invoices.financial_year_id'=>$st_year_id])->where($where);
+		
+		
+		$this->set(compact('Invoices','SalesMans','Customer','ItemCategories','ItemGroups','ItemSubGroups','Items'));
+	}
+	
+	
+	
 	
 	public function weightedAvgCostSerialNo($itemId=null){
 			$ItemSerialNumber=$this->Invoices->ItemLedgers->SerialNumbers->get($itemId);
