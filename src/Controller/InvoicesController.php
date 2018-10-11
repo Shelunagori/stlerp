@@ -6195,11 +6195,136 @@ class InvoicesController extends AppController
 			$where['Invoices.date_created <=']=$To;
 		}
 
-		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items'=>['Units'],'IvRows'=>['IvRowItems'=>['Items'=>['Units'],'ItemLedgers']]]])->where($where)->where(['Invoices.company_id'=>$st_company_id])->toArray();
+		$Invoices =$this->Invoices->find()->contain(['InvoiceRows'=>['Items']])->where(['Invoices.company_id'=>$st_company_id])->toArray();
 		//pr($Invoices);exit;
 		$this->set(compact('Invoices','url'));
 	}
 	
+	public function invoiceGrossProfit(){
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$this->viewBuilder()->layout('index_layout');
+		$st_year_id = $session->read('st_year_id');
+		 $Invoices =$this->Invoices->find()->contain(['InvoiceRows'])->where(['Invoices.profit_status'=>'No'])->order(['Invoices.id'=>'ASC']);
+		foreach($Invoices as $Invoice){ 
+			foreach($Invoice->invoice_rows as $invoice_row){ 
+				$srDatas=[];
+				if($invoice_row->serial_number){
+					$ItemSerialNumber=$this->Invoices->ItemLedgers->SerialNumbers->find()->where(['invoice_row_id'=>$invoice_row->id]);
+					$Totrate=0;
+					foreach($ItemSerialNumber as $sr){ //pr($sr->parent_id); exit;
+						$unit_rate = $this->weightedAvgCostSerialNo(@$sr->parent_id);
+						$Totrate+=$unit_rate;
+					}
+					$GrossProfitReportData = $this->Invoices->GrossProfitReports->newEntity();
+					$GrossProfitReportData->invoice_id =$Invoice->id;
+					$GrossProfitReportData->invoice_row_id =$invoice_row->id;
+					$GrossProfitReportData->financial_year_id=$Invoice->financial_year_id;
+					$GrossProfitReportData->taxable_value=$invoice_row->taxable_value;
+					$GrossProfitReportData->inventory_ledger_cost=$Totrate;
+					$GrossProfitReportData->sales_price=$invoice_row->rate; //pr($GrossProfitReportData); exit;
+					$this->Invoices->GrossProfitReports->save($GrossProfitReportData);
+					
+				}else{
+					$unit_rate = $this->weightedAvgCostIvs(@$invoice_row->item_id,$Invoice->date_created);
+					$GrossProfitReportData = $this->Invoices->GrossProfitReports->newEntity();
+					$GrossProfitReportData->invoice_id =$Invoice->id;
+					$GrossProfitReportData->invoice_row_id =$invoice_row->id;
+					$GrossProfitReportData->financial_year_id=$Invoice->financial_year_id;
+					$GrossProfitReportData->taxable_value=$invoice_row->taxable_value;
+					$GrossProfitReportData->inventory_ledger_cost=$unit_rate;
+					$GrossProfitReportData->sales_price=$invoice_row->rate; //pr($GrossProfitReportData); exit;
+					$this->Invoices->GrossProfitReports->save($GrossProfitReportData);
+					
+				}
+			}
+			$query = $this->Invoices->query();
+			$query->update()
+				->set(['profit_status' =>"Yes"])
+				->where(['id' => $Invoice->id])
+				->execute();
+		} 
+		/* $query = $this->Invoices->query();
+			$query->update()
+				->set(['profit_status' =>"No"])
+				->where(['profit_status' =>"Yes"])
+				->execute(); */
+			//$GrossProfitReports=$this->Invoices->GrossProfitReports->find()->where(['GrossProfitReports.financial_year_id'=>$st_year_id])->contain(['Invoices'=>['InvoiceRows'=>['Items']]]);
+		$Invoices=$this->Invoices->find()->contain(['GrossProfitReports'=>['InvoiceRows'=>['Items']]])->where(['Invoices.financial_year_id'=>$st_year_id]);
+			
+		//pr($Invoices->toArray()); exit;
+		$this->set(compact('Invoices'));
+		
+	}
+	
+	public function weightedAvgCostSerialNo($itemId=null){
+			$ItemSerialNumber=$this->Invoices->ItemLedgers->SerialNumbers->get($itemId);
+			$unitRate=0;
+			if($ItemSerialNumber->grn_id){
+				$data=$this->Invoices->ItemLedgers->find()->where(['source_model'=>'Grns','source_id'=>$ItemSerialNumber->grn_id])->first();
+				$unitRate=$data->rate;
+			}
+			return $unitRate; 
+	}
+	public function weightedAvgCostIvs($item_id=null,$transaction_date){ 
+			$this->viewBuilder()->layout('');
+			$session = $this->request->session();
+			$st_company_id = $session->read('st_company_id');
+			$unit_rate=0;
+			$stock=[];  $sumValue=0; $where=[];   $stockNew=[]; 
+					if(!empty($transaction_date)){
+						$where['ItemLedgers.processed_on <']=$transaction_date;
+						$where['ItemLedgers.item_id']=$item_id;
+						$where['ItemLedgers.company_id']=$st_company_id;
+					}
+					$StockLedgers=$this->Invoices->ItemLedgers->find()->where($where)->order(['ItemLedgers.processed_on'=>'ASC']);
+					foreach($StockLedgers as $StockLedger){ 
+						if($StockLedger->in_out=='In'){ 
+							if(($StockLedger->source_model=='Grns' and $StockLedger->rate_updated=='Yes') or ($StockLedger->source_model!='Grns')){
+							$stockNew[]=['qty'=>$StockLedger->quantity, 'rate'=>$StockLedger->rate];
+							}
+						}
+					}
+					foreach($StockLedgers as $StockLedger){
+						if($StockLedger->in_out=='Out'){	
+							if(sizeof(@$stockNew)==0){
+							break;
+							}
+							$outQty=$StockLedger->quantity;
+							a:
+							if(sizeof(@$stockNew)==0){
+								break;
+							}
+							$R=@$stockNew[0]['qty']-$outQty;
+							if($R>0){
+								$stockNew[0]['qty']=$R;
+							}
+							else if($R<0){
+								unset($stockNew[0]);
+								@$stockNew=array_values(@$stockNew);
+								$outQty=abs($R);
+								goto a;
+							}
+							else{
+								unset($stockNew[0]);
+								$stockNew=array_values($stockNew);
+							}
+						}
+					}
+					$closingValue=0;
+					$total_stock=0;
+					$total_amt=0;
+					$unit_rate=0;
+					foreach($stockNew as $qw){
+							$total_stock+=$qw['qty'];
+							$total_amt+=$qw['rate']*$qw['qty'];
+						
+					} 
+					if($total_amt > 0 && $total_stock > 0){
+						 $unit_rate = $total_amt/$total_stock; 
+					}
+			return $unit_rate; 
+	}
 	
 	public function invoiceReceivableReport(){
 		$session = $this->request->session();
@@ -6246,16 +6371,18 @@ class InvoicesController extends AppController
 		$Receiptdatas=[];$recieptArray=[];
 		foreach($Invoices as $invoice){ 
 			foreach($invoice->reference_details as $reference_detail){ 
-				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0])->order(['ReferenceDetails.transaction_date'=>'DESC']);
-				foreach($References as $refData){
-					
+				$References =$this->Invoices->ReferenceDetails->find()->contain(['Receipts'=> function($q){
+				return $q->order(['Receipts.id'=>'DESC']);;
+			}])->where(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'Against Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0])->orWhere(['ledger_account_id'=>$reference_detail->ledger_account_id,'reference_type'=>'New Reference','reference_no'=>$reference_detail->reference_no,'receipt_id >'=>0])->order(['ReferenceDetails.transaction_date'=>'DESC']);
+				
+				foreach($References as $refData){ //pr($References->toArray()); exit;
 					$recieptArray[$refData->receipt_id]= $refData->receipt->transaction_date;
 				}
 				
 				$Receiptdatas[$invoice->id]=$References->toArray();
 			}
 		}
-		
+		//pr($Receiptdatas); exit;
 		$SalesMans = $this->Invoices->Employees->find('list')->matching(
 					'Departments', function ($q) use($st_company_id) {
 						return $q->where(['Departments.id' =>1]);

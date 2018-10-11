@@ -102,12 +102,27 @@
 						?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo $invoice->customer->payment_terms ?>Days</td>
-						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>">-</td>
-						<td  style="text-align:right;" rowspan="<?php echo $refSize; ?>"><?php echo $this->Number->format($invoice->total,['places'=>2]); ?></td>
 						<?php 
-							$jk=0;
+							$RTD=date('Y-m-d',strtotime(($Receiptdatas[$invoice->id][0]->transaction_date)));
+							$CD=date('Y-m-d',strtotime(($invoice->date_created)));
+							//pr($CD);
+							//pr($RTD); exit;
+							$datediff = strtotime($RTD) - strtotime($invoice->date_created);
+							$Diff=floor($datediff / (60 * 60 * 24)); 
+						?>
+						<?php if($Diff >=0){ ?>
+						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>"><?php echo $Diff; ?></td>
+						<?php }else{ ?>
+						<td  style="text-align:center;" rowspan="<?php echo $refSize; ?>">Advance</td>
+						<?php } ?>
+						
+						<td  style="text-align:right;" rowspan="<?php echo $refSize; ?>"><?php echo $this->Number->format($invoice->grand_total,['places'=>2]); ?></td>
+						<?php 
+							$jk=0; 
+								
+								
 								foreach($Receiptdatas[$invoice->id] as $data){
-									$dataArray[$invoice->id] = $recieptArray[$data->id];
+									@$dataArray[$invoice->id] = @$recieptArray[$data->id];
 									if($jk > 0)
 									{
 										?>
@@ -153,19 +168,14 @@
 										
 										?>
 									</td>
+									
 									<td  style="text-align:center;"><?php echo date("d-m-Y",strtotime($invoice->date_created)); ?></td>
 									<td  style="text-align:center;"><?php echo $invoice->customer->payment_terms ?> Days</td> 
 									<td  style="text-align:center;">
 									<?php
-										$due_date=date('Y-m-d', strtotime(@$invoice->date_created)); 
-										$t_date = strtotime(date("d-m-Y"));
-										$due_dates = strtotime(date("d-m-Y",strtotime($due_date)));
-										if($due_dates < $t_date){
-											$due_day=date("d-m-Y")-date("d-m-Y",strtotime($due_date)); ?>
-											<span style="color:red;"> <?php echo $due_day.' '.'Days';?></span>
-										<?php }else{
+										
 											echo "-";
-										}
+										
 										
 									?>
 									</td> 

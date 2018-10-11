@@ -46,7 +46,21 @@ class InvoicesTable extends Table
             'foreignKey' => 'invoice_id',
 			'saveStrategy' => 'replace'
         ]);
-        $this->belongsTo('Customers', [
+		/* $this->belongsTo('GrossProfitReportda', [
+			'className' => 'GrossProfitReports',
+			'foreignKey' => 'invoice_id',
+			'propertyName' => 'GrossProfitReports',
+		]); */
+		$this->hasMany('GrossProfitReports', [
+            'foreignKey' => 'invoice_id',
+			'saveStrategy' => 'replace'
+        ]);
+		
+      /*   $this->belongsTo('GrossProfitReports', [
+            'foreignKey' => 'invoice_id',
+            'joinType' => 'LEFT'
+        ]); */
+		$this->belongsTo('Customers', [
             'foreignKey' => 'customer_id',
             'joinType' => 'INNER'
         ]);

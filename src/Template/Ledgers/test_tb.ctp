@@ -1,6 +1,6 @@
 <?php 
 
-	$date= date("d-m-Y"); 
+ 	$date= date("d-m-Y"); 
 	$time=date('h:i:a',time());
 
 	$filename="Trial_Balance".$date.'_'.$time;
@@ -20,50 +20,73 @@
 						
 						<tr>
 							<th scope="col"><b>Group</b></th>
-							<th scope="col" ></th>
+							<th scope="col" >First Sub Group</th>
+							<th scope="col" >Second Sub Group</th>
+							<th scope="col" >Ledgers</th>
+							<th scope="col" >Amount</th>
 						</tr>
 					</thead>
 					<tbody>
-							<?php $i=1; $totalDr=0; $totalCr=0; foreach($ClosingBalanceForPrint as $key=>$data){  
-							 $tdsize=(sizeof($data));
-							//pr($key); exit;
+							<?php
+							$groupRowspan=[]; $firstgroupRowspan=[]; $secondgroupRowspan=[];
+							foreach($AccountLedgers as $AccountLedger){
+								if(@$ClosingBalanceForPrint[$AccountLedger->id]!=0){
+									@$groupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->account_group->id]=@$groupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->account_group->id] + 1;
+								
+									@$firstgroupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->id]=@$firstgroupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->id] + 1;
+									
+									@$secondgroupRowspan[$AccountLedger->account_second_subgroup->id]=@$secondgroupRowspan[$AccountLedger->account_second_subgroup->id] + 1;
+								}
+							}
+							//pr($firstgroupRowspan); exit;
+							$groups=[]; $firstgroups=[]; $secondgroups=[];
+							foreach($AccountLedgers as $AccountLedger){
 							?>
-							<tr>		
+							<?php if(@$ClosingBalanceForPrint[$AccountLedger->id]!=0){ ?>
+							<tr>
+								<?php if(!in_array($AccountLedger->account_second_subgroup->account_first_subgroup->account_group->id, $groups)){ ?>
+								<td valign="top" rowspan="<?php echo $groupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->account_group->id]; ?>">
+									<?php echo $AccountLedger->account_second_subgroup->account_first_subgroup->account_group->name; ?>
+								</td>
+								<?php 
+								$groups[]=$AccountLedger->account_second_subgroup->account_first_subgroup->account_group->id;
+								} ?>
+								
+								<?php if(!in_array($AccountLedger->account_second_subgroup->account_first_subgroup->id, $firstgroups)){ ?>
+								<td valign="top" rowspan="<?php echo $firstgroupRowspan[$AccountLedger->account_second_subgroup->account_first_subgroup->id]; ?>">
+									<?php echo $AccountLedger->account_second_subgroup->account_first_subgroup->name; ?>
+								</td>
+								<?php 
+								$firstgroups[]=$AccountLedger->account_second_subgroup->account_first_subgroup->id;
+								} ?>
+								
+								<?php if(!in_array($AccountLedger->account_second_subgroup->id, $secondgroups)){ ?>
+								<td valign="top" rowspan="<?php echo $secondgroupRowspan[$AccountLedger->account_second_subgroup->id]; ?>">
+									<?php echo $AccountLedger->account_second_subgroup->name; ?>
+								</td>
+								<?php 
+								$secondgroups[]=$AccountLedger->account_second_subgroup->id;
+								} ?>
+								
+								
+								
+								
 								<td valign="top">
-									<?php echo $group_name[$key]; ?>
+									<?php echo $AccountLedger->name; ?>
 								</td>
-								<td>
-								
-										<table border="1">
-											<thead>
-												<tr>
-													<th scope="col"><b>Ledgers</th>
-													<th scope="col" style="text-align:center";><b>Debit</th>
-													<th scope="col" style="text-align:center";><b>Credit</th>
-												</tr>
-											</thead>
-											<tbody>
-											<?php foreach($data as $dt){ ?>
-												<tr>
-													<td>
-														<?php echo @$dt['name']; ?>
-													</td>
-													<?php if($dt['balance'] > 0){ ?>
-													<td><?php echo $dt['balance'];
-															?></td>
-													<td><?php echo "-" ?></td>
-													<?php }else{ ?>
-													<td><?php echo "-"; ?></td>
-													<td><?php echo abs($dt['balance']);  ?></td>
-													<?php } ?>
-													
-												</tr>
-												<?php } ?>
-											</tbody>
-										</table>
-								
+								<?php if($ClosingBalanceForPrint[$AccountLedger->id] > 0){ ?>
+								<td valign="top">
+									<?= h($this->Number->format(@$ClosingBalanceForPrint[$AccountLedger->id],[ 'places' => 2]))?> Dr.
 								</td>
+								<?php }else{ ?>
+								<td valign="top">
+									<?= h($this->Number->format(abs($ClosingBalanceForPrint[$AccountLedger->id]),[ 'places' => 2]))?> Cr.
+									
+								</td>
+								<?php } ?>
+								
 							</tr>
+							<?php } ?>
 							<?php } ?>
 							
 					</tbody>

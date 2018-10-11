@@ -34,6 +34,40 @@ class ReferenceDetailsController extends AppController
      * @return \Cake\Network\Response|null
      * @throws \Cake\Datasource\Exception\RecordNotFoundException When record not found.
      */
+    public function refrenceTrackingReport($id = null){ exit;
+		$session = $this->request->session();
+		$st_company_id = $session->read('st_company_id');
+		$this->viewBuilder()->layout('index_layout');
+		$st_year_id = $session->read('st_year_id');
+		//$referenceDetails = $this->ReferenceDetails->find()->where(['reference_type'=>'New Reference']);
+		$ReferenceDetails=$this->ReferenceDetails->find()->contain(['Payments','Receipts','Invoices'])->group(['ReferenceDetails.payment_id','ReferenceDetails.receipt_id','ReferenceDetails.invoice_id'])->autoFields(true); 
+		//pr($ReferenceDetails->toArray()); exit;
+		$InRef=[];
+		$InRefrom=[];
+		$OutRef=[];
+		$OutRefrom=[];
+		foreach($ReferenceDetails as $data){
+			if($data->reference_type == 'New Reference'){
+				if($data->invoice_id > 0){ 
+					if($data->invoice->company_id == $st_company_id && $data->invoice->financial_year_id==$st_year_id){
+							$InRef[$data->ledger_account_id][$data->reference_no]=$data->debit;
+							//$InRefrom[$data->reference_no]=$data->invoice;
+					}
+					
+				}
+			}else if($data->reference_type == 'Against Reference'){
+				if($data->invoice_id > 0){ 
+					if($data->invoice->company_id == $st_company_id && $data->invoice->financial_year_id==$st_year_id){
+							$OutRef[$data->ledger_account_id][$data->reference_no]=$data->credit;
+							//$InRefrom[$data->reference_no]=$data->invoice;
+					}
+					
+				}
+			}
+		}
+		
+		 $this->set(compact('OutRef', 'InRef'));
+	}
     public function view($id = null)
     {
         $referenceDetail = $this->ReferenceDetails->get($id, [

@@ -92,6 +92,7 @@ class ReferenceDetailsTable extends Table
         ]);
 		$this->belongsTo('PettyCashVouchers');
 		$this->belongsTo('Receipts');
+		$this->belongsTo('Payments');
     }
 
     /**
